@@ -4,11 +4,10 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.lhjz</groupId>
-	<artifactId>lhjz.portal</artifactId>
+	<artifactId>tms</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
-	<name>lhjz.spring.boot</name>
-	<description>立衡脊柱门户网站</description>
+	<name>tms.spring.boot</name>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -175,7 +174,7 @@
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<url>http://www.lihengjizhu.com:8080/manager/text</url>
+					<url>http://xiweicheng.com:8080/manager/text</url>
 					<server>tomcatServer</server>
 					<path>/</path>
 					<update>true</update>
@@ -185,17 +184,17 @@
 	</build>
 
 	<packaging>war</packaging>
-	<url>http://lihengjizhu.com</url>
+	<url>http://xiweicheng.com</url>
 	<organization>
-		<url>http://lihengjizhu.com/</url>
-		<name>立衡脊柱</name>
+		<url>http://xiweicheng.com</url>
+		<name>xiweicheng</name>
 	</organization>
 	<issueManagement>
-		<url>https://github.com/czs/lhjz.portal/issues</url>
-		<system>github-lhjz-issues</system>
+		<url>https://github.com/xiwc/tms/issues</url>
+		<system>github-tms-issues</system>
 	</issueManagement>
 	<ciManagement>
-		<system>github-lhjz-repo</system>
-		<url>https://github.com/czs/lhjz.portal</url>
+		<system>github-tms-repo</system>
+		<url>https://github.com/xiwc/tms</url>
 	</ciManagement>
 </project>
