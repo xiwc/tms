@@ -1,0 +1,106 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>立衡脊柱- 在线诊断</title>
+    <link rel="icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/lib/bootstrap/css/bootstrap.min.css}" href="../../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/lib/scrollup/css/themes/image.css}" href="../../static/lib/scrollup/css/themes/image.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" rel="stylesheet" />
+    <!-- Add custom CSS here -->
+    <link th:href="@{/landing/css/custom.css}" href="../../static/landing/css/custom.css" rel="stylesheet" />
+    <!-- JavaScript -->
+    <script th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/bootstrap/js/bootstrap.min.js}" src="../../static/lib/bootstrap/js/bootstrap.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/scrollup/js/jquery.scrollUp.min.js}" src="../../static/lib/scrollup/js/jquery.scrollUp.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script th:src="@{/landing/js/custom.js}" src="../../static/landing/js/custom.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <div th:replace="landing/index :: header"></div>
+    <div class="container">
+        <div class="row clearfix" id="about">
+            <div class="col-md-12 column">
+                <div class="panel panel-default lhjz-margin-top20">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                                在线诊断说明
+                            </h4>
+                    </div>
+                    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel">
+                        <div class="panel-body">在线诊断是针对您在网上描述的基本症状信息,我们的专家人员会及时反馈到您的初步诊断信息,以便您清楚的了解自己的病况,然后选择正确的治疗方法.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="alert alert-warning col-sm-offset-2" role="alert">
+                            <p>
+                                需要留下您的<strong>邮箱</strong>或者<strong>手机号</strong>,以方便反馈到您我们的初步诊断信息.
+                            </p>
+                        </div>
+                        <form class="form-horizontal" role="form">
+                            <div class="form-group">
+                                <label for="txtAreaSymptom" class="col-sm-2 control-label">症状描述</label>
+                                <div class="col-sm-10">
+                                    <textarea id="txtAreaSymptom" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="txtMail" class="col-sm-2 control-label">邮箱</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="txtMail" placeholder="" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="txtPhone" class="col-sm-2 control-label">手机</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="txtPhone" placeholder="" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <button id="btnSubmit" type="button" class="btn btn-default">提交</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="landing/index :: footer"></div>
+    <div th:include="landing/template :: page-common"></div>
+    <script type="text/javascript">
+    jQuery(function($) {
+        // diagnose handler
+        $('#btnSubmit').click(function(event) {
+            $.post('diagnose/save', {
+                mail: $('#txtMail').val(),
+                phone: $('#txtPhone').val(),
+                description: $('#txtAreaSymptom').val()
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    toastr['success'](data.data, "提交成功！");
+                } else {
+                    toastr['error'](data.data, "提交失败！");
+                }
+            });
+        });
+
+    });
+    </script>
+</body>
+
+</html>

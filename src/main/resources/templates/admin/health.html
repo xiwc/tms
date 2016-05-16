@@ -1,0 +1,252 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>立衡脊柱-脊柱健康</title>
+    <!-- css -->
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <!-- script -->
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/date.format.js}" src="../../static/lib/date.format.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+    <!-- template html segment used by jquery.tmpl -->
+    <script th:replace="admin/template :: imageItemTpl"></script>
+    <script th:replace="admin/template :: hotNewsItemTpl"></script>
+    <script th:replace="admin/template :: articleItemTpl"></script>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <div th:replace="admin/template :: ad-page-header ('脊柱健康', 'health')"></div>
+                <div th:replace="admin/template :: ad-page-basic-settings ('health')"></div>
+                <div class="ui styled fluid accordion">
+                    <div class="title">
+                        <i class="dropdown icon"></i> 总体介绍
+                    </div>
+                    <div class="content">
+                        <div class="ui form">
+                            <div class="field">
+                                <textarea id="txtIntroduction" th:text="${#lists.isEmpty(introductions) ? '' : introductions[0].content}"></textarea>
+                            </div>
+                        </div>
+                        <div class="ui segment">
+                            <div class="ui primary button btn-intro-save" th:attr="data-id=${#lists.isEmpty(introductions) ? '' : introductions[0].id}">保存</div>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i> 更多文章
+                    </div>
+                    <div class="content">
+                        <div class="ui segment">
+                            <div class="ui primary button ad-add-image" data-for="health:more">添加</div>
+                        </div>
+                        <div class="ui link cards ad-health-list" th:remove="all-but-first">
+                            <div class="card" th:each="health : ${mores}">
+                                <div class="image">
+                                    <img th:title="${health.more}" th:alt="${health.link}" src="../../static/landing/img/img1.jpg" title="" th:src="${health.imgUrl}">
+                                </div>
+                                <div class="content">
+                                    <div class="header" th:text="${health.title}"></div>
+                                    <div class="description ad-hot-news-content" th:text="${#strings.abbreviate(health.content,65)}"></div>
+                                </div>
+                                <div class="extra content">
+                                    <span class="right floated">
+                                        <div class="ui small red compact button btn-hot-news-del" th:attrappend="data-id=${health.id}">删除</div>
+                                    </span>
+                                    <span>
+                                        <div class="ui small primary compact button btn-hot-news-edit" th:attrappend="data-id=${health.id}">编辑</div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-images"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-news-edit"></div>
+    <div th:replace="admin/template :: ad-news-select"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <script type="text/javascript">
+    jQuery(function($) {
+        // save introduction
+        $('.btn-intro-save').click(function(event) {
+            var $btn = $(this);
+
+            if (!$btn.attr('data-id')) {
+                $.post('admin/settings/save', {
+                    page: "health",
+                    module: 'introduction',
+                    content: $('#txtIntroduction').val()
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $btn.attr('data-id', data.data.id);
+                        toastr.success('设置成功!');
+                    } else {
+                        toastr.error('设置失败!');
+                    }
+                });
+            } else {
+                $.post('admin/settings/update', {
+                    id: $btn.attr('data-id'),
+                    content: $('#txtIntroduction').val()
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        toastr.success('更新成功!');
+                    } else {
+                        toastr.error('更新失败!');
+                    }
+                });
+            }
+        });
+
+        //article dropdown list selected item changed handle
+        $('.ui.dropdown.ad-article-list').dropdown({
+            onChange: function(value, text, $choice) {
+                var $dropdown = $(this);
+                var $btn = $('.btn-article-detail');
+                if (!!value) {
+                    $('.ad-news-edit input[name="title"]').val(text);
+                }
+                $btn.siblings('.popup').find('.header').text(text);
+                $btn.siblings('.popup').find('p').html($dropdown.dropdown('get item', value).attr('data-content'));
+            }
+        });
+        // article dropdown list popup
+        $('.btn-article-detail')
+            .popup({
+                inline: true,
+                hoverable: true,
+                position: 'bottom left',
+                delay: {
+                    show: 300,
+                    hide: 800
+                }
+            });
+        // image select callback handle
+        window.imgSelectedCallback = function(imgUrlArr, page, module) {
+            // save to server db.
+            $.each(imgUrlArr, function(index, imgUrl) {
+                $.post('admin/settings/save', {
+                    page: page,
+                    module: module,
+                    imgUrl: imgUrl
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        var m = [{
+                            id: data.data.id,
+                            imgUrl: data.data.imgUrl
+                        }];
+                        if (module == "more") {
+                            $('#hotNewsItemTpl').tmpl(m).appendTo($('.ad-health-list'));
+                        }
+
+                        toastr.success('设置成功!');
+                    } else {
+                        toastr.error('设置失败!');
+                    }
+                });
+            });
+        };
+
+        // hot news edit handle
+        $('.ad-health-list').on('click', '.btn-hot-news-edit', function(event) {
+            var $btn = $(this);
+
+            $.post('admin/article/list', {
+                    timestamp: new Date().getTime()
+                },
+                function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $.tmpl('<div class="item" data-value="${id}" data-content="${content}">${name}</div>', data.data).appendTo($('.ad-article-list .menu').empty());
+                        $('<div class="item" data-value="" data-content=""></div>').prependTo('.ad-article-list .menu');
+
+                        $.post('admin/settings/find', {
+                            id: $btn.attr('data-id')
+                        }, function(data, textStatus, xhr) {
+                            if (data.success) {
+                                if (!!data.data.link) {
+                                    $('.ui.dropdown.ad-article-list').dropdown('set selected', data.data.link);
+                                } else {
+                                    $('.ui.dropdown.ad-article-list').dropdown('restore defaults');
+                                }
+                                $('.ad-news-edit input[name="title"]').val(data.data.title);
+                                $('.ad-news-edit textarea[name="content"]').val(data.data.content);
+                                //show modal
+                                $('.ad-news-edit').modal({
+                                    onApprove: function() {
+                                        $.post('admin/settings/update', {
+                                            id: $btn.attr('data-id'),
+                                            title: $('.ad-news-edit input[name="title"]').val(),
+                                            content: $('.ad-news-edit textarea[name="content"]').val(),
+                                            link: $('.ui.dropdown.ad-article-list').dropdown('get value'),
+                                            more: $('.ui.dropdown.ad-article-list').dropdown('get text')
+                                        }, function(data, textStatus, xhr) {
+                                            if (data.success) {
+                                                $btn.parents(".card").find('.content .header').text(data.data.title);
+                                                $btn.parents(".card").find('.content .description').text(Utils.abbreviate(data.data.content, 65));
+                                                $btn.parents(".card").find('.image img').attr({
+                                                    "title": data.data.more,
+                                                    'alt': data.data.link
+                                                });
+                                                toastr.success('更新成功!');
+                                            } else {
+                                                toastr.error('更新失败!');
+                                            }
+                                        });
+                                    }
+                                }).modal('show');
+                            } else {
+                                toastr.error('查询设置失败!');
+                                return false;
+                            }
+                        });
+                    } else {
+                        toastr.error('查询文章失败!');
+                        return false;
+                    }
+                });
+        });
+        // hot news delete handle
+        $('.ad-health-list').on('click', '.btn-hot-news-del', function(event) {
+            var $btn = $(this);
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/settings/delete', {
+                        id: $btn.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.parents('.card').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+    });
+    </script>
+</body>
+
+</html>

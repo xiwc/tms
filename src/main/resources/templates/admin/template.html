@@ -1,0 +1,410 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>立衡脊柱-模板页面</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+</head>
+
+<body>
+    <script th:fragment="imageItemTpl" id="imageItemTpl" type="text/x-jquery-tmpl">
+        <div class="card">
+            <a class="image">
+                <img src="${$item.pathHuge}${uuidName}" data-src="${path}${uuidName}">
+            </a>
+            <div class="content">
+                <div class="ui checkbox">
+                    <input type="checkbox" name="image">
+                    <label>${name}</label>
+                </div>
+            </div>
+        </div>
+    </script>
+    <script th:fragment="bigImgItemTpl" id="bigImgItemTpl" type="text/x-jquery-tmpl">
+        <div class="item">
+            <div class="ui segment">
+                <img class="ui image" src="${imgUrl}">
+                <div class="carousel-caption">
+                    <h1 class="new-title"></h1>
+                    <p class="new-content"></p>
+                    <p class="new-link"></p>
+                </div>
+                <div class="ui divider"></div>
+                <div class="ui primary compact button btn-big-img-edit" data-id="${id}">编辑</div>
+                <div class="right floated compact ui red button btn-big-img-del" data-id="${id}">删除</div>
+            </div>
+        </div>
+    </script>
+    <script th:fragment="hotNewsItemTpl" id="hotNewsItemTpl" type="text/x-jquery-tmpl">
+        <div class="card">
+            <div class="image">
+                <img src="${imgUrl}">
+            </div>
+            <div class="content">
+                <div class="header"></div>
+                <div class="description ad-hot-news-content"></div>
+            </div>
+            <div class="extra content">
+                <span class="right floated">
+                    <div class="ui small red compact button btn-hot-news-del" data-id="${id}">删除</div>
+                </span>
+                <span>
+                    <div class="ui small primary compact button btn-hot-news-edit" data-id="${id}">编辑</div>
+                </span>
+            </div>
+        </div>
+    </script>
+    <script th:fragment="moreNewsItemTpl" id="moreNewsItemTpl" type="text/x-jquery-tmpl">
+        <div class="item">
+            <div class="right floated compact ui red button btn-more-news-del" data-id="${id}">删除</div>
+            <i class="linkify icon"></i>
+            <div class="content">
+                <div class="header">${title}</div>
+            </div>
+        </div>
+    </script>
+    <script th:fragment="articleItemTpl" id="articleItemTpl" type="text/x-jquery-tmpl">
+        <tr>
+            <td class="collapsing">
+                <div class="ui checkbox">
+                    <input type="checkbox" value="${id}">
+                    <label></label>
+                </div>
+            </td>
+            <td class="article-name">${name}</td>
+            <td>${createDate}</td>
+            <td>${username}</td>
+        </tr>
+    </script>
+    <!-- image select modal -->
+    <div th:fragment="ad-images" class="ui modal ad-images">
+        <!-- <i class="close icon"></i> -->
+        <div class="header">
+            图片选择
+        </div>
+        <div class="content">
+            <div class="ui cards grouped" th:remove="body">
+                <div class="card">
+                    <a class="image">
+                        <img src="../../static/landing/img/img-b1.jpg">
+                    </a>
+                    <div class="content">
+                        <div class="ui checkbox">
+                            <input type="checkbox" name="image" checked="checked">
+                            <label>图片1</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <a class="image">
+                        <img src="../../static/landing/img/img-b2.jpg">
+                    </a>
+                    <div class="content">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="image" checked="checked">
+                            <label>图片1</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <a class="image">
+                        <img src="../../static/landing/img/img-b3.jpg">
+                    </a>
+                    <div class="content">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="image" checked="checked">
+                            <label>图片1</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- delete confirm modal -->
+    <div th:fragment="ad-delete-confirm" class="ui small modal ad-delete-confirm">
+        <!-- <i class="close icon"></i> -->
+        <div class="header">
+            删除确认
+        </div>
+        <div class="content">
+            <p>确定要删除吗?</p>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- handle confirm -->
+    <div th:fragment="ad-handle-confirm" class="ui small modal ad-handle-confirm">
+        <!-- <i class="close icon"></i> -->
+        <div class="header">
+            操作确认
+        </div>
+        <div class="content">
+            <p>确定要执行当前操作吗?</p>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- hot news edit modal -->
+    <div th:fragment="ad-news-edit" class="ui small modal ad-news-edit">
+        <!-- <i class="close icon"></i> -->
+        <div class="header">
+            配置编辑
+        </div>
+        <div class="content">
+            <div class="ui form segment">
+                <div class="fields">
+                    <div class="fourteen wide field">
+                        <label>链接</label>
+                        <div class="ui selection floating dropdown ad-article-list">
+                            <div class="default text">动态详细链接</div>
+                            <i class="dropdown icon"></i>
+                            <input type="hidden" name="link">
+                            <div class="menu">
+                                <div class="item" data-value="1">文章1</div>
+                                <div class="item" data-value="2">文章2</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="two wide field">
+                        <label>&nbsp;</label>
+                        <div class="ui icon fluid button btn-article-detail">
+                            <i class="angle double down icon"></i>
+                        </div>
+                        <div class="ui fluid popup">
+                            <div class="ui segment" style="max-height:200px; overflow:auto;">
+                                <h3 class="ui header"></h3>
+                                <p></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>标题</label>
+                    <input type="text" name="title" placeholder="动态标题">
+                </div>
+                <div class="field">
+                    <label>描述</label>
+                    <textarea name="content" placeholder="动态描述"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- news select modal -->
+    <div th:fragment="ad-news-select" class="ui small modal ad-news-select">
+        <div class="header">
+            文章选择
+        </div>
+        <div class="content">
+            <div class="content-news">
+                <table class="ui compact unstackable striped definition table table-news-select">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>文章名</th>
+                            <th>发布日期</th>
+                            <th>发布者</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="collapsing">
+                                <div class="ui checkbox">
+                                    <input type="checkbox" value="1">
+                                    <label></label>
+                                </div>
+                            </td>
+                            <td class="article-name">John Lilki</td>
+                            <td>September 14, 2013</td>
+                            <td>jhlilk22@yahoo.com</td>
+                        </tr>
+                        <tr>
+                            <td class="collapsing">
+                                <div class="ui checkbox">
+                                    <input type="checkbox" value="2">
+                                    <label></label>
+                                </div>
+                            </td>
+                            <td>Jamie Harington</td>
+                            <td>January 11, 2014</td>
+                            <td>jamieharingonton@yahoo.com</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- diagnose feedback modal -->
+    <div th:fragment="ad-diagnose-feedback" class="ui small modal ad-diagnose-feedback">
+        <div class="header">
+            在线诊断-症状反馈
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <form class="ui reply form">
+                    <div class="inline field">
+                        <label>反馈对象:</label>
+                        <div class="ui black label diagnose-mail">xiweicheng@yeah.net</div>
+                        <div class="ui icon compact small button btn-diagnose-detail">
+                            <i class="angle double down icon"></i>
+                        </div>
+                        <div class="ui popup">
+                            <div class="ui segment" style="max-height:200px; overflow:auto;">
+                                <h3 class="ui header">症状描述</h3>
+                                <p class="diagnose-description">症状内容</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <textarea name="content" placeholder="反馈内容"></textarea>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <div th:fragment="ad-page-dimmer" class="ui dimmer ad-page-dimmer">
+        <div class="ui large text loader">加载中...</div>
+    </div>
+    <!-- user add modal -->
+    <div th:fragment="ad-user-add" class="ui small modal ad-user-add">
+        <div class="header">
+            添加用户
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui warning message">新添加的用户默认密码为 888888 并且是禁用状态,需要单独开启后才能使用.</div>
+                <div class="ui form">
+                    <div class="field">
+                        <label>用户名:</label>
+                        <input name="username" type="text" placeholder="用户名">
+                    </div>
+                    <div class="inline field">
+                        <label>角色:</label>
+                        <div class="ui radio checkbox chk-user">
+                            <input type="radio" name="role" value="user" checked>
+                            <label>普通用户</label>
+                        </div>
+                        <div class="ui radio checkbox chk-admin" sec:authorize="hasRole('ROLE_SUPER')">
+                            <input type="radio" name="role" value="admin">
+                            <label>管理员</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- user edit modal -->
+    <div th:fragment="ad-user-edit" class="ui small modal ad-user-edit">
+        <div class="header">
+            用户信息修改
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="inline field">
+                        <label>用户名:</label>
+                        <div class="ui black label user-username">username</div>
+                    </div>
+                    <div class="field">
+                        <label>密码:</label>
+                        <input name="password" type="text" placeholder="密码">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <div th:fragment="ad-page-dimmer" class="ui dimmer ad-page-dimmer">
+        <div class="ui large text loader">加载中...</div>
+    </div>
+    <!-- common page template -->
+    <div th:fragment="ad-page-common">
+        <!-- hidden form for getting csrf -->
+        <form th:fragment="ad-csrf" class="hidden ad-csrf">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        </form>
+        <!-- user own edit modal -->
+        <div th:fragment="ad-user-own-edit" class="ui small modal ad-user-own-edit">
+            <div class="header">
+                个人信息修改
+            </div>
+            <div class="content">
+                <div class="ui segment">
+                    <div class="ui form">
+                        <div class="inline field">
+                            <label>用户名:</label>
+                            <div class="ui black label user-username">username</div>
+                        </div>
+                        <div class="field">
+                            <label>密码:</label>
+                            <input name="password" type="text" placeholder="密码">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="ui cancel negative button">取消</div>
+                <div class="ui ok positive button">确定</div>
+            </div>
+        </div>
+    </div>
+    <th:block th:fragment="ad-page-header (name, id)">
+        <div class="ui styled fluid accordion">
+            <div class="title">
+                <i class="dropdown icon"></i> <span th:text="${name} + ' - 使用指导'">XXXX - 使用指导</span>
+            </div>
+            <div class="content">
+                <p class="markdown-content" th:attr="data-url='admin/md/' + ${id} + '.md'"></p>
+            </div>
+        </div>
+        <h2 class="ui header">
+            <i class="settings icon"></i>
+            <div class="content">
+                <span th:text="${name} + '设置'">XXXX设置</span>
+                <div class="sub header" th:text="'设置' + ${name} + '各模块的内容'">设置XXXX各模块的内容</div>
+            </div>
+        </h2>
+    </th:block>
+    <div th:fragment="ad-page-basic-settings (page)" class="ui attached segment">
+        <div class="ui toggle checkbox page-enable-checkbox" th:attr="data-page=${page}" th:with="chk=${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, page)} and ${not pageEnable[__${page}__]}">
+            <input th:if="${chk}" type="checkbox">
+            <input th:unless="${chk}" type="checkbox" checked>
+            <label>门户页面显示与否</label>
+        </div>
+    </div>
+</body>
+
+</html>

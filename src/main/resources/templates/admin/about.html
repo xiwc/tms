@@ -1,0 +1,347 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>立衡脊柱-关于我们</title>
+    <!-- css -->
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <!-- script -->
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/date.format.js}" src="../../static/lib/date.format.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+    <!-- template html segment used by jquery.tmpl -->
+    <script th:replace="admin/template :: imageItemTpl"></script>
+    <script th:replace="admin/template :: bigImgItemTpl"></script>
+    <script th:replace="admin/template :: hotNewsItemTpl"></script>
+    <script th:replace="admin/template :: articleItemTpl"></script>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <div th:replace="admin/template :: ad-page-header ('关于我们', 'about')"></div>
+                <div th:replace="admin/template :: ad-page-basic-settings ('about')"></div>
+                <div class="ui styled fluid accordion">
+                    <div class="title">
+                        <i class="dropdown icon"></i> 轮动图
+                    </div>
+                    <div class="content">
+                        <div class="ui segment">
+                            <div class="ui primary button ad-add-image" data-for="about:bigImg">添加</div>
+                        </div>
+                        <div class="ui divided list big-img-list" th:remove="all-but-first">
+                            <div class="item" th:each="bigImg : ${bigImgs}">
+                                <div class="ui segment">
+                                    <img class="ui image" th:src="${bigImg.imgUrl}">
+                                    <div class="carousel-caption">
+                                        <h1 class="new-title" th:if="${#strings.isEmpty(bigImg.title)}"></h1>
+                                        <h1 class="new-title" th:if="${not #strings.isEmpty(bigImg.title)}" th:text="${bigImg.title}">关于我们</h1>
+                                        <p class="new-content" th:if="${#strings.isEmpty(bigImg.content)}"></p>
+                                        <p class="new-content" th:if="${not #strings.isEmpty(bigImg.content)}" th:text="${#strings.abbreviate(bigImg.content,120)}">立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                                        <p class="new-link" th:if="${#strings.isEmpty(bigImg.link)}"></p>
+                                        <p class="new-link" th:if="${not #strings.isEmpty(bigImg.link)}"><a target="_blank" class="ui primary button" th:href="@{/article(id=${bigImg.link})}" href="#" role="button">了解更多</a></p>
+                                    </div>
+                                    <div class="ui divider"></div>
+                                    <div class="ui primary compact button btn-big-img-edit" th:attrappend="data-id=${bigImg.id}">编辑</div>
+                                    <div class="right floated compact ui red button btn-big-img-del" th:attrappend="data-id=${bigImg.id}">删除</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i> 各地分店
+                    </div>
+                    <div class="content">
+                        <div class="ui segment">
+                            <div class="ui primary button ad-add-image" data-for="about:branch">添加</div>
+                        </div>
+                        <div class="ui link cards ad-branch-list" th:remove="all-but-first">
+                            <div class="card" th:each="branch : ${branches}">
+                                <div class="image">
+                                    <img th:title="${branch.more}" th:alt="${branch.link}" src="../../static/landing/img/img1.jpg" title="" th:src="${branch.imgUrl}">
+                                </div>
+                                <div class="content">
+                                    <div class="header" th:text="${branch.title}"></div>
+                                    <div class="description ad-hot-news-content" th:text="${#strings.abbreviate(branch.content,65)}"></div>
+                                </div>
+                                <div class="extra content">
+                                    <span class="right floated">
+                                        <div class="ui small red compact button btn-hot-news-del" th:attrappend="data-id=${branch.id}">删除</div>
+                                    </span>
+                                    <span>
+                                        <div class="ui small primary compact button btn-hot-news-edit" th:attrappend="data-id=${branch.id}">编辑</div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i> 资深专家
+                    </div>
+                    <div class="content">
+                        <div class="ui segment">
+                            <div class="ui primary button ad-add-image" data-for="about:expert">添加</div>
+                        </div>
+                        <div class="ui link cards ad-expert-list" th:remove="all-but-first">
+                            <div class="card" th:each="expert : ${experts}">
+                                <div class="image">
+                                    <img th:title="${expert.more}" th:alt="${expert.link}" src="../../static/landing/img/img1.jpg" title="" th:src="${expert.imgUrl}">
+                                </div>
+                                <div class="content">
+                                    <div class="header" th:text="${expert.title}"></div>
+                                    <div class="description ad-hot-news-content" th:text="${#strings.abbreviate(expert.content,65)}"></div>
+                                </div>
+                                <div class="extra content">
+                                    <span class="right floated">
+                                        <div class="ui small red compact button btn-hot-news-del" th:attrappend="data-id=${expert.id}">删除</div>
+                                    </span>
+                                    <span>
+                                        <div class="ui small primary compact button btn-hot-news-edit" th:attrappend="data-id=${expert.id}">编辑</div>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-images"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-news-edit"></div>
+    <div th:replace="admin/template :: ad-news-select"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <script type="text/javascript">
+    jQuery(function($) {
+        //article dropdown list selected item changed handle
+        $('.ui.dropdown.ad-article-list').dropdown({
+            onChange: function(value, text, $choice) {
+                var $dropdown = $(this);
+                var $btn = $('.btn-article-detail');
+                if (!!value) {
+                    $('.ad-news-edit input[name="title"]').val(text);
+                }
+                $btn.siblings('.popup').find('.header').text(text);
+                $btn.siblings('.popup').find('p').html($dropdown.dropdown('get item', value).attr('data-content'));
+            }
+        });
+        // article dropdown list popup
+        $('.btn-article-detail')
+            .popup({
+                inline: true,
+                hoverable: true,
+                position: 'bottom left',
+                delay: {
+                    show: 300,
+                    hide: 800
+                }
+            });
+        // image select callback handle
+        window.imgSelectedCallback = function(imgUrlArr, page, module) {
+            // save to server db.
+            $.each(imgUrlArr, function(index, imgUrl) {
+                $.post('admin/settings/save', {
+                    page: page,
+                    module: module,
+                    imgUrl: imgUrl
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        var m = [{
+                            id: data.data.id,
+                            imgUrl: data.data.imgUrl
+                        }];
+                        if (module == "bigImg") {
+                            $("#bigImgItemTpl").tmpl(m).appendTo($('.big-img-list'));
+                        } else if (module == "branch") {
+                            $('#hotNewsItemTpl').tmpl(m).appendTo($('.ad-branch-list'));
+                        } else if (module == "expert") {
+                            $('#hotNewsItemTpl').tmpl(m).appendTo($('.ad-expert-list'));
+                        }
+
+                        toastr.success('设置成功!');
+                    } else {
+                        toastr.error('设置失败!');
+                    }
+                });
+            });
+        };
+
+        // big img edit handle
+        $('.big-img-list').on('click', '.btn-big-img-edit', function(event) {
+            var $btn = $(this);
+
+            $.post('admin/article/list', {
+                    timestamp: new Date().getTime()
+                },
+                function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $.tmpl('<div class="item" data-value="${id}" data-content="${content}">${name}</div>', data.data).appendTo($('.ad-article-list .menu').empty());
+                        $('<div class="item" data-value="" data-content=""></div>').prependTo('.ad-article-list .menu');
+
+                        $.post('admin/settings/find', {
+                            id: $btn.attr('data-id')
+                        }, function(data, textStatus, xhr) {
+
+                            if (data.success) {
+                                if (!!data.data.link) {
+                                    $('.ui.dropdown.ad-article-list').dropdown('set selected', data.data.link);
+                                } else {
+                                    $('.ui.dropdown.ad-article-list').dropdown('restore defaults');
+                                }
+
+                                $('.ad-news-edit input[name="title"]').val(data.data.title);
+                                $('.ad-news-edit textarea[name="content"]').val(data.data.content);
+                                // show modal
+                                $('.ad-news-edit').modal({
+                                    onApprove: function() {
+                                        $.post('admin/settings/update', {
+                                            id: $btn.attr('data-id'),
+                                            title: $('.ad-news-edit input[name="title"]').val(),
+                                            content: $('.ad-news-edit textarea[name="content"]').val(),
+                                            link: $('.ui.dropdown.ad-article-list').dropdown('get value'),
+                                            more: $('.ui.dropdown.ad-article-list').dropdown('get text')
+                                        }, function(data, textStatus, xhr) {
+                                            if (data.success) {
+                                                $btn.closest('.item').find('.new-title').text(data.data.title);
+                                                $btn.closest('.item').find('.new-content').text(Utils.abbreviate(data.data.content, 120));
+                                                if (!!data.data.link) {
+                                                    $btn.closest('.item').find('.new-link').empty().append($('<a class="ui primary button" target="_blank" th:href="@{/article(id=${bigImg.link})}" href="#" role="button">了解更多</a>').attr('href', 'article?id=' + data.data.link));
+                                                } else {
+                                                    $btn.closest('.item').find('.new-link').empty();
+                                                }
+                                                toastr.success('更新成功!');
+                                            } else {
+                                                toastr.error('更新失败!');
+                                            }
+                                        });
+                                    }
+                                }).modal('show');
+
+                            } else {
+                                toastr.error('查询设置失败!');
+                                return false;
+                            }
+                        });
+                    } else {
+                        toastr.error('查询文章失败!');
+                        return false;
+                    }
+                });
+        });
+
+        // big img delete handle
+        $('.big-img-list').on('click', '.btn-big-img-del', function(event) {
+            var $btn = $(this);
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/settings/delete', {
+                        id: $btn.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.parents('.item').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        // hot news edit handle
+        $('.ad-branch-list,.ad-expert-list').on('click', '.btn-hot-news-edit', function(event) {
+            var $btn = $(this);
+
+            $.post('admin/article/list', {
+                    timestamp: new Date().getTime()
+                },
+                function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $.tmpl('<div class="item" data-value="${id}" data-content="${content}">${name}</div>', data.data).appendTo($('.ad-article-list .menu').empty());
+                        $('<div class="item" data-value="" data-content=""></div>').prependTo('.ad-article-list .menu');
+
+                        $.post('admin/settings/find', {
+                            id: $btn.attr('data-id')
+                        }, function(data, textStatus, xhr) {
+                            if (data.success) {
+                                if (!!data.data.link) {
+                                    $('.ui.dropdown.ad-article-list').dropdown('set selected', data.data.link);
+                                } else {
+                                    $('.ui.dropdown.ad-article-list').dropdown('restore defaults');
+                                }
+                                $('.ad-news-edit input[name="title"]').val(data.data.title);
+                                $('.ad-news-edit textarea[name="content"]').val(data.data.content);
+                                //show modal
+                                $('.ad-news-edit').modal({
+                                    onApprove: function() {
+                                        $.post('admin/settings/update', {
+                                            id: $btn.attr('data-id'),
+                                            title: $('.ad-news-edit input[name="title"]').val(),
+                                            content: $('.ad-news-edit textarea[name="content"]').val(),
+                                            link: $('.ui.dropdown.ad-article-list').dropdown('get value'),
+                                            more: $('.ui.dropdown.ad-article-list').dropdown('get text')
+                                        }, function(data, textStatus, xhr) {
+                                            if (data.success) {
+                                                $btn.parents(".card").find('.content .header').text(data.data.title);
+                                                $btn.parents(".card").find('.content .description').text(Utils.abbreviate(data.data.content, 65));
+                                                $btn.parents(".card").find('.image img').attr({
+                                                    "title": data.data.more,
+                                                    'alt': data.data.link
+                                                });
+                                                toastr.success('更新成功!');
+                                            } else {
+                                                toastr.error('更新失败!');
+                                            }
+                                        });
+                                    }
+                                }).modal('show');
+                            } else {
+                                toastr.error('查询设置失败!');
+                                return false;
+                            }
+                        });
+                    } else {
+                        toastr.error('查询文章失败!');
+                        return false;
+                    }
+                });
+        });
+        // hot news delete handle
+        $('.ad-branch-list,.ad-expert-list').on('click', '.btn-hot-news-del', function(event) {
+            var $btn = $(this);
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/settings/delete', {
+                        id: $btn.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.parents('.card').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>立衡脊柱-在线诊断</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <div th:replace="admin/template :: ad-page-header ('在线诊断', 'diagnose')"></div>
+                <div th:replace="admin/template :: ad-page-basic-settings ('diagnose')"></div>
+                <div class="ui segment">
+                    <a th:href="@{/admin/diagnose?status=new}" class="ui primary compact button">新创建</a>
+                    <a th:href="@{/admin/diagnose?status=ignored}" class="ui yellow compact button">已忽略</a>
+                    <a th:href="@{/admin/diagnose?status=resolved}" class="ui green compact button">已处理</a>
+                    <a th:href="@{/admin/diagnose?status=failed}" class="ui red compact button">反馈失败</a>
+                    <a th:href="@{/admin/diagnose}" class="ui black compact button">全部</a>
+                </div>
+                <div style="max-height: 450px; overflow-y: auto;">
+                    <table class="ui sortable celled striped compact table segment table-diagnose">
+                        <thead>
+                            <th>症状描述</th>
+                            <th>手机</th>
+                            <th>邮箱</th>
+                            <th>创建时间</th>
+                            <th>状态</th>
+                            <th>处理</th>
+                        </thead>
+                        <tbody th:remove="all-but-first">
+                            <tr th:each="diagnose : ${diagnoses}" th:attr="data-id=${diagnose.id}">
+                                <td class="popup diagnose-description" th:attr="data-content=${diagnose.description}" th:text="${#strings.abbreviate(diagnose.description,25)}">ddd</td>
+                                <td th:text="${diagnose.phone}">2015/05/12 12:00:00</td>
+                                <td class="diagnose-mail" th:text="${diagnose.mail}">2015/05/12 12:00:00</td>
+                                <td th:text="${#calendars.format(diagnose.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
+                                <td th:if="${#strings.equalsIgnoreCase(diagnose.status, 'new')}">
+                                    <div class="ui blue small tag label">新创建</div>
+                                </td>
+                                <td th:if="${#strings.equalsIgnoreCase(diagnose.status, 'ignored')}">
+                                    <div class="ui yellow small tag label">已忽略</div>
+                                </td>
+                                <td th:if="${#strings.equalsIgnoreCase(diagnose.status, 'resolved')}">
+                                    <div th:attr="data-content=${diagnose.content}" class="ui green small tag label popup-resolved">已处理</div>
+                                </td>
+                                <td th:if="${#strings.equalsIgnoreCase(diagnose.status, 'failed')}">
+                                    <div class="ui red small tag label">反馈失败</div>
+                                </td>
+                                <td>
+                                    <div th:if="${not #strings.isEmpty(diagnose.mail)}" class="ui compact tiny primary button lhjz-btn-feedback">反馈</div>
+                                    <div th:if="${#strings.equalsIgnoreCase(diagnose.status, 'new')}" class="ui compact tiny yellow button lhjz-btn-ignore">忽略</div>
+                                    <div class="ui compact tiny red button lhjz-btn-del">删除</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-handle-confirm"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-diagnose-feedback"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <script type="text/javascript">
+    jQuery(function($) {
+        $('table').tablesort().data('tablesort');
+        $('.popup').popup({
+            hoverable: true,
+            delay: {
+                show: 300,
+                hide: 300
+            }
+        });
+        $('.btn-diagnose-detail')
+            .popup({
+                hoverable: true,
+                position: 'bottom right',
+                delay: {
+                    show: 300,
+                    hide: 300
+                }
+            });
+        $('.popup-resolved').popup();
+
+        $('.table-diagnose').on('click', '.lhjz-btn-feedback', function(event) {
+            var $btn = $(this);
+
+            $('.ad-diagnose-feedback .diagnose-mail').text($btn.closest('tr').find('.diagnose-mail').text());
+            $('.ad-diagnose-feedback .diagnose-description').text($btn.closest('tr').find('.diagnose-description').attr('data-content'));
+            $('.ad-diagnose-feedback').find('textarea[name="content"]').val('');
+
+            $('.ad-diagnose-feedback').modal({
+                onApprove: function() {
+                    $.post('admin/diagnose/feedback', {
+                        id: $btn.closest('tr').attr('data-id'),
+                        content: $('.ad-diagnose-feedback').find('textarea[name="content"]').val()
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('反馈提交成功,请稍后查看反馈状态!');
+                        } else {
+                            toastr.error('反馈提交失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-diagnose').on('click', '.lhjz-btn-ignore', function(event) {
+            var $btn = $(this);
+
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/diagnose/update', {
+                        id: $btn.closest('tr').attr('data-id'),
+                        status: 'ignored'
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('操作成功!');
+                        } else {
+                            toastr.error('操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-diagnose').on('click', '.lhjz-btn-del', function(event) {
+            var $btn = $(this);
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/diagnose/delete', {
+                        id: $btn.closest('tr').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+    });
+    </script>
+</body>
+
+</html>

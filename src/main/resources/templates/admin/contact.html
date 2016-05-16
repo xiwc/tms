@@ -1,0 +1,109 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>立衡脊柱-联系我们</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+    <script th:replace="admin/template :: imageItemTpl"></script>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <div th:replace="admin/template :: ad-page-header ('联系我们', 'contact')"></div>
+                <div th:replace="admin/template :: ad-page-basic-settings ('contact')"></div>
+                <div class="ui attached form segment contact-form">
+                    <div class="field">
+                        <label>名称:</label>
+                        <input type="text" name="name" th:value="${contact.name}">
+                    </div>
+                    <div class="field">
+                        <label>地址:</label>
+                        <input type="text" name="addr" th:value="${contact.addr}">
+                    </div>
+                    <div class="field">
+                        <label>电话:</label>
+                        <input type="text" name="phone" th:value="${contact.phone}">
+                    </div>
+                    <div class="field">
+                        <label>邮箱:</label>
+                        <input type="text" name="mail" th:value="${contact.mail}">
+                    </div>
+                    <div class="field">
+                        <label>QQ:</label>
+                        <input type="text" name="qq" th:value="${contact.qq}">
+                    </div>
+                    <div class="field">
+                        <label>公交:</label>
+                        <input type="text" name="bus" th:value="${contact.bus}">
+                    </div>
+                    <div class="field">
+                        <label>地图:</label>
+                        <img class="ui image contact-map" th:src="${contact.map}" src="../../static/landing/img/map1.jpg" alt="">
+                    </div>
+                </div>
+                <div class="ui attached segment">
+                    <div class="ui compact button ad-add-image" data-for="contact:map">设置地图</div>
+                    <div class="ui primary compact button btn-save">保存</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-images"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <script type="text/javascript">
+    jQuery(function($) {
+
+        $('.btn-save').click(function(event) {
+            var $btn = $(this);
+
+            $.post('admin/config/saveOrUpdate', {
+                name: $('.contact-form').find('input[name="name"]').val(),
+                addr: $('.contact-form').find('input[name="addr"]').val(),
+                phone: $('.contact-form').find('input[name="phone"]').val(),
+                mail: $('.contact-form').find('input[name="mail"]').val(),
+                qq: $('.contact-form').find('input[name="qq"]').val(),
+                bus: $('.contact-form').find('input[name="bus"]').val(),
+                map: $('.contact-form').find('.contact-map').attr('src')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    toastr.success('保存成功!');
+                } else {
+                    toastr.error(data.data, '保存失败!');
+                }
+            });
+        });
+
+        // image select callback handle
+        window.imgSelectedCallback = function(imgUrlArr, page, module) {
+            // save to server db.
+            $.each(imgUrlArr, function(index, imgUrl) {
+                $('.contact-form').find('.contact-map').attr('src', imgUrl);
+                return false;
+            });
+        };
+
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>立衡脊柱- 联系我们</title>
+    <link rel="icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/lib/bootstrap/css/bootstrap.min.css}" href="../../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/lib/scrollup/css/themes/image.css}" href="../../static/lib/scrollup/css/themes/image.css" rel="stylesheet" type="text/css" />
+    <!-- Add custom CSS here -->
+    <link th:href="@{/landing/css/custom.css}" href="../../static/landing/css/custom.css" rel="stylesheet" />
+    <!-- JavaScript -->
+    <script th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/bootstrap/js/bootstrap.min.js}" src="../../static/lib/bootstrap/js/bootstrap.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/scrollup/js/jquery.scrollUp.min.js}" src="../../static/lib/scrollup/js/jquery.scrollUp.min.js" charset="utf-8"></script>
+    <script th:src="@{/landing/js/custom.js}" src="../../static/landing/js/custom.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <div th:replace="landing/index :: header"></div>
+    <div class="container">
+        <div class="row clearfix">
+            <div class="col-md-12 column">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="thumbnail lhjz-margin-top20">
+                            <div class="caption lhjz-contact" th:object="${contact}">
+                                <h3 th:text="*{name}">北京立衡脊柱健康科技有限公司</h3>
+                                <div>
+                                    <span class="glyphicon glyphicon-home"></span> <span class="lhjz-contact-item-name">地址:</span><span th:text="*{addr}">北京丰台马家堡东路公益东桥北路东海上海花园168号立衡脊柱</span>
+                                </div>
+                                <div>
+                                    <span class="glyphicon glyphicon-earphone"></span> <span class="lhjz-contact-item-name">电话:</span> <span th:text="*{phone}">18921345678</span>
+                                </div>
+                                <div>
+                                    <span class="glyphicon glyphicon-envelope"></span> <span class="lhjz-contact-item-name">邮箱:</span> <span th:text="*{mail}">168171468@qq.com</span>
+                                </div>
+                                <div>
+                                    <span class="lhjz-icon lhjz-icon-qq"></span> <span class="lhjz-contact-item-name">QQ:</span> <span th:text="*{qq}">168171468</span>
+                                </div>
+                                <div>
+                                    <span class="lhjz-icon lhjz-icon-bus"></span> <span class="lhjz-contact-item-name">公交:</span> <span th:text="*{bus}">453路, 29路, 58路</span>
+                                </div>
+                                <div>
+                                    <span class="glyphicon glyphicon-map-marker"></span> <span class="lhjz-contact-item-name">地图:</span>
+                                    <br /> <img class="lhjz-map" alt="300x200" th:src="*{map}" src="../../static/landing/img/map1.jpg" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="landing/index :: footer"></div>
+    <div th:include="landing/template :: page-common"></div>
+</body>
+
+</html>

@@ -1,0 +1,385 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>立衡脊柱-团队招聘</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <div th:replace="admin/template :: ad-page-header ('团队招聘', 'job')"></div>
+                <div th:replace="admin/template :: ad-page-basic-settings ('job')"></div>
+                <div class="ui styled fluid accordion">
+                    <div class="title">
+                        <i class="dropdown icon"></i> 总体介绍
+                    </div>
+                    <div class="content">
+                        <div class="ui form">
+                            <div class="field">
+                                <textarea id="txtIntroduction" th:text="${#lists.isEmpty(introductions) ? '' : introductions[0].content}"></textarea>
+                            </div>
+                        </div>
+                        <div class="ui segment">
+                            <div class="ui primary button btn-intro-save" th:attr="data-id=${#lists.isEmpty(introductions) ? '' : introductions[0].id}">保存</div>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i> 发布职位
+                    </div>
+                    <div class="content">
+                        <div class="ui attached segment">
+                            <div class="ui primary button btn-add-job">添加</div>
+                        </div>
+                        <table class="ui sortable celled striped compact table attached segment table-job">
+                            <thead>
+                                <th>添加日期</th>
+                                <th>职位类别</th>
+                                <th>职位数目</th>
+                                <th>工作经验</th>
+                                <th>学历要求</th>
+                                <th>转正工资</th>
+                                <th>职位标签</th>
+                                <th>岗位职责</th>
+                                <th>处理</th>
+                            </thead>
+                            <tbody th:remove="all-but-first">
+                                <tr th:each="job : ${jobs}" th:attr="data-id=${job.id}">
+                                    <td th:text="${#calendars.format(job.createDate,'yyyy/MM/dd HH:mm:ss')}"></td>
+                                    <td th:text="${job.category}"></td>
+                                    <td th:text="${job.size}"></td>
+                                    <td th:text="${job.experience}"></td>
+                                    <td th:text="${job.education}"></td>
+                                    <td th:text="${job.salary}"></td>
+                                    <td>
+                                        <div th:each="lbl : ${job.labelList}" class="ui small tag label" th:text="${lbl}"></div>
+                                    </td>
+                                    <td>
+                                        <div class="ui compact tiny button popup-duty" th:attr="data-content=${job.duty}">
+                                            查看详细
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="ui compact tiny primary button btn-edit-job">编辑</div>
+                                        <div class="ui compact tiny red button btn-del-job">删除</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i> 简历管理
+                    </div>
+                    <div class="content">
+                        <table class="ui sortable celled striped compact table attached segment table-jobApply">
+                            <thead>
+                                <th>申请日期</th>
+                                <th>申请职位</th>
+                                <th>文件名</th>
+                                <th>下载</th>
+                                <th>状态</th>
+                                <th>处理</th>
+                            </thead>
+                            <tbody th:remove="all-but-first">
+                                <tr th:each="jobApply : ${jobApplies}" th:attr="data-id=${jobApply.id}">
+                                    <td th:text="${#calendars.format(jobApply.createDate,'yyyy/MM/dd HH:mm:ss')}"></td>
+                                    <td th:text="${jobApply.job.category}"></td>
+                                    <td th:text="${jobApply.name}"></td>
+                                    <td><a th:href="@{${jobApply.resume}}" target="_blank" href="#"><div class="ui green label">下载</div></a></td>
+                                    <td>
+                                        <div class="jobApply-status" th:switch="${#strings.toString(jobApply.status)}">
+                                            <div th:case="'Normal'" class="ui green tag label">新创建</div>
+                                            <div th:case="'Checked'" class="ui tag label">已查看</div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="ui compact tiny primary button btn-checked-jobApply">已查看</div>
+                                        <div class="ui compact tiny red button btn-del-jobApply">删除</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ui small modal modal-add-job">
+        <div class="header">
+            添加工作职位
+        </div>
+        <div class="content">
+            <div class="ui form segment">
+                <div class="field">
+                    <label>职位类别</label>
+                    <input name="category" type="text">
+                </div>
+                <div class="field">
+                    <label>职位数目</label>
+                    <input name="size" type="text">
+                </div>
+                <div class="field">
+                    <label>工作经验</label>
+                    <input name="experience" type="text">
+                </div>
+                <div class="field">
+                    <label>学历要求</label>
+                    <input name="education" type="text">
+                </div>
+                <div class="field">
+                    <label>转正工资</label>
+                    <input name="salary" type="text">
+                </div>
+                <div class="field">
+                    <label>职位标签</label>
+                    <input name="labels" type="text">
+                </div>
+                <div class="field">
+                    <label>岗位职责</label>
+                    <textarea name="duty"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <div class="ui small modal modal-edit-job">
+        <div class="header">
+            编辑工作职位
+        </div>
+        <div class="content">
+            <div class="ui form segment">
+                <div class="field">
+                    <label>职位类别</label>
+                    <input name="category" type="text">
+                </div>
+                <div class="field">
+                    <label>职位数目</label>
+                    <input name="size" type="text">
+                </div>
+                <div class="field">
+                    <label>工作经验</label>
+                    <input name="experience" type="text">
+                </div>
+                <div class="field">
+                    <label>学历要求</label>
+                    <input name="education" type="text">
+                </div>
+                <div class="field">
+                    <label>转正工资</label>
+                    <input name="salary" type="text">
+                </div>
+                <div class="field">
+                    <label>职位标签</label>
+                    <input name="labels" type="text">
+                </div>
+                <div class="field">
+                    <label>岗位职责</label>
+                    <textarea name="duty"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-handle-confirm"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <script type="text/javascript">
+    jQuery(function($) {
+        $('table').tablesort().data('tablesort');
+        $('.popup-duty').popup({
+            hoverable: true,
+            position: 'top right',
+            delay: {
+                show: 300,
+                hide: 300
+            }
+        });
+        $('.modal-add-job').modal({
+            onApprove: function() {
+
+                var params = {};
+                $('.modal-add-job .form .field').find('input,textarea').each(function(index, el) {
+                    params[$(el).attr('name')] = $(el).val();
+                });
+
+                $.post('admin/job/save', params, function(data, textStatus, xhr) {
+
+                    if (data.success) {
+                        toastr.success('添加职位成功!');
+                        $('.ui.sidebar.menu').find('a[class*="active"]').children().click();
+                    } else {
+                        toastr.error(data.data, '添加职位失败!');
+                    }
+                });
+            }
+        });
+
+        $('.btn-add-job').click(function(event) {
+            $('.modal-add-job').modal('show');
+        });
+
+        $('.table-job').on('click', '.btn-del-job', function(event) {
+            var $btn = $(this);
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/job/delete', {
+                        id: $btn.closest('tr').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('职位信息删除成功!');
+                        } else {
+                            toastr.error(data.data, '职位信息删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-job').on('click', '.btn-edit-job', function(event) {
+            var $btn = $(this);
+
+            $.post('admin/job/get', {
+                id: $btn.closest('tr').attr('data-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+
+                    $('.modal-edit-job').find('input[name="category"]').val(data.data.category);
+                    $('.modal-edit-job').find('input[name="size"]').val(data.data.size);
+                    $('.modal-edit-job').find('input[name="experience"]').val(data.data.experience);
+                    $('.modal-edit-job').find('input[name="education"]').val(data.data.education);
+                    $('.modal-edit-job').find('input[name="salary"]').val(data.data.salary);
+                    $('.modal-edit-job').find('input[name="labels"]').val(data.data.labels);
+                    $('.modal-edit-job').find('textarea[name="duty"]').val(data.data.duty);
+
+                    $('.modal-edit-job').modal({
+                        onApprove: function() {
+
+                            var params = {
+                                id: $btn.closest('tr').attr('data-id')
+                            };
+                            $('.modal-edit-job .form .field').find('input,textarea').each(function(index, el) {
+                                params[$(el).attr('name')] = $(el).val();
+                            });
+
+                            $.post('admin/job/update', params, function(data, textStatus, xhr) {
+
+                                if (data.success) {
+                                    toastr.success('更新职位成功!');
+                                    $('.ui.sidebar.menu').find('a[class*="active"]').children().click();
+                                } else {
+                                    toastr.error(data.data, '更新职位失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+
+                } else {
+                    toastr.error('获取职位失败!');
+                }
+            });
+
+        });
+
+        // save introduction
+        $('.btn-intro-save').click(function(event) {
+            var $btn = $(this);
+
+            if (!$btn.attr('data-id')) {
+                $.post('admin/settings/save', {
+                    page: "job",
+                    module: 'introduction',
+                    content: $('#txtIntroduction').val()
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $btn.attr('data-id', data.data.id);
+                        toastr.success('设置成功!');
+                    } else {
+                        toastr.error('设置失败!');
+                    }
+                });
+            } else {
+                $.post('admin/settings/update', {
+                    id: $btn.attr('data-id'),
+                    content: $('#txtIntroduction').val()
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        toastr.success('更新成功!');
+                    } else {
+                        toastr.error('更新失败!');
+                    }
+                });
+            }
+        });
+
+        // 标记 已查看
+        $('.table-jobApply').on('click', '.btn-checked-jobApply', function(event) {
+            var $btn = $(this);
+
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/jobApply/update', {
+                        id: $btn.closest('tr').attr('data-id'),
+                        status: 'checked'
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').find('.jobApply-status').html('<div class="ui tag label">已查看</div>');
+                            $btn.remove();
+                            toastr.success('职位申请状态更新成功!');
+                        } else {
+                            toastr.error('职位申请状态更新失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        // 删除
+        $('.table-jobApply').on('click', '.btn-del-jobApply', function(event) {
+            var $btn = $(this);
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/jobApply/delete', {
+                        id: $btn.closest('tr').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('职位申请信息删除成功!');
+                        } else {
+                            toastr.error('职位申请信息删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+    });
+    </script>
+</body>
+
+</html>

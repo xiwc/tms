@@ -1,0 +1,275 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <title>立衡脊柱</title>
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/lib/bootstrap/css/bootstrap.min.css}" href="../../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/lib/scrollup/css/themes/image.css}" href="../../static/lib/scrollup/css/themes/image.css" rel="stylesheet" type="text/css" />
+    <!-- Add custom CSS here -->
+    <link th:href="@{/landing/css/custom.css}" href="../../static/landing/css/custom.css" rel="stylesheet" type="text/css" />
+    <!-- JavaScript -->
+    <script th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/bootstrap/js/bootstrap.min.js}" src="../../static/lib/bootstrap/js/bootstrap.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/scrollup/js/jquery.scrollUp.min.js}" src="../../static/lib/scrollup/js/jquery.scrollUp.min.js" charset="utf-8"></script>
+    <!-- custom js -->
+    <script th:src="@{/landing/js/custom.js}" src="../../static/landing/js/custom.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <div class="container-fluid lhjz-container-fluid">
+        <div th:unless="${#lists.isEmpty(bigImgs)}" class="carousel slide" id="carousel-lhjz">
+            <ol class="carousel-indicators" th:remove="all-but-first">
+                <li th:each="bigImg,sts : ${bigImgs
+}" th:classappend="${sts.index} == 0 ? 'active' : ''" th:attrappend="data-slide-to=${sts.index}" data-target="#carousel-lhjz"></li>
+                <li data-slide-to="1" data-target="#carousel-lhjz"></li>
+                <li data-slide-to="2" data-target="#carousel-lhjz"></li>
+            </ol>
+            <div class="carousel-inner" th:remove="all-but-first">
+                <div class="item" th:each="bigImg,sts : ${bigImgs}" th:classappend="${sts.index} == 0 ? 'active' : ''">
+                    <img alt="" th:src="${bigImg.imgUrl}" src="../../static/landing/img/img-b1.jpg" width="100%" />
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h1 th:if="${not #strings.isEmpty(bigImg.title)}" th:text="${bigImg.title}">关于我们</h1>
+                            <p th:if="${not #strings.isEmpty(bigImg.content)}" th:text="${#strings.abbreviate(bigImg.content,120)}">立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                            <p th:if="${not #strings.isEmpty(bigImg.link)}"><a class="btn btn-lg btn-primary" th:href="@{/article(id=${bigImg.link})}" href="#" role="button">了解更多</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <img alt="" th:src="@{/landing/img/img-b2.jpg}" src="../../static/landing/img/img-b2.jpg" width="100%" />
+                    <div class="carousel-caption">
+                        <h4>焦点图二</h4>
+                        <p>焦点图二的描述</p>
+                    </div>
+                </div>
+                <div class="item">
+                    <img alt="" th:src="@{/landing/img/img-b3.jpg}" src="../../static/landing/img/img-b3.jpg" width="100%" />
+                    <div class="carousel-caption">
+                        <h4>焦点图三</h4>
+                        <p>焦点图三的描述</p>
+                    </div>
+                </div>
+            </div>
+            <a class="left carousel-control" href="#carousel-lhjz" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+            <a class="right carousel-control" href="#carousel-lhjz" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+        </div>
+    </div>
+    <div th:fragment="header" class="lhjz-navbar">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                        <div class="container">
+                            <div class="navbar-header">
+                                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                                    <span class="sr-only">切换导航</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                                </button>
+                                <a class="navbar-brand" th:href="@{/}" href="index.html">
+                                    <img class="lhjz-logo-img" th:src="@{/landing/img/logo_128.jpg}" src="../../static/landing/img/logo_128.jpg" alt="立恒脊柱" /> 立衡脊柱
+                                </a>
+                            </div>
+                            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                                <ul class="nav navbar-nav" th:with="uri=${#httpServletRequest.requestURI}">
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'about')} and ${not pageEnable['about']}" th:classappend="${#strings.contains(uri, '/about')} ? 'active' : ''"><a th:href="@{/about}" href="about.html">关于</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'feature')} and ${not pageEnable['feature']}" th:classappend="${#strings.contains(uri, '/feature')} ? 'active' : ''"><a th:href="@{/feature}" href="feature.html">特色</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'case')} and ${not pageEnable['case']}" th:classappend="${#strings.contains(uri, '/case')} ? 'active' : ''"><a th:href="@{/case}" href="case.html">案例</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'product')} and ${not pageEnable['product']}" th:classappend="${#strings.contains(uri, '/product')} ? 'active' : ''"><a th:href="@{/product}" href="product.html">专利</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'env')} and ${not pageEnable['env']}" th:classappend="${#strings.contains(uri, '/env')} ? 'active' : ''"><a th:href="@{/env}" href="env.html">环境</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'job')} and ${not pageEnable['job']}" th:classappend="${#strings.contains(uri, '/job')} ? 'active' : ''"><a th:href="@{/job}" href="job.html">招聘</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'health')} and ${not pageEnable['health']}" th:classappend="${#strings.contains(uri, '/health')} ? 'active' : ''"><a th:href="@{/health}" href="health.html">健康</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'diagnose')} and ${not pageEnable['diagnose']}" th:classappend="${#strings.contains(uri, '/diagnose')} ? 'active' : ''"><a th:href="@{/diagnose}" href="diagnose.html">诊断</a></li>
+                                    <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'contact')} and ${not pageEnable['contact']}" th:classappend="${#strings.contains(uri, '/contact')} ? 'active' : ''"><a th:href="@{/contact}" href="contact.html">联系</a></li>
+                                </ul>
+                                <button type="button" id="btn--global-feedback" class="btn btn-success navbar-btn navbar-right">反馈</button>
+                            </div>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container lhjz-content">
+        <div class="page-header">
+            <h1><small>热门动态</small></h1>
+        </div>
+        <div class="row" th:remove="all-but-first">
+            <div class="col-xs-6 col-md-3" th:each="hotNew : ${hotNews}">
+                <div class="thumbnail lhzj-thumbnail">
+                    <a th:if="${not #strings.isEmpty(hotNew.link)}" th:href="@{/article(id=${hotNew.link})}"><img alt="300x200" th:src="${hotNew.imgUrl}" src="../../static/landing/img/thumb/1.png" /></a>
+                    <a th:if="${#strings.isEmpty(hotNew.link)}"><img alt="300x200" th:src="${hotNew.imgUrl}" src="../../static/landing/img/thumb/1.png" /></a>
+                    <div class="caption">
+                        <h4 class="lhjz-news-title" th:text="${hotNew.title}">标题一</h4>
+                        <p class="lhzj-news-content" th:text="${#strings.abbreviate(hotNew.content,65)}">简单的介绍！</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <img alt="300x200" th:src="@{/landing/img/thumb/2.png}" src="../../static/landing/img/thumb/2.png" />
+                    <div class="caption">
+                        <h3>标题二</h3>
+                        <p>简单的介绍!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <img alt="300x200" th:src="@{/landing/img/thumb/3.png}" src="../../static/landing/img/thumb/3.png" />
+                    <div class="caption">
+                        <h3>标题三</h3>
+                        <p>简单的介绍！</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <img alt="300x200" th:src="@{/landing/img/thumb/4.png}" src="../../static/landing/img/thumb/4.png" />
+                    <div class="caption">
+                        <h3>标题三</h3>
+                        <p>简单的介绍！</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <img alt="300x200" th:src="@{/landing/img/thumb/1.png}" src="../../static/landing/img/thumb/1.png" />
+                    <div class="caption">
+                        <h3>标题一</h3>
+                        <p>简单的介绍！</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <img alt="300x200" th:src="@{/landing/img/thumb/2.png}" src="../../static/landing/img/thumb/2.png" />
+                    <div class="caption">
+                        <h3>标题二</h3>
+                        <p>简单的介绍！</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <img alt="300x200" th:src="@{/landing/img/thumb/3.png}" src="../../static/landing/img/thumb/3.png" />
+                    <div class="caption">
+                        <h3>标题三</h3>
+                        <p>简单的介绍！</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-6 col-md-3">
+                <div class="thumbnail">
+                    <img alt="300x200" th:src="@{/landing/img/thumb/4.png}" src="../../static/landing/img/thumb/4.png" />
+                    <div class="caption">
+                        <h3>标题三</h3>
+                        <p>简单的介绍！</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-header">
+            <h1><small>更多动态</small></h1>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-md-6">
+                <div class="list-group" th:remove="all-but-first">
+                    <a th:each="moreNew : ${moreNews}" th:if="${moreNew.more == '1'}" th:href="@{/article(id=${moreNew.link})}" th:text="${moreNew.title}" href="#" class="list-group-item">xxx领导来我机构视察</a>
+                    <a href="#" class="list-group-item">我院评选先进卫生单位</a>
+                    <a href="#" class="list-group-item">院长参加第几届会议</a>
+                    <a href="#" class="list-group-item">第1000例脊柱病患者</a>
+                    <a href="#" class="list-group-item">怎样在工作中保护自己的脊柱</a>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <div class="list-group" th:remove="all-but-first">
+                    <a th:each="moreNew : ${moreNews}" th:if="${moreNew.more == '2'}" th:href="@{/article(id=${moreNew.link})}" th:text="${moreNew.title}" href="#" class="list-group-item">xxx领导来我机构视察</a>
+                    <a href="#" class="list-group-item">我院评选先进卫生单位</a>
+                    <a href="#" class="list-group-item">院长参加第几届会议</a>
+                    <a href="#" class="list-group-item">第1000例脊柱病患者</a>
+                    <a href="#" class="list-group-item">怎样在工作中保护自己的脊柱</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer th:fragment="footer" class="lhjz-footer">
+        <div class="container">
+            <div class="row footer-top">
+                <div class="col-sm-6 col-lg-6">
+                    <div class="col-xs-6">
+                        <h4>
+                            <img th:src="@{/landing/img/logo_128.jpg}" src="../../static/landing/img/logo_128.jpg" />
+                        </h4>
+                    </div>
+                    <div class="col-xs-6">
+                        <h4>
+                            <img th:src="@{/landing/img/wechat_128.jpg}" src="../../static/landing/img/wechat_128.jpg" />
+                        </h4>
+                    </div>
+                </div>
+                <div class="col-sm-6  col-lg-5 col-lg-offset-1">
+                    <div class="row about">
+                        <div class="col-xs-3">
+                            <h4>关于</h4>
+                            <ul class="list-unstyled">
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'about')} and ${not pageEnable['about']}"><a th:href="@{/about}" href="about.html">关于我们</a></li>
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'job')} and ${not pageEnable['job']}"><a th:href="@{/job}" href="job.html">团队招聘</a></li>
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'env')} and ${not pageEnable['env']}"env><a th:href="@{/env}" href="env.html">店内环境</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-xs-3">
+                            <h4>联系</h4>
+                            <ul class="list-unstyled">
+                                <li><a href="http://weibo.com/bootcss" title="立衡脊柱官方微博" target="_blank">新浪微博</a></li>
+                                <li><a href="mailto:lihengjizhu@163.com">电子邮件</a></li>
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'contact')} and ${not pageEnable['contact']}"><a th:href="@{/contact}" href="contact.html">联系我们</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-xs-3">
+                            <h4>产品</h4>
+                            <ul class="list-unstyled">
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'feature')} and ${not pageEnable['feature']}"><a th:href="@{/feature}" href="feature.html">疗法特色</a></li>
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'product')} and ${not pageEnable['product']}"><a th:href="@{/product}" href="product.html">专利产品</a></li>
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'case')} and ${not pageEnable['case']}"><a th:href="@{/case}" href="case.html">康复案例</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-xs-3">
+                            <h4>诊断</h4>
+                            <ul class="list-unstyled">
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'health')} and ${not pageEnable['health']}"><a th:href="@{/health}" href="health.html">脊柱健康</a></li>
+                                <li th:unless="${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, 'diagnose')} and ${not pageEnable['diagnose']}"><a th:href="@{/diagnose}" href="diagnose.html">在线诊断</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="copyright text-muted small">Copyright &copy; 北京立衡脊柱 2015. 保留所有权利</p>
+                </div>
+            </div>
+            <div class="row footer-bottom">
+                <ul class="list-inline text-center">
+                    <li><a href="http://www.miibeian.gov.cn/" target="_blank">京ICP备15019407号</a></li>
+                    <!-- <li>京公网安备11010802014853</li> -->
+                </ul>
+            </div>
+        </div>
+    </footer>
+    <div th:include="landing/template :: page-common"></div>
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+        //$('.lhjz-navbar').stickUp();
+    });
+    </script>
+</body>
+
+</html>

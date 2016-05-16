@@ -1,0 +1,107 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <link rel="icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
+    <title>立衡脊柱 - 关于我们</title>
+    <!-- Bootstrap core CSS -->
+    <link th:href="@{/lib/bootstrap/css/bootstrap.min.css}" href="../../static/lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link th:href="@{/lib/scrollup/css/themes/image.css}" href="../../static/lib/scrollup/css/themes/image.css" rel="stylesheet" type="text/css" />
+    <!-- Add custom CSS here -->
+    <link th:href="@{/landing/css/custom.css}" href="../../static/landing/css/custom.css" rel="stylesheet" />
+    <!-- JavaScript -->
+    <script th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/bootstrap/js/bootstrap.min.js}" src="../../static/lib/bootstrap/js/bootstrap.min.js" charset="utf-8"></script>
+    <script th:src="@{/lib/scrollup/js/jquery.scrollUp.min.js}" src="../../static/lib/scrollup/js/jquery.scrollUp.min.js" charset="utf-8"></script>
+    <script th:src="@{/landing/js/custom.js}" src="../../static/landing/js/custom.js" charset="utf-8"></script>
+</head>
+
+<body>
+    <div th:replace="landing/index :: header"></div>
+    <div class="container lhjz-content">
+        <!-- 关于我们总体轮动图介绍栏 -->
+        <div th:unless="${#lists.isEmpty(bigImgs)}" id="carousel-about" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators" th:remove="all-but-first">
+                <li th:each="bigImg,sts : ${bigImgs}" th:classappend="${sts.index} == 0 ? 'active' : ''" th:attr="data-slide-to=${sts.index}" data-target="#carousel-about" data-slide-to="0" class=""></li>
+                <li data-target="#carousel-about" data-slide-to="1" class=""></li>
+                <li data-target="#carousel-about" data-slide-to="2" class="active"></li>
+            </ol>
+            <div class="carousel-inner" th:remove="all-but-first">
+                <div class="item" th:each="bigImg,sts : ${bigImgs}" th:classappend="${sts.index} == 0 ? 'active' : ''">
+                    <img th:src="${bigImg.imgUrl}" alt="First slide" src="../../static/landing/img/1.jpg">
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h1 th:if="${not #strings.isEmpty(bigImg.title)}" th:text="${bigImg.title}">关于我们</h1>
+                            <p th:if="${not #strings.isEmpty(bigImg.content)}" th:text="${#strings.abbreviate(bigImg.content,120)}">立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                            <p th:if="${not #strings.isEmpty(bigImg.link)}"><a class="btn btn-lg btn-primary" th:href="@{/article(id=${bigImg.link})}" href="#" role="button">了解更多</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item">
+                    <img data-src="" th:src="@{/landing/img/2.jpg}" alt="First slide" src="../../static/landing/img/2.jpg">
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h1>关于我们</h1>
+                            <p>立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                            <p><a class="btn btn-lg btn-primary" href="#" role="button">了解更多</a></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="item active">
+                    <img data-src="" th:src="@{/landing/img/3.jpg}" alt="First slide" src="../../static/landing/img/3.jpg">
+                    <div class="container">
+                        <div class="carousel-caption">
+                            <h1>关于我们</h1>
+                            <p>立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                            <p><a class="btn btn-lg btn-primary" href="#" role="button">了解更多</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <a class="left carousel-control" href="#carousel-about" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+            <a class="right carousel-control" href="#carousel-about" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+        </div>
+        <!-- 分店介绍栏 -->
+        <div class="row">
+            <div class="page-header">
+                <h1><small>各地分店</small></h1>
+            </div>
+            <div class="col-sm-12 col-md-6" th:each="branch : ${branches}">
+                <div class="thumbnail">
+                    <img class="media-object" alt="" th:src="${branch.imgUrl}" src="../../static/landing/img/img2.jpg" />
+                    <div class="caption">
+                        <h3 id="thumbnail-label" th:text="${branch.title}">北京分店</h3>
+                        <p th:text="${#strings.abbreviate(branch.content,65)}">立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                        <p th:unless="${#strings.isEmpty(branch.link)}"><a href="#" th:href="@{/article(id=${branch.link})}" class="btn btn-primary" role="button">了解更多</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 专家介绍栏 -->
+        <div class="row">
+            <div class="page-header">
+                <h1><small>资深专家</small></h1>
+            </div>
+            <div class="col-sm-6 col-md-3" th:each="expert : ${experts}">
+                <div class="thumbnail">
+                    <img class="media-object" alt="" th:src="${expert.imgUrl}" src="../../static/landing/img/team/p1.jpg" />
+                    <div class="caption">
+                        <h3 id="thumbnail-label" th:text="${expert.title}">张教授</h3>
+                        <p th:text="${#strings.abbreviate(expert.content,65)}">立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                        <p th:unless="${#strings.isEmpty(expert.link)}"><a href="#" th:href="@{/article(id=${expert.link})}" class="btn btn-primary" role="button">了解更多</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="landing/index :: footer"></div>
+    <div th:include="landing/template :: page-common"></div>
+</body>
+
+</html>

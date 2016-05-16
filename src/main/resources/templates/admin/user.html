@@ -1,0 +1,206 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>立衡脊柱-用户管理</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <div th:replace="admin/template :: ad-page-header ('用户管理', 'user')"></div>
+                <div class="ui attached segment">
+                    <div class="ui primary compact button btn-add">添加</div>
+                </div>
+                <div style="max-height: 450px; overflow-y: auto;">
+                    <table class="ui sortable celled striped compact table segment table-user">
+                        <thead>
+                            <th>用户名</th>
+                            <th>角色</th>
+                            <th>创建时间</th>
+                            <th>状态</th>
+                            <th>处理</th>
+                        </thead>
+                        <tbody th:remove="all-but-first">
+                            <tr th:each="user : ${users}" th:attr="data-id=${user.username}">
+                                <td th:text="${user.username}">username</td>
+                                <td>
+                                    <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small tag label user-role" th:text="${auth}"></div>
+                                </td>
+                                <td th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
+                                <td class="user-status" th:if="${user.enabled}">
+                                    <div class="ui green small tag label">开启</div>
+                                </td>
+                                <td class="user-status" th:if="${not user.enabled}">
+                                    <div class="ui yellow small tag label">停用</div>
+                                </td>
+                                <td>
+                                    <!-- if is super role, super admin can mgr not super admin and user role -->
+                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
+                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
+                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
+                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny red button lhjz-btn-del">删除</div>
+                                    <!-- if is not super but admin(only can see this page, so no need judge is admin role) role, admin can only mgr user role -->
+                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
+                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
+                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
+                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-handle-confirm"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-user-add"></div>
+    <div th:replace="admin/template :: ad-user-edit"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <script type="text/javascript">
+    jQuery(function($) {
+        $('table').tablesort().data('tablesort');
+        $('.ui.checkbox').checkbox();
+        $('.user-role').each(function(index, el) {
+            if ($(el).text() == 'ROLE_ADMIN') {
+                $(el).text('管理员').addClass('green');
+            } else if ($(el).text() == 'ROLE_USER') {
+                $(el).text('普通用户');
+                $(el).prependTo($(el).parent('td'));
+            } else if ($(el).text() == 'ROLE_SUPER') {
+                $(el).text('超级管理员').addClass('black');
+                $(el).appendTo($(el).parent('td'));
+            }
+        });
+
+        $('.btn-add').click(function(event) {
+
+            $('.ad-user-add').find('input[name="username"]').val('');
+            $('.ui.checkbox.chk-user').checkbox('check');
+
+            $('.ad-user-add').modal({
+                onApprove: function() {
+                    $.post('admin/user/save', {
+                        username: $('.ad-user-add').find('input[name="username"]').val(),
+                        password: '888888',
+                        enabled: false,
+                        role: $('.ad-user-add').find('input:radio:checked').val()
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            toastr.success('添加成功,刷新当前页面可以查看!');
+                        } else {
+                            toastr.error(data.data, '添加失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-user').on('click', '.lhjz-btn-disable', function(event) {
+            var $btn = $(this);
+
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/user/update', {
+                        username: $btn.closest('tr').attr('data-id'),
+                        enabled: false
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('td').prepend('<div class="ui compact tiny green button lhjz-btn-enable">开启</div>');
+                            $btn.closest('tr').find('td.user-status').empty().append('<div class="ui yellow small tag label">停用</div>');
+                            $btn.remove();
+                            toastr.success('停用操作成功!');
+                        } else {
+                            toastr.error('停用操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        $('.table-user').on('click', '.lhjz-btn-enable', function(event) {
+            var $btn = $(this);
+
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/user/update', {
+                        username: $btn.closest('tr').attr('data-id'),
+                        enabled: true
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('td').prepend('<div class="ui compact tiny yellow button lhjz-btn-disable">停用</div>');
+                            $btn.closest('tr').find('td.user-status').empty().append('<div class="ui green small tag label">开启</div>')
+                            $btn.remove();
+                            toastr.success('开启操作成功!');
+                        } else {
+                            toastr.error('开启操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        $('.table-user').on('click', '.lhjz-btn-del', function(event) {
+            var $btn = $(this);
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/user/delete', {
+                        username: $btn.closest('tr').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('用户删除成功!');
+                        } else {
+                            toastr.error('用户删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        $('.table-user').on('click', '.lhjz-btn-edit', function(event) {
+            var $btn = $(this);
+
+            $('.ad-user-edit').find('.user-username').text($btn.closest('tr').attr('data-id'));
+            $('.ad-user-edit').find('input[name="password"]').val('');
+
+            $('.ad-user-edit').modal({
+                onApprove: function() {
+                    $.post('admin/user/update', {
+                        username: $btn.closest('tr').attr('data-id'),
+                        password: $('.ad-user-edit').find('input[name="password"]').val()
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('用户信息修改成功!');
+                        } else {
+                            toastr.error(data.data, '用户信息修改失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+    });
+    </script>
+</body>
+
+</html>

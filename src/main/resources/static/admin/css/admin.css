@@ -1,0 +1,125 @@
+div.admin.login {
+    min-width: 300px;
+    max-width: 300px;
+    top: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+}
+
+#context {
+    min-height: 500px;
+}
+
+.ad-index-content {
+    padding-top: 70px;
+    padding-bottom: 70px;
+    padding-right: 12px;
+    min-height: 100%;
+}
+
+.ad-index-container {
+    margin-left: 250px;
+    position: relative;
+    min-height: 432px;
+}
+
+.ad-index-rail {}
+
+.ad-index-sticky {
+    width: 120px;
+}
+
+@media only screen and (max-width: 767px) {
+    .ad-index-rail {
+        display: none;
+    }
+    .ad-index-container {
+        margin-left: 12px;
+    }
+}
+/* start <admin/resource.html> */
+
+#dropzone {
+    max-width: 500px;
+    margin: auto;
+}
+
+.dropzone {
+    border: 2px dashed #0087F7;
+    border-radius: 5px;
+    background: white;
+}
+
+.dropzone .dz-message {
+    font-weight: 400;
+    font-size: x-large;
+}
+/* end <admin/resource.html> */
+/* start <admin/article.html> */
+/* CSS for the font-name + font-size plugin */
+
+.wysiwyg-plugin-list {
+    max-height: 16em;
+    overflow: auto;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.wysiwyg-plugin-list a,
+.wysiwyg-plugin-list a:link,
+.wysiwyg-plugin-list a:visited {
+    display: block;
+    color: black;
+    padding: 5px 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.wysiwyg-plugin-list a:hover {
+    color: HighlightText;
+    background-color: Highlight;
+}
+/* CSS for the smiley plugin */
+
+.wysiwyg-plugin-smilies {
+    padding: 10px;
+    text-align: center;
+    white-space: normal;
+}
+
+.wysiwyg-plugin-smilies img {
+    display: -moz-inline-stack;
+    /* inline-block: http://blog.mozilla.org/webdev/2009/02/20/cross-browser-inline-block/ */
+    
+    display: inline-block;
+    *display: inline;
+}
+
+.lhjz-article-editor {
+    /* height: 500px; */
+}
+
+.lhjz-editor-smiles {
+    display: none;
+}
+/* end <admin/article.html> */
+
+.ad-images .cards {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ad-hot-news-content {
+    word-break: break-word;
+}
+
+.table-news-select {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.ad-news-select .content-news {
+    max-height: 300px;
+    overflow-y: auto;
+}

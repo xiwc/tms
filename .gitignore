@@ -8,8 +8,8 @@ dependency-reduced-pom.xml
 buildNumber.properties
 test-output/
 log/
-doc/
-resources/
+/doc/
+/resources/
 .README.md.html
 
 src/main/webapp/upload/
