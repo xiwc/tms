@@ -165,16 +165,16 @@ jQuery(function($) {
 
     $('.page-enable-checkbox').checkbox({
 
-        onChange:function(){
+        onChange: function() {
             var $chk = $('.page-enable-checkbox');
 
             $.post('admin/pageEnable', {
-                page: $chk.attr('data-page'), 
+                page: $chk.attr('data-page'),
                 enable: $chk.checkbox('is checked')
             }, function(data, textStatus, xhr) {
-                if(data.success){
+                if (data.success) {
                     toastr.success('页面显示状态设置成功!');
-                }else{
+                } else {
                     toastr.error('页面显示状态设置失败!');
                 }
             });
@@ -202,6 +202,17 @@ jQuery(function($) {
             }
 
             return str;
+        },
+        formData: function(selector) {
+
+            var data = {};
+            $(selector).find('input,textarea').each(function(index, el) {
+                var name = $(el).attr('name');
+                var val = $(el).val();
+                data[name] = val;
+            });
+
+            return data;
         }
     });
 });

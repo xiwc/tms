@@ -4,7 +4,6 @@
 package com.lhjz.portal.controller;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,8 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.entity.Config;
-import com.lhjz.portal.entity.Job;
-import com.lhjz.portal.entity.JobApply;
 import com.lhjz.portal.entity.Settings;
 import com.lhjz.portal.entity.security.Authority;
 import com.lhjz.portal.entity.security.User;
@@ -36,19 +33,14 @@ import com.lhjz.portal.pojo.ContactForm;
 import com.lhjz.portal.pojo.Enum.Key;
 import com.lhjz.portal.pojo.Enum.Module;
 import com.lhjz.portal.pojo.Enum.Page;
-import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.repository.ConfigRepository;
-import com.lhjz.portal.repository.DiagnoseRepository;
 import com.lhjz.portal.repository.FileRepository;
-import com.lhjz.portal.repository.JobApplyRepository;
-import com.lhjz.portal.repository.JobRepository;
 import com.lhjz.portal.repository.SettingsRepository;
 import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.EnumUtil;
 import com.lhjz.portal.util.FileUtil;
 import com.lhjz.portal.util.JsonUtil;
 import com.lhjz.portal.util.MapUtil;
-import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.WebUtil;
 
 /**
@@ -71,19 +63,10 @@ public class AdminController extends BaseController {
 	SettingsRepository settingsRepository;
 
 	@Autowired
-	DiagnoseRepository diagnoseRepository;
-
-	@Autowired
 	UserRepository userRepository;
 
 	@Autowired
 	ConfigRepository configRepository;
-
-	@Autowired
-	JobRepository jobRepository;
-
-	@Autowired
-	JobApplyRepository jobApplyRepository;
 
 	@RequestMapping("login")
 	public String login(Model model) {
@@ -182,27 +165,6 @@ public class AdminController extends BaseController {
 		return "admin/contact";
 	}
 
-	@RequestMapping("diagnose")
-	public String diagnose(Model model,
-			@RequestParam(value = "status", required = false) String status) {
-
-		if (StringUtil.isEmpty(status)) {
-			model.addAttribute("diagnoses", diagnoseRepository.findAll());
-		} else {
-
-			Status sts = EnumUtil.status(status);
-
-			if (sts == Status.Unknow) {
-				logger.error("查询状态对象不存在! status: {}", status);
-			}
-
-			model.addAttribute("diagnoses",
-					diagnoseRepository.findByStatus(sts));
-		}
-
-		return "admin/diagnose";
-	}
-
 	@RequestMapping("env")
 	public String env(Model model) {
 
@@ -267,45 +229,6 @@ public class AdminController extends BaseController {
 		model.addAttribute("mores", mores);
 
 		return "admin/health";
-	}
-
-	@RequestMapping("job")
-	public String job(Model model) {
-
-		List<Settings> settings = settingsRepository.findByPage(Page.Job);
-
-		List<Settings> introductions = new ArrayList<Settings>();
-
-		for (Settings settings2 : settings) {
-			if (settings2.getModule() == Module.Introduction) {
-				introductions.add(settings2);
-			}
-		}
-
-		model.addAttribute("introductions", introductions);
-
-		List<Job> jobs = jobRepository.findAll();
-
-		for (Job job : jobs) {
-			String labels = job.getLabels();
-
-			if (labels != null) {
-				String[] arr = labels.split(",");
-
-				for (String lbl : arr) {
-					String[] arr2 = lbl.trim().split("\\s+");
-					job.getLabelList().addAll(Arrays.asList(arr2));
-				}
-			}
-		}
-
-		model.addAttribute("jobs", jobs);
-
-		List<JobApply> jobApplies = jobApplyRepository.findAll();
-
-		model.addAttribute("jobApplies", jobApplies);
-
-		return "admin/job";
 	}
 
 	@RequestMapping("product")
@@ -394,6 +317,11 @@ public class AdminController extends BaseController {
 		return "admin/feedback";
 	}
 
+	@RequestMapping("translate")
+	public String translate(Model model) {
+		return "admin/translate";
+	}
+	
 	@RequestMapping(value = "pageEnable", method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody pageEnable(@RequestParam("page") String page,

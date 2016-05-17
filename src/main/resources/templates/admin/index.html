@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-    <title>立衡脊柱-门户主页</title>
+    <title>TMS-主页</title>
     <!-- css -->
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
@@ -31,58 +31,34 @@
 
 <body class="admin-index">
     <div th:with="uri=${#httpServletRequest.requestURI}" th:fragment="sidebar-menu" class="ui left thin vertical inverted labeled icon sidebar menu ad-index-menu">
-        <!-- <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html"> <i class="home icon"></i> 门户主页
+        <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html"> <i class="home icon"></i> 主页
         </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/about')} ? 'active' : ''" class="item" th:href="@{/admin/about}" href="about.html"> <i class="info circle icon"></i> 关于我们
+        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html"> <i class="info circle icon"></i> 翻译
         </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/feature')} ? 'active' : ''" class="item" th:href="@{/admin/feature}" href="feature.html"> <i class="dashboard icon"></i> 疗法特色
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/case')} ? 'active' : ''" class="item" th:href="@{/admin/case}" href="case.html"> <i class="smile icon"></i> 康复案例
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/product')} ? 'active' : ''" class="item" th:href="@{/admin/product}" href="product.html"> <i class="idea icon"></i> 专利产品
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/env')} ? 'active' : ''" class="item" th:href="@{/admin/env}" href="env.html"> <i class="grid layout icon"></i> 店内环境
-        </a> -->
-        <!-- <a th:classappend="${#strings.contains(uri, '/admin/team')} ? 'active' : ''" class="item" th:href="@{/admin/team}" href="team.html"> <i class="doctor icon"></i> 专家团队
-        </a> -->
-        <!-- <a th:classappend="${#strings.contains(uri, '/admin/job')} ? 'active' : ''" class="item" th:href="@{/admin/job}" href="job.html"> <i class="flag icon"></i> 团队招聘
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/health')} ? 'active' : ''" class="item" th:href="@{/admin/health}" href="health.html"> <i class="heartbeat icon"></i> 脊柱健康
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/diagnose')} ? 'active' : ''" class="item" th:href="@{/admin/diagnose?status=new}" href="diagnose.html"> <i class="treatment icon"></i> 在线诊断
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/contact')} ? 'active' : ''" class="item" th:href="@{/admin/contact}" href="contact.html"> <i class="at icon"></i> 联系我们
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/resource')} ? 'active' : ''" class="item" th:href="@{/admin/resource}" href="resource.html"> <i class="file image outline icon"></i> 资源文件
-        </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/article')} ? 'active' : ''" class="item" th:href="@{/admin/article}" href="article.html"> <i class="file text outline icon"></i> 文章管理
-        </a> -->
         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="users icon"></i> 用户管理
         </a>
     </div>
     <div th:fragment="top-fixed-menu" class="ui fixed inverted main menu">
-        <div class="container">
-            <a class="ui button icon item ad-index-btn-menu">
-                <i class="content icon"></i> 菜单
-            </a>
-            <div class="title item">
-                <b>立衡脊柱</b>
+        <a class="item ad-index-btn-menu">
+            <i class="content icon"></i> 菜单
+        </a>
+        <div class="title item">
+            <b>TMS</b>
+        </div>
+        <div class="right menu">
+            <div class="item link ad-item-feedback">
+                <div class="" th:attrappend="data-url=${#httpServletRequest.requestURI}">反馈 </div>
+                <form class="hidden" th:action="@{/admin/feedback}" action="" method="post">
+                    <input type="hidden" name="url" value="" th:value="${#httpServletRequest.requestURI}" />
+                    <input type="hidden" name="name" value="" />
+                </form>
             </div>
-            <div class="right menu">
-                <div class="item ui button ad-item-feedback">
-                    <div class="" th:attrappend="data-url=${#httpServletRequest.requestURI}">反馈 </div>
-                    <form class="hidden" th:action="@{/admin/feedback}" action="" method="post">
-                        <input type="hidden" name="url" value="" th:value="${#httpServletRequest.requestURI}" />
-                        <input type="hidden" name="name" value="" />
-                    </form>
-                </div>
-                <div class="item ui button">
-                    <div th:attr="data-id=${#authentication.name},data-html='当前登录用户: <b>' + ${#authentication.name} + '</b>'" class="ad-index-user-edit popup-login-user">修改 </div>
-                </div>
-                <div class="item ui button">
-                    <div class="ad-index-logout">退出 </div>
-                    <form class="hidden" th:action="@{/admin/logout}" action="" method="post"></form>
-                </div>
+            <div class="item link">
+                <div th:attr="data-id=${#authentication.name},data-html='当前登录用户: <b>' + ${#authentication.name} + '</b>'" class="ad-index-user-edit popup-login-user">修改 </div>
+            </div>
+            <div class="item link">
+                <div class="ad-index-logout">退出 </div>
+                <form class="hidden" th:action="@{/admin/logout}" action="" method="post"></form>
             </div>
         </div>
     </div>
@@ -91,45 +67,12 @@
             <div th:fragment="rail-menu" class="ui dividing close left rail ad-index-rail" style="width:210px; min-height:450px;">
                 <div class="ui sticky ad-index-sticky">
                     <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing menu">
-                        <!-- <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
-                            <i class="home icon"></i> 门户主页
+                        <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
+                            <i class="home icon"></i> 主页
                         </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/about')} ? 'active' : ''" class="item" th:href="@{/admin/about}" href="about.html">
-                            <i class="info circle icon"></i> 关于我们
+                        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html">
+                            <i class="info circle icon"></i> 翻译
                         </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/feature')} ? 'active' : ''" class="item" th:href="@{/admin/feature}" href="feature.html">
-                            <i class="dashboard icon"></i> 疗法特色
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/case')} ? 'active' : ''" class="item" th:href="@{/admin/case}" href="case.html">
-                            <i class="smile icon"></i> 康复案例
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/product')} ? 'active' : ''" class="item" th:href="@{/admin/product}" href="product.html">
-                            <i class="idea icon"></i> 专利产品
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/env')} ? 'active' : ''" class="item" th:href="@{/admin/env}" href="env.html">
-                            <i class="grid layout icon"></i> 店内环境
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/team')} ? 'active' : ''" class="item" th:href="@{/admin/team}" href="team.html">
-                            <i class="doctor icon"></i> 专家团队
-                        </a> 
-                        <a th:classappend="${#strings.contains(uri, '/admin/job')} ? 'active' : ''" class="item" th:href="@{/admin/job}" href="job.html">
-                            <i class="flag icon"></i> 团队招聘
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/health')} ? 'active' : ''" class="item" th:href="@{/admin/health}" href="health.html">
-                            <i class="heartbeat icon"></i> 脊柱健康
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/diagnose')} ? 'active' : ''" class="item" th:href="@{/admin/diagnose?status=new}" href="diagnose.html">
-                            <i class="treatment icon"></i> 在线诊断
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/contact')} ? 'active' : ''" class="item" th:href="@{/admin/contact}" href="contact.html">
-                            <i class="at icon"></i> 联系我们
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/resource')} ? 'active' : ''" class="item" th:href="@{/admin/resource}" href="resource.html">
-                            <i class="file image outline icon"></i> 资源文件
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/article')} ? 'active' : ''" class="item" th:href="@{/admin/article}" href="article.html">
-                            <i class="file text outline icon"></i> 文章管理
-                        </a> -->
                         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
                             <i class="users icon"></i> 用户管理
                         </a>
@@ -138,114 +81,6 @@
             </div>
             <div id="context">
                 <div th:replace="admin/template :: ad-page-header ('门户主页', 'index')"></div>
-                <div class="ui styled fluid accordion">
-                    <div class="title">
-                        <i class="dropdown icon"></i> 轮动图
-                    </div>
-                    <div class="content">
-                        <div class="ui segment">
-                            <div class="ui primary button ad-add-image" data-for="index:bigImg">添加</div>
-                        </div>
-                        <div class="ui divided list big-img-list" th:remove="all-but-first">
-                            <div class="item" th:each="bigImg : ${bigImgs}">
-                                <div class="ui segment">
-                                    <img class="ui image" th:src="${bigImg.imgUrl}">
-                                    <div class="carousel-caption">
-                                        <h1 class="new-title" th:if="${#strings.isEmpty(bigImg.title)}"></h1>
-                                        <h1 class="new-title" th:if="${not #strings.isEmpty(bigImg.title)}" th:text="${bigImg.title}">关于我们</h1>
-                                        <p class="new-content" th:if="${#strings.isEmpty(bigImg.content)}"></p>
-                                        <p class="new-content" th:if="${not #strings.isEmpty(bigImg.content)}" th:text="${#strings.abbreviate(bigImg.content,120)}">立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
-                                        <p class="new-link" th:if="${#strings.isEmpty(bigImg.link)}"></p>
-                                        <p class="new-link" th:if="${not #strings.isEmpty(bigImg.link)}"><a target="_blank" class="ui primary button" th:href="@{/article(id=${bigImg.link})}" href="#" role="button">了解更多</a></p>
-                                    </div>
-                                    <div class="ui divider"></div>
-                                    <div class="ui primary compact button btn-big-img-edit" th:attrappend="data-id=${bigImg.id}">编辑</div>
-                                    <div class="right floated compact ui red button btn-big-img-del" th:attrappend="data-id=${bigImg.id}">删除</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="title">
-                        <i class="dropdown icon"></i> 热门动态
-                    </div>
-                    <div class="content">
-                        <div class="ui segment">
-                            <div class="ui primary button ad-add-image" data-for="index:hotNews">添加</div>
-                        </div>
-                        <div class="ui link cards ad-hot-news-list" th:remove="all-but-first">
-                            <div class="card" th:each="hotNew : ${hotNews}">
-                                <div class="image">
-                                    <img th:title="${hotNew.more}" th:alt="${hotNew.link}" src="../../static/landing/img/img1.jpg" title="" th:src="${hotNew.imgUrl}">
-                                </div>
-                                <div class="content">
-                                    <div class="header" th:text="${hotNew.title}"></div>
-                                    <div class="description ad-hot-news-content" th:text="${#strings.abbreviate(hotNew.content,65)}"></div>
-                                </div>
-                                <div class="extra content">
-                                    <span class="right floated">
-                                        <div class="ui small red compact button btn-hot-news-del" th:attrappend="data-id=${hotNew.id}">删除</div>
-                                    </span>
-                                    <span>
-                                        <div class="ui small primary compact button btn-hot-news-edit" th:attrappend="data-id=${hotNew.id}">编辑</div>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="title">
-                        <i class="dropdown icon"></i> 更多动态
-                    </div>
-                    <div class="content">
-                        <div class="ui two column stackable grid grid-more-news">
-                            <div class="column">
-                                <div class="ui segment">
-                                    <div class="ui primary button btn-more-news-add" data-col="1">添加</div>
-                                </div>
-                                <div class="ui segment">
-                                    <div class="ui divided list" th:remove="all-but-first">
-                                        <div class="item" th:each="moreNew : ${moreNews}" th:if="${moreNew.more == '1'}">
-                                            <div class="right floated compact ui red button btn-more-news-del" th:attrappend="data-id=${moreNew.id}">删除</div>
-                                            <i class="linkify icon"></i>
-                                            <div class="content">
-                                                <div class="header" th:text="${moreNew.title}">Justen Kitsune</div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="right floated compact ui red button btn-more-news-del">删除</div>
-                                            <i class="linkify icon"></i>
-                                            <div class="content">
-                                                <div class="header">Justen Kitsune</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="column">
-                                <div class="ui segment">
-                                    <div class="ui primary button btn-more-news-add" data-col="2">添加</div>
-                                </div>
-                                <div class="ui segment">
-                                    <div class="ui divided list" th:remove="all-but-first">
-                                        <div class="item" th:each="moreNew : ${moreNews}" th:if="${moreNew.more == '2'}">
-                                            <div class="right floated compact ui red button btn-more-news-del" th:attrappend="data-id=${moreNew.id}">删除</div>
-                                            <i class="linkify icon"></i>
-                                            <div class="content">
-                                                <div class="header" th:text="${moreNew.title}">Justen Kitsune</div>
-                                            </div>
-                                        </div>
-                                        <div class="item">
-                                            <div class="right floated compact ui red button btn-more-news-del">删除</div>
-                                            <i class="linkify icon"></i>
-                                            <div class="content">
-                                                <div class="header">Justen Kitsune</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -270,6 +105,7 @@
                 $btn.siblings('.popup').find('p').html($dropdown.dropdown('get item', value).attr('data-content'));
             }
         });
+
         // article dropdown list popup
         $('.btn-article-detail')
             .popup({

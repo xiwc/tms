@@ -5,6 +5,8 @@ package com.lhjz.portal.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,6 +14,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
@@ -26,35 +30,36 @@ import com.lhjz.portal.pojo.Enum.Status;
  * 
  */
 @Entity
-public class Diagnose implements Serializable {
+public class Project implements Serializable {
 
-	/** serialVersionUID (long) */
-	private static final long serialVersionUID = 4730479799042412659L;
+	private static final long serialVersionUID = -278833537706540131L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	private String username;
-	private Integer age;
-	private String job;
-	private String mail;
-	private String phone;
-	@Column(nullable = false, length = 1000)
+	private String name;
+
+	@Column(length = 2000)
 	private String description;
 
-	@Column(length = 16777216)
-	private String content;
+	private String creator;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private Status status = Status.New;
+	private Status status = Status.Normal;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date createDate;
+	private Date createDate = new Date();
 
 	@Version
 	private long version;
+
+	@ManyToMany(mappedBy = "projects")
+	private Set<Language> languages = new HashSet<Language>();
+
+	@OneToMany(mappedBy = "project")
+	private Set<Translate> translates = new HashSet<Translate>();
 
 	public Long getId() {
 		return id;
@@ -64,44 +69,12 @@ public class Diagnose implements Serializable {
 		this.id = id;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getName() {
+		return name;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public Integer getAge() {
-		return age;
-	}
-
-	public void setAge(Integer age) {
-		this.age = age;
-	}
-
-	public String getJob() {
-		return job;
-	}
-
-	public void setJob(String job) {
-		this.job = job;
-	}
-
-	public String getMail() {
-		return mail;
-	}
-
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getDescription() {
@@ -110,6 +83,14 @@ public class Diagnose implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public String getCreator() {
+		return creator;
+	}
+
+	public void setCreator(String creator) {
+		this.creator = creator;
 	}
 
 	public Status getStatus() {
@@ -136,21 +117,26 @@ public class Diagnose implements Serializable {
 		this.version = version;
 	}
 
-	public String getContent() {
-		return content;
+	public Set<Language> getLanguages() {
+		return languages;
 	}
 
-	public void setContent(String content) {
-		this.content = content;
+	public void setLanguages(Set<Language> languages) {
+		this.languages = languages;
+	}
+
+	public Set<Translate> getTranslates() {
+		return translates;
+	}
+
+	public void setTranslates(Set<Translate> translates) {
+		this.translates = translates;
 	}
 
 	@Override
 	public String toString() {
-		return "Diagnose [id=" + id + ", username=" + username + ", age=" + age
-				+ ", job=" + job + ", mail=" + mail + ", phone=" + phone
-				+ ", description=" + description + ", content=" + content
-				+ ", status=" + status + ", createDate=" + createDate
-				+ ", version=" + version + "]";
+		return "Project [id=" + id + ", name=" + name + ", description=" + description + ", creator=" + creator
+				+ ", status=" + status + ", createDate=" + createDate + ", version=" + version + "]";
 	}
 
 }

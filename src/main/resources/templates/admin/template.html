@@ -323,6 +323,38 @@
             <div class="ui ok positive button">确定</div>
         </div>
     </div>
+    <!-- translate add modal -->
+    <div th:fragment="ad-translate-add" class="ui small modal ad-translate-add">
+        <div class="header">
+            添加翻译
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="field">
+                        <label>名称:</label>
+                        <input name="key" type="text" placeholder="名称" value="app.name">
+                    </div>
+                    <div class="field">
+                        <label>描述:</label>
+                        <textarea name="desc" rows="2" placeholder="描述">程序名称</textarea>
+                    </div>
+                    <div class="inline field">
+                        <label>中文:</label>
+                        <textarea name="zh" rows="2" placeholder="中文">测试</textarea>
+                    </div>
+                    <div class="inline field">
+                        <label>英文:</label>
+                        <textarea name="en" rows="2" placeholder="英文">test</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
     <!-- user edit modal -->
     <div th:fragment="ad-user-edit" class="ui small modal ad-user-edit">
         <div class="header">

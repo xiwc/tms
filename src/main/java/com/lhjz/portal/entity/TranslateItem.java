@@ -28,40 +28,36 @@ import com.lhjz.portal.pojo.Enum.Status;
  * 
  */
 @Entity
-public class JobApply implements Serializable {
+public class TranslateItem implements Serializable {
 
-	/** serialVersionUID (long) */
-	private static final long serialVersionUID = -7244230054736049452L;
+	private static final long serialVersionUID = -7590249673888211416L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
-	// 申请人
-	private String claimer;
-	private String phone;
-	private String mail;
-	private String address;
 	@Column(length = 16777216)
 	private String content;
-	// 简历路径
-	private String resume;
-	// 简历文件名称
-	private String name;
 
-	@ManyToOne
-	@JoinColumn(name = "JOB_ID")
-	private Job job;
+	private String creator;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Status status = Status.Normal;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date createDate;
+	private Date createDate = new Date();
 
 	@Version
 	private long version;
+
+	@ManyToOne
+	@JoinColumn(name = "translate_id")
+	private Translate translate;
+
+	@ManyToOne
+	@JoinColumn(name = "language_id")
+	private Language language;
 
 	public Long getId() {
 		return id;
@@ -69,38 +65,6 @@ public class JobApply implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getClaimer() {
-		return claimer;
-	}
-
-	public void setClaimer(String claimer) {
-		this.claimer = claimer;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getMail() {
-		return mail;
-	}
-
-	public void setMail(String mail) {
-		this.mail = mail;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
 	}
 
 	public String getContent() {
@@ -111,12 +75,12 @@ public class JobApply implements Serializable {
 		this.content = content;
 	}
 
-	public String getResume() {
-		return resume;
+	public String getCreator() {
+		return creator;
 	}
 
-	public void setResume(String resume) {
-		this.resume = resume;
+	public void setCreator(String creator) {
+		this.creator = creator;
 	}
 
 	public Status getStatus() {
@@ -143,28 +107,25 @@ public class JobApply implements Serializable {
 		this.version = version;
 	}
 
-	public String getName() {
-		return name;
+	public Translate getTranslate() {
+		return translate;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTranslate(Translate translate) {
+		this.translate = translate;
 	}
 
-	public Job getJob() {
-		return job;
+	public Language getLanguage() {
+		return language;
 	}
 
-	public void setJob(Job job) {
-		this.job = job;
+	public void setLanguage(Language language) {
+		this.language = language;
 	}
 
 	@Override
 	public String toString() {
-		return "JobApply [id=" + id + ", claimer=" + claimer + ", phone="
-				+ phone + ", mail=" + mail + ", address=" + address
-				+ ", content=" + content + ", resume=" + resume + ", name="
-				+ name + ", jobId=" + job.getId() + ", status=" + status
+		return "TranslateItem [id=" + id + ", content=" + content + ", creator=" + creator + ", status=" + status
 				+ ", createDate=" + createDate + ", version=" + version + "]";
 	}
 

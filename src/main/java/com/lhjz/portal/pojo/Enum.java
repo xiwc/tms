@@ -18,7 +18,7 @@ public class Enum {
 	}
 
 	public static enum Target {
-		Article, File, Feedback, Diagnose, Settings, Page, User, Authority, Config, Feature, Case, Product, Env, Health, Job, JobApply;
+		Translate, Article, File, Feedback, Diagnose, Settings, Page, User, Authority, Config, Feature, Case, Product, Env, Health, Job, JobApply;
 	}
 
 	public static enum Page {
