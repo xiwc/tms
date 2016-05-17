@@ -57,6 +57,7 @@ public class Project implements Serializable {
 	@Version
 	private long version;
 
+	@JsonIgnore
 	@ManyToMany(mappedBy = "projects")
 	private Set<Language> languages = new HashSet<Language>();
 	

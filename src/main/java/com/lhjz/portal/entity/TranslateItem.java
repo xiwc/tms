@@ -53,9 +53,9 @@ public class TranslateItem implements Serializable {
 	@Version
 	private long version;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "translate_id")
-	@JsonIgnore
 	private Translate translate;
 
 	@ManyToOne

@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -67,7 +68,7 @@ public class Translate implements Serializable {
 	@JoinColumn(name = "project_id")
 	private Project project;
 
-	@OneToMany(mappedBy = "translate", cascade = { CascadeType.ALL })
+	@OneToMany(mappedBy = "translate", cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	private Set<TranslateItem> translateItems = new HashSet<TranslateItem>();
 
 	public Long getId() {
