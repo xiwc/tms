@@ -18,6 +18,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -53,6 +55,7 @@ public class TranslateItem implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "translate_id")
+	@JsonIgnore
 	private Translate translate;
 
 	@ManyToOne

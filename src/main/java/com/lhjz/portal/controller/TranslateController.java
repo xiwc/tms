@@ -218,13 +218,7 @@ public class TranslateController extends BaseController {
 			return RespBody.failed("项目不存在!");
 		}
 
-		List<Translate> translates = translateRepository.findByProject(project);
-		for (Translate translate : translates) {
-			Set<TranslateItem> items = translate.getTranslateItems();
-			for (TranslateItem translateItem : items) {
-				translateItem.setTranslate(null);
-			}
-		}
+		Set<Translate> translates = project.getTranslates();
 
 		return RespBody.succeed(translates);
 	}

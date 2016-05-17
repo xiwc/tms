@@ -20,6 +20,8 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -57,7 +59,8 @@ public class Project implements Serializable {
 
 	@ManyToMany(mappedBy = "projects")
 	private Set<Language> languages = new HashSet<Language>();
-
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "project")
 	private Set<Translate> translates = new HashSet<Translate>();
 
