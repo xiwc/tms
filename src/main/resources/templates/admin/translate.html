@@ -28,15 +28,18 @@
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
                 <div th:replace="admin/template :: ad-page-header ('翻译', 'translate')"></div>
-                <div class="ui attached segment">
+                <div class="ui segment">
                     <div class="ui selection dropdown dd-project">
-                        <input type="hidden" name="project" value="1">
+                        <input type="hidden" name="project" th:value="${projectId}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">项目</div>
-                        <div class="menu">
-                            <div class="item" data-value="1">STEP</div>
-                            <div class="item" data-value="2">WORK</div>
-                            <div class="item" data-value="3">CONSOLE</div>
+                        <div class="menu" th:remove="all-but-first">
+                            <!--/*/
+                            <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
+                            /*/-->
+                            <a class="item" data-value="1">STEP</a>
+                            <a class="item" data-value="2">WORK</a>
+                            <a class="item" data-value="3">CONSOLE</a>
                         </div>
                     </div>
                     <div class="ui primary compact button btn-add">添加</div>
@@ -46,35 +49,35 @@
                         <thead>
                             <th>名称</th>
                             <th>描述</th>
-                            <th>中文</th>
-                            <th>英文</th>
+                            <th>翻译</th>
+                            <!-- <th th:each="l : ${languages}" th:text="${l.description}">中文</th> -->
                             <th>创建时间</th>
                             <th>状态</th>
                             <th>处理</th>
                         </thead>
                         <tbody th:remove="all-but-first">
                             <!--/*/
-                            <tr th:each="user : ${users}" th:attr="data-id=${user.username}">
-                                <td th:text="${user.username}">username</td>
+                            <tr th:each="t : ${translates}" th:attr="data-id=${t.id}">
+                                <td th:text="${t.key}">app.name</td>
+                                <td th:text="${t.description}">应用名称</td>
                                 <td>
-                                    <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small tag label user-role" th:text="${auth}"></div>
+                                    <div class="ui form">
+                                        <div class="inline field" th:each="item : ${t.translateItems}" th:attr="data-id=${item.id}">
+                                            <label th:text="${item.language.description} + ':'">中文:</label>
+                                            <textarea name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
-                                <td class="user-status" th:if="${user.enabled}">
-                                    <div class="ui green small tag label">开启</div>
-                                </td>
-                                <td class="user-status" th:if="${not user.enabled}">
-                                    <div class="ui yellow small tag label">停用</div>
-                                </td>
+                                <td th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td th:text="${t.status}">待翻译</td>
                                 <td>
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny red button lhjz-btn-del">删除</div>
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div>
+                                    <div class="ui dropdown">
+                                        <div class="text">操作</div>
+                                        <i class="dropdown icon"></i>
+                                        <div class="menu">
+                                            <div class="item">删除</div>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             /*/-->

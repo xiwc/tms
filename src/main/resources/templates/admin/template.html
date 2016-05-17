@@ -333,19 +333,15 @@
                 <div class="ui form">
                     <div class="field">
                         <label>名称:</label>
-                        <input name="key" type="text" placeholder="名称" value="app.name">
+                        <input name="key" type="text" placeholder="名称" th:value="''" value="app.name">
                     </div>
                     <div class="field">
                         <label>描述:</label>
-                        <textarea name="desc" rows="2" placeholder="描述">程序名称</textarea>
+                        <textarea name="desc" rows="2" placeholder="描述" th:text="''">程序名称</textarea>
                     </div>
-                    <div class="inline field">
-                        <label>中文:</label>
-                        <textarea name="zh" rows="2" placeholder="中文">测试</textarea>
-                    </div>
-                    <div class="inline field">
-                        <label>英文:</label>
-                        <textarea name="en" rows="2" placeholder="英文">test</textarea>
+                    <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
+                        <label th:text="${l.description} + ':'">中文:</label>
+                        <textarea name="zh" th:name="${l.name}" rows="1" th:placeholder="${l.description}" th:text="''">测试</textarea>
                     </div>
                 </div>
             </div>
@@ -422,13 +418,13 @@
                 <p class="markdown-content" th:attr="data-url='admin/md/' + ${id} + '.md'"></p>
             </div>
         </div>
-        <h2 class="ui header">
+        <!-- <h2 class="ui header">
             <i class="settings icon"></i>
             <div class="content">
                 <span th:text="${name} + '设置'">XXXX设置</span>
                 <div class="sub header" th:text="'设置' + ${name} + '各模块的内容'">设置XXXX各模块的内容</div>
             </div>
-        </h2>
+        </h2> -->
     </th:block>
     <div th:fragment="ad-page-basic-settings (page)" class="ui attached segment">
         <div class="ui toggle checkbox page-enable-checkbox" th:attr="data-page=${page}" th:with="chk=${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, page)} and ${not pageEnable[__${page}__]}">

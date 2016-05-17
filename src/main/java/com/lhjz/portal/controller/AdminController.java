@@ -24,7 +24,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.entity.Config;
+import com.lhjz.portal.entity.Language;
+import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Settings;
+import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.security.Authority;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.RespBody;
@@ -35,6 +38,7 @@ import com.lhjz.portal.pojo.Enum.Module;
 import com.lhjz.portal.pojo.Enum.Page;
 import com.lhjz.portal.repository.ConfigRepository;
 import com.lhjz.portal.repository.FileRepository;
+import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.SettingsRepository;
 import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.EnumUtil;
@@ -61,6 +65,9 @@ public class AdminController extends BaseController {
 
 	@Autowired
 	SettingsRepository settingsRepository;
+
+	@Autowired
+	ProjectRepository projectRepository;
 
 	@Autowired
 	UserRepository userRepository;
@@ -318,10 +325,34 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("translate")
-	public String translate(Model model) {
+	public String translate(Model model,
+			@RequestParam(value = "projectId", required = false) Long projectId) {
+
+		List<Project> projects = projectRepository.findAll();
+		Set<Translate> translates = null;
+		Set<Language> languages = null;
+		if (projectId != null) {
+			Project project = projectRepository.findOne(projectId);
+			if (project != null) {
+				translates = project.getTranslates();
+				languages = project.getLanguages();
+			}
+		} else {
+			if (projects.size() > 0) {
+				projectId = projects.get(0).getId();
+				translates = projects.get(0).getTranslates();
+				languages = projects.get(0).getLanguages();
+			}
+		}
+
+		model.addAttribute("projects", projects);
+		model.addAttribute("translates", translates);
+		model.addAttribute("languages", languages);
+		model.addAttribute("projectId", projectId);
+
 		return "admin/translate";
 	}
-	
+
 	@RequestMapping(value = "pageEnable", method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody pageEnable(@RequestParam("page") String page,
