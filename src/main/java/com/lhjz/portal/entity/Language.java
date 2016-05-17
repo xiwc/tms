@@ -14,16 +14,15 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -59,7 +58,7 @@ public class Language implements Serializable {
 	@Version
 	private long version;
 
-	@JsonIgnore
+	@com.fasterxml.jackson.annotation.JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "language_project", joinColumns = { @JoinColumn(name = "language_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "project_id") })
