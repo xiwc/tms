@@ -57,7 +57,7 @@
                         </thead>
                         <tbody th:remove="all-but-first">
                             <!--/*/
-                            <tr th:each="t : ${translates}" th:attr="data-id=${t.id}">
+                            <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
                                 <td th:text="${t.key}">app.name</td>
                                 <td th:text="${t.description}">应用名称</td>
                                 <td>
@@ -104,6 +104,24 @@
                                 </td>
                             </tr>
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="6">
+                                    <div class="ui right floated pagination menu">
+                                        <!-- <a th:href="@{/admin/translate(page=${page.pageable.page - 1}, size=${page.pageable.size})}" class="icon item">
+                                            <i class="left chevron icon"></i>
+                                        </a> -->
+                                        <a class="item">1</a>
+                                        <a class="item">2</a>
+                                        <a class="item">3</a>
+                                        <a class="item">4</a>
+                                        <!-- <a th:href="@{/admin/translate(page=${page.pageable.page + 1}, size=${page.pageable.size})}" class="icon item">
+                                            <i class="right chevron icon"></i>
+                                        </a> -->
+                                    </div>
+                                </th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>

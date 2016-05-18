@@ -5,6 +5,8 @@ package com.lhjz.portal.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lhjz.portal.entity.Project;
@@ -22,4 +24,6 @@ public interface TranslateRepository extends JpaRepository<Translate, Long> {
 	List<Translate> findByKeyAndProject(String key, Project project);
 
 	List<Translate> findByProject(Project project);
+
+	Page<Translate> findByProject(Project project, Pageable pageable);
 }

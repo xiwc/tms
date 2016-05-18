@@ -13,6 +13,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +42,7 @@ import com.lhjz.portal.repository.ConfigRepository;
 import com.lhjz.portal.repository.FileRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.SettingsRepository;
+import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.EnumUtil;
 import com.lhjz.portal.util.FileUtil;
@@ -68,6 +71,9 @@ public class AdminController extends BaseController {
 
 	@Autowired
 	ProjectRepository projectRepository;
+
+	@Autowired
+	TranslateRepository translateRepository;
 
 	@Autowired
 	UserRepository userRepository;
@@ -318,27 +324,32 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("translate")
-	public String translate(Model model, @RequestParam(value = "projectId", required = false) Long projectId) {
+	public String translate(Model model, @PageableDefault Pageable pageable,
+			@RequestParam(value = "projectId", required = false) Long projectId) {
 
 		List<Project> projects = projectRepository.findAll();
-		Set<Translate> translates = null;
+		// Set<Translate> translates = null;
 		Set<Language> languages = null;
+		org.springframework.data.domain.Page<Translate> page = null;
 		if (projectId != null) {
 			Project project = projectRepository.findOne(projectId);
 			if (project != null) {
-				translates = project.getTranslates();
+				// translates = project.getTranslates();
+				page = translateRepository.findByProject(project, pageable);
 				languages = project.getLanguages();
 			}
 		} else {
 			if (projects.size() > 0) {
 				projectId = projects.get(0).getId();
-				translates = projects.get(0).getTranslates();
+				// translates = projects.get(0).getTranslates();
+				page = translateRepository.findByProject(projects.get(0), pageable);
 				languages = projects.get(0).getLanguages();
 			}
 		}
 
 		model.addAttribute("projects", projects);
-		model.addAttribute("translates", translates);
+		// model.addAttribute("translates", translates);
+		model.addAttribute("page", page);
 		model.addAttribute("languages", languages);
 		model.addAttribute("projectId", projectId);
 
