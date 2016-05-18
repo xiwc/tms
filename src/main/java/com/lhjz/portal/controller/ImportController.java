@@ -3,6 +3,7 @@
  */
 package com.lhjz.portal.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -96,6 +97,9 @@ public class ImportController extends BaseController {
 		Map<String, String> kvMaps = new HashMap<>();
 		joinKV(jsonO, "", kvMaps);
 
+		List<TranslateItem> translateItems2 = new ArrayList<TranslateItem>();
+		List<Translate> translates2 = new ArrayList<Translate>();
+
 		for (String key : kvMaps.keySet()) {
 			List<Translate> translates = translateRepository.findByKeyAndProject(key, project);
 			if (translates.size() > 0) {
@@ -106,8 +110,8 @@ public class ImportController extends BaseController {
 					if (translateItem.getLanguage().getId().equals(languageId)) {
 						language = translateItem.getLanguage();
 						translateItem.setContent(kvMaps.get(key));
-
-						translateItemRepository.saveAndFlush(translateItem);
+						translateItems2.add(translateItem);
+						// translateItemRepository.saveAndFlush(translateItem);
 					}
 				}
 
@@ -120,7 +124,8 @@ public class ImportController extends BaseController {
 					translateItem.setStatus(Status.New);
 					translateItem.setTranslate(translate2);
 
-					translateItemRepository.saveAndFlush(translateItem);
+					translateItems2.add(translateItem);
+					// translateItemRepository.saveAndFlush(translateItem);
 				}
 			} else {
 				Translate translate = new Translate();
@@ -150,10 +155,15 @@ public class ImportController extends BaseController {
 					translateItems.add(item);
 				}
 
-				translateRepository.saveAndFlush(translate);
+				translates2.add(translate);
+				// translateRepository.saveAndFlush(translate);
 			}
-
 		}
+
+		translateItemRepository.save(translateItems2);
+		translateItemRepository.flush();
+		translateRepository.save(translates2);
+		translateRepository.flush();
 
 		return RespBody.succeed();
 	}

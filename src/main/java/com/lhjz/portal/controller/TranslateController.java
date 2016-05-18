@@ -12,6 +12,9 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -181,7 +184,8 @@ public class TranslateController extends BaseController {
 	@RequestMapping(value = "get", method = RequestMethod.GET)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
-	public RespBody get(@RequestParam("projectId") Long projectId) {
+	public RespBody get(@RequestParam("projectId") Long projectId,
+			@PageableDefault Pageable pageable) {
 
 		Project project = projectRepository.findOne(projectId);
 
@@ -190,9 +194,10 @@ public class TranslateController extends BaseController {
 			return RespBody.failed("项目不存在!");
 		}
 
-		Set<Translate> translates = project.getTranslates();
+		Page<Translate> page = translateRepository.findByProject(project,
+				pageable);
 
-		return RespBody.succeed(translates);
+		return RespBody.succeed(page);
 	}
 
 	@RequestMapping(value = "getById", method = RequestMethod.GET)
