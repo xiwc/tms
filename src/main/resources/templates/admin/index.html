@@ -35,6 +35,8 @@
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html"> <i class="info circle icon"></i> 翻译
         </a>
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="users icon"></i> 导入导出
+        </a>
         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="users icon"></i> 用户管理
         </a>
     </div>
@@ -73,6 +75,9 @@
                         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html">
                             <i class="info circle icon"></i> 翻译
                         </a>
+                        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
+                            <i class="users icon"></i> 导入导出
+                        </a>
                         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
                             <i class="users icon"></i> 用户管理
                         </a>
@@ -80,7 +85,8 @@
                 </div>
             </div>
             <div id="context">
-                <div th:replace="admin/template :: ad-page-header ('门户主页', 'index')"></div>
+                <!-- <div th:replace="admin/template :: ad-page-header ('门户主页', 'index')"></div> -->
+                <div class="ui header">建设中...尽请期待!</div>
             </div>
         </div>
     </div>

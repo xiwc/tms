@@ -163,8 +163,7 @@ public class AdminController extends BaseController {
 		Config config = configRepository.findFirstByKey(Key.Contact);
 
 		if (config != null) {
-			model.addAttribute("contact",
-					JsonUtil.json2Object(config.getValue(), ContactForm.class));
+			model.addAttribute("contact", JsonUtil.json2Object(config.getValue(), ContactForm.class));
 		} else {
 			model.addAttribute("contact", new ContactForm());
 		}
@@ -294,20 +293,14 @@ public class AdminController extends BaseController {
 	public String resource(Model model) {
 
 		String storePath = env.getProperty("lhjz.upload.img.store.path");
-		int sizeLarge = env.getProperty("lhjz.upload.img.scale.size.large",
-				Integer.class);
-		int sizeHuge = env.getProperty("lhjz.upload.img.scale.size.huge",
-				Integer.class);
-		int sizeOriginal = env.getProperty(
-				"lhjz.upload.img.scale.size.original", Integer.class);
+		int sizeLarge = env.getProperty("lhjz.upload.img.scale.size.large", Integer.class);
+		int sizeHuge = env.getProperty("lhjz.upload.img.scale.size.huge", Integer.class);
+		int sizeOriginal = env.getProperty("lhjz.upload.img.scale.size.original", Integer.class);
 
 		// img relative path (eg:'upload/img/' & 640 & '/' )
-		model.addAttribute("path",
-				FileUtil.joinPaths(storePath, sizeOriginal + "/"));
-		model.addAttribute("pathLarge",
-				FileUtil.joinPaths(storePath, sizeLarge + "/"));
-		model.addAttribute("pathHuge",
-				FileUtil.joinPaths(storePath, sizeHuge + "/"));
+		model.addAttribute("path", FileUtil.joinPaths(storePath, sizeOriginal + "/"));
+		model.addAttribute("pathLarge", FileUtil.joinPaths(storePath, sizeLarge + "/"));
+		model.addAttribute("pathHuge", FileUtil.joinPaths(storePath, sizeHuge + "/"));
 		// list all files
 		model.addAttribute("imgs", fileRepository.findAll());
 
@@ -325,8 +318,7 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("translate")
-	public String translate(Model model,
-			@RequestParam(value = "projectId", required = false) Long projectId) {
+	public String translate(Model model, @RequestParam(value = "projectId", required = false) Long projectId) {
 
 		List<Project> projects = projectRepository.findAll();
 		Set<Translate> translates = null;
@@ -353,10 +345,37 @@ public class AdminController extends BaseController {
 		return "admin/translate";
 	}
 
+	@RequestMapping("import")
+	public String _import(Model model, @RequestParam(value = "projectId", required = false) Long projectId) {
+
+		List<Project> projects = projectRepository.findAll();
+		Set<Translate> translates = null;
+		Set<Language> languages = null;
+		if (projectId != null) {
+			Project project = projectRepository.findOne(projectId);
+			if (project != null) {
+				translates = project.getTranslates();
+				languages = project.getLanguages();
+			}
+		} else {
+			if (projects.size() > 0) {
+				projectId = projects.get(0).getId();
+				translates = projects.get(0).getTranslates();
+				languages = projects.get(0).getLanguages();
+			}
+		}
+
+		model.addAttribute("projects", projects);
+		model.addAttribute("translates", translates);
+		model.addAttribute("languages", languages);
+		model.addAttribute("projectId", projectId);
+
+		return "admin/import";
+	}
+
 	@RequestMapping(value = "pageEnable", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody pageEnable(@RequestParam("page") String page,
-			@RequestParam("enable") boolean enable) {
+	public RespBody pageEnable(@RequestParam("page") String page, @RequestParam("enable") boolean enable) {
 
 		Page page2 = EnumUtil.page(page);
 

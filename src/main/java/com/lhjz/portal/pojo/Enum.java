@@ -10,7 +10,7 @@ package com.lhjz.portal.pojo;
 public class Enum {
 
 	public static enum Status {
-		Unknow, Normal, Deleted, Bultin, New, Opening, Analyzing, Accepted, Processing, Resolved, Closed, Ignored, Failed, Checked;
+		Updated, Unknow, Normal, Deleted, Bultin, New, Opening, Analyzing, Accepted, Processing, Resolved, Closed, Ignored, Failed, Checked;
 	}
 
 	public static enum Action {

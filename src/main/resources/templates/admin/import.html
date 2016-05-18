@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-    <title>TMS-翻译</title>
+    <title>TMS-翻译导入</title>
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
@@ -27,7 +27,7 @@
         <div class="ad-index-container">
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
-                <div th:replace="admin/template :: ad-page-header ('翻译', 'translate')"></div>
+                <div th:replace="admin/template :: ad-page-header ('翻译导入', 'import')"></div>
                 <div class="ui segment">
                     选择项目:
                     <div class="ui selection dropdown dd-project">
@@ -36,75 +36,33 @@
                         <div class="default text">项目</div>
                         <div class="menu" th:remove="all-but-first">
                             <!--/*/
-                            <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
+                            <a th:each="p : ${projects}" class="item" th:href="@{/admin/import(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
                             /*/-->
                             <a class="item" data-value="1">STEP</a>
                             <a class="item" data-value="2">WORK</a>
                             <a class="item" data-value="3">CONSOLE</a>
                         </div>
                     </div>
-                    <div class="ui primary compact button btn-add">添加</div>
-                </div>
-                <div style="max-height: 450px; overflow-y: auto;">
-                    <table class="ui sortable celled striped compact table segment tb-translate">
-                        <thead>
-                            <th>名称</th>
-                            <th>描述</th>
-                            <th>翻译</th>
-                            <th>创建时间</th>
-                            <th>状态</th>
-                            <th>处理</th>
-                        </thead>
-                        <tbody th:remove="all-but-first">
+                    选择语言:
+                    <div class="ui selection dropdown dd-language">
+                        <input type="hidden" name="language" th:value="${languages[0].id}" value="1">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">语言</div>
+                        <div class="menu" th:remove="all-but-first">
                             <!--/*/
-                            <tr th:each="t : ${translates}" th:attr="data-id=${t.id}">
-                                <td th:text="${t.key}">app.name</td>
-                                <td th:text="${t.description}">应用名称</td>
-                                <td>
-                                    <div class="ui form">
-                                        <div class="inline field" th:each="item : ${t.translateItems}">
-                                            <label th:text="${item.language.description} + ':'">中文:</label>
-                                            <textarea class="ta-translteItem" th:attr="data-id=${item.id}" name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
-                                <td th:text="${t.status}">待翻译</td>
-                                <td>
-                                    <div class="ui dropdown dd-actions">
-                                        <div class="text">操作</div>
-                                        <i class="dropdown icon"></i>
-                                        <div class="menu">
-                                            <div class="item ddmi-delete">删除</div>
-                                            <div class="item ddmi-edit">编辑</div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
+                            <div th:each="l : ${languages}" class="item" th:title="${l.description}" th:attr="data-value=${l.id}" th:text="${l.description + '[' + l.name + ']'}">中文[zh]</div>
                             /*/-->
-                            <tr>
-                                <td>app.name</td>
-                                <td>应用名称</td>
-                                <td>
-                                    <textarea rows="1">测试</textarea>
-                                </td>
-                                <td>
-                                    <textarea rows="1">test</textarea>
-                                </td>
-                                <td>2016/05/10 12:00:00</td>
-                                <td>待翻译</td>
-                                <td>
-                                    <div class="ui dropdown">
-                                        <div class="text">操作</div>
-                                        <i class="dropdown icon"></i>
-                                        <div class="menu">
-                                            <div class="item">删除</div>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                            <div class="item" data-value="1">中文[zh]</div>
+                            <div class="item" data-value="2">日语[jp]</div>
+                            <div class="item" data-value="3">英语[en]</div>
+                        </div>
+                    </div>
+                    <div class="ui primary compact button btn-import">导入</div>
+                    <div class="ui form segment">
+                        <div class="field">
+                            <textarea class="ta-content" name="content" rows="10"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -118,30 +76,33 @@
     <script type="text/javascript">
     jQuery(function($) {
         $('table').tablesort().data('tablesort');
-        $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
-        $('.ui.dropdown.dd-actions').dropdown({
-            action: 'hide'
-        });
 
-        $('.btn-add').click(function(event) {
+        $('.btn-import').click(function(event) {
+            var projectId = $('.dd-project').dropdown('get value');
+            var languageId = $('.dd-language').dropdown('get value');
+            var content = $('.ta-content').val();
 
-            $('.ad-translate-add').modal({
-                onApprove: function() {
-                    var data = Utils.formData('.ad-translate-add .ui.form');
-                    data.projectId = $('.dd-project').dropdown('get value');
-                    data.content = JSON.stringify(data);
-                    $.post('admin/translate/save', data,
-                        function(data, textStatus, xhr) {
-                            if (data.success) {
-                                toastr.success('添加成功!');
-                                window.location.reload();
-                            } else {
-                                toastr.error(data.data, '添加失败!');
-                            }
-                        });
+            if (content) {
+                try {
+                    $.parseJSON(content);
+                } catch (e) {
+                    toastr.error('导入JSON内容格式错误!');
+                    return;
                 }
-            }).modal('show');
+
+                $.post('admin/import/save', {
+                    projectId: projectId,
+                    languageId: languageId,
+                    content: content
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        toastr.success('导入成功!');
+                    } else {
+                        toastr.error('导入失败!');
+                    }
+                });
+            }
         });
 
         $('.tb-translate').on('click', '.ddmi-delete', function(event) {

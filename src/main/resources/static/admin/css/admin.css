@@ -1,3 +1,7 @@
+body {
+    overflow: hidden;
+}
+
 div.admin.login {
     min-width: 300px;
     max-width: 300px;
@@ -38,6 +42,8 @@ div.admin.login {
         margin-left: 12px;
     }
 }
+
+
 /* start <admin/resource.html> */
 
 #dropzone {
@@ -55,8 +61,14 @@ div.admin.login {
     font-weight: 400;
     font-size: x-large;
 }
+
+
 /* end <admin/resource.html> */
+
+
 /* start <admin/article.html> */
+
+
 /* CSS for the font-name + font-size plugin */
 
 .wysiwyg-plugin-list {
@@ -80,6 +92,8 @@ div.admin.login {
     color: HighlightText;
     background-color: Highlight;
 }
+
+
 /* CSS for the smiley plugin */
 
 .wysiwyg-plugin-smilies {
@@ -91,7 +105,6 @@ div.admin.login {
 .wysiwyg-plugin-smilies img {
     display: -moz-inline-stack;
     /* inline-block: http://blog.mozilla.org/webdev/2009/02/20/cross-browser-inline-block/ */
-    
     display: inline-block;
     *display: inline;
 }
@@ -103,6 +116,8 @@ div.admin.login {
 .lhjz-editor-smiles {
     display: none;
 }
+
+
 /* end <admin/article.html> */
 
 .ad-images .cards {
