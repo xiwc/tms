@@ -1,5 +1,8 @@
 package com.lhjz.portal.pojo;
 
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Pattern.Flag;
+
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -7,6 +10,8 @@ public class TranslateForm {
 
 	@NotBlank(message = "翻译名称不能为空！")
 	@Length(max = 255, message = "翻译名称长度不能超过255！")
+	@Pattern(regexp = "^[a-zA-Z_][a-z0-9_\\.]+[a-zA-Z0-9_]$", message = "翻译名称必须是[a-zA-Z_.]组合,而且需要以[a-zA-Z_]开头和以[a-zA-Z0-9_]结尾!", flags = {
+			Flag.CASE_INSENSITIVE })
 	private String key;
 
 	@NotBlank(message = "描述不能为空！")

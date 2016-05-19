@@ -28,7 +28,7 @@
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
                 <div th:replace="admin/template :: ad-page-header ('翻译导入', 'import')"></div>
-                <div class="ui segment">
+                <div class="ui attached segment">
                     选择项目:
                     <div class="ui selection dropdown dd-project">
                         <input type="hidden" name="project" th:value="${projectId}" value="1">
@@ -58,6 +58,7 @@
                         </div>
                     </div>
                     <div class="ui primary compact button btn-import">导入</div>
+                    <div class="ui primary compact button btn-export">导出</div>
                     <div class="ui form segment">
                         <div class="field">
                             <textarea class="ta-content" name="content" rows="10"></textarea>
@@ -69,8 +70,6 @@
     </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
-    <div th:replace="admin/template :: ad-translate-add"></div>
-    <div th:replace="admin/template :: ad-translate-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <script type="text/javascript">
@@ -79,117 +78,61 @@
         $('.ui.dropdown').dropdown();
 
         $('.btn-import').click(function(event) {
-            var projectId = $('.dd-project').dropdown('get value');
-            var languageId = $('.dd-language').dropdown('get value');
-            var content = $('.ta-content').val();
 
-            if (content) {
-                try {
-                    $.parseJSON(content);
-                } catch (e) {
-                    toastr.error('导入JSON内容格式错误!');
-                    return;
-                }
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    var projectId = $('.dd-project').dropdown('get value');
+                    var languageId = $('.dd-language').dropdown('get value');
+                    var content = $('.ta-content').val();
 
-                $.post('admin/import/save', {
-                    projectId: projectId,
-                    languageId: languageId,
-                    content: content
-                }, function(data, textStatus, xhr) {
-                    if (data.success) {
-                        toastr.success('导入成功!');
-                    } else {
-                        toastr.error('导入失败!');
+                    if (content) {
+                        try {
+                            $.parseJSON(content);
+                        } catch (e) {
+                            toastr.error('导入JSON内容格式错误!');
+                            return;
+                        }
+
+                        $.post('admin/import/save', {
+                            projectId: projectId,
+                            languageId: languageId,
+                            content: content
+                        }, function(data, textStatus, xhr) {
+                        	if (data.success) {
+                                toastr.success('导入成功!');
+                            } else {
+                                toastr.error('导入失败!');
+                            }
+                        });
                     }
-                });
-            }
+                }
+            }).modal('show');
+
         });
 
-        $('.tb-translate').on('click', '.ddmi-delete', function(event) {
-            var $btn = $(this);
+        $('.btn-export').click(function(event) {
 
-            $('.ad-delete-confirm').modal({
+            $('.ad-handle-confirm').modal({
                 onApprove: function() {
-                    $.post('admin/translate/delete', {
-                        id: $btn.closest('tr').attr('data-id')
+                    var projectId = $('.dd-project').dropdown('get value');
+                    var languageId = $('.dd-language').dropdown('get value');
+
+                    $.post('admin/import/export', {
+                        projectId: projectId,
+                        languageId: languageId
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
-                            $btn.closest('tr').remove();
-                            toastr.success('删除成功!');
+                        	$('.ta-content').val(JSON.stringify(data.data, null, 4));
+                            toastr.success('导出成功!');
                         } else {
-                            toastr.error('删除失败!');
+                            toastr.error('导出失败!');
                         }
                     });
                 }
             }).modal('show');
-        });
-
-        $('.tb-translate').on('click', '.ddmi-edit', function(event) {
-            var $btn = $(this);
-
-            $.get('admin/translate/getById', {
-                id: $btn.closest('tr').attr('data-id')
-            }, function(data) {
-                if (data.success) {
-                    $('.ad-translate-edit').modal({
-                        onShow: function() {
-                            $(this).find('input[name="key"]').val(data.data.key);
-                            $(this).find('textarea[name="desc"]').val(data.data.description);
-                        },
-                        onApprove: function() {
-                            var data = Utils.formData('.ad-translate-edit .ui.form');
-                            data.id = $btn.closest('tr').attr('data-id');
-                            $.post('admin/translate/update2', data, function(data, textStatus, xhr) {
-                                if (data.success) {
-                                    toastr.success('更新成功!');
-                                    window.location.reload();
-                                } else {
-                                    toastr.error('更新失败!');
-                                }
-                            });
-                        }
-                    }).modal('show');
-                }
-            });
 
         });
 
-        $('textarea.ta-translteItem').blur(function(event) {
-            var $ta = $(this);
-            $.post('admin/translate/update', {
-                id: $ta.attr('data-id'),
-                content: $ta.val()
-            }, function(data, textStatus, xhr) {
-                if (data.success) {
-                    toastr.success('更新成功!');
-                } else {
-                    toastr.success('更新失败!');
-                }
-            });
-        });
-
-        // $('.table-user').on('click', '.lhjz-btn-edit', function(event) {
-        //     var $btn = $(this);
-
-        //     $('.ad-user-edit').find('.user-username').text($btn.closest('tr').attr('data-id'));
-        //     $('.ad-user-edit').find('input[name="password"]').val('');
-
-        //     $('.ad-user-edit').modal({
-        //         onApprove: function() {
-        //             $.post('admin/user/update', {
-        //                 username: $btn.closest('tr').attr('data-id'),
-        //                 password: $('.ad-user-edit').find('input[name="password"]').val()
-        //             }, function(data, textStatus, xhr) {
-        //                 if (data.success) {
-        //                     $btn.closest('tr').remove();
-        //                     toastr.success('用户信息修改成功!');
-        //                 } else {
-        //                     toastr.error(data.data, '用户信息修改失败!');
-        //                 }
-        //             });
-        //         }
-        //     }).modal('show');
-        // });
     });
     </script>
 </body>

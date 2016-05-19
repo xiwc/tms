@@ -1,5 +1,5 @@
 /**
- * 立衡脊柱版权所有 (lhjz)
+ * 版权所有 (TMS)
  */
 package com.lhjz.portal.entity;
 
@@ -58,7 +58,7 @@ public class Language implements Serializable {
 	@Version
 	private long version;
 
-	@com.fasterxml.jackson.annotation.JsonIgnore
+	@JsonIgnore
 	@ManyToMany
 	@JoinTable(name = "language_project", joinColumns = { @JoinColumn(name = "language_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "project_id") })

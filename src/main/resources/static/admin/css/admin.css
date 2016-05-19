@@ -1,5 +1,5 @@
 body {
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 div.admin.login {
@@ -17,13 +17,13 @@ div.admin.login {
 
 .ad-index-content {
     padding-top: 70px;
-    padding-bottom: 70px;
+    /* padding-bottom: 70px; */
     padding-right: 12px;
     min-height: 100%;
 }
 
 .ad-index-container {
-    margin-left: 250px;
+    margin-left: 185px;
     position: relative;
     min-height: 432px;
 }

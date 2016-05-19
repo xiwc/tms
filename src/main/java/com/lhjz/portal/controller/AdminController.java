@@ -1,5 +1,5 @@
 /**
- * 立衡脊柱版权所有 (lhjz)
+ * 版权所有 (TMS)
  */
 package com.lhjz.portal.controller;
 
@@ -13,6 +13,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.annotation.Secured;
@@ -38,6 +39,7 @@ import com.lhjz.portal.pojo.ContactForm;
 import com.lhjz.portal.pojo.Enum.Key;
 import com.lhjz.portal.pojo.Enum.Module;
 import com.lhjz.portal.pojo.Enum.Page;
+import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.repository.ConfigRepository;
 import com.lhjz.portal.repository.FileRepository;
 import com.lhjz.portal.repository.ProjectRepository;
@@ -48,6 +50,7 @@ import com.lhjz.portal.util.EnumUtil;
 import com.lhjz.portal.util.FileUtil;
 import com.lhjz.portal.util.JsonUtil;
 import com.lhjz.portal.util.MapUtil;
+import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.WebUtil;
 
 /**
@@ -325,30 +328,48 @@ public class AdminController extends BaseController {
 
 	@RequestMapping("translate")
 	public String translate(Model model, @PageableDefault Pageable pageable,
-			@RequestParam(value = "projectId", required = false) Long projectId) {
+			@RequestParam(value = "projectId", required = false) Long projectId,
+			@RequestParam(value = "my", required = false) String my,
+			@RequestParam(value = "new", required = false) String _new,
+			@RequestParam(value = "languageId", required = false) Long languageId,
+			@RequestParam(value = "search", required = false) String search) {
 
 		List<Project> projects = projectRepository.findAll();
-		// Set<Translate> translates = null;
 		Set<Language> languages = null;
+		Project project = null;
 		org.springframework.data.domain.Page<Translate> page = null;
 		if (projectId != null) {
-			Project project = projectRepository.findOne(projectId);
-			if (project != null) {
-				// translates = project.getTranslates();
-				page = translateRepository.findByProject(project, pageable);
-				languages = project.getLanguages();
-			}
+			project = projectRepository.findOne(projectId);
 		} else {
 			if (projects.size() > 0) {
+				project = projects.get(0);
 				projectId = projects.get(0).getId();
-				// translates = projects.get(0).getTranslates();
-				page = translateRepository.findByProject(projects.get(0), pageable);
-				languages = projects.get(0).getLanguages();
 			}
 		}
 
+		if (project != null) {
+
+			languages = project.getLanguages();
+			projectId = project.getId();
+
+			if (StringUtil.isNotEmpty(my)) {
+				page = translateRepository.findByProjectAndCreator(project, WebUtil.getUsername(), pageable);
+			} else if (StringUtil.isNotEmpty(_new)) {
+				page = translateRepository.findByProjectAndStatus(project, Status.New, pageable);
+			} else if (StringUtil.isNotEmpty(languageId)) {
+				long total = translateRepository.countUnTranslatedByProject(languageId, projectId);
+				List<Translate> unTranslates = translateRepository.queryUnTranslatedByProject(languageId, projectId,
+						pageable.getOffset(), pageable.getPageSize());
+				page = new PageImpl<Translate>(unTranslates, pageable, total);
+			} else if (StringUtil.isNotEmpty(search)) {
+				String like = "%" + search + "%";
+				page = translateRepository.findByProjectAndKeyLikeOrProjectAndDescriptionLike(project, like, project,
+						like, pageable);
+			} else {
+				page = translateRepository.findByProject(project, pageable);
+			}
+		}
 		model.addAttribute("projects", projects);
-		// model.addAttribute("translates", translates);
 		model.addAttribute("page", page);
 		model.addAttribute("languages", languages);
 		model.addAttribute("projectId", projectId);

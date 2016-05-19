@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-    <title>立衡脊柱-关于我们</title>
+    <title>TMS-关于我们</title>
     <!-- css -->
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
@@ -53,7 +53,7 @@
                                         <h1 class="new-title" th:if="${#strings.isEmpty(bigImg.title)}"></h1>
                                         <h1 class="new-title" th:if="${not #strings.isEmpty(bigImg.title)}" th:text="${bigImg.title}">关于我们</h1>
                                         <p class="new-content" th:if="${#strings.isEmpty(bigImg.content)}"></p>
-                                        <p class="new-content" th:if="${not #strings.isEmpty(bigImg.content)}" th:text="${#strings.abbreviate(bigImg.content,120)}">立衡脊柱成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领立衡脊柱专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——立衡脊柱平衡矫正疗法。...</p>
+                                        <p class="new-content" th:if="${not #strings.isEmpty(bigImg.content)}" th:text="${#strings.abbreviate(bigImg.content,120)}">TMS成立于1994年，是一家专门治疗脊柱病以及脊柱相关病的医疗机构，全国开设有四家分院。院长张军，主任医师，带领TMS专家组潜心临床研究数十年总结出一套不开刀不手术无创伤治疗颈椎病以及腰椎病的保守疗法——TMS平衡矫正疗法。...</p>
                                         <p class="new-link" th:if="${#strings.isEmpty(bigImg.link)}"></p>
                                         <p class="new-link" th:if="${not #strings.isEmpty(bigImg.link)}"><a target="_blank" class="ui primary button" th:href="@{/article(id=${bigImg.link})}" href="#" role="button">了解更多</a></p>
                                     </div>

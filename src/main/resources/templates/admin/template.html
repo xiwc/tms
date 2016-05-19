@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-    <title>立衡脊柱-模板页面</title>
+    <title>TMS-模板页面</title>
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
@@ -366,6 +366,10 @@
                     <div class="field">
                         <label>描述:</label>
                         <textarea name="desc" rows="2" placeholder="描述" th:text="''">程序名称</textarea>
+                    </div>
+                    <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
+                        <label th:text="${l.description} + ':'">中文:</label>
+                        <textarea name="zh" th:name="${l.name}" rows="1" th:placeholder="${l.description}" th:text="''">测试</textarea>
                     </div>
                 </div>
             </div>

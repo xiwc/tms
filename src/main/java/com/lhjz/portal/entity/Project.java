@@ -1,5 +1,5 @@
 /**
- * 立衡脊柱版权所有 (lhjz)
+ * 版权所有 (TMS)
  */
 package com.lhjz.portal.entity;
 
@@ -56,7 +56,7 @@ public class Project implements Serializable {
 	@Version
 	private long version;
 
-	@JsonIgnore
+	// @JsonIgnore
 	@ManyToMany(mappedBy = "projects")
 	private Set<Language> languages = new HashSet<Language>();
 	

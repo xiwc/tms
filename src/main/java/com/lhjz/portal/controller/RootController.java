@@ -1,5 +1,5 @@
 /**
- * 立衡脊柱版权所有 (lhjz)
+ * 版权所有 (TMS)
  */
 package com.lhjz.portal.controller;
 

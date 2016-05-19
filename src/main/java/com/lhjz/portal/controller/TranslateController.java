@@ -1,5 +1,5 @@
 /**
- * 立衡脊柱版权所有 (lhjz)
+ * 版权所有 (TMS)
  */
 package com.lhjz.portal.controller;
 
@@ -114,6 +114,7 @@ public class TranslateController extends BaseController {
 			item.setLanguage(language);
 			item.setStatus(Status.New);
 			item.setTranslate(translate);
+
 			translate.getTranslateItems().add(item);
 		}
 
@@ -132,10 +133,13 @@ public class TranslateController extends BaseController {
 		TranslateItem translateItem = translateItemRepository.findOne(id);
 
 		if (translateItem != null) {
+			translateItem.setContent(translateItemForm.getContent());
+
 			translateItemRepository.saveAndFlush(translateItem);
 
 			Translate translate = translateItem.getTranslate();
 			translate.setStatus(Status.Updated);
+
 			translateRepository.saveAndFlush(translate);
 		} else {
 			logger.error("更新翻译条目不存在! ID: {}", id);
@@ -143,6 +147,17 @@ public class TranslateController extends BaseController {
 		}
 
 		return RespBody.succeed(id);
+	}
+
+	private TranslateItem getExitTranslateItem(String lngName, Translate translate) {
+
+		Set<TranslateItem> translateItems = translate.getTranslateItems();
+		for (TranslateItem translateItem : translateItems) {
+			if (translateItem.getLanguage().getName().equals(lngName)) {
+				return translateItem;
+			}
+		}
+		return null;
 	}
 
 	@RequestMapping(value = "update2", method = RequestMethod.POST)
@@ -162,6 +177,40 @@ public class TranslateController extends BaseController {
 			translate.setKey(translateForm.getKey());
 			translate.setDescription(translateForm.getDesc());
 			translate.setStatus(Status.Updated);
+
+			JsonObject jsonO = (JsonObject) JsonUtil.toJsonElement(translateForm.getContent());
+			Set<Language> lngs = translate.getProject().getLanguages();
+
+			for (Language language : lngs) {
+
+				String name = language.getName();
+				String content = StringUtil.EMPTY;
+				if (jsonO.has(name)) {
+					content = jsonO.get(name).getAsString();
+				}
+
+				TranslateItem exitTranslateItem = getExitTranslateItem(name, translate);
+				if (exitTranslateItem != null) {
+					exitTranslateItem.setContent(content);
+					exitTranslateItem.setStatus(Status.Updated);
+
+					translateItemRepository.saveAndFlush(exitTranslateItem);
+				} else {
+					TranslateItem item = new TranslateItem();
+					item.setContent(content);
+					item.setCreateDate(new Date());
+					item.setCreator(WebUtil.getUsername());
+					item.setLanguage(language);
+					item.setStatus(Status.New);
+					item.setTranslate(translate);
+
+					translateItemRepository.saveAndFlush(item);
+
+					translate.getTranslateItems().add(item);
+				}
+			}
+
+			log(Action.Update, Target.Translate, translate);
 			translateRepository.saveAndFlush(translate);
 		} else {
 			logger.error("更新翻译不存在! ID: {}", id);

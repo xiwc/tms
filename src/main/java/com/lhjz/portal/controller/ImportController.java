@@ -1,5 +1,5 @@
 /**
- * 立衡脊柱版权所有 (lhjz)
+ * 版权所有 (TMS)
  */
 package com.lhjz.portal.controller;
 
@@ -85,7 +85,7 @@ public class ImportController extends BaseController {
 
 	@RequestMapping(value = "save", method = RequestMethod.POST)
 	@ResponseBody
-	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody save(@RequestParam("projectId") Long projectId, @RequestParam("languageId") Long languageId,
 			@RequestParam("content") String content) {
 
@@ -111,7 +111,6 @@ public class ImportController extends BaseController {
 						language = translateItem.getLanguage();
 						translateItem.setContent(kvMaps.get(key));
 						translateItems2.add(translateItem);
-						// translateItemRepository.saveAndFlush(translateItem);
 					}
 				}
 
@@ -125,7 +124,6 @@ public class ImportController extends BaseController {
 					translateItem.setTranslate(translate2);
 
 					translateItems2.add(translateItem);
-					// translateItemRepository.saveAndFlush(translateItem);
 				}
 			} else {
 				Translate translate = new Translate();
@@ -156,7 +154,6 @@ public class ImportController extends BaseController {
 				}
 
 				translates2.add(translate);
-				// translateRepository.saveAndFlush(translate);
 			}
 		}
 
@@ -166,6 +163,17 @@ public class ImportController extends BaseController {
 		translateRepository.flush();
 
 		return RespBody.succeed();
+	}
+
+	@RequestMapping(value = "export", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody export(@RequestParam("projectId") Long projectId, @RequestParam("languageId") Long languageId) {
+
+		Project project = projectRepository.findOne(projectId);
+		// Language language2 = languageRepository.findOne(languageId);
+
+		return RespBody.succeed(project);
 	}
 
 }
