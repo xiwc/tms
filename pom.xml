@@ -198,7 +198,6 @@
 		</plugins>
 	</build>
 
-	<packaging>war</packaging>
 	<url>http://xiweicheng.com</url>
 	<organization>
 		<url>http://xiweicheng.com</url>

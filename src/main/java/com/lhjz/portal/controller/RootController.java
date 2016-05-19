@@ -67,13 +67,7 @@ public class RootController extends BaseController {
 	@RequestMapping()
 	public String home(HttpServletRequest request, Model model) {
 
-		return "landing/index";
-	}
-
-	@RequestMapping("about")
-	public String about(Model model) {
-
-		return "landing/about";
+		return "admin/login";
 	}
 
 	@RequestMapping(value = "feedback/save", method = RequestMethod.POST)
