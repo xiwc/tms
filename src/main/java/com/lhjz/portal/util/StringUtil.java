@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 字符串常用工具类.
@@ -233,6 +234,29 @@ public final class StringUtil {
 	 * @return
 	 */
 	public static String join(String connector, List<String> objects) {
+
+		StringBuffer sBuffer = new StringBuffer();
+
+		for (String object : objects) {
+			sBuffer.append(object).append(connector);
+		}
+
+		if (sBuffer.length() > 0) {
+			sBuffer.delete(sBuffer.length() - connector.length(),
+					sBuffer.length());
+		}
+
+		return sBuffer.toString();
+	}
+
+	/**
+	 * 连接字符串.
+	 * 
+	 * @param connector
+	 * @param objects
+	 * @return
+	 */
+	public static String join(String connector, Set<String> objects) {
 
 		StringBuffer sBuffer = new StringBuffer();
 

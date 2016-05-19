@@ -139,29 +139,29 @@
                     </table>
                 </div>
                 <!-- <div class="ui segment"> -->
-                    <div class="ui label">
-                        共计:
-                        <div class="detail" th:text="${page.totalPages + '页/' + page.totalElements + '条'}">214</div>
-                    </div>
-                    <div class="ui label">
-                        当前:
-                        <div class="detail" th:text="${'第' + (page.number + 1) + '页/共' + page.numberOfElements + '条'}">214</div>
-                    </div>
-                    <div class="ui right floated pagination small menu" th:if="${page.totalPages > 0}">
-                        <a class="item" th:if="${(page.totalPages > 0) and (not page.first)}" th:href="@{/admin/translate(projectId=${projectId}, page=0, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">首页</a>
-                        <a th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item">
-                            <i class="left chevron icon"></i>
-                        </a>
-                        <a class="item" th:if="${page.number > 1}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number - 1}"></a>
-                        <a class="item" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number}"></a>
-                        <a class="item active" th:if="${page.totalPages > 0}" th:href="'javascript:void(0);'" th:text="${page.number + 1}"></a>
-                        <a class="item" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 2}"></a>
-                        <a class="item" th:if="${page.number < page.totalPages - 2}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 3}"></a>
-                        <a th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item">
-                            <i class="right chevron icon"></i>
-                        </a>
-                        <a class="item" th:if="${(page.totalPages > 0) and (not page.last)}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.totalPages - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">末页</a>
-                    </div>
+                <div class="ui label">
+                    共计:
+                    <div class="detail" th:text="${page.totalPages + '页/' + page.totalElements + '条'}">214</div>
+                </div>
+                <div class="ui label">
+                    当前:
+                    <div class="detail" th:text="${'第' + (page.number + 1) + '页/共' + page.numberOfElements + '条'}">214</div>
+                </div>
+                <div class="ui right floated pagination small menu" th:if="${page.totalPages > 0}">
+                    <a class="item" th:if="${(page.totalPages > 0) and (not page.first)}" th:href="@{/admin/translate(projectId=${projectId}, page=0, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">首页</a>
+                    <a title="上一页" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
+                        <i class="left chevron icon"></i>
+                    </a>
+                    <a class="item" th:if="${page.number > 1}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number - 1}"></a>
+                    <a class="item" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number}"></a>
+                    <a class="item active" th:if="${page.totalPages > 0}" th:href="'javascript:void(0);'" th:text="${page.number + 1}"></a>
+                    <a class="item" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 2}"></a>
+                    <a class="item" th:if="${page.number < page.totalPages - 2}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 3}"></a>
+                    <a title="下一页" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
+                        <i class="right chevron icon"></i>
+                    </a>
+                    <a class="item" th:if="${(page.totalPages > 0) and (not page.last)}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.totalPages - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">末页</a>
+                </div>
                 <!-- </div> -->
             </div>
         </div>
@@ -180,6 +180,7 @@
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
+        $('.popup').popup();
         $('.ui.dropdown.dd-actions').dropdown({
             action: 'hide'
         });
@@ -285,6 +286,10 @@
 
         $('textarea.ta-translteItem').blur(function(event) {
             var $ta = $(this);
+
+            if (typeof($ta.attr('title')) == "undefined" && !$ta.val()) {
+                return;
+            }
 
             if ($ta.val() == $ta.attr('title')) {
                 return;

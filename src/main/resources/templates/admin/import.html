@@ -30,7 +30,7 @@
                 <div th:replace="admin/template :: ad-page-header ('翻译导入', 'import')"></div>
                 <div class="ui attached segment">
                     选择项目:
-                    <div class="ui selection dropdown dd-project">
+                    <div class="ui selection compact dropdown dd-project">
                         <input type="hidden" name="project" th:value="${projectId}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">项目</div>
@@ -44,7 +44,7 @@
                         </div>
                     </div>
                     选择语言:
-                    <div class="ui selection dropdown dd-language">
+                    <div class="ui selection compact dropdown dd-language">
                         <input type="hidden" name="language" th:value="${languages[0].id}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">语言</div>
@@ -57,11 +57,21 @@
                             <div class="item" data-value="3">英语[en]</div>
                         </div>
                     </div>
+                    选择格式:
+                    <div class="ui selection compact dropdown dd-type">
+                        <input type="hidden" name="type" value="1">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">格式</div>
+                        <div class="menu">
+                            <div class="item" data-value="1">JSON</div>
+                            <div class="item" data-value="2">Property</div>
+                        </div>
+                    </div>
                     <div class="ui primary compact button btn-import">导入</div>
                     <div class="ui primary compact button btn-export">导出</div>
                     <div class="ui form segment">
                         <div class="field">
-                            <textarea class="ta-content" name="content" rows="10"></textarea>
+                            <textarea class="ta-content" name="content" rows="20"></textarea>
                         </div>
                     </div>
                 </div>
@@ -83,22 +93,26 @@
                 onApprove: function() {
                     var projectId = $('.dd-project').dropdown('get value');
                     var languageId = $('.dd-language').dropdown('get value');
+                    var type = $('.dd-type').dropdown('get value');
                     var content = $('.ta-content').val();
 
                     if (content) {
-                        try {
-                            $.parseJSON(content);
-                        } catch (e) {
-                            toastr.error('导入JSON内容格式错误!');
-                            return;
+                        if (type == 1) { // JSON
+                            try {
+                                $.parseJSON(content);
+                            } catch (e) {
+                                toastr.error('导入JSON内容格式错误!');
+                                return;
+                            }
                         }
 
                         $.post('admin/import/save', {
                             projectId: projectId,
                             languageId: languageId,
+                            type: type,
                             content: content
                         }, function(data, textStatus, xhr) {
-                        	if (data.success) {
+                            if (data.success) {
                                 toastr.success('导入成功!');
                             } else {
                                 toastr.error('导入失败!');
@@ -116,13 +130,19 @@
                 onApprove: function() {
                     var projectId = $('.dd-project').dropdown('get value');
                     var languageId = $('.dd-language').dropdown('get value');
+                    var type = $('.dd-type').dropdown('get value');
 
                     $.post('admin/import/export', {
                         projectId: projectId,
-                        languageId: languageId
+                        languageId: languageId,
+                        type: type
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
-                        	$('.ta-content').val(JSON.stringify(data.data, null, 4));
+                            if (type == 1) {
+                                $('.ta-content').val(JSON.stringify($.parseJSON(data.data), null, 4));
+                            } else {
+                                $('.ta-content').val(data.data);
+                            }
                             toastr.success('导出成功!');
                         } else {
                             toastr.error('导出失败!');

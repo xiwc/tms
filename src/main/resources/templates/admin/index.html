@@ -33,9 +33,9 @@
     <div th:with="uri=${#httpServletRequest.requestURI}" th:fragment="sidebar-menu" class="ui left thin vertical inverted labeled icon sidebar menu ad-index-menu">
         <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html"> <i class="home icon"></i> 主页
         </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html"> <i class="info circle icon"></i> 翻译
+        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译
         </a>
-        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="users icon"></i> 导入导出
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
         </a>
         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="users icon"></i> 用户管理
         </a>
@@ -73,10 +73,10 @@
                             <i class="home icon"></i> 主页
                         </a>
                         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html">
-                            <i class="info circle icon"></i> 翻译
+                            <i class="world icon"></i> 翻译
                         </a>
                         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
-                            <i class="users icon"></i> 导入导出
+                            <i class="retweet icon"></i> 导入导出
                         </a>
                         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
                             <i class="users icon"></i> 用户管理
@@ -86,7 +86,10 @@
             </div>
             <div id="context">
                 <!-- <div th:replace="admin/template :: ad-page-header ('门户主页', 'index')"></div> -->
-                <div class="ui header">建设中...尽请期待!</div>
+                <h2 class="ui center aligned icon header">
+                  <i class="circular users icon"></i>
+                  欢迎使用TMS翻译管理系统!
+                </h2>
             </div>
         </div>
     </div>

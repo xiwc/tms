@@ -3,12 +3,16 @@
  */
 package com.lhjz.portal.controller;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -71,9 +75,11 @@ public class ImportController extends BaseController {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
-	private void joinKV(JsonObject jsonObject, String key, Map<String, String> kvMaps) {
+	private void joinKV(JsonObject jsonObject, String key,
+			Map<String, String> kvMaps) {
 		for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-			String k = StringUtil.isEmpty(key) ? entry.getKey() : StringUtil.join2(".", key, entry.getKey());
+			String k = StringUtil.isEmpty(key) ? entry.getKey() : StringUtil
+					.join2(".", key, entry.getKey());
 			JsonElement jsonE = entry.getValue();
 			if (jsonE.isJsonPrimitive()) {
 				kvMaps.put(k, jsonE.getAsString());
@@ -86,25 +92,42 @@ public class ImportController extends BaseController {
 	@RequestMapping(value = "save", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
-	public RespBody save(@RequestParam("projectId") Long projectId, @RequestParam("languageId") Long languageId,
+	public RespBody save(@RequestParam("projectId") Long projectId,
+			@RequestParam("languageId") Long languageId,
+			@RequestParam("type") Long type,
 			@RequestParam("content") String content) {
 
 		Project project = projectRepository.findOne(projectId);
 		Language language2 = languageRepository.findOne(languageId);
 
-		JsonObject jsonO = (JsonObject) JsonUtil.toJsonElement(content);
-
 		Map<String, String> kvMaps = new HashMap<>();
-		joinKV(jsonO, "", kvMaps);
+		if (type == 1) {// JSON
+			joinKV((JsonObject) JsonUtil.toJsonElement(content), "", kvMaps);
+		} else { // Property
+			Properties properties = new Properties();
+			try {
+				properties.load(new StringReader(content));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return RespBody.failed(e.getMessage());
+			}
+			Set<Object> keySet = properties.keySet();
+			for (Object k : keySet) {
+				kvMaps.put(String.valueOf(k), properties.getProperty(
+						String.valueOf(k), StringUtil.EMPTY));
+			}
+		}
 
 		List<TranslateItem> translateItems2 = new ArrayList<TranslateItem>();
 		List<Translate> translates2 = new ArrayList<Translate>();
 
 		for (String key : kvMaps.keySet()) {
-			List<Translate> translates = translateRepository.findByKeyAndProject(key, project);
+			List<Translate> translates = translateRepository
+					.findByKeyAndProject(key, project);
 			if (translates.size() > 0) {
 				Translate translate2 = translates.get(0);
-				Set<TranslateItem> translateItems = translate2.getTranslateItems();
+				Set<TranslateItem> translateItems = translate2
+						.getTranslateItems();
 				Language language = null;
 				for (TranslateItem translateItem : translateItems) {
 					if (translateItem.getLanguage().getId().equals(languageId)) {
@@ -133,7 +156,8 @@ public class ImportController extends BaseController {
 				translate.setKey(key);
 				translate.setProject(project);
 				translate.setStatus(Status.New);
-				Set<TranslateItem> translateItems = translate.getTranslateItems();
+				Set<TranslateItem> translateItems = translate
+						.getTranslateItems();
 
 				Set<Language> languages = project.getLanguages();
 
@@ -168,12 +192,52 @@ public class ImportController extends BaseController {
 	@RequestMapping(value = "export", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
-	public RespBody export(@RequestParam("projectId") Long projectId, @RequestParam("languageId") Long languageId) {
+	public RespBody export(@RequestParam("projectId") Long projectId,
+			@RequestParam("languageId") Long languageId,
+			@RequestParam("type") Long type) {
 
 		Project project = projectRepository.findOne(projectId);
-		// Language language2 = languageRepository.findOne(languageId);
+		Set<Translate> translates = project.getTranslates();
 
-		return RespBody.succeed(project);
+		Map<String, String> map = new HashMap<String, String>();
+
+		for (Translate translate : translates) {
+			Set<TranslateItem> translateItems = translate.getTranslateItems();
+			for (TranslateItem translateItem : translateItems) {
+				if (translateItem.getLanguage().getId().equals(languageId)) {
+					map.put(translate.getKey(), translateItem.getContent());
+				}
+			}
+		}
+
+		if (type == 1) {
+			JsonObject root = new JsonObject();
+			for (String k : map.keySet()) {
+				String[] keys = k.split("\\.");
+				JsonObject lastE = root;
+				for (int i = 0; i < keys.length; i++) {
+					if (i < keys.length - 1) {
+						if (!lastE.has(keys[i])) {
+							lastE.add(keys[i], new JsonObject());
+						}
+
+						lastE = (JsonObject) lastE.get(keys[i]);
+					} else {
+						lastE.addProperty(keys[i], map.get(k));
+					}
+				}
+			}
+
+			return RespBody.succeed(JsonUtil.toJson(root));
+		} else {
+			List<String> list = new ArrayList<String>();
+			for (String k : map.keySet()) {
+				list.add(k + "=" + map.get(k));
+			}
+
+			Collections.sort(list);
+
+			return RespBody.succeed(StringUtil.join("\r\n", list));
+		}
 	}
-
 }
