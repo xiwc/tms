@@ -33,8 +33,8 @@ SET NAMES 'utf8';
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_ADMIN');
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_USER');
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_SUPER');
-INSERT INTO `authorities` (username, authority) VALUES ('tms', 'ROLE_ADMIN');
-INSERT INTO `authorities` (username, authority) VALUES ('tms', 'ROLE_USER');
+INSERT INTO `authorities` (username, authority) VALUES ('step', 'ROLE_ADMIN');
+INSERT INTO `authorities` (username, authority) VALUES ('step', 'ROLE_USER');
 INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
 
 -- ----------------------------
@@ -98,7 +98,7 @@ INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
 -- Records of users
 -- ----------------------------
 INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiweicheng@yeah.net', 'Bultin', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('tms', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.com', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('step', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.com', 'Normal', '2015-04-25 10:01:51', '0');
 INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiwc87@yeah.net', 'Normal', '2015-04-25 10:01:51', '0');
 
 -- ----------------------------
