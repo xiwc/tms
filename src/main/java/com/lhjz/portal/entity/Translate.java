@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -21,7 +22,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
-import javax.persistence.CascadeType;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -54,6 +54,10 @@ public class Translate implements Serializable {
 	@NotBlank
 	private String creator;
 
+	private String updater;
+
+	private String translator;
+
 	@Version
 	private long version;
 
@@ -63,6 +67,12 @@ public class Translate implements Serializable {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updateDate;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date translateDate;
 
 	@ManyToOne
 	@JoinColumn(name = "project_id")
@@ -143,10 +153,44 @@ public class Translate implements Serializable {
 		this.translateItems = translateItems;
 	}
 
+	public String getUpdater() {
+		return updater;
+	}
+
+	public void setUpdater(String updater) {
+		this.updater = updater;
+	}
+
+	public String getTranslator() {
+		return translator;
+	}
+
+	public void setTranslator(String translator) {
+		this.translator = translator;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	public Date getTranslateDate() {
+		return translateDate;
+	}
+
+	public void setTranslateDate(Date translateDate) {
+		this.translateDate = translateDate;
+	}
+
 	@Override
 	public String toString() {
 		return "Translate [id=" + id + ", key=" + key + ", description=" + description + ", creator=" + creator
-				+ ", version=" + version + ", status=" + status + ", createDate=" + createDate + "]";
+				+ ", updater=" + updater + ", translator=" + translator + ", version=" + version + ", status=" + status
+				+ ", createDate=" + createDate + ", updateDate=" + updateDate + ", translateDate=" + translateDate
+				+ "]";
 	}
 
 }

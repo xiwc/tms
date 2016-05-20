@@ -14,11 +14,11 @@ public class Enum {
 	}
 
 	public static enum Action {
-		Create, Read, Update, Delete, Upload, Visit;
+		Create, Read, Update, Delete, Upload, Visit, Import, Export;
 	}
 
 	public static enum Target {
-		Translate, TranslateItem, Language, Project, Article, File, Feedback, Diagnose, Settings, Page, User, Authority, Config, Feature, Case, Product, Env, Health, Job, JobApply;
+		Translate, TranslateItem, Language, Project, Article, File, Feedback, Diagnose, Settings, Page, User, Authority, Config, Feature, Case, Product, Env, Health, Job, JobApply, Import;
 	}
 
 	public static enum Page {

@@ -14,7 +14,6 @@ public class TranslateForm {
 			Flag.CASE_INSENSITIVE })
 	private String key;
 
-	@NotBlank(message = "描述不能为空！")
 	@Length(max = 2000, message = "描述过长！")
 	private String desc;
 

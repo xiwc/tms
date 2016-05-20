@@ -58,9 +58,6 @@ public class RootController extends BaseController {
 	@Value("${lhjz.mail.to.addresses}")
 	private String toAddrArr;
 
-	@Value("${lhjz.mail.job.to.addresses}")
-	private String toAddrArrForJob;
-
 	@Autowired
 	Environment env;
 
