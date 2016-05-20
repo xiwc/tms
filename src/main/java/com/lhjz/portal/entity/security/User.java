@@ -40,10 +40,13 @@ public class User implements java.io.Serializable {
 	@Column(name = "username", unique = true, nullable = false, length = 50)
 	private String username;
 
+	@JsonIgnore
 	@Column(name = "password", nullable = false, length = 255)
 	private String password;
 
 	private String mails;
+
+	private String name;
 
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
@@ -60,8 +63,7 @@ public class User implements java.io.Serializable {
 
 	@JsonIgnore
 	@ManyToMany
-	@JoinTable(name = "user_project", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
-			@JoinColumn(name = "project_id") })
+	@JoinTable(name = "user_project", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "project_id") })
 	private Set<Project> projects = new HashSet<Project>();
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.REMOVE)
@@ -76,7 +78,8 @@ public class User implements java.io.Serializable {
 		this.enabled = enabled;
 	}
 
-	public User(String username, String password, boolean enabled, Set<Authority> authorities) {
+	public User(String username, String password, boolean enabled,
+			Set<Authority> authorities) {
 		this.username = username;
 		this.password = password;
 		this.enabled = enabled;
@@ -155,10 +158,20 @@ public class User implements java.io.Serializable {
 		this.projects = projects;
 	}
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", password=" + password + ", mails=" + mails + ", enabled=" + enabled
-				+ ", status=" + status + ", createDate=" + createDate + ", version=" + version + "]";
+		return "User [username=" + username + ", password=" + password
+				+ ", mails=" + mails + ", name=" + name + ", enabled="
+				+ enabled + ", status=" + status + ", createDate=" + createDate
+				+ ", version=" + version + "]";
 	}
 
 }

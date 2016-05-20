@@ -88,6 +88,8 @@ public class AdminController extends BaseController {
 			userInfo.setEnabled(user.isEnabled());
 			userInfo.setStatus(user.getStatus());
 			userInfo.setUsername(user.getUsername());
+			userInfo.setMails(user.getMails());
+			userInfo.setName(user.getName());
 
 			Set<String> authorities = new HashSet<String>();
 			for (Authority authority : user.getAuthorities()) {
@@ -110,7 +112,9 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("translate")
-	public String translate(Model model, @PageableDefault Pageable pageable,
+	public String translate(
+			Model model,
+			@PageableDefault Pageable pageable,
 			@RequestParam(value = "projectId", required = false) Long projectId,
 			@RequestParam(value = "my", required = false) String my,
 			@RequestParam(value = "new", required = false) String _new,
@@ -136,53 +140,93 @@ public class AdminController extends BaseController {
 			projectId = project.getId();
 
 			if (StringUtil.isNotEmpty(my)) {
-				page = translateRepository.findByProjectAndCreator(project, WebUtil.getUsername(), pageable);
+				page = translateRepository.findByProjectAndCreator(project,
+						WebUtil.getUsername(), pageable);
 			} else if (StringUtil.isNotEmpty(_new)) {
-				page = translateRepository.findByProjectAndStatus(project, Status.New, pageable);
+				page = translateRepository.findByProjectAndStatus(project,
+						Status.New, pageable);
 			} else if (StringUtil.isNotEmpty(languageId)) {
-				long total = translateRepository.countUnTranslatedByProject(languageId, projectId);
-				List<Translate> unTranslates = translateRepository.queryUnTranslatedByProject(languageId, projectId,
-						pageable.getOffset(), pageable.getPageSize());
+				long total = translateRepository.countUnTranslatedByProject(
+						languageId, projectId);
+				List<Translate> unTranslates = translateRepository
+						.queryUnTranslatedByProject(languageId, projectId,
+								pageable.getOffset(), pageable.getPageSize());
 				page = new PageImpl<Translate>(unTranslates, pageable, total);
 			} else if (StringUtil.isNotEmpty(search)) {
 				String like = "%" + search + "%";
-				page = translateRepository.findByProjectAndKeyLikeOrProjectAndDescriptionLike(project, like, project,
-						like, pageable);
+				page = translateRepository
+						.findByProjectAndKeyLikeOrProjectAndSearchLike(project,
+								like, project, like, pageable);
 			} else {
 				page = translateRepository.findByProject(project, pageable);
 			}
 		}
+
+		List<Language> languages2 = new ArrayList<Language>();
+
+		if (languages != null && project != null
+				&& project.getLanguage() != null) {
+			for (Language language : languages) {
+				if (language.getId().equals(project.getLanguage().getId())) {
+					languages2.add(0, language);
+				} else {
+					languages2.add(language);
+				}
+			}
+		} else {
+			languages2.addAll(languages);
+		}
+
 		model.addAttribute("projects", projects);
+		model.addAttribute("project", project);
 		model.addAttribute("page", page);
-		model.addAttribute("languages", languages);
+		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
 
 		return "admin/translate";
 	}
 
 	@RequestMapping("import")
-	public String _import(Model model, @RequestParam(value = "projectId", required = false) Long projectId) {
+	public String _import(Model model,
+			@RequestParam(value = "projectId", required = false) Long projectId) {
 
 		List<Project> projects = projectRepository.findAll();
 		Set<Translate> translates = null;
 		Set<Language> languages = null;
+		Project project = null;
 		if (projectId != null) {
-			Project project = projectRepository.findOne(projectId);
+			project = projectRepository.findOne(projectId);
 			if (project != null) {
 				translates = project.getTranslates();
 				languages = project.getLanguages();
 			}
 		} else {
 			if (projects.size() > 0) {
+				project = projects.get(0);
 				projectId = projects.get(0).getId();
 				translates = projects.get(0).getTranslates();
 				languages = projects.get(0).getLanguages();
 			}
 		}
 
+		List<Language> languages2 = new ArrayList<Language>();
+
+		if (languages != null && project != null
+				&& project.getLanguage() != null) {
+			for (Language language : languages) {
+				if (language.getId().equals(project.getLanguage().getId())) {
+					languages2.add(0, language);
+				} else {
+					languages2.add(language);
+				}
+			}
+		} else {
+			languages2.addAll(languages);
+		}
+
 		model.addAttribute("projects", projects);
 		model.addAttribute("translates", translates);
-		model.addAttribute("languages", languages);
+		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
 
 		return "admin/import";

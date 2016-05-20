@@ -185,6 +185,11 @@ public class ImportController extends BaseController {
 
 		translateItemRepository.save(translateItems2);
 		translateItemRepository.flush();
+
+		for (Translate translate : translates2) {
+			translate.setSearch(translate.toString());
+		}
+
 		translateRepository.save(translates2);
 		translateRepository.flush();
 		

@@ -23,6 +23,8 @@ public class UserInfo implements Serializable {
 	private static final long serialVersionUID = -5501393570981445761L;
 	private String username;
 	private String password;
+	private String mails;
+	private String name;
 	private boolean enabled;
 
 	private Status status = Status.Normal;
@@ -90,12 +92,28 @@ public class UserInfo implements Serializable {
 		this.authorities = authorities;
 	}
 
+	public String getMails() {
+		return mails;
+	}
+
+	public void setMails(String mails) {
+		this.mails = mails;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public String toString() {
 		return "UserInfo [username=" + username + ", password=" + password
-				+ ", enabled=" + enabled + ", status=" + status
-				+ ", createDate=" + createDate + ", version=" + version
-				+ ", authorities=" + authorities + "]";
+				+ ", mails=" + mails + ", name=" + name + ", enabled="
+				+ enabled + ", status=" + status + ", createDate=" + createDate
+				+ ", version=" + version + "]";
 	}
 
 }

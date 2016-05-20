@@ -97,7 +97,7 @@ public class FeedbackController extends BaseController {
 
 			try {
 				mailSender.sendHtml(
-						String.format("立恒脊柱-用户反馈_%s",
+						String.format("TMS-用户反馈_%s",
 								DateUtil.format(new Date(), DateUtil.FORMAT2)),
 						TemplateUtil.process("templates/mail/feedback",
 								MapUtil.objArr2Map("feedback", feedback2)),
