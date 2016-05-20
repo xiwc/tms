@@ -97,9 +97,9 @@ INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Bultin', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('tms', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Normal', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiweicheng@yeah.net', 'Bultin', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('tms', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.com', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiwc87@yeah.net', 'Normal', '2015-04-25 10:01:51', '0');
 
 -- ----------------------------
 -- Table structure for persistent_logins
@@ -123,9 +123,9 @@ INSERT INTO `users` (username, password, enabled, status, create_date, version) 
 -- ----------------------------
 -- Records of project
 -- ----------------------------
-INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('1', '2016-05-17 15:55:49', 'admin', '团队协作', 'STEP', 'Normal', '0', '1');
-INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('2', '2016-05-17 15:56:46', 'admin', '新致云主站', 'WORK', 'Normal', '0', '1');
-INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('3', '2016-05-17 15:57:54', 'admin', '管理控制台', 'CONSOLE', 'Normal', '0', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, watchers, `language_id`) VALUES ('1', '2016-05-17 15:55:49', 'admin', '团队协作', 'STEP', 'Normal', '0', 'xiwc87@yeah.net,xiweicheng@yeah.net', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, watchers, `language_id`) VALUES ('2', '2016-05-17 15:56:46', 'admin', '新致云主站', 'WORK', 'Normal', '0', 'xiwc87@yeah.net,xiweicheng@yeah.net', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, watchers, `language_id`) VALUES ('3', '2016-05-17 15:57:54', 'admin', '管理控制台', 'CONSOLE', 'Normal', '0', 'xiwc87@yeah.net,xiweicheng@yeah.net', '1');
 
 
 -- ----------------------------

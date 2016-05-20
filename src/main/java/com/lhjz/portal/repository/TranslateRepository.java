@@ -29,15 +29,19 @@ public interface TranslateRepository extends JpaRepository<Translate, Long> {
 
 	Page<Translate> findByProject(Project project, Pageable pageable);
 
-	Page<Translate> findByProjectAndCreator(Project project, String creator, Pageable pageable);
+	Page<Translate> findByProjectAndCreator(Project project, String creator,
+			Pageable pageable);
 
-	Page<Translate> findByProjectAndKeyLikeOrProjectAndDescriptionLike(Project project, String key, Project project2,
-			String desc, Pageable pageable);
+	Page<Translate> findByProjectAndKeyLikeOrProjectAndSearchLike(
+			Project project, String key, Project project2, String desc,
+			Pageable pageable);
 
-	Page<Translate> findByProjectAndStatus(Project project, Status status, Pageable pageable);
+	Page<Translate> findByProjectAndStatus(Project project, Status status,
+			Pageable pageable);
 
 	@Query(value = "SELECT * FROM translate WHERE id IN (SELECT DISTINCT t.id FROM translate_item AS ti INNER JOIN translate AS t ON ti.translate_id = t.id WHERE ti.language_id = ?1 AND t.project_id = ?2 AND ti.content = '') ORDER BY create_date DESC LIMIT ?3, ?4", nativeQuery = true)
-	List<Translate> queryUnTranslatedByProject(Long languageId, Long projectId, int from, int size);
+	List<Translate> queryUnTranslatedByProject(Long languageId, Long projectId,
+			int from, int size);
 
 	@Query(value = "SELECT COUNT(*) FROM translate WHERE id IN (SELECT DISTINCT t.id FROM translate_item AS ti INNER JOIN translate AS t ON ti.translate_id = t.id WHERE ti.language_id = ?1 AND t.project_id = ?2 AND ti.content = '')", nativeQuery = true)
 	long countUnTranslatedByProject(Long languageId, Long projectId);

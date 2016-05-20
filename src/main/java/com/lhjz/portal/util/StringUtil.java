@@ -83,6 +83,9 @@ public final class StringUtil {
 	/** EMPTY [String] */
 	public static final String EMPTY = "";
 
+	/** EMPTY [String] */
+	public static final String SEARCH_SEPARATOR = "@&~";
+
 	private StringUtil() {
 		super();
 	}

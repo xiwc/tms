@@ -36,6 +36,7 @@
                         <thead>
                             <th>用户名</th>
                             <th>角色</th>
+                            <th>邮箱</th>
                             <th>创建时间</th>
                             <th>状态</th>
                             <th>处理</th>
@@ -46,6 +47,7 @@
                                 <td>
                                     <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small tag label user-role" th:text="${auth}"></div>
                                 </td>
+                                <td th:text="${user.mails}">test@test.com</td>
                                 <td th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
                                 <td class="user-status" th:if="${user.enabled}">
                                     <div class="ui green small tag label">开启</div>
@@ -180,24 +182,37 @@
         $('.table-user').on('click', '.lhjz-btn-edit', function(event) {
             var $btn = $(this);
 
-            $('.ad-user-edit').find('.user-username').text($btn.closest('tr').attr('data-id'));
-            $('.ad-user-edit').find('input[name="password"]').val('');
+            $.get('admin/user/get', {
+                username: $btn.closest('tr').attr('data-id')
+            }, function(data) {
 
-            $('.ad-user-edit').modal({
-                onApprove: function() {
-                    $.post('admin/user/update', {
-                        username: $btn.closest('tr').attr('data-id'),
-                        password: $('.ad-user-edit').find('input[name="password"]').val()
-                    }, function(data, textStatus, xhr) {
-                        if (data.success) {
-                            $btn.closest('tr').remove();
-                            toastr.success('用户信息修改成功!');
-                        } else {
-                            toastr.error(data.data, '用户信息修改失败!');
+                if (data.success) {
+
+                    $('.ad-user-edit').find('.user-username').text($btn.closest('tr').attr('data-id'));
+                    $('.ad-user-edit').find('input[name="password"]').val('');
+                    $('.ad-user-edit').find('input[name="mail"]').val(data.data.mails);
+
+                    $('.ad-user-edit').modal({
+                        onApprove: function() {
+                            $.post('admin/user/update', {
+                                username: $btn.closest('tr').attr('data-id'),
+                                password: $('.ad-user-edit').find('input[name="password"]').val(),
+                                mail: $('.ad-user-edit').find('input[name="mail"]').val()
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    toastr.success('用户信息修改成功!');
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.data, '用户信息修改失败!');
+                                }
+                            });
                         }
-                    });
+                    }).modal('show');
+                } else {
+                    toastr.error("获取用户信息失败!");
                 }
-            }).modal('show');
+            });
+
         });
     });
     </script>

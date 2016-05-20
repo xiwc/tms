@@ -18,24 +18,33 @@ jQuery(function($) {
     $('.ad-index-user-edit').click(function() {
         var $btn = $(this);
 
-        $('.ad-user-own-edit').find('.user-username').text($btn.attr('data-id'));
-        $('.ad-user-own-edit').find('input[name="password"]').val('');
+        $.get('admin/user/get', { username: $btn.attr('data-id') },
+            function(data) {
+                if (data.success) {
+                    $('.ad-user-own-edit').find('.user-username').text($btn.attr('data-id'));
+                    $('.ad-user-own-edit').find('input[name="password"]').val('');
+                    $('.ad-user-own-edit').find('input[name="mail"]').val(data.data.mails);
 
-        $('.ad-user-own-edit').modal({
-            onApprove: function() {
-                $.post('admin/user/update2', {
-                    username: $btn.attr('data-id'),
-                    password: $('.ad-user-own-edit').find('input[name="password"]').val()
-                }, function(data, textStatus, xhr) {
-                    if (data.success) {
-                        $btn.closest('tr').remove();
-                        toastr.success('个人信息修改成功!');
-                    } else {
-                        toastr.error(data.data, '个人信息修改失败!');
-                    }
-                });
-            }
-        }).modal('show');
+                    $('.ad-user-own-edit').modal({
+                        onApprove: function() {
+                            $.post('admin/user/update2', {
+                                username: $btn.attr('data-id'),
+                                password: $('.ad-user-own-edit').find('input[name="password"]').val(),
+                                mail: $('.ad-user-own-edit').find('input[name="mail"]').val()
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    toastr.success('个人信息修改成功!');
+                                } else {
+                                    toastr.error(data.data, '个人信息修改失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                } else {
+                    toastr.error('获取用户信息失败!');
+                }
+            });
+
     });
 
     $('.ui.accordion').accordion();

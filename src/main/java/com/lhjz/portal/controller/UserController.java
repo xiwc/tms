@@ -110,7 +110,13 @@ public class UserController extends BaseController {
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN" })
-	public RespBody update(UserForm userForm) {
+	public RespBody update(@Valid UserForm userForm, BindingResult bindingResult) {
+
+		if (bindingResult.hasErrors()) {
+			return RespBody.failed(bindingResult.getAllErrors().stream()
+					.map(err -> err.getDefaultMessage())
+					.collect(Collectors.joining("<br/>")));
+		}
 
 		User user = userRepository.findOne(userForm.getUsername());
 
@@ -133,6 +139,10 @@ public class UserController extends BaseController {
 			user.setEnabled(userForm.getEnabled());
 		}
 
+		if (StringUtil.isNotEmpty(userForm.getMail())) {
+			user.setMails(userForm.getMail());
+		}
+
 		userRepository.saveAndFlush(user);
 
 		return RespBody.succeed(user.getUsername());
@@ -141,7 +151,14 @@ public class UserController extends BaseController {
 	@RequestMapping(value = "update2", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_USER" })
-	public RespBody update2(UserForm userForm) {
+	public RespBody update2(@Valid UserForm userForm,
+			BindingResult bindingResult) {
+
+		if (bindingResult.hasErrors()) {
+			return RespBody.failed(bindingResult.getAllErrors().stream()
+					.map(err -> err.getDefaultMessage())
+					.collect(Collectors.joining("<br/>")));
+		}
 
 		if (!WebUtil.getUsername().equals(userForm.getUsername())) {
 			logger.error("普通用户无权限修改其他用户信息!");
@@ -167,6 +184,10 @@ public class UserController extends BaseController {
 
 		if (userForm.getEnabled() != null && user.getStatus() != Status.Bultin) {
 			user.setEnabled(userForm.getEnabled());
+		}
+
+		if (StringUtil.isNotEmpty(userForm.getMail())) {
+			user.setMails(userForm.getMail());
 		}
 
 		userRepository.saveAndFlush(user);
@@ -196,7 +217,7 @@ public class UserController extends BaseController {
 		return RespBody.succeed(username);
 	}
 
-	@RequestMapping(value = "get", method = RequestMethod.POST)
+	@RequestMapping(value = "get", method = RequestMethod.GET)
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN" })
 	public RespBody get(@RequestParam("username") String username) {
@@ -209,7 +230,7 @@ public class UserController extends BaseController {
 		}
 
 		// prevent ref to each other
-		user.setAuthorities(null);
+		// user.setAuthorities(null);
 
 		return RespBody.succeed(user);
 	}

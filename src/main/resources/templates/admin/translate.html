@@ -52,7 +52,7 @@
                         <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size})}" th:classappend="${((not param.containsKey('my')) and (not param.containsKey('new')) and (not param.containsKey('languageId')) and (not param.containsKey('search'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
                     </div>
                     &nbsp;&nbsp;
-                    <div class="ui label">未翻译语言:</div>
+                    <div class="ui label">语言:</div>
                     <div class="ui selection compact dropdown dd-languages">
                         <input type="hidden" name="language" th:value="${param.containsKey('languageId') ? param.languageId[0] : ''}" value="1">
                         <i class="dropdown icon"></i>
@@ -87,8 +87,8 @@
                                 <td th:text="${t.key}">app.name</td>
                                 <td th:text="${t.description}">应用名称</td>
                                 <td>
-                                    <div class="ui form">
-                                        <div class="inline field" th:each="item : ${t.translateItems}">
+                                    <div class="ui form fm-language">
+                                        <div class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
                                             <label th:text="${item.language.description} + ':'">中文:</label>
                                             <textarea class="ta-translteItem" th:attr="data-id=${item.id}" th:title="${item.content}" name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
                                         </div>
@@ -175,6 +175,7 @@
     <input type="hidden" name="page.number" th:value="${page.number}" />
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
+    <input type="hidden" name="project.languageId" th:value="${project.language.id}" />
     <script type="text/javascript">
     jQuery(function($) {
         $('table').tablesort().data('tablesort');
@@ -183,6 +184,18 @@
         $('.popup').popup();
         $('.ui.dropdown.dd-actions').dropdown({
             action: 'hide'
+        });
+
+        var projectLanguageId = $('input:hidden[name="project.languageId"]').val();
+        $('.tb-translate .fm-language').each(function(index, el) {
+            $fm = $(this);
+            $fm.find('.fd-language').each(function(index, el) {
+                var lngId = $(this).attr('data-language');
+                if(lngId == projectLanguageId) {
+                    $fm.prepend($(this));
+                    return false;
+                }
+            });
         });
 
         function searchHandler() {

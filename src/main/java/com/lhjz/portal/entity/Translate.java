@@ -25,6 +25,7 @@ import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.lhjz.portal.model.Search;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -57,6 +58,9 @@ public class Translate implements Serializable {
 	private String updater;
 
 	private String translator;
+
+	@Column(length = 16777216)
+	private String search;
 
 	@Version
 	private long version;
@@ -185,12 +189,18 @@ public class Translate implements Serializable {
 		this.translateDate = translateDate;
 	}
 
+	public String getSearch() {
+		return search;
+	}
+
+	public void setSearch(String search) {
+		this.search = search;
+	}
+
 	@Override
 	public String toString() {
-		return "Translate [id=" + id + ", key=" + key + ", description=" + description + ", creator=" + creator
-				+ ", updater=" + updater + ", translator=" + translator + ", version=" + version + ", status=" + status
-				+ ", createDate=" + createDate + ", updateDate=" + updateDate + ", translateDate=" + translateDate
-				+ "]";
+
+		return Search.instance().translate(this).toString();
 	}
 
 }
