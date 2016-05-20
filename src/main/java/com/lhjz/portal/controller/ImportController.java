@@ -152,7 +152,7 @@ public class ImportController extends BaseController {
 				Translate translate = new Translate();
 				translate.setCreateDate(new Date());
 				translate.setCreator(WebUtil.getUsername());
-				translate.setDescription("导入翻译项(暂无描述)");
+				translate.setDescription(kvMaps.get(key));
 				translate.setKey(key);
 				translate.setProject(project);
 				translate.setStatus(Status.New);
