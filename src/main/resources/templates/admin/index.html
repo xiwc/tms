@@ -35,7 +35,7 @@
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译
         </a>
-        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
+        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
         </a>
         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="users icon"></i> 用户管理
         </a>
@@ -75,7 +75,7 @@
                         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html">
                             <i class="world icon"></i> 翻译
                         </a>
-                        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
+                        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
                             <i class="retweet icon"></i> 导入导出
                         </a>
                         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">

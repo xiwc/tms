@@ -27,7 +27,7 @@
         <div class="ad-index-container">
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
-                <div th:replace="admin/template :: ad-page-header ('翻译导入', 'import')"></div>
+                <div th:replace="admin/template :: ad-page-header ('导入导出', 'import')"></div>
                 <div class="ui attached segment">
                     选择项目:
                     <div class="ui selection compact dropdown dd-project">
@@ -67,7 +67,7 @@
                             <div class="item" data-value="2">Property</div>
                         </div>
                     </div>
-                    <div class="ui primary compact button btn-import">导入</div>
+                    <div sec:authorize="hasRole('ROLE_ADMIN')" class="ui primary compact button btn-import">导入</div>
                     <div class="ui primary compact button btn-export">导出</div>
                     <div class="ui form segment">
                         <div class="field">

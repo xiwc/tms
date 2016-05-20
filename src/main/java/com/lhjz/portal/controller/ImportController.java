@@ -233,7 +233,7 @@ public class ImportController extends BaseController {
 			List<String> list = new ArrayList<String>();
 			for (String k : map.keySet()) {
 				String v = map.get(k);
-				v = StringUtil.join("\\", (StringUtil.isNotEmpty(v) ? v
+				v = StringUtil.join("\\\n", (StringUtil.isNotEmpty(v) ? v
 						: StringUtil.EMPTY).split("\n"));
 				list.add(k + "=" + v);
 			}
