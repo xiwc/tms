@@ -67,7 +67,7 @@ public class RootController extends BaseController {
 	@RequestMapping()
 	public String home(HttpServletRequest request, Model model) {
 
-		return "admin/login";
+		return "redirect:admin/login";
 	}
 
 	@RequestMapping(value = "feedback/save", method = RequestMethod.POST)

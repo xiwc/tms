@@ -33,11 +33,9 @@ SET NAMES 'utf8';
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_ADMIN');
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_USER');
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_SUPER');
-INSERT INTO `authorities` (username, authority) VALUES ('xiwc', 'ROLE_ADMIN');
-INSERT INTO `authorities` (username, authority) VALUES ('xiwc', 'ROLE_USER');
-INSERT INTO `authorities` (username, authority) VALUES ('lhjz', 'ROLE_USER');
-INSERT INTO `authorities` (username, authority) VALUES ('test1', 'ROLE_USER');
-INSERT INTO `authorities` (username, authority) VALUES ('test2', 'ROLE_USER');
+INSERT INTO `authorities` (username, authority) VALUES ('tms', 'ROLE_ADMIN');
+INSERT INTO `authorities` (username, authority) VALUES ('tms', 'ROLE_USER');
+INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
 
 -- ----------------------------
 -- Table structure for groups
@@ -99,9 +97,9 @@ INSERT INTO `authorities` (username, authority) VALUES ('test2', 'ROLE_USER');
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('admin', '$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Bultin', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('tms', '$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Normal', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('test', '$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Bultin', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('tms', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'Normal', '2015-04-25 10:01:51', '0');
 
 -- ----------------------------
 -- Table structure for persistent_logins
@@ -134,19 +132,16 @@ INSERT INTO `project` VALUES ('3', '2016-05-17 15:57:54', 'admin', '管理控制
 -- Records of language
 -- ----------------------------
 INSERT INTO `language` VALUES ('1', '2016-05-17 15:59:25', 'admin', '中文', 'zh', 'Normal', '0');
-INSERT INTO `language` VALUES ('2', '2016-05-17 15:59:52', 'admin', '英文', 'en', 'Normal', '0');
-INSERT INTO `language` VALUES ('3', '2016-05-17 16:00:30', 'admin', '日语', 'jp', 'Normal', '0');
+INSERT INTO `language` VALUES ('2', '2016-05-17 16:00:30', 'admin', '日语', 'jp', 'Normal', '0');
 
 
 -- ----------------------------
 -- Records of language_project
 -- ----------------------------
 INSERT INTO `language_project` VALUES ('1', '1');
-INSERT INTO `language_project` VALUES ('2', '1');
-INSERT INTO `language_project` VALUES ('3', '1');
 INSERT INTO `language_project` VALUES ('1', '2');
-INSERT INTO `language_project` VALUES ('2', '2');
-INSERT INTO `language_project` VALUES ('3', '2');
 INSERT INTO `language_project` VALUES ('1', '3');
+INSERT INTO `language_project` VALUES ('2', '1');
+INSERT INTO `language_project` VALUES ('2', '2');
 INSERT INTO `language_project` VALUES ('2', '3');
-INSERT INTO `language_project` VALUES ('3', '3');
+

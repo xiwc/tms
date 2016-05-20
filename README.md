@@ -32,4 +32,9 @@ lhjz.mail.sender.password=
 lhjz.mail.sender.from.address=  
 lhjz.mail.to.addresses=  
 
+# 内置用户
+admin/888888 角色:超级管理员  
+tms/888888 角色:管理员  
+test/888888 角色:普通用户  
 
+ 
