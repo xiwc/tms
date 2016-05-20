@@ -1,0 +1,315 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>TMS-翻译</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <!-- <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script> -->
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <div th:replace="admin/template :: ad-page-header ('翻译', 'translate')"></div>
+                <div class="ui attached segment">
+                    选择项目:
+                    <div class="ui selection compact dropdown dd-project">
+                        <input type="hidden" name="project" th:value="${projectId}" value="1">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">项目</div>
+                        <div class="menu" th:remove="all-but-first">
+                            <!--/*/
+                            <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
+                            /*/-->
+                            <a class="item" data-value="1">STEP</a>
+                            <a class="item" data-value="2">WORK</a>
+                            <a class="item" data-value="3">CONSOLE</a>
+                        </div>
+                    </div>
+                    <div class="ui primary compact button btn-add">添加</div>
+                    <div class="ui label">筛选:</div>
+                    <div class="ui compact basic buttons">
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, my=${'1'})}" th:classappend="${(param.containsKey('my') and (not #strings.isEmpty(param.my[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, new=${'1'})}" th:classappend="${(param.containsKey('new') and (not #strings.isEmpty(param.new[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size})}" th:classappend="${((not param.containsKey('my')) and (not param.containsKey('new')) and (not param.containsKey('languageId')) and (not param.containsKey('search'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
+                    </div>
+                    &nbsp;&nbsp;
+                    <div class="ui label">未翻译语言:</div>
+                    <div class="ui selection compact dropdown dd-languages">
+                        <input type="hidden" name="language" th:value="${param.containsKey('languageId') ? param.languageId[0] : ''}" value="1">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">按未翻译语言过滤</div>
+                        <div class="menu" th:remove="all-but-first">
+                            <!--/*/
+                            <a th:each="l : ${languages}" class="item" th:href="@{/admin/translate(projectId=${projectId}, languageId=${l.id})}" th:title="${l.description}" th:attr="data-value=${l.id}" th:text="${l.description}">中文</a>
+                            /*/-->
+                            <a class="item" data-value="1">中文</a>
+                            <a class="item" data-value="2">英语</a>
+                            <a class="item" data-value="3">日语</a>
+                        </div>
+                    </div>
+                    <div class="ui icon input inp-search">
+                        <input type="text" th:value="${param.containsKey('search') ? param.search[0] : ''}" placeholder="查找...">
+                        <i class="circular search link icon"></i>
+                    </div>
+                </div>
+                <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;">
+                    <table class="ui small sortable celled striped compact table segment tb-translate">
+                        <thead>
+                            <th class="three wide">名称</th>
+                            <th class="three wide">描述</th>
+                            <th class="five wide">翻译</th>
+                            <th class="three wide">创建时间</th>
+                            <th class="one wide">状态</th>
+                            <th class="one wide">处理</th>
+                        </thead>
+                        <tbody th:remove="all-but-first">
+                            <!--/*/
+                            <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
+                                <td th:text="${t.key}">app.name</td>
+                                <td th:text="${t.description}">应用名称</td>
+                                <td>
+                                    <div class="ui form">
+                                        <div class="inline field" th:each="item : ${t.translateItems}">
+                                            <label th:text="${item.language.description} + ':'">中文:</label>
+                                            <textarea class="ta-translteItem" th:attr="data-id=${item.id}" th:title="${item.content}" name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td th:text="${t.status}">待翻译</td>
+                                <td>
+                                    <div class="ui dropdown dd-actions">
+                                        <div class="text">操作</div>
+                                        <i class="dropdown icon"></i>
+                                        <div class="menu">
+                                            <div sec:authorize="hasRole('ROLE_ADMIN')" class="item ddmi-delete">删除</div>
+                                            <div class="item ddmi-edit">编辑</div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            /*/-->
+                            <tr>
+                                <td>app.name</td>
+                                <td>应用名称</td>
+                                <td>
+                                    <textarea rows="1">测试</textarea>
+                                </td>
+                                <td>
+                                    <textarea rows="1">test</textarea>
+                                </td>
+                                <td>2016/05/10 12:00:00</td>
+                                <td>待翻译</td>
+                                <td>
+                                    <div class="ui dropdown">
+                                        <div class="text">操作</div>
+                                        <i class="dropdown icon"></i>
+                                        <div class="menu">
+                                            <div class="item">删除</div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <!-- <tfoot>
+                            <tr>
+                                <td colspan="6">
+                                </td>
+                            </tr>
+                        </tfoot> -->
+                    </table>
+                </div>
+                <!-- <div class="ui segment"> -->
+                <div class="ui label">
+                    共计:
+                    <div class="detail" th:text="${page.totalPages + '页/' + page.totalElements + '条'}">214</div>
+                </div>
+                <div class="ui label">
+                    当前:
+                    <div class="detail" th:text="${'第' + (page.number + 1) + '页/共' + page.numberOfElements + '条'}">214</div>
+                </div>
+                <div class="ui right floated pagination small menu" th:if="${page.totalPages > 0}">
+                    <a class="item" th:if="${(page.totalPages > 0) and (not page.first)}" th:href="@{/admin/translate(projectId=${projectId}, page=0, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">首页</a>
+                    <a title="上一页" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
+                        <i class="left chevron icon"></i>
+                    </a>
+                    <a class="item" th:if="${page.number > 1}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number - 1}"></a>
+                    <a class="item" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number}"></a>
+                    <a class="item active" th:if="${page.totalPages > 0}" th:href="'javascript:void(0);'" th:text="${page.number + 1}"></a>
+                    <a class="item" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 2}"></a>
+                    <a class="item" th:if="${page.number < page.totalPages - 2}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 3}"></a>
+                    <a title="下一页" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
+                        <i class="right chevron icon"></i>
+                    </a>
+                    <a class="item" th:if="${(page.totalPages > 0) and (not page.last)}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.totalPages - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">末页</a>
+                </div>
+                <!-- </div> -->
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-handle-confirm"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-translate-add"></div>
+    <div th:replace="admin/template :: ad-translate-edit"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <input type="hidden" name="page.number" th:value="${page.number}" />
+    <input type="hidden" name="page.size" th:value="${page.size}" />
+    <input type="hidden" name="projectId" th:value="${projectId}" />
+    <script type="text/javascript">
+    jQuery(function($) {
+        $('table').tablesort().data('tablesort');
+        $('.ui.checkbox').checkbox();
+        $('.ui.dropdown').dropdown();
+        $('.popup').popup();
+        $('.ui.dropdown.dd-actions').dropdown({
+            action: 'hide'
+        });
+
+        function searchHandler() {
+            var search = $('.inp-search > input').val();
+            var number = $('input:hidden[name="page.number"]').val();
+            var size = $('input:hidden[name="page.size"]').val();
+            var projectId = $('input:hidden[name="projectId"]').val();
+            if (search) {
+                window.location.href = "/admin/translate?projectId=" + projectId + "&page=" + number + "&size=" + size + "&search=" + search;
+            } else {
+                window.location.href = "/admin/translate?projectId=" + projectId + "&page=" + number + "&size=" + size;
+            }
+        }
+
+        $('.inp-search > input').keyup(function(event) {
+            if (event.keyCode == 13) {
+                searchHandler();
+            }
+        });
+
+        $('.inp-search > i').click(function(event) {
+            searchHandler();
+        });
+
+        $('.btn-add').click(function(event) {
+
+            $('.ad-translate-add').modal({
+                onApprove: function() {
+                    var data = Utils.formData('.ad-translate-add .ui.form');
+                    data.projectId = $('.dd-project').dropdown('get value');
+                    data.content = JSON.stringify(data);
+                    $.post('admin/translate/save', data,
+                        function(data, textStatus, xhr) {
+                            if (data.success) {
+                                toastr.success('添加成功!');
+                                window.location.reload();
+                            } else {
+                                toastr.error(data.data, '添加失败!');
+                            }
+                        });
+                }
+            }).modal('show');
+        });
+
+        $('.tb-translate').on('click', '.ddmi-delete', function(event) {
+            var $btn = $(this);
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/translate/delete', {
+                        id: $btn.closest('tr').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('tr').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.tb-translate').on('click', '.ddmi-edit', function(event) {
+            var $btn = $(this);
+
+            $.get('admin/translate/getById', {
+                id: $btn.closest('tr').attr('data-id')
+            }, function(data) {
+                if (data.success) {
+                    $('.ad-translate-edit').modal({
+                        onShow: function() {
+                            var modal = this;
+                            $(this).find('input[name="key"]').val(data.data.key);
+                            $(this).find('textarea[name="desc"]').val(data.data.description);
+                            var translateItems = data.data.translateItems;
+                            if ($.isArray(translateItems)) {
+                                $.each(translateItems, function(index, val) {
+                                    $(modal).find('textarea[name=' + val.language.name + ']').val(val.content);
+                                });
+                            }
+                        },
+                        onApprove: function() {
+                            var data = Utils.formData('.ad-translate-edit .ui.form');
+                            data.id = $btn.closest('tr').attr('data-id');
+                            data.content = JSON.stringify(data);
+                            $.post('admin/translate/update2', data, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    toastr.success('更新成功!');
+                                    window.location.reload();
+                                } else {
+                                    toastr.error('更新失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                }
+            });
+
+        });
+
+        $('textarea.ta-translteItem').blur(function(event) {
+            var $ta = $(this);
+
+            if (typeof($ta.attr('title')) == "undefined" && !$ta.val()) {
+                return;
+            }
+
+            if ($ta.val() == $ta.attr('title')) {
+                return;
+            }
+
+            $.post('admin/translate/update', {
+                id: $ta.attr('data-id'),
+                content: $ta.val()
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    $ta.attr('title', $ta.val());
+                    toastr.success('更新成功!');
+                } else {
+                    toastr.success('更新失败!');
+                }
+            });
+        });
+
+    });
+    </script>
+</body>
+
+</html>

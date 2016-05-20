@@ -1,0 +1,48 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<base th:href="@{/}" href="">
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<title>TMS-后台管理登录</title>
+<link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}"
+	href="../../static/lib/semantic/semantic.min.css" />
+<link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+<script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+</head>
+<body>
+	<div class="admin login">
+		<h2 class="ui center aligned icon header">
+			<i class="circular users icon"></i> 用户登录
+		</h2>
+		<form th:action="@{/admin/signin}" action="" method="post">
+			<div class="ui error form segment">
+				<div class="ui error message" th:if="${param.error}">
+					<div class="header">错误信息</div>
+					<p>用户名密码错误</p>
+				</div>
+				<div class="ui message" th:if="${param.logout}">
+					<div class="header">您已经退出登录</div>
+				</div>
+
+				<div class="field">
+					<div class="ui left icon input">
+						<i class="user icon"></i><input type="text" id="username" name="username" placeholder="用户名" />
+					</div>
+				</div>
+				<div class="field">
+					<div class="ui left icon input">
+						<i class="lock icon"></i> <input type="password" id="password" name="password" placeholder="密码" />
+					</div>
+				</div>
+				<div class="ui center aligned header">
+					<button type="submit" class="ui submit button">登录</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</body>
+</html>

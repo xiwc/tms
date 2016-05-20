@@ -1,0 +1,398 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>TMS-主页</title>
+    <!-- css -->
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <!-- script -->
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/date.format.js}" src="../../static/lib/date.format.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+    <!-- template html segment used by jquery.tmpl -->
+    <script th:replace="admin/template :: imageItemTpl"></script>
+    <script th:replace="admin/template :: bigImgItemTpl"></script>
+    <script th:replace="admin/template :: hotNewsItemTpl"></script>
+    <script th:replace="admin/template :: moreNewsItemTpl"></script>
+    <script th:replace="admin/template :: articleItemTpl"></script>
+</head>
+
+<body class="admin-index">
+    <div th:with="uri=${#httpServletRequest.requestURI}" th:fragment="sidebar-menu" class="ui left thin vertical inverted labeled icon sidebar menu ad-index-menu">
+        <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html"> <i class="home icon"></i> 主页
+        </a>
+        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译
+        </a>
+        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
+        </a>
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="users icon"></i> 用户管理
+        </a>
+    </div>
+    <div th:fragment="top-fixed-menu" class="ui fixed inverted main menu">
+        <a class="item ad-index-btn-menu">
+            <i class="content icon"></i> 菜单
+        </a>
+        <div class="title item">
+            <b>TMS</b>
+        </div>
+        <div class="right menu">
+            <div class="item link ad-item-feedback">
+                <div class="" th:attrappend="data-url=${#httpServletRequest.requestURI}">反馈 </div>
+                <form class="hidden" th:action="@{/admin/feedback}" action="" method="post">
+                    <input type="hidden" name="url" value="" th:value="${#httpServletRequest.requestURI}" />
+                    <input type="hidden" name="name" value="" />
+                </form>
+            </div>
+            <div class="item link">
+                <div th:attr="data-id=${#authentication.name},data-html='当前登录用户: <b>' + ${#authentication.name} + '</b>'" class="ad-index-user-edit popup-login-user">修改 </div>
+            </div>
+            <div class="item link">
+                <div class="ad-index-logout">退出 </div>
+                <form class="hidden" th:action="@{/admin/logout}" action="" method="post"></form>
+            </div>
+        </div>
+    </div>
+    <div class="pusher ad-index-content">
+        <div class="ad-index-container">
+            <div th:fragment="rail-menu" class="ui dividing close left rail ad-index-rail" style="width:160px; min-height:450px;">
+                <div class="ui sticky ad-index-sticky">
+                    <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing menu" style="width: 11rem !important;">
+                        <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
+                            <i class="home icon"></i> 主页
+                        </a>
+                        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html">
+                            <i class="world icon"></i> 翻译
+                        </a>
+                        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
+                            <i class="retweet icon"></i> 导入导出
+                        </a>
+                        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
+                            <i class="users icon"></i> 用户管理
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div id="context">
+                <!-- <div th:replace="admin/template :: ad-page-header ('门户主页', 'index')"></div> -->
+                <h2 class="ui center aligned icon header">
+                  <i class="circular users icon"></i>
+                  欢迎使用TMS翻译管理系统!
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-images"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-news-edit"></div>
+    <div th:replace="admin/template :: ad-news-select"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <!-- page handler -->
+    <script type="text/javascript">
+    jQuery(document).ready(function($) {
+        //article dropdown list selected item changed handle
+        $('.ui.dropdown.ad-article-list').dropdown({
+            onChange: function(value, text, $choice) {
+                var $dropdown = $(this);
+                var $btn = $('.btn-article-detail');
+                if (!!value) {
+                    $('.ad-news-edit input[name="title"]').val(text);
+                }
+                $btn.siblings('.popup').find('.header').text(text);
+                $btn.siblings('.popup').find('p').html($dropdown.dropdown('get item', value).attr('data-content'));
+            }
+        });
+
+        // article dropdown list popup
+        $('.btn-article-detail')
+            .popup({
+                inline: true,
+                hoverable: true,
+                position: 'bottom left',
+                delay: {
+                    show: 300,
+                    hide: 800
+                }
+            });
+        // more news delete handle
+        $('.grid-more-news').on('click', '.btn-more-news-del', function(event) {
+            var $btn = $(this);
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/settings/delete', {
+                        id: $btn.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('.item').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        // more news add handle
+        $('.grid-more-news').on('click', '.btn-more-news-add', function(event) {
+            var $btn = $(this);
+
+            $.post('admin/article/list', {
+                    timestamp: new Date().getTime()
+                },
+                function(data, textStatus, xhr) {
+                    if (data.success) {
+
+                        $.each(data.data, function(index, val) {
+                            val['createDate'] = new Date(val.createDate).format('yyyy/MM/dd hh:mm:ss');
+                        });
+
+                        $('#articleItemTpl').tmpl(data.data).appendTo($('.ad-news-select table > tbody').empty());
+                        $('.ui.checkbox').checkbox();
+                        // show modal
+                        $('.ad-news-select').modal({
+                            onApprove: function() {
+
+                                //get selected news
+                                var linkIds = [];
+                                $('.table-news-select input:checkbox:checked').each(function(index, el) {
+                                    linkIds.push({
+                                        link: $(el).val(),
+                                        title: $(el).parents('tr').find('td[class="article-name"]').text()
+                                    });
+                                });
+
+                                if (linkIds.length == 0) {
+                                    toastr.error('没有选择任何项目!');
+                                    return false;
+                                }
+
+                                $.each(linkIds, function(index, val) {
+                                    $.post('admin/settings/save', {
+                                        page: 'index',
+                                        module: 'moreNews',
+                                        title: val.title,
+                                        link: val.link,
+                                        more: $btn.attr('data-col')
+                                    }, function(data, textStatus, xhr) {
+                                        if (data.success) {
+                                            $('#moreNewsItemTpl').tmpl(data.data).appendTo($btn.closest('.column').find('.list'));
+                                            toastr.success('保存成功!');
+                                        } else {
+                                            toastr.error('保存失败!');
+                                        }
+                                    });
+                                });
+
+                            },
+                            onVisible: function() {
+                                $('.ad-news-select.modal').modal('refresh');
+                            }
+                        }).modal('show');
+
+                    } else {
+                        toastr.error('查询文章失败!');
+                        return false;
+                    }
+                });
+        });
+        // big img delete handle
+        $('.big-img-list').on('click', '.btn-big-img-del', function(event) {
+            var $btn = $(this);
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/settings/delete', {
+                        id: $btn.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.parents('.item').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        // big img edit handle
+        $('.big-img-list').on('click', '.btn-big-img-edit', function(event) {
+            var $btn = $(this);
+
+            $.post('admin/article/list', {
+                    timestamp: new Date().getTime()
+                },
+                function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $.tmpl('<div class="item" data-value="${id}" data-content="${content}">${name}</div>', data.data).appendTo($('.ad-article-list .menu').empty());
+                        $('<div class="item" data-value="" data-content=""></div>').prependTo('.ad-article-list .menu');
+
+                        $.post('admin/settings/find', {
+                            id: $btn.attr('data-id')
+                        }, function(data, textStatus, xhr) {
+
+                            if (data.success) {
+                                if (!!data.data.link) {
+                                    $('.ui.dropdown.ad-article-list').dropdown('set selected', data.data.link);
+                                } else {
+                                    $('.ui.dropdown.ad-article-list').dropdown('restore defaults');
+                                }
+
+                                $('.ad-news-edit input[name="title"]').val(data.data.title);
+                                $('.ad-news-edit textarea[name="content"]').val(data.data.content);
+                                // show modal
+                                $('.ad-news-edit').modal({
+                                    onApprove: function() {
+                                        $.post('admin/settings/update', {
+                                            id: $btn.attr('data-id'),
+                                            title: $('.ad-news-edit input[name="title"]').val(),
+                                            content: $('.ad-news-edit textarea[name="content"]').val(),
+                                            link: $('.ui.dropdown.ad-article-list').dropdown('get value'),
+                                            more: $('.ui.dropdown.ad-article-list').dropdown('get text')
+                                        }, function(data, textStatus, xhr) {
+                                            if (data.success) {
+                                                $btn.closest('.item').find('.new-title').text(data.data.title);
+                                                $btn.closest('.item').find('.new-content').text(Utils.abbreviate(data.data.content, 120));
+                                                if (!!data.data.link) {
+                                                    $btn.closest('.item').find('.new-link').empty().append($('<a class="ui primary button" target="_blank" th:href="@{/article(id=${bigImg.link})}" href="#" role="button">了解更多</a>').attr('href', 'article?id=' + data.data.link));
+                                                } else {
+                                                    $btn.closest('.item').find('.new-link').empty();
+                                                }
+                                                toastr.success('更新成功!');
+                                            } else {
+                                                toastr.error('更新失败!');
+                                            }
+                                        });
+                                    }
+                                }).modal('show');
+
+                            } else {
+                                toastr.error('查询设置失败!');
+                                return false;
+                            }
+                        });
+                    } else {
+                        toastr.error('查询文章失败!');
+                        return false;
+                    }
+                });
+        });
+        // hot news edit handle
+        $('.ad-hot-news-list').on('click', '.btn-hot-news-edit', function(event) {
+            var $btn = $(this);
+
+            $.post('admin/article/list', {
+                    timestamp: new Date().getTime()
+                },
+                function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $.tmpl('<div class="item" data-value="${id}" data-content="${content}">${name}</div>', data.data).appendTo($('.ad-article-list .menu').empty());
+                        $('<div class="item" data-value="" data-content=""></div>').prependTo('.ad-article-list .menu');
+
+                        $.post('admin/settings/find', {
+                            id: $btn.attr('data-id')
+                        }, function(data, textStatus, xhr) {
+                            if (data.success) {
+                                if (!!data.data.link) {
+                                    $('.ui.dropdown.ad-article-list').dropdown('set selected', data.data.link);
+                                } else {
+                                    $('.ui.dropdown.ad-article-list').dropdown('restore defaults');
+                                }
+                                $('.ad-news-edit input[name="title"]').val(data.data.title);
+                                $('.ad-news-edit textarea[name="content"]').val(data.data.content);
+                                //show modal
+                                $('.ad-news-edit').modal({
+                                    onApprove: function() {
+                                        $.post('admin/settings/update', {
+                                            id: $btn.attr('data-id'),
+                                            title: $('.ad-news-edit input[name="title"]').val(),
+                                            content: $('.ad-news-edit textarea[name="content"]').val(),
+                                            link: $('.ui.dropdown.ad-article-list').dropdown('get value'),
+                                            more: $('.ui.dropdown.ad-article-list').dropdown('get text')
+                                        }, function(data, textStatus, xhr) {
+                                            if (data.success) {
+                                                $btn.parents(".card").find('.content .header').text(data.data.title);
+                                                $btn.parents(".card").find('.content .description').text(Utils.abbreviate(data.data.content, 65));
+                                                $btn.parents(".card").find('.image img').attr({
+                                                    "title": data.data.more,
+                                                    'alt': data.data.link
+                                                });
+                                                toastr.success('更新成功!');
+                                            } else {
+                                                toastr.error('更新失败!');
+                                            }
+                                        });
+                                    }
+                                }).modal('show');
+                            } else {
+                                toastr.error('查询设置失败!');
+                                return false;
+                            }
+                        });
+                    } else {
+                        toastr.error('查询文章失败!');
+                        return false;
+                    }
+                });
+        });
+        // hot news delete handle
+        $('.ad-hot-news-list').on('click', '.btn-hot-news-del', function(event) {
+            var $btn = $(this);
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/settings/delete', {
+                        id: $btn.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.parents('.card').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+        // image select callback handle
+        window.imgSelectedCallback = function(imgUrlArr, page, module) {
+            // save to server db.
+            $.each(imgUrlArr, function(index, imgUrl) {
+                $.post('admin/settings/save', {
+                    page: page,
+                    module: module,
+                    imgUrl: imgUrl
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        var m = [{
+                            id: data.data.id,
+                            imgUrl: data.data.imgUrl
+                        }];
+                        if (module == "bigImg") {
+                            $("#bigImgItemTpl").tmpl(m).appendTo($('.big-img-list'));
+                        } else if (module == "hotNews") {
+                            $('#hotNewsItemTpl').tmpl(m).appendTo($('.ad-hot-news-list'));
+                        }
+
+                        toastr.success('设置成功!');
+                    } else {
+                        toastr.error('设置失败!');
+                    }
+                });
+            });
+        };
+
+    });
+    </script>
+</body>
+
+</html>
