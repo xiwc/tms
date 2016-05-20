@@ -232,7 +232,10 @@ public class ImportController extends BaseController {
 		} else {
 			List<String> list = new ArrayList<String>();
 			for (String k : map.keySet()) {
-				list.add(k + "=" + map.get(k));
+				String v = map.get(k);
+				v = StringUtil.join("\\", (StringUtil.isNotEmpty(v) ? v
+						: StringUtil.EMPTY).split("\n"));
+				list.add(k + "=" + v);
 			}
 
 			Collections.sort(list);
