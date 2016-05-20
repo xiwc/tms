@@ -34,7 +34,9 @@ import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
 import com.lhjz.portal.model.RespBody;
+import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
+import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.AuthorityRepository;
 import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
@@ -185,6 +187,8 @@ public class ImportController extends BaseController {
 		translateItemRepository.flush();
 		translateRepository.save(translates2);
 		translateRepository.flush();
+		
+		log(Action.Import, Target.Import, content);
 
 		return RespBody.succeed();
 	}
@@ -228,7 +232,10 @@ public class ImportController extends BaseController {
 				}
 			}
 
-			return RespBody.succeed(JsonUtil.toJson(root));
+			String data = JsonUtil.toJson(root);
+			log(Action.Export, Target.Import, data);
+
+			return RespBody.succeed(data);
 		} else {
 			List<String> list = new ArrayList<String>();
 			for (String k : map.keySet()) {
@@ -240,7 +247,10 @@ public class ImportController extends BaseController {
 
 			Collections.sort(list);
 
-			return RespBody.succeed(StringUtil.join("\r\n", list));
+			String data = StringUtil.join("\r\n", list);
+			log(Action.Export, Target.Import, data);
+
+			return RespBody.succeed(data);
 		}
 	}
 }

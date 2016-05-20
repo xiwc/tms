@@ -42,12 +42,22 @@ public class TranslateItem implements Serializable {
 
 	private String creator;
 
+	private String updater;
+
+	private String translator;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Status status = Status.Normal;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate = new Date();
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updateDate;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date translateDate;
 
 	@Version
 	private long version;
@@ -125,12 +135,43 @@ public class TranslateItem implements Serializable {
 		this.language = language;
 	}
 
+	public String getUpdater() {
+		return updater;
+	}
+
+	public void setUpdater(String updater) {
+		this.updater = updater;
+	}
+
+	public String getTranslator() {
+		return translator;
+	}
+
+	public void setTranslator(String translator) {
+		this.translator = translator;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	public Date getTranslateDate() {
+		return translateDate;
+	}
+
+	public void setTranslateDate(Date translateDate) {
+		this.translateDate = translateDate;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((language == null) ? 0 : language.hashCode());
+		result = prime * result + ((language == null) ? 0 : language.hashCode());
 		return result;
 	}
 
@@ -153,8 +194,9 @@ public class TranslateItem implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TranslateItem [id=" + id + ", content=" + content + ", creator=" + creator + ", status=" + status
-				+ ", createDate=" + createDate + ", version=" + version + "]";
+		return "TranslateItem [id=" + id + ", content=" + content + ", creator=" + creator + ", updater=" + updater
+				+ ", translator=" + translator + ", status=" + status + ", createDate=" + createDate + ", updateDate="
+				+ updateDate + ", translateDate=" + translateDate + ", version=" + version + "]";
 	}
 
 }

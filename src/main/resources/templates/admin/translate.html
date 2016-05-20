@@ -197,6 +197,13 @@
             }
         }
 
+        // $('.ad-translate-edit').find('textarea[class="language"]').keyup(function(event) {
+        //     var $desc = $('.ad-translate-edit').find('textarea[name="desc"]');
+        //     if (!$desc.val()) {
+        //         $desc.val($(this).val());
+        //     }
+        // });
+
         $('.inp-search > input').keyup(function(event) {
             if (event.keyCode == 13) {
                 searchHandler();
@@ -214,6 +221,9 @@
                     var data = Utils.formData('.ad-translate-add .ui.form');
                     data.projectId = $('.dd-project').dropdown('get value');
                     data.content = JSON.stringify(data);
+                    if (!data.key) {
+                        data.key = "todo.key.id" + (new Date()).getTime();
+                    }
                     $.post('admin/translate/save', data,
                         function(data, textStatus, xhr) {
                             if (data.success) {

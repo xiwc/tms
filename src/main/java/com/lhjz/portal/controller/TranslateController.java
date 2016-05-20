@@ -106,6 +106,10 @@ public class TranslateController extends BaseController {
 			String name = language.getName();
 			if (jsonO.has(name)) {
 				item.setContent(jsonO.get(name).getAsString());
+				// 如果描述为空, 取第一个语言翻译值.
+				if (StringUtil.isEmpty(translate.getDescription())) {
+					translate.setDescription(item.getContent());
+				}
 			} else {
 				item.setContent(StringUtil.EMPTY);
 			}
@@ -132,8 +136,14 @@ public class TranslateController extends BaseController {
 
 		TranslateItem translateItem = translateItemRepository.findOne(id);
 
+		String oldContent = StringUtil.EMPTY;
+
 		if (translateItem != null) {
+			oldContent = translateItem.getContent();
+
 			translateItem.setContent(translateItemForm.getContent());
+			translateItem.setUpdater(WebUtil.getUsername());
+			translateItem.setUpdateDate(new Date());
 
 			translateItemRepository.saveAndFlush(translateItem);
 
@@ -145,6 +155,8 @@ public class TranslateController extends BaseController {
 			logger.error("更新翻译条目不存在! ID: {}", id);
 			return RespBody.failed("更新翻译条目不存在!");
 		}
+
+		logWithProperties(Action.Update, Target.TranslateItem, "content", translateItemForm.getContent(), oldContent);
 
 		return RespBody.succeed(id);
 	}
@@ -177,6 +189,8 @@ public class TranslateController extends BaseController {
 			translate.setKey(translateForm.getKey());
 			translate.setDescription(translateForm.getDesc());
 			translate.setStatus(Status.Updated);
+			translate.setUpdater(WebUtil.getUsername());
+			translate.setUpdateDate(new Date());
 
 			JsonObject jsonO = (JsonObject) JsonUtil.toJsonElement(translateForm.getContent());
 			Set<Language> lngs = translate.getProject().getLanguages();
@@ -189,12 +203,23 @@ public class TranslateController extends BaseController {
 					content = jsonO.get(name).getAsString();
 				}
 
+				if (StringUtil.isEmpty(translate.getDescription())) {
+					if (StringUtil.isNotEmpty(content)) {
+						translate.setDescription(content);
+					}
+				}
+
 				TranslateItem exitTranslateItem = getExitTranslateItem(name, translate);
 				if (exitTranslateItem != null) {
+					String oldContent = exitTranslateItem.getContent();
 					exitTranslateItem.setContent(content);
 					exitTranslateItem.setStatus(Status.Updated);
+					exitTranslateItem.setUpdater(WebUtil.getUsername());
+					exitTranslateItem.setUpdateDate(new Date());
 
 					translateItemRepository.saveAndFlush(exitTranslateItem);
+
+					logWithProperties(Action.Update, Target.TranslateItem, "content", content, oldContent);
 				} else {
 					TranslateItem item = new TranslateItem();
 					item.setContent(content);
@@ -206,12 +231,15 @@ public class TranslateController extends BaseController {
 
 					translateItemRepository.saveAndFlush(item);
 
+					logWithProperties(Action.Create, Target.TranslateItem, "content", item);
+
 					translate.getTranslateItems().add(item);
 				}
 			}
 
-			log(Action.Update, Target.Translate, translate);
 			translateRepository.saveAndFlush(translate);
+
+			log(Action.Update, Target.Translate, translate);
 		} else {
 			logger.error("更新翻译不存在! ID: {}", id);
 			return RespBody.failed("更新翻译不存在!");
@@ -226,6 +254,8 @@ public class TranslateController extends BaseController {
 	public RespBody delete(@RequestParam("id") Long id) {
 
 		translateRepository.delete(id);
+
+		logWithProperties(Action.Delete, Target.Translate, "id", id);
 
 		return RespBody.succeed(id);
 	}

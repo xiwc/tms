@@ -14,12 +14,17 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -31,14 +36,35 @@ public class User implements java.io.Serializable {
 
 	/** serialVersionUID long */
 	private static final long serialVersionUID = -5501393570981445761L;
+	@Id
+	@Column(name = "username", unique = true, nullable = false, length = 50)
 	private String username;
+
+	@Column(name = "password", nullable = false, length = 255)
 	private String password;
+
+	private String mails;
+
+	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private Status status = Status.Normal;
+
+	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
+
+	@Version
 	private long version;
 
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "user_project", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = {
+			@JoinColumn(name = "project_id") })
+	private Set<Project> projects = new HashSet<Project>();
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.REMOVE)
 	private Set<Authority> authorities = new HashSet<Authority>(0);
 
 	public User() {
@@ -50,16 +76,13 @@ public class User implements java.io.Serializable {
 		this.enabled = enabled;
 	}
 
-	public User(String username, String password, boolean enabled,
-			Set<Authority> authorities) {
+	public User(String username, String password, boolean enabled, Set<Authority> authorities) {
 		this.username = username;
 		this.password = password;
 		this.enabled = enabled;
 		this.authorities = authorities;
 	}
 
-	@Id
-	@Column(name = "username", unique = true, nullable = false, length = 50)
 	public String getUsername() {
 		return this.username;
 	}
@@ -68,7 +91,6 @@ public class User implements java.io.Serializable {
 		this.username = username;
 	}
 
-	@Column(name = "password", nullable = false, length = 255)
 	public String getPassword() {
 		return this.password;
 	}
@@ -77,7 +99,6 @@ public class User implements java.io.Serializable {
 		this.password = password;
 	}
 
-	@Column(name = "enabled", nullable = false)
 	public boolean isEnabled() {
 		return this.enabled;
 	}
@@ -86,8 +107,6 @@ public class User implements java.io.Serializable {
 		this.enabled = enabled;
 	}
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
 	public Status getStatus() {
 		return status;
 	}
@@ -96,7 +115,6 @@ public class User implements java.io.Serializable {
 		this.status = status;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP)
 	public Date getCreateDate() {
 		return createDate;
 	}
@@ -105,7 +123,6 @@ public class User implements java.io.Serializable {
 		this.createDate = createDate;
 	}
 
-	@Version
 	public long getVersion() {
 		return version;
 	}
@@ -114,7 +131,6 @@ public class User implements java.io.Serializable {
 		this.version = version;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.REMOVE)
 	public Set<Authority> getAuthorities() {
 		return this.authorities;
 	}
@@ -123,11 +139,26 @@ public class User implements java.io.Serializable {
 		this.authorities = authorities;
 	}
 
+	public String getMails() {
+		return mails;
+	}
+
+	public void setMails(String mails) {
+		this.mails = mails;
+	}
+
+	public Set<Project> getProjects() {
+		return projects;
+	}
+
+	public void setProjects(Set<Project> projects) {
+		this.projects = projects;
+	}
+
 	@Override
 	public String toString() {
-		return "User [username=" + username + ", password=" + password
-				+ ", enabled=" + enabled + ", status=" + status
-				+ ", createDate=" + createDate + ", version=" + version + "]";
+		return "User [username=" + username + ", password=" + password + ", mails=" + mails + ", enabled=" + enabled
+				+ ", status=" + status + ", createDate=" + createDate + ", version=" + version + "]";
 	}
 
 }

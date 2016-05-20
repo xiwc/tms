@@ -14,13 +14,16 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -46,6 +49,10 @@ public class Project implements Serializable {
 
 	private String creator;
 
+	private String updater;
+
+	private String watchers;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Status status = Status.Normal;
@@ -53,16 +60,25 @@ public class Project implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate = new Date();
 
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updateDate;
+
 	@Version
 	private long version;
 
-	// @JsonIgnore
 	@ManyToMany(mappedBy = "projects")
 	private Set<Language> languages = new HashSet<Language>();
-	
+
+	@ManyToMany(mappedBy = "projects")
+	private Set<User> users = new HashSet<User>();
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "project")
 	private Set<Translate> translates = new HashSet<Translate>();
+
+	@ManyToOne
+	@JoinColumn(name = "language_id")
+	private Language language;
 
 	public Long getId() {
 		return id;
@@ -136,10 +152,51 @@ public class Project implements Serializable {
 		this.translates = translates;
 	}
 
+	public String getUpdater() {
+		return updater;
+	}
+
+	public void setUpdater(String updater) {
+		this.updater = updater;
+	}
+
+	public String getWatchers() {
+		return watchers;
+	}
+
+	public void setWatchers(String watchers) {
+		this.watchers = watchers;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+
+	public Set<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
+
+	public Language getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
+
 	@Override
 	public String toString() {
 		return "Project [id=" + id + ", name=" + name + ", description=" + description + ", creator=" + creator
-				+ ", status=" + status + ", createDate=" + createDate + ", version=" + version + "]";
+				+ ", updater=" + updater + ", watchers=" + watchers + ", status=" + status + ", createDate="
+				+ createDate + ", updateDate=" + updateDate + ", version=" + version + "]";
 	}
 
 }

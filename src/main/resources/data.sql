@@ -123,25 +123,25 @@ INSERT INTO `users` (username, password, enabled, status, create_date, version) 
 -- ----------------------------
 -- Records of project
 -- ----------------------------
-INSERT INTO `project` VALUES ('1', '2016-05-17 15:55:49', 'admin', '团队协作', 'STEP', 'Normal', '0');
-INSERT INTO `project` VALUES ('2', '2016-05-17 15:56:46', 'admin', '新致云主站', 'WORK', 'Normal', '0');
-INSERT INTO `project` VALUES ('3', '2016-05-17 15:57:54', 'admin', '管理控制台', 'CONSOLE', 'Normal', '0');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('1', '2016-05-17 15:55:49', 'admin', '团队协作', 'STEP', 'Normal', '0', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('2', '2016-05-17 15:56:46', 'admin', '新致云主站', 'WORK', 'Normal', '0', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('3', '2016-05-17 15:57:54', 'admin', '管理控制台', 'CONSOLE', 'Normal', '0', '1');
 
 
 -- ----------------------------
 -- Records of language
 -- ----------------------------
-INSERT INTO `language` VALUES ('1', '2016-05-17 15:59:25', 'admin', '中文', 'zh', 'Normal', '0');
-INSERT INTO `language` VALUES ('2', '2016-05-17 16:00:30', 'admin', '日语', 'jp', 'Normal', '0');
+INSERT INTO `language` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`) VALUES ('1', '2016-05-17 15:59:25', 'admin', '中文', 'zh', 'Normal', '0');
+INSERT INTO `language` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`) VALUES ('2', '2016-05-17 16:00:30', 'admin', '日语', 'jp', 'Normal', '0');
 
 
 -- ----------------------------
 -- Records of language_project
 -- ----------------------------
-INSERT INTO `language_project` VALUES ('1', '1');
-INSERT INTO `language_project` VALUES ('1', '2');
-INSERT INTO `language_project` VALUES ('1', '3');
-INSERT INTO `language_project` VALUES ('2', '1');
-INSERT INTO `language_project` VALUES ('2', '2');
-INSERT INTO `language_project` VALUES ('2', '3');
+INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('1', '1');
+INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('1', '2');
+INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('1', '3');
+INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('2', '1');
+INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('2', '2');
+INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('2', '3');
 
