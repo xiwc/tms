@@ -123,9 +123,9 @@ INSERT INTO `users` (username, password, enabled, mails, status, create_date, ve
 -- ----------------------------
 -- Records of project
 -- ----------------------------
-INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, watchers, `language_id`) VALUES ('1', '2016-05-17 15:55:49', 'admin', '团队协作', 'STEP', 'Normal', '0', 'xiwc87@yeah.net,xiweicheng@yeah.net', '1');
-INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, watchers, `language_id`) VALUES ('2', '2016-05-17 15:56:46', 'admin', '新致云主站', 'WORK', 'Normal', '0', 'xiwc87@yeah.net,xiweicheng@yeah.net', '1');
-INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, watchers, `language_id`) VALUES ('3', '2016-05-17 15:57:54', 'admin', '管理控制台', 'CONSOLE', 'Normal', '0', 'xiwc87@yeah.net,xiweicheng@yeah.net', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('1', '2016-05-17 15:55:49', 'admin', '团队协作', 'STEP', 'Normal', '0', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('2', '2016-05-17 15:56:46', 'admin', '新致云主站', 'WORK', 'Normal', '0', '1');
+INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`, `language_id`) VALUES ('3', '2016-05-17 15:57:54', 'admin', '管理控制台', 'CONSOLE', 'Normal', '0', '1');
 
 
 -- ----------------------------

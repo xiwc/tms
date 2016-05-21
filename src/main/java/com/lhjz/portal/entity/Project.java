@@ -51,8 +51,6 @@ public class Project implements Serializable {
 
 	private String updater;
 
-	private String watchers;
-
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Status status = Status.Normal;
@@ -75,6 +73,9 @@ public class Project implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "project")
 	private Set<Translate> translates = new HashSet<Translate>();
+
+	@ManyToMany(mappedBy = "watcherProjects")
+	Set<User> watchers = new HashSet<User>();
 
 	@ManyToOne
 	@JoinColumn(name = "language_id")
@@ -160,14 +161,6 @@ public class Project implements Serializable {
 		this.updater = updater;
 	}
 
-	public String getWatchers() {
-		return watchers;
-	}
-
-	public void setWatchers(String watchers) {
-		this.watchers = watchers;
-	}
-
 	public Date getUpdateDate() {
 		return updateDate;
 	}
@@ -190,6 +183,14 @@ public class Project implements Serializable {
 
 	public void setLanguage(Language language) {
 		this.language = language;
+	}
+
+	public Set<User> getWatchers() {
+		return watchers;
+	}
+
+	public void setWatchers(Set<User> watchers) {
+		this.watchers = watchers;
 	}
 
 	@Override

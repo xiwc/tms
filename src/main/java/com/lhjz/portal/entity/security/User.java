@@ -69,6 +69,11 @@ public class User implements java.io.Serializable {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.REMOVE)
 	private Set<Authority> authorities = new HashSet<Authority>(0);
 
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "watcher_project", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "project_id") })
+	private Set<Project> watcherProjects = new HashSet<Project>();
+
 	public User() {
 	}
 
@@ -164,6 +169,14 @@ public class User implements java.io.Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Set<Project> getWatcherProjects() {
+		return watcherProjects;
+	}
+
+	public void setWatcherProjects(Set<Project> watcherProjects) {
+		this.watcherProjects = watcherProjects;
 	}
 
 	@Override

@@ -27,6 +27,7 @@ import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.FeedbackForm;
 import com.lhjz.portal.repository.FeedbackRepository;
+import com.lhjz.portal.util.CommonUtil;
 import com.lhjz.portal.util.DateUtil;
 import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
@@ -94,6 +95,9 @@ public class FeedbackController extends BaseController {
 		log(Action.Create, Target.Feedback, feedback2);
 
 		ThreadUtil.exec(() -> {
+			
+			feedback2.setContent(CommonUtil.replaceLinebreak(feedback2
+					.getContent()));
 
 			try {
 				mailSender.sendHtml(

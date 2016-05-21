@@ -119,6 +119,7 @@ public class AdminController extends BaseController {
 			@RequestParam(value = "my", required = false) String my,
 			@RequestParam(value = "new", required = false) String _new,
 			@RequestParam(value = "languageId", required = false) Long languageId,
+			@RequestParam(value = "id", required = false) Long id,
 			@RequestParam(value = "search", required = false) String search) {
 
 		List<Project> projects = projectRepository.findAll();
@@ -139,7 +140,9 @@ public class AdminController extends BaseController {
 			languages = project.getLanguages();
 			projectId = project.getId();
 
-			if (StringUtil.isNotEmpty(my)) {
+			if (StringUtil.isNotEmpty(id)) {
+				page = translateRepository.findById(id, pageable);
+			} else if (StringUtil.isNotEmpty(my)) {
 				page = translateRepository.findByProjectAndCreator(project,
 						WebUtil.getUsername(), pageable);
 			} else if (StringUtil.isNotEmpty(_new)) {
@@ -154,9 +157,8 @@ public class AdminController extends BaseController {
 				page = new PageImpl<Translate>(unTranslates, pageable, total);
 			} else if (StringUtil.isNotEmpty(search)) {
 				String like = "%" + search + "%";
-				page = translateRepository
-						.findByProjectAndKeyLikeOrProjectAndSearchLike(project,
-								like, project, like, pageable);
+				page = translateRepository.findByProjectAndSearchLike(project,
+						like, pageable);
 			} else {
 				page = translateRepository.findByProject(project, pageable);
 			}

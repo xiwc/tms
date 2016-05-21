@@ -29,11 +29,12 @@ public interface TranslateRepository extends JpaRepository<Translate, Long> {
 
 	Page<Translate> findByProject(Project project, Pageable pageable);
 
+	Page<Translate> findById(Long id, Pageable pageable);
+
 	Page<Translate> findByProjectAndCreator(Project project, String creator,
 			Pageable pageable);
 
-	Page<Translate> findByProjectAndKeyLikeOrProjectAndSearchLike(
-			Project project, String key, Project project2, String desc,
+	Page<Translate> findByProjectAndSearchLike(Project project, String search,
 			Pageable pageable);
 
 	Page<Translate> findByProjectAndStatus(Project project, Status status,
