@@ -4,6 +4,8 @@
 package com.lhjz.portal.controller;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,10 +29,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.JsonObject;
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
+import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
+import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
@@ -38,9 +43,12 @@ import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.TranslateForm;
 import com.lhjz.portal.pojo.TranslateItemForm;
 import com.lhjz.portal.repository.AuthorityRepository;
+import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateItemRepository;
 import com.lhjz.portal.repository.TranslateRepository;
+import com.lhjz.portal.repository.UserRepository;
+import com.lhjz.portal.util.CommonUtil;
 import com.lhjz.portal.util.DateUtil;
 import com.lhjz.portal.util.JsonUtil;
 import com.lhjz.portal.util.MapUtil;
@@ -75,15 +83,24 @@ public class TranslateController extends BaseController {
 	AuthorityRepository authorityRepository;
 
 	@Autowired
+	LabelRepository labelRepository;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
 	PasswordEncoder passwordEncoder;
 
 	@Autowired
 	MailSender2 mailSender;
 
+	String translateAction = "admin/translate";
+
 	@RequestMapping(value = "save", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody save(@RequestParam("projectId") Long projectId,
+			@RequestParam("baseURL") String baseURL,
 			@Valid TranslateForm translateForm, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
@@ -100,17 +117,44 @@ public class TranslateController extends BaseController {
 			return RespBody.failed("添加名称已经存在!");
 		}
 
-		Translate translate = new Translate();
+		final Translate translate = new Translate();
+
+		Set<Label> labels = null;
+
+		String tags = translateForm.getTags();
+		if (StringUtil.isNotEmpty(tags)) {
+			String[] tagsArr = tags.split(",");
+			labels = new HashSet<Label>();
+			for (String tag : tagsArr) {
+				Label label = new Label();
+				label.setCreateDate(new Date());
+				label.setCreator(WebUtil.getUsername());
+				label.setName(tag);
+				label.setStatus(Status.New);
+				label.setTranslate(translate);
+
+				labels.add(label);
+			}
+
+		}
+
 		translate.setKey(translateForm.getKey());
 		translate.setProject(project);
 		translate.setCreateDate(new Date());
 		translate.setCreator(WebUtil.getUsername());
 		translate.setDescription(translateForm.getDesc());
 		translate.setStatus(Status.New);
+		if (labels != null) {
+			translate.getLabels().addAll(labels);
+		}
+		User loginUser = getLoginUser();
+		translate.getWatchers().add(loginUser);
 
 		JsonObject jsonO = (JsonObject) JsonUtil.toJsonElement(translateForm
 				.getContent());
 		Set<Language> lngs = project.getLanguages();
+
+		final Mail mail2 = Mail.instance().parseTranslateForm(translateForm);
 
 		for (Language language : lngs) {
 			TranslateItem item = new TranslateItem();
@@ -131,6 +175,9 @@ public class TranslateController extends BaseController {
 			item.setStatus(Status.New);
 			item.setTranslate(translate);
 
+			mail2.put(language.getDescription() + "[" + language.getName()
+					+ "]", item.getContent());
+
 			translate.getTranslateItems().add(item);
 		}
 
@@ -138,7 +185,18 @@ public class TranslateController extends BaseController {
 
 		translateRepository.saveAndFlush(translate);
 
+		loginUser.getWatcherTranslates().add(translate);
+		userRepository.saveAndFlush(loginUser);
+
 		log(Action.Create, Target.Translate, translate);
+
+		final Mail mail = Mail.instance().addWatchers(translate)
+				.addUsers(getUser(translate.getCreator()))
+				.removeUser(getLoginUser());
+
+		final String href = baseURL + translateAction + "?projectId="
+				+ projectId
+				+ "&id=" + translate.getId();
 
 		ThreadUtil.exec(() -> {
 
@@ -146,9 +204,9 @@ public class TranslateController extends BaseController {
 				mailSender.sendHtml(String.format("TMS-翻译新建_%s",
 						DateUtil.format(new Date(), DateUtil.FORMAT2)),
 						TemplateUtil.process("templates/mail/translate-create",
-								MapUtil.objArr2Map("translate", translate)),
-						StringUtil.split(translate.getProject().getWatchers(),
-								","));
+								MapUtil.objArr2Map("translate", translate,
+										"href", href, "body", mail2.body())),
+						mail.get());
 				logger.info("翻译新建邮件发送成功！ID:{}", translate.getId());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -164,7 +222,8 @@ public class TranslateController extends BaseController {
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody update(@RequestParam("id") Long id,
-			TranslateItemForm translateItemForm) {
+			TranslateItemForm translateItemForm,
+			@RequestParam("baseURL") String baseURL) {
 
 		TranslateItem translateItem = translateItemRepository.findOne(id);
 
@@ -179,8 +238,14 @@ public class TranslateController extends BaseController {
 
 			translateItemRepository.saveAndFlush(translateItem);
 
-			Translate translate = translateItem.getTranslate();
+			final Translate translate = translateItem.getTranslate();
+			translate.setUpdateDate(new Date());
+			translate.setUpdater(WebUtil.getUsername());
 			translate.setStatus(Status.Updated);
+
+			User loginUser = getLoginUser();
+			translate.getWatchers().add(loginUser);
+
 			translate.setSearch(translate.toString());
 
 			if (translate.getProject().getLanguage().getId()
@@ -192,6 +257,22 @@ public class TranslateController extends BaseController {
 
 			translateRepository.saveAndFlush(translate);
 
+			loginUser.getWatcherTranslates().add(translate);
+			userRepository.saveAndFlush(loginUser);
+
+			final Mail mail = Mail.instance().addWatchers(translate)
+					.addUsers(getUser(translate.getCreator()))
+					.removeUser(getLoginUser());
+
+			final String href = baseURL + translateAction + "?projectId="
+					+ translate.getProject().getId() + "&id="
+					+ translate.getId();
+
+			final Mail mail2 = Mail.instance().put(
+					translateItem.getLanguage().getDescription() + "["
+							+ translateItem.getLanguage().getName() + "]",
+					translateItemForm.getContent());
+
 			ThreadUtil
 					.exec(() -> {
 
@@ -201,9 +282,9 @@ public class TranslateController extends BaseController {
 											DateUtil.FORMAT2)), TemplateUtil
 									.process("templates/mail/translate-update",
 											MapUtil.objArr2Map("translate",
-													translate)),
-									StringUtil.split(translate.getProject()
-											.getWatchers(), ","));
+													translate, "href", href,
+													"body", mail2.body())),
+									mail.get());
 							logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -235,10 +316,20 @@ public class TranslateController extends BaseController {
 		return null;
 	}
 
+	private boolean isLabelExits(Set<Label> labels, String tag) {
+		for (Label label : labels) {
+			if (label.getName().equalsIgnoreCase(tag)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	@RequestMapping(value = "update2", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody update2(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
 			@Valid TranslateForm translateForm, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
@@ -247,7 +338,7 @@ public class TranslateController extends BaseController {
 					.collect(Collectors.joining("<br/>")));
 		}
 
-		Translate translate = translateRepository.findOne(id);
+		final Translate translate = translateRepository.findOne(id);
 
 		if (translate != null) {
 			translate.setKey(translateForm.getKey());
@@ -255,6 +346,51 @@ public class TranslateController extends BaseController {
 			translate.setStatus(Status.Updated);
 			translate.setUpdater(WebUtil.getUsername());
 			translate.setUpdateDate(new Date());
+
+			User loginUser = getLoginUser();
+			translate.getWatchers().add(loginUser);
+
+			Set<Label> labels = translate.getLabels();
+			Set<Label> delLabels = new HashSet<Label>();
+			Set<Label> addLabels = new HashSet<Label>();
+			String tags = translateForm.getTags();
+			if (StringUtil.isNotEmpty(tags)) {
+				Set<String> tagSet = CommonUtil.arr2Set(tags.split(","));
+				for (Label label : labels) {
+					if (!tagSet.contains(label.getName())) { // delete tag
+						delLabels.add(label);
+					}
+				}
+
+				for (String tag : tagSet) {
+					if (!isLabelExits(labels, tag)) { // add tag
+						Label label = new Label();
+						label.setCreateDate(new Date());
+						label.setCreator(WebUtil.getUsername());
+						label.setName(tag);
+						label.setStatus(Status.New);
+						label.setTranslate(translate);
+
+						addLabels.add(label);
+					}
+				}
+			} else {
+				delLabels = new HashSet<Label>(labels); // delete all tags
+			}
+
+			if (delLabels.size() > 0) {
+				labels.removeAll(delLabels);
+				labelRepository.deleteInBatch(delLabels);
+				labelRepository.flush();
+			}
+
+			if (addLabels.size() > 0) {
+				List<Label> save = labelRepository.save(addLabels);
+				labels.addAll(save);
+			}
+
+			final Mail mail2 = Mail.instance()
+					.parseTranslateForm(translateForm);
 
 			JsonObject jsonO = (JsonObject) JsonUtil
 					.toJsonElement(translateForm.getContent());
@@ -286,6 +422,11 @@ public class TranslateController extends BaseController {
 
 					translateItemRepository.saveAndFlush(exitTranslateItem);
 
+					mail2.put(
+							language.getDescription() + "["
+									+ language.getName() + "]",
+							exitTranslateItem.getContent());
+
 					logWithProperties(Action.Update, Target.TranslateItem,
 							"content", content, oldContent);
 				} else {
@@ -299,18 +440,35 @@ public class TranslateController extends BaseController {
 
 					translateItemRepository.saveAndFlush(item);
 
+					mail2.put(
+							language.getDescription() + "["
+									+ language.getName() + "]",
+							item.getContent());
+
 					logWithProperties(Action.Create, Target.TranslateItem,
 							"content", item);
 
 					translate.getTranslateItems().add(item);
 				}
+
 			}
 
 			translate.setSearch(translate.toString());
 
 			translateRepository.saveAndFlush(translate);
 
+			loginUser.getWatcherTranslates().add(translate);
+			userRepository.saveAndFlush(loginUser);
+
 			log(Action.Update, Target.Translate, translate);
+
+			final Mail mail = Mail.instance().addWatchers(translate)
+					.addUsers(getUser(translate.getCreator()))
+					.removeUser(getLoginUser());
+
+			final String href = baseURL + translateAction + "?projectId="
+					+ translate.getProject().getId() + "&id="
+					+ translate.getId();
 
 			ThreadUtil
 					.exec(() -> {
@@ -321,9 +479,9 @@ public class TranslateController extends BaseController {
 											DateUtil.FORMAT2)), TemplateUtil
 									.process("templates/mail/translate-update",
 											MapUtil.objArr2Map("translate",
-													translate)),
-									StringUtil.split(translate.getProject()
-											.getWatchers(), ","));
+													translate, "href", href,
+													"body", mail2.body())),
+									mail.get());
 							logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -343,13 +501,135 @@ public class TranslateController extends BaseController {
 	@RequestMapping(value = "delete", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN" })
-	public RespBody delete(@RequestParam("id") Long id) {
+	public RespBody delete(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL) {
+
+		final Translate translate = translateRepository.findOne(id);
+
+		Long projectId = translate.getProject().getId();
+		final Mail mail2 = Mail.instance().parseTranslate(translate);
+
+		Set<User> watchers = translate.getWatchers();
+		for (User user : watchers) {
+			user.getWatcherTranslates().remove(translate);
+		}
+
+		userRepository.save(watchers);
+		userRepository.flush();
 
 		translateRepository.delete(id);
+		translateRepository.flush();
 
 		logWithProperties(Action.Delete, Target.Translate, "id", id);
 
+		User loginUser = getLoginUser();
+
+		final Mail mail = Mail.instance().addWatchers(translate)
+				.addUsers(getUser(translate.getCreator()))
+				.removeUser(loginUser);
+
+		final String href = baseURL + translateAction + "?projectId="
+				+ projectId;
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				mailSender.sendHtml(String.format("TMS-翻译删除_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT2)),
+						TemplateUtil.process("templates/mail/translate-delete",
+								MapUtil.objArr2Map("translate", translate,
+										"deleter", loginUser.getUsername(),
+										"deleteDate", new Date(), "href", href,
+										"body", mail2.body())), mail.get());
+				logger.info("翻译更删除邮件发送成功！ID:{}", translate.getId());
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("翻译删除邮件发送失败！ID:{}", translate.getId());
+			}
+
+		});
+
 		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = "deleteTag", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody deleteTag(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL) {
+
+		Label label = labelRepository.findOne(id);
+
+		final Translate translate = label.getTranslate();
+
+		final Mail mail = Mail.instance().addWatchers(translate)
+				.addUsers(getUser(translate.getCreator()))
+				.removeUser(getLoginUser());
+
+		final String href = baseURL + translateAction + "?projectId="
+				+ translate.getProject().getId() + "&id=" + translate.getId();
+
+		translate.getLabels().remove(label);
+		translateRepository.saveAndFlush(translate);
+
+		labelRepository.delete(label);
+		labelRepository.flush();
+
+		log(Action.Delete, Target.Label, label);
+
+		final Mail mail2 = Mail.instance().put("删除标签", label.getName());
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				mailSender.sendHtml(String.format("TMS-翻译更新_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT2)),
+						TemplateUtil.process("templates/mail/translate-update",
+								MapUtil.objArr2Map("translate", translate,
+										"href", href, "body", mail2.body())),
+						mail.get());
+				logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("翻译更新邮件发送失败！ID:{}", translate.getId());
+			}
+
+		});
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = "addTag", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody addTag(@RequestParam("id") Long id,
+			@RequestParam("tag") String tag) {
+
+		if (StringUtil.isEmail(tag)) {
+			return RespBody.failed("标签内容不能为空!");
+		}
+
+		Translate translate = translateRepository.findOne(id);
+
+		Label label2 = labelRepository
+				.findOneByNameAndTranslate(tag, translate);
+
+		if (label2 != null) {
+			return RespBody.failed("标签添加重复!");
+		}
+
+		Label label = new Label();
+		label.setCreateDate(new Date());
+		label.setCreator(WebUtil.getUsername());
+		label.setName(tag);
+		label.setStatus(Status.New);
+		label.setTranslate(translate);
+
+		labelRepository.saveAndFlush(label);
+
+		log(Action.Create, Target.Label, label);
+
+		return RespBody.succeed(label);
 	}
 
 	@RequestMapping(value = "get", method = RequestMethod.GET)

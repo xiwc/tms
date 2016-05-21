@@ -25,6 +25,7 @@ import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lhjz.portal.entity.Project;
+import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -68,6 +69,16 @@ public class User implements java.io.Serializable {
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user", cascade = CascadeType.REMOVE)
 	private Set<Authority> authorities = new HashSet<Authority>(0);
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "watcher_project", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "project_id") })
+	private Set<Project> watcherProjects = new HashSet<Project>();
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "watcher_translate", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "translate_id") })
+	private Set<Translate> watcherTranslates = new HashSet<Translate>();
 
 	public User() {
 	}
@@ -164,6 +175,48 @@ public class User implements java.io.Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public Set<Project> getWatcherProjects() {
+		return watcherProjects;
+	}
+
+	public void setWatcherProjects(Set<Project> watcherProjects) {
+		this.watcherProjects = watcherProjects;
+	}
+
+	public Set<Translate> getWatcherTranslates() {
+		return watcherTranslates;
+	}
+
+	public void setWatcherTranslates(Set<Translate> watcherTranslates) {
+		this.watcherTranslates = watcherTranslates;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((username == null) ? 0 : username.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (username == null) {
+			if (other.username != null)
+				return false;
+		} else if (!username.equals(other.username))
+			return false;
+		return true;
 	}
 
 	@Override

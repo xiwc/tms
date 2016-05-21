@@ -5,8 +5,6 @@ package com.lhjz.portal.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,16 +12,12 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -34,14 +28,16 @@ import com.lhjz.portal.pojo.Enum.Status;
  * 
  */
 @Entity
-public class Project implements Serializable {
+public class Label implements Serializable {
 
-	private static final long serialVersionUID = -278833537706540131L;
+	/** serialVersionUID (long) */
+	private static final long serialVersionUID = -9182071299487898824L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
 
+	@Column(nullable = false, length = 255)
 	private String name;
 
 	@Column(length = 2000)
@@ -64,22 +60,17 @@ public class Project implements Serializable {
 	@Version
 	private long version;
 
-	@ManyToMany(mappedBy = "projects")
-	private Set<Language> languages = new HashSet<Language>();
-
-	@ManyToMany(mappedBy = "projects")
-	private Set<User> users = new HashSet<User>();
-
 	@JsonIgnore
-	@OneToMany(mappedBy = "project")
-	private Set<Translate> translates = new HashSet<Translate>();
-
-	@ManyToMany(mappedBy = "watcherProjects")
-	Set<User> watchers = new HashSet<User>();
-
 	@ManyToOne
-	@JoinColumn(name = "language_id")
-	private Language language;
+	private Translate translate;
+
+	public Translate getTranslate() {
+		return translate;
+	}
+
+	public void setTranslate(Translate translate) {
+		this.translate = translate;
+	}
 
 	public Long getId() {
 		return id;
@@ -113,6 +104,14 @@ public class Project implements Serializable {
 		this.creator = creator;
 	}
 
+	public String getUpdater() {
+		return updater;
+	}
+
+	public void setUpdater(String updater) {
+		this.updater = updater;
+	}
+
 	public Status getStatus() {
 		return status;
 	}
@@ -129,38 +128,6 @@ public class Project implements Serializable {
 		this.createDate = createDate;
 	}
 
-	public long getVersion() {
-		return version;
-	}
-
-	public void setVersion(long version) {
-		this.version = version;
-	}
-
-	public Set<Language> getLanguages() {
-		return languages;
-	}
-
-	public void setLanguages(Set<Language> languages) {
-		this.languages = languages;
-	}
-
-	public Set<Translate> getTranslates() {
-		return translates;
-	}
-
-	public void setTranslates(Set<Translate> translates) {
-		this.translates = translates;
-	}
-
-	public String getUpdater() {
-		return updater;
-	}
-
-	public void setUpdater(String updater) {
-		this.updater = updater;
-	}
-
 	public Date getUpdateDate() {
 		return updateDate;
 	}
@@ -169,35 +136,20 @@ public class Project implements Serializable {
 		this.updateDate = updateDate;
 	}
 
-	public Set<User> getUsers() {
-		return users;
+	public long getVersion() {
+		return version;
 	}
 
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
-
-	public Language getLanguage() {
-		return language;
-	}
-
-	public void setLanguage(Language language) {
-		this.language = language;
-	}
-
-	public Set<User> getWatchers() {
-		return watchers;
-	}
-
-	public void setWatchers(Set<User> watchers) {
-		this.watchers = watchers;
+	public void setVersion(long version) {
+		this.version = version;
 	}
 
 	@Override
 	public String toString() {
-		return "Project [id=" + id + ", name=" + name + ", description=" + description + ", creator=" + creator
-				+ ", updater=" + updater + ", watchers=" + watchers + ", status=" + status + ", createDate="
-				+ createDate + ", updateDate=" + updateDate + ", version=" + version + "]";
+		return "Label [id=" + id + ", name=" + name + ", description="
+				+ description + ", creator=" + creator + ", updater=" + updater
+				+ ", status=" + status + ", createDate=" + createDate
+				+ ", updateDate=" + updateDate + ", version=" + version + "]";
 	}
 
 }

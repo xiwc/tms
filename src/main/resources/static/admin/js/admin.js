@@ -24,12 +24,14 @@ jQuery(function($) {
                     $('.ad-user-own-edit').find('.user-username').text($btn.attr('data-id'));
                     $('.ad-user-own-edit').find('input[name="password"]').val('');
                     $('.ad-user-own-edit').find('input[name="mail"]').val(data.data.mails);
+                    $('.ad-user-own-edit').find('input[name="name"]').val(data.data.name);
 
                     $('.ad-user-own-edit').modal({
                         onApprove: function() {
                             $.post('admin/user/update2', {
                                 username: $btn.attr('data-id'),
                                 password: $('.ad-user-own-edit').find('input[name="password"]').val(),
+                                name: $('.ad-user-own-edit').find('input[name="name"]').val(),
                                 mail: $('.ad-user-own-edit').find('input[name="mail"]').val()
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
@@ -215,7 +217,7 @@ jQuery(function($) {
         formData: function(selector) {
 
             var data = {};
-            $(selector).find('input,textarea').each(function(index, el) {
+            $(selector).find('input[name],textarea[name]').each(function(index, el) {
                 var name = $(el).attr('name');
                 var val = $(el).val();
                 data[name] = val;

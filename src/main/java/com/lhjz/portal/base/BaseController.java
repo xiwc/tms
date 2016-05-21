@@ -11,10 +11,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.lhjz.portal.entity.Log;
+import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Message;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.LogRepository;
+import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.WebUtil;
 
@@ -31,12 +33,23 @@ public abstract class BaseController {
 	protected LogRepository logRepository;
 
 	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
 	protected Environment env;
 
 	protected Log log(Action action, Target target, Object... vals) {
 
 		return logWithProperties(action, target, null, vals);
 
+	}
+
+	protected User getLoginUser() {
+		return userRepository.findOne(WebUtil.getUsername());
+	}
+
+	protected User getUser(String username) {
+		return userRepository.findOne(username);
 	}
 
 	protected Log logWithProperties(Action action, Target target,

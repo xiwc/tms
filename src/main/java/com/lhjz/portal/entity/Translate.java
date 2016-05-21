@@ -17,6 +17,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -25,6 +26,7 @@ import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Search;
 import com.lhjz.portal.pojo.Enum.Status;
 
@@ -84,6 +86,12 @@ public class Translate implements Serializable {
 
 	@OneToMany(mappedBy = "translate", cascade = { CascadeType.ALL }, fetch = FetchType.EAGER)
 	private Set<TranslateItem> translateItems = new HashSet<TranslateItem>();
+
+	@ManyToMany(mappedBy = "watcherTranslates")
+	Set<User> watchers = new HashSet<User>();
+
+	@OneToMany(mappedBy = "translate", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	Set<Label> labels = new HashSet<Label>();
 
 	public Long getId() {
 		return id;
@@ -195,6 +203,47 @@ public class Translate implements Serializable {
 
 	public void setSearch(String search) {
 		this.search = search;
+	}
+
+	public Set<User> getWatchers() {
+		return watchers;
+	}
+
+	public void setWatchers(Set<User> watchers) {
+		this.watchers = watchers;
+	}
+
+	public Set<Label> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(Set<Label> labels) {
+		this.labels = labels;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Translate other = (Translate) obj;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		return true;
 	}
 
 	@Override

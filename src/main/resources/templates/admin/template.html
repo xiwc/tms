@@ -300,9 +300,17 @@
             <div class="ui segment">
                 <div class="ui warning message">新添加的用户默认密码为 888888 并且是禁用状态,需要单独开启后才能使用.</div>
                 <div class="ui form">
-                    <div class="field">
+                    <div class="required field">
                         <label>用户名:</label>
                         <input name="username" type="text" placeholder="用户名">
+                    </div>
+                    <div class="field">
+                        <label>姓名:</label>
+                        <input name="name" type="text" placeholder="姓名">
+                    </div>
+                    <div class="field">
+                        <label>邮箱:</label>
+                        <input name="mail" type="text" placeholder="邮箱">
                     </div>
                     <div class="inline field">
                         <label>角色:</label>
@@ -335,9 +343,19 @@
                         <label>名称:</label>
                         <input name="key" type="text" placeholder="名称" th:value="''" value="app.name">
                     </div>
-                    <div class="field">
+                    <!-- <div class="field">
                         <label>描述:</label>
                         <textarea name="desc" rows="2" placeholder="描述" th:text="''">程序名称</textarea>
+                    </div> -->
+                    <div class="field">
+                        <label>标签:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-tags">
+                            <input name="tags" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">标签</div>
+                            <div class="menu">
+                            </div>
+                        </div>
                     </div>
                     <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
                         <label th:text="${l.description} + ':'">中文:</label>
@@ -363,9 +381,20 @@
                         <label>名称:</label>
                         <input name="key" type="text" placeholder="名称" th:value="''" value="app.name">
                     </div>
-                    <div class="field">
+                    <!-- <div class="field">
                         <label>描述:</label>
                         <textarea name="desc" rows="2" placeholder="描述" th:text="''">程序名称</textarea>
+                    </div> -->
+                    <div class="field">
+                        <label>标签:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-tags">
+                            <input name="tags" type="hidden" value="">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">标签</div>
+                            <div class="menu">
+                                <!-- <div class="item" data-value="dfs">dfs</div> -->
+                            </div>
+                        </div>
                     </div>
                     <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
                         <label th:text="${l.description} + ':'">中文:</label>
@@ -389,11 +418,15 @@
                 <div class="ui form">
                     <div class="inline field">
                         <label>用户名:</label>
-                        <div class="ui black label user-username">username</div>
+                        <div class="ui basic label user-username">username</div>
                     </div>
                     <div class="field">
                         <label>密码:</label>
                         <input name="password" type="text" placeholder="密码">
+                    </div>
+                    <div class="field">
+                        <label>姓名:</label>
+                        <input name="name" type="text" placeholder="姓名">
                     </div>
                     <div class="field">
                         <label>邮箱:</label>
@@ -426,11 +459,15 @@
                     <div class="ui form">
                         <div class="inline field">
                             <label>用户名:</label>
-                            <div class="ui black label user-username">username</div>
+                            <div class="ui basic label user-username">username</div>
                         </div>
                         <div class="field">
                             <label>密码:</label>
                             <input name="password" type="text" placeholder="密码">
+                        </div>
+                        <div class="field">
+                            <label>姓名:</label>
+                            <input name="name" type="text" placeholder="姓名">
                         </div>
                         <div class="field">
                             <label>邮箱:</label>
