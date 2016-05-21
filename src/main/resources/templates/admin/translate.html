@@ -16,6 +16,7 @@
     <!-- <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script> -->
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -49,7 +50,7 @@
                     <div class="ui compact basic buttons">
                         <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, my=${'1'})}" th:classappend="${(param.containsKey('my') and (not #strings.isEmpty(param.my[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
                         <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, new=${'1'})}" th:classappend="${(param.containsKey('new') and (not #strings.isEmpty(param.new[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
-                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size})}" th:classappend="${((not param.containsKey('my')) and (not param.containsKey('new')) and (not param.containsKey('languageId')) and (not param.containsKey('search'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size})}" th:classappend="${((not param.containsKey('my')) and (not param.containsKey('new')) and (not param.containsKey('languageId')) and (not param.containsKey('search')) and (not param.containsKey('id'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
                     </div>
                     &nbsp;&nbsp;
                     <div class="ui label">语言:</div>
@@ -108,8 +109,8 @@
                                         <div class="text">操作</div>
                                         <i class="dropdown icon"></i>
                                         <div class="menu">
-                                            <div sec:authorize="hasRole('ROLE_ADMIN')" class="item ddmi-delete">删除</div>
                                             <div class="item ddmi-edit">编辑</div>
+                                            <div sec:authorize="hasRole('ROLE_ADMIN')" class="item ddmi-delete">删除</div>
                                         </div>
                                     </div>
                                 </td>
@@ -196,6 +197,9 @@
             allowAdditions: true
         });
 
+        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        $(".ui.form").append($('<input name="baseURL" type="hidden" value="">').val(baseURL));
+
         var projectLanguageId = $('input:hidden[name="project.languageId"]').val();
         $('.tb-translate .fm-language').each(function(index, el) {
             $fm = $(this);
@@ -262,7 +266,8 @@
             $('.ad-delete-confirm').modal({
                 onApprove: function() {
                     $.post('admin/translate/delete', {
-                        id: $btn.closest('tr').attr('data-id')
+                        id: $btn.closest('tr').attr('data-id'),
+                        baseURL: baseURL
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
                             $btn.closest('tr').remove();
@@ -281,7 +286,8 @@
             $('.ad-delete-confirm').modal({
                 onApprove: function() {
                     $.post('admin/translate/deleteTag', {
-                        id: $icon.attr('data-id')
+                        id: $icon.attr('data-id'),
+                        baseURL: baseURL
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
                             $icon.closest('.ui.label').remove();
@@ -310,9 +316,9 @@
 
                             var tags = [];
                             $.each(data.data.labels, function(index, val) {
-                                 tags.push(val.name);
-                                 $item = $('<div class="item" data-value="dfs">dfs</div>').attr('data-value', val.name).text(val.name);
-                                 $tags.find('.menu').append($item);
+                                tags.push(val.name);
+                                $item = $('<div class="item" data-value="dfs">dfs</div>').attr('data-value', val.name).text(val.name);
+                                $tags.find('.menu').append($item);
                             });
                             $(this).find('input[name="tags"]').val(tags.join(','));
                             $(this).find('.dd-tags').dropdown({
@@ -357,6 +363,7 @@
 
             $.post('admin/translate/update', {
                 id: $ta.attr('data-id'),
+                baseURL: baseURL,
                 content: $ta.val()
             }, function(data, textStatus, xhr) {
                 if (data.success) {

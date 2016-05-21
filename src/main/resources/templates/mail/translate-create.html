@@ -16,8 +16,8 @@
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="box-sizing: border-box; max-width: 100%; margin-bottom: 20px; color: rgb(51, 51, 51); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 20px;">
             <thead style="box-sizing: border-box;">
                 <tr style="box-sizing: border-box;">
-                    <th width="100" style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: bottom; border-top-width: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221);"></th>
-                    <th style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: bottom; border-top-width: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221);"></th>
+                    <th width="100" style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: bottom; border-top-width: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221);">翻译链接:</th>
+                    <th style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: bottom; border-top-width: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221);"><a th:href="${href}" th:text="${href}" href="http://localhost/admin/translate?projectId=1&id=1">http://localhost/admin/translate?projectId=1&id=1</a></th>
                 </tr>
             </thead>
             <tbody style="box-sizing: border-box;">
@@ -43,7 +43,7 @@
                 </tr>
                 <tr style="box-sizing: border-box;">
                     <td colspan="2" style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">
-                        <div style="box-sizing: border-box; padding: 15px; margin-bottom: 20px; border: 1px solid rgb(188, 232, 241); border-radius: 4px; color: rgb(49, 112, 143); background-color: rgb(217, 237, 247);" th:text="${#strings.toString(translate.translateItems)}"></div>
+                        <div style="box-sizing: border-box; padding: 15px; margin-bottom: 20px; border: 1px solid rgb(188, 232, 241); border-radius: 4px; color: rgb(49, 112, 143); background-color: rgb(217, 237, 247);" th:utext="${body}"></div>
                     </td>
                 </tr>
             </tbody>

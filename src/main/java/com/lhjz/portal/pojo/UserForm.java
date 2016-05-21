@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.NotBlank;
 public class UserForm {
 
 	@NotBlank(message = "用户名不能为空!")
-	@Pattern(regexp = "^[a-z][a-z0-9]{2,3}$", message = "用户名必须是3到50位小写字母和数字组合,并且以字母开头!")
+	@Pattern(regexp = "^[a-z][a-z0-9]{2,49}$", message = "用户名必须是3到50位小写字母和数字组合,并且以字母开头!")
 	private String username;
 
 	private String password;
