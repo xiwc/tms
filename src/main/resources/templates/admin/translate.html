@@ -75,8 +75,9 @@
                     <table class="ui small sortable celled striped compact table segment tb-translate">
                         <thead>
                             <th class="three wide">名称</th>
-                            <th class="three wide">描述</th>
+                            <!-- <th class="three wide">描述</th> -->
                             <th class="five wide">翻译</th>
+                            <th class="three wide">标签</th>
                             <th class="three wide">创建时间</th>
                             <th class="one wide">状态</th>
                             <th class="one wide">处理</th>
@@ -85,13 +86,19 @@
                             <!--/*/
                             <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
                                 <td th:text="${t.key}">app.name</td>
-                                <td th:text="${t.description}">应用名称</td>
                                 <td>
                                     <div class="ui form fm-language">
                                         <div class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
                                             <label th:text="${item.language.description} + ':'">中文:</label>
                                             <textarea class="ta-translteItem" th:attr="data-id=${item.id}" th:title="${item.content}" name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
                                         </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="ui labels">
+                                      <a class="ui basic blue label" th:each="l : ${t.labels}">
+                                        <span th:text="${l.name}"></span> <i th:attr="data-id=${l.id}" class="icon close ico-delete"></i>
+                                      </a>
                                     </div>
                                 </td>
                                 <td th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
@@ -185,13 +192,16 @@
         $('.ui.dropdown.dd-actions').dropdown({
             action: 'hide'
         });
+        $('.ui.dropdown.dd-tags').dropdown({
+            allowAdditions: true
+        });
 
         var projectLanguageId = $('input:hidden[name="project.languageId"]').val();
         $('.tb-translate .fm-language').each(function(index, el) {
             $fm = $(this);
             $fm.find('.fd-language').each(function(index, el) {
                 var lngId = $(this).attr('data-language');
-                if(lngId == projectLanguageId) {
+                if (lngId == projectLanguageId) {
                     $fm.prepend($(this));
                     return false;
                 }
@@ -210,13 +220,6 @@
             }
         }
 
-        // $('.ad-translate-edit').find('textarea[class="language"]').keyup(function(event) {
-        //     var $desc = $('.ad-translate-edit').find('textarea[name="desc"]');
-        //     if (!$desc.val()) {
-        //         $desc.val($(this).val());
-        //     }
-        // });
-
         $('.inp-search > input').keyup(function(event) {
             if (event.keyCode == 13) {
                 searchHandler();
@@ -230,6 +233,9 @@
         $('.btn-add').click(function(event) {
 
             $('.ad-translate-add').modal({
+                onShow: function() {
+                    $(this).find('.dd-tags').dropdown('clear');
+                },
                 onApprove: function() {
                     var data = Utils.formData('.ad-translate-add .ui.form');
                     data.projectId = $('.dd-project').dropdown('get value');
@@ -269,6 +275,25 @@
             }).modal('show');
         });
 
+        $('.tb-translate').on('click', 'i.icon.ico-delete', function(event) {
+            var $icon = $(this);
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/translate/deleteTag', {
+                        id: $icon.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $icon.closest('.ui.label').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
         $('.tb-translate').on('click', '.ddmi-edit', function(event) {
             var $btn = $(this);
 
@@ -279,8 +304,20 @@
                     $('.ad-translate-edit').modal({
                         onShow: function() {
                             var modal = this;
+                            var $tags = $(this).find('dd-tags');
                             $(this).find('input[name="key"]').val(data.data.key);
-                            $(this).find('textarea[name="desc"]').val(data.data.description);
+                            // $(this).find('textarea[name="desc"]').val(data.data.description);
+
+                            var tags = [];
+                            $.each(data.data.labels, function(index, val) {
+                                 tags.push(val.name);
+                                 $item = $('<div class="item" data-value="dfs">dfs</div>').attr('data-value', val.name).text(val.name);
+                                 $tags.find('.menu').append($item);
+                            });
+                            $(this).find('input[name="tags"]').val(tags.join(','));
+                            $(this).find('.dd-tags').dropdown({
+                                allowAdditions: true
+                            });
                             var translateItems = data.data.translateItems;
                             if ($.isArray(translateItems)) {
                                 $.each(translateItems, function(index, val) {

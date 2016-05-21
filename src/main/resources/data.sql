@@ -99,7 +99,7 @@ INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
 -- ----------------------------
 INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiwc87@yeah.net', 'Bultin', '2015-04-25 10:01:51', '0');
 INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('step', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiweicheng@yeah.net', 'Normal', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.com', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.cn', 'Normal', '2015-04-25 10:01:51', '0');
 
 -- ----------------------------
 -- Table structure for persistent_logins

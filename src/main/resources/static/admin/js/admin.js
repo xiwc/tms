@@ -215,7 +215,7 @@ jQuery(function($) {
         formData: function(selector) {
 
             var data = {};
-            $(selector).find('input,textarea').each(function(index, el) {
+            $(selector).find('input[name],textarea[name]').each(function(index, el) {
                 var name = $(el).attr('name');
                 var val = $(el).val();
                 data[name] = val;

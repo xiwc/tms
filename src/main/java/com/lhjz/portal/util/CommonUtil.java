@@ -1,5 +1,8 @@
 package com.lhjz.portal.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 
 public class CommonUtil {
@@ -17,5 +20,15 @@ public class CommonUtil {
 			return winString.replaceAll("\n", "<br/>");
 		}
 		return StringUtil.EMPTY;
+	}
+
+	public static Set<String> arr2Set(String... arr) {
+		Set<String> set = new HashSet<String>();
+		if (arr != null) {
+			for (String string : arr) {
+				set.add(string);
+			}
+		}
+		return set;
 	}
 }

@@ -31,11 +31,11 @@
                 </tr>
                 <tr style="box-sizing: border-box;">
                     <th style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">删除者:</th>
-                    <td th:text="${translate.updater}" style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);"></td>
+                    <td th:text="${deleter}" style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);"></td>
                 </tr>
                 <tr style="box-sizing: border-box; background-color: rgb(249, 249, 249);">
                     <th style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">删除日期:</th>
-                    <td th:text="${#dates.format(translate.updateDate,'yyyy/MM/dd HH:mm:ss')}" style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);"></td>
+                    <td th:text="${#dates.format(deleteDate,'yyyy/MM/dd HH:mm:ss')}" style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);"></td>
                 </tr>
                 <tr style="box-sizing: border-box;">
                     <th style="box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: top; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">翻译内容:</th>
