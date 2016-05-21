@@ -71,8 +71,17 @@
                     <div class="ui primary compact button btn-export">导出</div>
                     <div class="ui form segment">
                         <div class="field">
-                            <textarea class="ta-content" name="content" rows="20"></textarea>
+                            <textarea class="ta-content" name="content" rows="18"></textarea>
                         </div>
+                    </div>
+                </div>
+                <div class="ui bottom attached icon message">
+                    <i class="warning circle icon"></i>
+                    <div class="content">
+                        <div class="header">
+                            操作结果
+                        </div>
+                        <p class="msg-content"></p>
                     </div>
                 </div>
             </div>
@@ -113,6 +122,7 @@
                             content: content
                         }, function(data, textStatus, xhr) {
                             if (data.success) {
+                                $('.msg-content').text("导入总数: " + data.data);
                                 toastr.success('导入成功!');
                             } else {
                                 toastr.error('导入失败!');
@@ -143,6 +153,7 @@
                             } else {
                                 $('.ta-content').val(data.data);
                             }
+                            $('.msg-content').text("导出总数: " + data.msgs[0]);
                             toastr.success('导出成功!');
                         } else {
                             toastr.error('导出失败!');

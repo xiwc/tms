@@ -4,7 +4,6 @@
 package com.lhjz.portal.controller;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +32,7 @@ import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
 import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
@@ -43,6 +43,7 @@ import com.lhjz.portal.repository.AuthorityRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateItemRepository;
 import com.lhjz.portal.repository.TranslateRepository;
+import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.DateUtil;
 import com.lhjz.portal.util.JsonUtil;
 import com.lhjz.portal.util.MapUtil;
@@ -75,6 +76,9 @@ public class TranslateController extends BaseController {
 
 	@Autowired
 	AuthorityRepository authorityRepository;
+
+	@Autowired
+	UserRepository userRepository;
 
 	@Autowired
 	PasswordEncoder passwordEncoder;
@@ -142,10 +146,9 @@ public class TranslateController extends BaseController {
 
 		log(Action.Create, Target.Translate, translate);
 
-		Set<User> watchers = translate.getProject().getWatchers();
-		List<String> watcherMails = watchers.stream().map((user) -> {
-			return user.getMails();
-		}).collect(Collectors.toList());
+		Mail mail = Mail.instance().addWatchers(translate)
+				.addUsers(getUser(translate.getCreator()))
+				.removeUser(getLoginUser());
 
 		ThreadUtil.exec(() -> {
 
@@ -154,7 +157,7 @@ public class TranslateController extends BaseController {
 						DateUtil.format(new Date(), DateUtil.FORMAT2)),
 						TemplateUtil.process("templates/mail/translate-create",
 								MapUtil.objArr2Map("translate", translate)),
-						watcherMails.toArray(new String[0]));
+						mail.get());
 				logger.info("翻译新建邮件发送成功！ID:{}", translate.getId());
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -186,6 +189,8 @@ public class TranslateController extends BaseController {
 			translateItemRepository.saveAndFlush(translateItem);
 
 			Translate translate = translateItem.getTranslate();
+			translate.setUpdateDate(new Date());
+			translate.setUpdater(WebUtil.getUsername());
 			translate.setStatus(Status.Updated);
 			translate.setSearch(translate.toString());
 
@@ -198,10 +203,9 @@ public class TranslateController extends BaseController {
 
 			translateRepository.saveAndFlush(translate);
 
-			Set<User> watchers = translate.getProject().getWatchers();
-			List<String> watcherMails = watchers.stream().map((user) -> {
-				return user.getMails();
-			}).collect(Collectors.toList());
+			Mail mail = Mail.instance().addWatchers(translate)
+					.addUsers(getUser(translate.getCreator()))
+					.removeUser(getLoginUser());
 
 			ThreadUtil
 					.exec(() -> {
@@ -212,8 +216,7 @@ public class TranslateController extends BaseController {
 											DateUtil.FORMAT2)), TemplateUtil
 									.process("templates/mail/translate-update",
 											MapUtil.objArr2Map("translate",
-													translate)), watcherMails
-									.toArray(new String[0]));
+													translate)), mail.get());
 							logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -322,10 +325,9 @@ public class TranslateController extends BaseController {
 
 			log(Action.Update, Target.Translate, translate);
 
-			Set<User> watchers = translate.getProject().getWatchers();
-			List<String> watcherMails = watchers.stream().map((user) -> {
-				return user.getMails();
-			}).collect(Collectors.toList());
+			Mail mail = Mail.instance().addWatchers(translate)
+					.addUsers(getUser(translate.getCreator()))
+					.removeUser(getLoginUser());
 
 			ThreadUtil
 					.exec(() -> {
@@ -336,8 +338,7 @@ public class TranslateController extends BaseController {
 											DateUtil.FORMAT2)), TemplateUtil
 									.process("templates/mail/translate-update",
 											MapUtil.objArr2Map("translate",
-													translate)), watcherMails
-									.toArray(new String[0]));
+													translate)), mail.get());
 							logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
 						} catch (Exception e) {
 							e.printStackTrace();
@@ -359,9 +360,38 @@ public class TranslateController extends BaseController {
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN" })
 	public RespBody delete(@RequestParam("id") Long id) {
 
+		Translate translate = translateRepository.findOne(id);
+
 		translateRepository.delete(id);
 
 		logWithProperties(Action.Delete, Target.Translate, "id", id);
+
+		User loginUser = getLoginUser();
+
+		Mail mail = Mail.instance().addWatchers(translate)
+				.addUsers(getUser(translate.getCreator()))
+				.removeUser(loginUser);
+
+		ThreadUtil
+				.exec(() -> {
+
+					try {
+						mailSender.sendHtml(String.format("TMS-翻译删除_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT2)),
+								TemplateUtil.process(
+										"templates/mail/translate-delete",
+										MapUtil.objArr2Map("translate",
+												translate, "deleter",
+												loginUser.getUsername(),
+												"deleteDate", new Date())),
+								mail.get());
+						logger.info("翻译更删除邮件发送成功！ID:{}", translate.getId());
+					} catch (Exception e) {
+						e.printStackTrace();
+						logger.error("翻译删除邮件发送失败！ID:{}", translate.getId());
+					}
+
+				});
 
 		return RespBody.succeed(id);
 	}

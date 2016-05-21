@@ -105,12 +105,15 @@
                 onApprove: function() {
                     $.post('admin/user/save', {
                         username: $('.ad-user-add').find('input[name="username"]').val(),
+                        name: $('.ad-user-add').find('input[name="name"]').val(),
+                        mail: $('.ad-user-add').find('input[name="mail"]').val(),
                         password: '888888',
                         enabled: false,
                         role: $('.ad-user-add').find('input:radio:checked').val()
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
-                            toastr.success('添加成功,刷新当前页面可以查看!');
+                            toastr.success('添加成功!');
+                            window.location.reload();
                         } else {
                             toastr.error(data.data, '添加失败!');
                         }
@@ -191,12 +194,14 @@
                     $('.ad-user-edit').find('.user-username').text($btn.closest('tr').attr('data-id'));
                     $('.ad-user-edit').find('input[name="password"]').val('');
                     $('.ad-user-edit').find('input[name="mail"]').val(data.data.mails);
+                    $('.ad-user-edit').find('input[name="name"]').val(data.data.name);
 
                     $('.ad-user-edit').modal({
                         onApprove: function() {
                             $.post('admin/user/update', {
                                 username: $btn.closest('tr').attr('data-id'),
                                 password: $('.ad-user-edit').find('input[name="password"]').val(),
+                                name: $('.ad-user-edit').find('input[name="name"]').val(),
                                 mail: $('.ad-user-edit').find('input[name="mail"]').val()
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {

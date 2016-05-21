@@ -25,6 +25,7 @@ import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lhjz.portal.entity.Project;
+import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -73,6 +74,11 @@ public class User implements java.io.Serializable {
 	@ManyToMany
 	@JoinTable(name = "watcher_project", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "project_id") })
 	private Set<Project> watcherProjects = new HashSet<Project>();
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "watcher_translate", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "translate_id") })
+	private Set<Translate> watcherTranslates = new HashSet<Translate>();
 
 	public User() {
 	}
@@ -177,6 +183,14 @@ public class User implements java.io.Serializable {
 
 	public void setWatcherProjects(Set<Project> watcherProjects) {
 		this.watcherProjects = watcherProjects;
+	}
+
+	public Set<Translate> getWatcherTranslates() {
+		return watcherTranslates;
+	}
+
+	public void setWatcherTranslates(Set<Translate> watcherTranslates) {
+		this.watcherTranslates = watcherTranslates;
 	}
 
 	@Override

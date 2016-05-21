@@ -97,9 +97,9 @@ INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiweicheng@yeah.net', 'Bultin', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('step', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.com', 'Normal', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiwc87@yeah.net', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiwc87@yeah.net', 'Bultin', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('step', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiweicheng@yeah.net', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.com', 'Normal', '2015-04-25 10:01:51', '0');
 
 -- ----------------------------
 -- Table structure for persistent_logins
@@ -145,3 +145,12 @@ INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('2', '1');
 INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('2', '2');
 INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('2', '3');
 
+-- ----------------------------
+-- Records of watcher_project
+-- ----------------------------
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('admin', '1');
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('step', '1');
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('admin', '2');
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('step', '2');
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('admin', '3');
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('step', '3');

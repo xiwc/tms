@@ -47,6 +47,10 @@ public class MailSender2 {
 	public boolean sendHtml(String subject, String html, String... toAddr)
 			throws MessagingException {
 
+		if (toAddr == null || toAddr.length == 0) {
+			return false;
+		}
+
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false,
 				"UTF-8");

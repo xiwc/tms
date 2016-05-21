@@ -80,6 +80,8 @@ public class UserController extends BaseController {
 		user.setPassword(passwordEncoder.encode(userForm.getPassword()));
 		user.setEnabled(userForm.getEnabled());
 		user.setCreateDate(new Date());
+		user.setName(userForm.getName());
+		user.setMails(userForm.getMail());
 
 		userRepository.saveAndFlush(user);
 
@@ -139,11 +141,17 @@ public class UserController extends BaseController {
 			user.setEnabled(userForm.getEnabled());
 		}
 
-		if (StringUtil.isNotEmpty(userForm.getMail())) {
+		if (userForm.getMail() != null) {
 			user.setMails(userForm.getMail());
 		}
 
+		if (userForm.getName() != null) {
+			user.setName(userForm.getName());
+		}
+
 		userRepository.saveAndFlush(user);
+
+		log(Action.Update, Target.User, user);
 
 		return RespBody.succeed(user.getUsername());
 	}
@@ -186,11 +194,17 @@ public class UserController extends BaseController {
 			user.setEnabled(userForm.getEnabled());
 		}
 
-		if (StringUtil.isNotEmpty(userForm.getMail())) {
+		if (userForm.getMail() != null) {
 			user.setMails(userForm.getMail());
 		}
 
+		if (userForm.getName() != null) {
+			user.setName(userForm.getName());
+		}
+
 		userRepository.saveAndFlush(user);
+
+		log(Action.Update, Target.User, user);
 
 		return RespBody.succeed(user.getUsername());
 	}
@@ -214,6 +228,8 @@ public class UserController extends BaseController {
 
 		userRepository.delete(user);
 
+		log(Action.Delete, Target.User, user);
+
 		return RespBody.succeed(username);
 	}
 
@@ -228,9 +244,6 @@ public class UserController extends BaseController {
 			logger.error("查询用户不存在! ID: {}", username);
 			return RespBody.failed("查询用户不存在!");
 		}
-
-		// prevent ref to each other
-		// user.setAuthorities(null);
 
 		return RespBody.succeed(user);
 	}

@@ -195,7 +195,7 @@ public class ImportController extends BaseController {
 		
 		log(Action.Import, Target.Import, content);
 
-		return RespBody.succeed();
+		return RespBody.succeed(kvMaps.size());
 	}
 
 	@RequestMapping(value = "export", method = RequestMethod.POST)
@@ -240,7 +240,7 @@ public class ImportController extends BaseController {
 			String data = JsonUtil.toJson(root);
 			log(Action.Export, Target.Import, data);
 
-			return RespBody.succeed(data);
+			return RespBody.succeed(data).addMsg(map.size());
 		} else {
 			List<String> list = new ArrayList<String>();
 			for (String k : map.keySet()) {
@@ -255,7 +255,7 @@ public class ImportController extends BaseController {
 			String data = StringUtil.join("\r\n", list);
 			log(Action.Export, Target.Import, data);
 
-			return RespBody.succeed(data);
+			return RespBody.succeed(data).addMsg(map.size());
 		}
 	}
 }
