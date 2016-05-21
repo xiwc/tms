@@ -314,11 +314,23 @@
                             $(this).find('input[name="key"]').val(data.data.key);
                             // $(this).find('textarea[name="desc"]').val(data.data.description);
 
+                            $(this).find('.dd-tags').dropdown('clear')
                             var tags = [];
                             $.each(data.data.labels, function(index, val) {
                                 tags.push(val.name);
-                                $item = $('<div class="item" data-value="dfs">dfs</div>').attr('data-value', val.name).text(val.name);
-                                $tags.find('.menu').append($item);
+
+                                var exist = false;
+                                $tags.find('.menu').children('.item').each(function(index, el) {
+                                    if ($(el).attr('data-value') == val.name) {
+                                        exist = true;
+                                        return false;
+                                    }
+                                });
+
+                                if (!exist) {
+                                    $item = $('<div class="item" data-value="dfs">dfs</div>').attr('data-value', val.name).text(val.name);
+                                    $tags.find('.menu').append($item);
+                                }
                             });
                             $(this).find('input[name="tags"]').val(tags.join(','));
                             $(this).find('.dd-tags').dropdown({

@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.lhjz.portal.base.BaseController;
+import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
@@ -29,6 +32,7 @@ import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.UserInfo;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.repository.FileRepository;
+import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
@@ -59,6 +63,9 @@ public class AdminController extends BaseController {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	LabelRepository labelRepository;
 
 	@RequestMapping("login")
 	public String login(Model model) {
@@ -114,7 +121,7 @@ public class AdminController extends BaseController {
 	@RequestMapping("translate")
 	public String translate(
 			Model model,
-			@PageableDefault Pageable pageable,
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "projectId", required = false) Long projectId,
 			@RequestParam(value = "my", required = false) String my,
 			@RequestParam(value = "new", required = false) String _new,
@@ -179,8 +186,21 @@ public class AdminController extends BaseController {
 			languages2.addAll(languages);
 		}
 
+		// login user labels
+		List<Label> labels = labelRepository.findByCreator(WebUtil
+				.getUsername());
+		Set<String> lbls = null;
+		if (labels != null) {
+			lbls = labels.stream().map((label) -> {
+				return label.getName();
+			}).collect(Collectors.toSet());
+		} else {
+			lbls = new HashSet<String>();
+		}
+
 		model.addAttribute("projects", projects);
 		model.addAttribute("project", project);
+		model.addAttribute("labels", lbls);
 		model.addAttribute("page", page);
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);

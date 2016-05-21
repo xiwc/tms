@@ -354,6 +354,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">标签</div>
                             <div class="menu">
+                                <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
                             </div>
                         </div>
                     </div>
@@ -392,7 +393,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">标签</div>
                             <div class="menu">
-                                <!-- <div class="item" data-value="dfs">dfs</div> -->
+                                <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
                             </div>
                         </div>
                     </div>
