@@ -224,6 +224,20 @@ jQuery(function($) {
             });
 
             return data;
+        },
+        remember: function() {
+            localStorage && (typeof url == 'function') && localStorage.setItem(url('path'), url('path') + (url('query') ? ('?' + url('query')) : ''));
+        },
+        getRemember: function(name) {
+            return localStorage && localStorage.getItem(name);
         }
     });
+
+    // remember the url
+    Utils.remember();
+
+    // set remember url
+    var translateUrl = Utils.getRemember('/admin/translate');
+    translateUrl && $('a.item.mi-translate').attr('href', translateUrl);
+
 });

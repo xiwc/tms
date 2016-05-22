@@ -147,7 +147,7 @@ public class TranslateController extends BaseController {
 		if (labels != null) {
 			translate.getLabels().addAll(labels);
 		}
-		User loginUser = getLoginUser();
+		final User loginUser = getLoginUser();
 		translate.getWatchers().add(loginUser);
 
 		JsonObject jsonO = (JsonObject) JsonUtil.toJsonElement(translateForm
@@ -205,6 +205,7 @@ public class TranslateController extends BaseController {
 						DateUtil.format(new Date(), DateUtil.FORMAT2)),
 						TemplateUtil.process("templates/mail/translate-create",
 								MapUtil.objArr2Map("translate", translate,
+										"user", loginUser,
 										"href", href, "body", mail2.body())),
 						mail.get());
 				logger.info("翻译新建邮件发送成功！ID:{}", translate.getId());
@@ -243,7 +244,7 @@ public class TranslateController extends BaseController {
 			translate.setUpdater(WebUtil.getUsername());
 			translate.setStatus(Status.Updated);
 
-			User loginUser = getLoginUser();
+			final User loginUser = getLoginUser();
 			translate.getWatchers().add(loginUser);
 
 			translate.setSearch(translate.toString());
@@ -282,7 +283,8 @@ public class TranslateController extends BaseController {
 											DateUtil.FORMAT2)), TemplateUtil
 									.process("templates/mail/translate-update",
 											MapUtil.objArr2Map("translate",
-													translate, "href", href,
+													translate, "user",
+													loginUser, "href", href,
 													"body", mail2.body())),
 									mail.get());
 							logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
@@ -347,7 +349,7 @@ public class TranslateController extends BaseController {
 			translate.setUpdater(WebUtil.getUsername());
 			translate.setUpdateDate(new Date());
 
-			User loginUser = getLoginUser();
+			final User loginUser = getLoginUser();
 			translate.getWatchers().add(loginUser);
 
 			Set<Label> labels = translate.getLabels();
@@ -479,7 +481,8 @@ public class TranslateController extends BaseController {
 											DateUtil.FORMAT2)), TemplateUtil
 									.process("templates/mail/translate-update",
 											MapUtil.objArr2Map("translate",
-													translate, "href", href,
+													translate, "user",
+													loginUser, "href", href,
 													"body", mail2.body())),
 									mail.get());
 							logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
@@ -522,7 +525,7 @@ public class TranslateController extends BaseController {
 
 		logWithProperties(Action.Delete, Target.Translate, "id", id);
 
-		User loginUser = getLoginUser();
+		final User loginUser = getLoginUser();
 
 		final Mail mail = Mail.instance().addWatchers(translate)
 				.addUsers(getUser(translate.getCreator()))
@@ -538,6 +541,7 @@ public class TranslateController extends BaseController {
 						DateUtil.format(new Date(), DateUtil.FORMAT2)),
 						TemplateUtil.process("templates/mail/translate-delete",
 								MapUtil.objArr2Map("translate", translate,
+										"user", loginUser,
 										"deleter", loginUser.getUsername(),
 										"deleteDate", new Date(), "href", href,
 										"body", mail2.body())), mail.get());
@@ -570,6 +574,10 @@ public class TranslateController extends BaseController {
 				+ translate.getProject().getId() + "&id=" + translate.getId();
 
 		translate.getLabels().remove(label);
+		translate.setUpdateDate(new Date());
+		translate.setUpdater(WebUtil.getUsername());
+		translate.setStatus(Status.Updated);
+
 		translateRepository.saveAndFlush(translate);
 
 		labelRepository.delete(label);
@@ -579,6 +587,8 @@ public class TranslateController extends BaseController {
 
 		final Mail mail2 = Mail.instance().put("删除标签", label.getName());
 
+		final User loginUser = getLoginUser();
+
 		ThreadUtil.exec(() -> {
 
 			try {
@@ -586,6 +596,7 @@ public class TranslateController extends BaseController {
 						DateUtil.format(new Date(), DateUtil.FORMAT2)),
 						TemplateUtil.process("templates/mail/translate-update",
 								MapUtil.objArr2Map("translate", translate,
+										"user", loginUser,
 										"href", href, "body", mail2.body())),
 						mail.get());
 				logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());

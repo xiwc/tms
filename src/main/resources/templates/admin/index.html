@@ -33,7 +33,7 @@
     <div th:with="uri=${#httpServletRequest.requestURI}" th:fragment="sidebar-menu" class="ui left thin vertical inverted labeled icon sidebar menu ad-index-menu">
         <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html"> <i class="home icon"></i> 主页
         </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译
+        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
         </a>
@@ -72,7 +72,7 @@
                         <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
                             <i class="home icon"></i> 主页
                         </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item" th:href="@{/admin/translate}" href="translate.html">
+                        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html">
                             <i class="world icon"></i> 翻译
                         </a>
                         <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
