@@ -12,6 +12,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -50,6 +51,9 @@
     <div th:include="admin/template :: ad-page-common"></div>
     <script type="text/javascript" th:inline="javascript">
     jQuery(function($) {
+
+        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+
         // feedback handler
         $('.submit.button').api({
             action: 'saveFeedback',
@@ -63,6 +67,7 @@
                 $.extend(settings.data, {
                     name: $(this).parent().find('input[name="name"]').val(),
                     url: $(this).parent().find(':hidden[name="url"]').val(),
+                    baseURL: baseURL,
                     content: $(this).parent().find('textarea[name="content"]').val()
                 });
                 return settings;
