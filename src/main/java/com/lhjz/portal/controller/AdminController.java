@@ -33,6 +33,7 @@ import com.lhjz.portal.model.UserInfo;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.repository.FileRepository;
 import com.lhjz.portal.repository.LabelRepository;
+import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
@@ -57,6 +58,9 @@ public class AdminController extends BaseController {
 
 	@Autowired
 	ProjectRepository projectRepository;
+
+	@Autowired
+	LanguageRepository languageRepository;
 
 	@Autowired
 	TranslateRepository translateRepository;
@@ -113,6 +117,26 @@ public class AdminController extends BaseController {
 		return "admin/user";
 	}
 
+	@RequestMapping("project")
+	@Secured("ROLE_ADMIN")
+	public String project(Model model) {
+
+		logger.debug("Enter method...");
+
+		List<Project> projects = projectRepository.findAll();
+
+		List<Language> languages = languageRepository.findAll();
+
+		List<User> users = userRepository.findAll();
+
+		model.addAttribute("projects", projects);
+		model.addAttribute("languages", languages);
+		model.addAttribute("users", users);
+		model.addAttribute("user", getLoginUser());
+
+		return "admin/project";
+	}
+
 	@RequestMapping("feedback")
 	public String feedback(Model model) {
 		return "admin/feedback";
@@ -130,11 +154,19 @@ public class AdminController extends BaseController {
 			@RequestParam(value = "search", required = false) String search) {
 
 		List<Project> projects = projectRepository.findAll();
+
+		if (projects.size() == 0) {
+			throw new RuntimeException("系统中不存在项目,请先创建项目后再尝试访问本页面!");
+		}
+
 		Set<Language> languages = null;
 		Project project = null;
 		org.springframework.data.domain.Page<Translate> page = null;
 		if (projectId != null) {
 			project = projectRepository.findOne(projectId);
+			if (project == null) {
+				return "redirect:translate";
+			}
 		} else {
 			if (projects.size() > 0) {
 				project = projects.get(0);

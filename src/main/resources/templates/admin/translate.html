@@ -72,7 +72,7 @@
                         <i class="circular search link icon"></i>
                     </div>
                 </div>
-                <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;">
+                <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
                     <table class="ui small sortable celled striped compact table segment tb-translate">
                         <thead>
                             <th class="three wide">名称</th>
@@ -145,13 +145,13 @@
                             </tr>
                         </tfoot> -->
                     </table>
-                </div>
+                <!-- </div> -->
                 <!-- <div class="ui segment"> -->
-                <div class="ui label">
+                <div class="ui basic label">
                     共计:
                     <div class="detail" th:text="${page.totalPages + '页/' + page.totalElements + '条'}">214</div>
                 </div>
-                <div class="ui label">
+                <div class="ui basic label">
                     当前:
                     <div class="detail" th:text="${'第' + (page.number + 1) + '页/共' + page.numberOfElements + '条'}">214</div>
                 </div>

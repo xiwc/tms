@@ -53,8 +53,7 @@ public abstract class BaseController {
 	}
 
 	protected Log logWithProperties(Action action, Target target,
-			String properties,
-			Object... vals) {
+			String properties, Object... vals) {
 
 		Log log = new Log();
 		log.setAction(action);
@@ -84,6 +83,7 @@ public abstract class BaseController {
 	@ExceptionHandler(Exception.class)
 	public ModelAndView exceptionHandler(Exception ex) {
 
-		return new ModelAndView("admin/error", "error", Message.error(ex.getMessage()));
+		return new ModelAndView("admin/error", "error", Message.error(
+				ex.getMessage()).detail(ex.toString()));
 	}
 }
