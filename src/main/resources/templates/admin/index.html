@@ -27,6 +27,9 @@
     <script th:replace="admin/template :: hotNewsItemTpl"></script>
     <script th:replace="admin/template :: moreNewsItemTpl"></script>
     <script th:replace="admin/template :: articleItemTpl"></script>
+    <style type="text/css">
+        
+    </style>
 </head>
 
 <body class="admin-index">
@@ -95,6 +98,80 @@
                   <i class="circular users icon"></i>
                   欢迎使用TMS翻译管理系统!
                 </h2>
+                <div class="ui container four column stackable centered grid" style="margin-top:50px;">
+                    <div class="aligined centered column">
+                        <div class="ui fade rotate reveal">
+                            <div class="visible content centered">
+                                <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
+                                  <i class="circular suitcase icon"></i>
+                                  项目
+                                </h2>
+                            </div>
+                            <div class="hidden content">
+                                <div class="ui inverted circular segment" style="width:133px; height:133px;">
+                                    <h2 class="ui inverted header">
+                                        总数:
+                                        <div class="sub header" th:text="${cntProject}">99</div>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aligined centered column">
+                        <div class="ui fade rotate reveal">
+                            <div class="visible content">
+                                <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
+                                  <i class="circular users icon"></i>
+                                  用户
+                                </h2>
+                            </div>
+                            <div class="hidden content">
+                                <div class="ui inverted circular segment" style="width:133px; height:133px;">
+                                    <h2 class="ui inverted header">
+                                        总数:
+                                        <div class="sub header" th:text="${cntUser}">99</div>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aligined centered column">
+                        <div class="ui fade rotate reveal">
+                            <div class="visible content">
+                                <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
+                                  <i class="circular world icon"></i>
+                                  语言
+                                </h2>
+                            </div>
+                            <div class="hidden content">
+                                <div class="ui inverted circular segment" style="width:133px; height:133px;">
+                                    <h2 class="ui inverted header">
+                                        总数:
+                                        <div class="sub header" th:text="${cntLanguage}">99</div>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aligined centered column">
+                        <div class="ui fade rotate reveal">
+                            <div class="visible content">
+                                <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
+                                  <i class="circular world icon"></i>
+                                  翻译
+                                </h2>
+                            </div>
+                            <div class="hidden content">
+                                <div class="ui inverted circular segment" style="width:133px; height:133px;">
+                                    <h2 class="ui inverted header">
+                                        总数:
+                                        <div class="sub header" th:text="${cntTranslate}">99</div>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

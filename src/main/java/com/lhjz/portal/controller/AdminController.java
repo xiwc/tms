@@ -82,6 +82,11 @@ public class AdminController extends BaseController {
 	@RequestMapping()
 	public String home(Model model) {
 
+		model.addAttribute("cntProject", projectRepository.count());
+		model.addAttribute("cntUser", userRepository.count());
+		model.addAttribute("cntLanguage", languageRepository.count());
+		model.addAttribute("cntTranslate", translateRepository.count());
+
 		return "admin/index";
 	}
 
