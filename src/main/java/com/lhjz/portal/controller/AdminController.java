@@ -7,12 +7,14 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.lhjz.portal.base.BaseController;
+import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
@@ -29,6 +32,8 @@ import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.UserInfo;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.repository.FileRepository;
+import com.lhjz.portal.repository.LabelRepository;
+import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
@@ -55,10 +60,16 @@ public class AdminController extends BaseController {
 	ProjectRepository projectRepository;
 
 	@Autowired
+	LanguageRepository languageRepository;
+
+	@Autowired
 	TranslateRepository translateRepository;
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	LabelRepository labelRepository;
 
 	@RequestMapping("login")
 	public String login(Model model) {
@@ -70,6 +81,11 @@ public class AdminController extends BaseController {
 
 	@RequestMapping()
 	public String home(Model model) {
+
+		model.addAttribute("cntProject", projectRepository.count());
+		model.addAttribute("cntUser", userRepository.count());
+		model.addAttribute("cntLanguage", languageRepository.count());
+		model.addAttribute("cntTranslate", translateRepository.count());
 
 		return "admin/index";
 	}
@@ -106,6 +122,26 @@ public class AdminController extends BaseController {
 		return "admin/user";
 	}
 
+	@RequestMapping("project")
+	@Secured("ROLE_ADMIN")
+	public String project(Model model) {
+
+		logger.debug("Enter method...");
+
+		List<Project> projects = projectRepository.findAll();
+
+		List<Language> languages = languageRepository.findAll();
+
+		List<User> users = userRepository.findAll();
+
+		model.addAttribute("projects", projects);
+		model.addAttribute("languages", languages);
+		model.addAttribute("users", users);
+		model.addAttribute("user", getLoginUser());
+
+		return "admin/project";
+	}
+
 	@RequestMapping("feedback")
 	public String feedback(Model model) {
 		return "admin/feedback";
@@ -114,7 +150,7 @@ public class AdminController extends BaseController {
 	@RequestMapping("translate")
 	public String translate(
 			Model model,
-			@PageableDefault Pageable pageable,
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "projectId", required = false) Long projectId,
 			@RequestParam(value = "my", required = false) String my,
 			@RequestParam(value = "new", required = false) String _new,
@@ -123,11 +159,19 @@ public class AdminController extends BaseController {
 			@RequestParam(value = "search", required = false) String search) {
 
 		List<Project> projects = projectRepository.findAll();
+
+		if (projects.size() == 0) {
+			throw new RuntimeException("系统中不存在项目,请先创建项目后再尝试访问本页面!");
+		}
+
 		Set<Language> languages = null;
 		Project project = null;
 		org.springframework.data.domain.Page<Translate> page = null;
 		if (projectId != null) {
 			project = projectRepository.findOne(projectId);
+			if (project == null) {
+				return "redirect:translate";
+			}
 		} else {
 			if (projects.size() > 0) {
 				project = projects.get(0);
@@ -179,8 +223,21 @@ public class AdminController extends BaseController {
 			languages2.addAll(languages);
 		}
 
+		// login user labels
+		List<Label> labels = labelRepository.findByCreator(WebUtil
+				.getUsername());
+		Set<String> lbls = null;
+		if (labels != null) {
+			lbls = labels.stream().map((label) -> {
+				return label.getName();
+			}).collect(Collectors.toSet());
+		} else {
+			lbls = new HashSet<String>();
+		}
+
 		model.addAttribute("projects", projects);
 		model.addAttribute("project", project);
+		model.addAttribute("labels", lbls);
 		model.addAttribute("page", page);
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);

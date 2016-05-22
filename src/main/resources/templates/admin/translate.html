@@ -72,7 +72,7 @@
                         <i class="circular search link icon"></i>
                     </div>
                 </div>
-                <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;">
+                <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
                     <table class="ui small sortable celled striped compact table segment tb-translate">
                         <thead>
                             <th class="three wide">名称</th>
@@ -145,13 +145,13 @@
                             </tr>
                         </tfoot> -->
                     </table>
-                </div>
+                <!-- </div> -->
                 <!-- <div class="ui segment"> -->
-                <div class="ui label">
+                <div class="ui basic label">
                     共计:
                     <div class="detail" th:text="${page.totalPages + '页/' + page.totalElements + '条'}">214</div>
                 </div>
-                <div class="ui label">
+                <div class="ui basic label">
                     当前:
                     <div class="detail" th:text="${'第' + (page.number + 1) + '页/共' + page.numberOfElements + '条'}">214</div>
                 </div>
@@ -186,6 +186,7 @@
     <input type="hidden" name="project.languageId" th:value="${project.language.id}" />
     <script type="text/javascript">
     jQuery(function($) {
+
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
@@ -314,11 +315,23 @@
                             $(this).find('input[name="key"]').val(data.data.key);
                             // $(this).find('textarea[name="desc"]').val(data.data.description);
 
+                            $(this).find('.dd-tags').dropdown('clear')
                             var tags = [];
                             $.each(data.data.labels, function(index, val) {
                                 tags.push(val.name);
-                                $item = $('<div class="item" data-value="dfs">dfs</div>').attr('data-value', val.name).text(val.name);
-                                $tags.find('.menu').append($item);
+
+                                var exist = false;
+                                $tags.find('.menu').children('.item').each(function(index, el) {
+                                    if ($(el).attr('data-value') == val.name) {
+                                        exist = true;
+                                        return false;
+                                    }
+                                });
+
+                                if (!exist) {
+                                    $item = $('<div class="item" data-value="dfs">dfs</div>').attr('data-value', val.name).text(val.name);
+                                    $tags.find('.menu').append($item);
+                                }
                             });
                             $(this).find('input[name="tags"]').val(tags.join(','));
                             $(this).find('.dd-tags').dropdown({

@@ -3,6 +3,8 @@
  */
 package com.lhjz.portal.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lhjz.portal.entity.Label;
@@ -18,5 +20,7 @@ import com.lhjz.portal.entity.Translate;
 public interface LabelRepository extends JpaRepository<Label, Long> {
 
 	Label findOneByNameAndTranslate(String name, Translate translate);
+
+	List<Label> findByCreator(String creator);
 
 }

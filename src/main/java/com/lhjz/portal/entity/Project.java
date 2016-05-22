@@ -195,9 +195,10 @@ public class Project implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Project [id=" + id + ", name=" + name + ", description=" + description + ", creator=" + creator
-				+ ", updater=" + updater + ", watchers=" + watchers + ", status=" + status + ", createDate="
-				+ createDate + ", updateDate=" + updateDate + ", version=" + version + "]";
+		return "Project [id=" + id + ", name=" + name + ", description="
+				+ description + ", creator=" + creator + ", updater=" + updater
+				+ ", status=" + status + ", createDate=" + createDate
+				+ ", updateDate=" + updateDate + ", version=" + version + "]";
 	}
 
 }

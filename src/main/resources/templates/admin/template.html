@@ -354,12 +354,105 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">标签</div>
                             <div class="menu">
+                                <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
                             </div>
                         </div>
                     </div>
                     <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
                         <label th:text="${l.description} + ':'">中文:</label>
                         <textarea name="zh" th:name="${l.name}" rows="1" th:placeholder="${l.description}" th:text="''">测试</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- project add modal -->
+    <div th:fragment="ad-project-add" class="ui small modal ad-project-add">
+        <div class="header">
+            添加项目
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="required field">
+                        <label>名称:</label>
+                        <input name="name" type="text" placeholder="3到10位大写字母数组下划线" th:value="''" value="STEP">
+                    </div>
+                    <div class="field">
+                        <label>描述:</label>
+                        <textarea name="desc" rows="2" placeholder="描述" th:text="''">项目描述</textarea>
+                    </div>
+                    <div class="required field">
+                        <label>语言:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-languages">
+                            <input name="languages" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">语言</div>
+                            <div class="menu">
+                                <div th:each="l : ${languages}" class="item" th:attr="data-value=${l.id}" th:text="${l.description + '[' + l.name + ']'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="required field">
+                        <label>主语言:</label>
+                        <div class="ui fluid search selection dropdown dd-language">
+                            <input name="language" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">主语言</div>
+                            <div class="menu">
+                                <div th:each="l : ${languages}" class="item" th:attr="data-value=${l.id}" th:text="${l.description + '[' + l.name + ']'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- project edit modal -->
+    <div th:fragment="ad-project-edit" class="ui small modal ad-project-edit">
+        <div class="header">
+            编辑项目
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="required field">
+                        <label>名称:</label>
+                        <input name="name" type="text" placeholder="3到10位大写字母数组下划线" th:value="''" value="STEP">
+                    </div>
+                    <div class="field">
+                        <label>描述:</label>
+                        <textarea name="desc" rows="2" placeholder="描述" th:text="''">项目描述</textarea>
+                    </div>
+                    <div class="required field">
+                        <label>语言:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-languages">
+                            <input name="languages" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">语言</div>
+                            <div class="menu">
+                                <div th:each="l : ${languages}" class="item" th:attr="data-value=${l.id}" th:text="${l.description + '[' + l.name + ']'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="required field">
+                        <label>主语言:</label>
+                        <div class="ui fluid search selection dropdown dd-language">
+                            <input name="language" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">主语言</div>
+                            <div class="menu">
+                                <div th:each="l : ${languages}" class="item" th:attr="data-value=${l.id}" th:text="${l.description + '[' + l.name + ']'}"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -392,7 +485,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">标签</div>
                             <div class="menu">
-                                <!-- <div class="item" data-value="dfs">dfs</div> -->
+                                <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
                             </div>
                         </div>
                     </div>

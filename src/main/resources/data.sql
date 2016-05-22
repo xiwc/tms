@@ -133,6 +133,7 @@ INSERT INTO `project` (`id`, `create_date`, `creator`, `description`, `name`, `s
 -- ----------------------------
 INSERT INTO `language` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`) VALUES ('1', '2016-05-17 15:59:25', 'admin', '中文', 'zh', 'Normal', '0');
 INSERT INTO `language` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`) VALUES ('2', '2016-05-17 16:00:30', 'admin', '日语', 'jp', 'Normal', '0');
+INSERT INTO `language` (`id`, `create_date`, `creator`, `description`, `name`, `status`, `version`) VALUES ('3', '2016-05-17 16:00:30', 'admin', '英语', 'en', 'Normal', '0');
 
 
 -- ----------------------------

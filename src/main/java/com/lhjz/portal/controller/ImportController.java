@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -73,9 +72,6 @@ public class ImportController extends BaseController {
 
 	@Autowired
 	AuthorityRepository authorityRepository;
-
-	@Autowired
-	PasswordEncoder passwordEncoder;
 
 	private void joinKV(JsonObject jsonObject, String key,
 			Map<String, String> kvMaps) {

@@ -80,7 +80,7 @@ public class Translate implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date translateDate;
 
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "project_id")
 	private Project project;
 

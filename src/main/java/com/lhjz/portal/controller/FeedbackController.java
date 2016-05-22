@@ -17,11 +17,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.entity.Feedback;
+import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Target;
@@ -64,7 +66,7 @@ public class FeedbackController extends BaseController {
 	@RequestMapping(value = "save", method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody save(@Valid FeedbackForm feedbackForm,
-			BindingResult bindingResult) {
+			BindingResult bindingResult, @RequestParam("baseURL") String baseURL) {
 
 		logger.debug("Enter method: {}", "save");
 
@@ -94,18 +96,22 @@ public class FeedbackController extends BaseController {
 
 		log(Action.Create, Target.Feedback, feedback2);
 
+		final User loginUser = getLoginUser();
+
+		final String href = baseURL;
+
 		ThreadUtil.exec(() -> {
-			
+
 			feedback2.setContent(CommonUtil.replaceLinebreak(feedback2
 					.getContent()));
 
 			try {
-				mailSender.sendHtml(
-						String.format("TMS-用户反馈_%s",
-								DateUtil.format(new Date(), DateUtil.FORMAT2)),
-						TemplateUtil.process("templates/mail/feedback",
-								MapUtil.objArr2Map("feedback", feedback2)),
-						StringUtil.split(toAddrArr, ","));
+				mailSender.sendHtml(String.format("TMS-用户反馈_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT2)),
+						TemplateUtil.process("templates/mail/feedback", MapUtil
+								.objArr2Map("feedback", feedback2, "user",
+										loginUser, "href", href)), StringUtil
+								.split(toAddrArr, ","));
 				logger.info("反馈邮件发送成功！ID:{}", feedback2.getId());
 			} catch (Exception e) {
 				e.printStackTrace();
