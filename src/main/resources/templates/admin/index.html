@@ -33,13 +33,13 @@
     <div th:with="uri=${#httpServletRequest.requestURI}" th:fragment="sidebar-menu" class="ui left thin vertical inverted labeled icon sidebar menu ad-index-menu">
         <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html"> <i class="home icon"></i> 主页
         </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译
+        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译管理
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
         </a>
         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/project')} ? 'active' : ''" class="item" th:href="@{/admin/project}" href="project.html"> <i class="suitcase icon"></i> 项目管理
         </a>
-        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/language')} ? 'active' : ''" class="item" th:href="@{/admin/language}" href="language.html"> <i class="flag icon"></i> 翻译管理
+        <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/language')} ? 'active' : ''" class="item" th:href="@{/admin/language}" href="language.html"> <i class="flag icon"></i> 语言管理
         </a>
         <a sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="users icon"></i> 用户管理
         </a>
@@ -77,7 +77,7 @@
                             <i class="home icon"></i> 主页
                         </a>
                         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html">
-                            <i class="world icon"></i> 翻译
+                            <i class="world icon"></i> 翻译管理
                         </a>
                         <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
                             <i class="retweet icon"></i> 导入导出
