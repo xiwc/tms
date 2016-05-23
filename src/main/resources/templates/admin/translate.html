@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-    <title>TMS-翻译</title>
+    <title>TMS-翻译管理</title>
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
@@ -29,7 +29,7 @@
         <div class="ad-index-container">
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
-                <div th:replace="admin/template :: ad-page-header ('翻译', 'translate')"></div>
+                <div th:replace="admin/template :: ad-page-header ('翻译管理', 'translate')"></div>
                 <div class="ui attached segment">
                     选择项目:
                     <div class="ui selection compact dropdown dd-project">
@@ -73,18 +73,18 @@
                     </div>
                 </div>
                 <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
-                    <table class="ui small sortable celled striped compact table segment tb-translate">
-                        <thead>
-                            <th class="three wide">名称</th>
-                            <!-- <th class="three wide">描述</th> -->
-                            <th class="five wide">翻译</th>
-                            <th class="three wide">标签</th>
-                            <th class="three wide">创建时间</th>
-                            <th class="one wide">状态</th>
-                            <th class="one wide">处理</th>
-                        </thead>
-                        <tbody th:remove="all-but-first">
-                            <!--/*/
+                <table class="ui small sortable celled striped compact table segment tb-translate">
+                    <thead>
+                        <th class="three wide">名称</th>
+                        <!-- <th class="three wide">描述</th> -->
+                        <th class="five wide">翻译</th>
+                        <th class="three wide">标签</th>
+                        <th class="three wide">创建时间</th>
+                        <th class="one wide">状态</th>
+                        <th class="one wide">处理</th>
+                    </thead>
+                    <tbody th:remove="all-but-first">
+                        <!--/*/
                             <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
                                 <td th:text="${t.key}">app.name</td>
                                 <td>
@@ -110,41 +110,41 @@
                                         <i class="dropdown icon"></i>
                                         <div class="menu">
                                             <div class="item ddmi-edit">编辑</div>
-                                            <div sec:authorize="hasRole('ROLE_ADMIN')" class="item ddmi-delete">删除</div>
+                                            <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (t.creator == user.username)}" class="item ddmi-delete">删除</div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                             /*/-->
-                            <tr>
-                                <td>app.name</td>
-                                <td>应用名称</td>
-                                <td>
-                                    <textarea rows="1">测试</textarea>
-                                </td>
-                                <td>
-                                    <textarea rows="1">test</textarea>
-                                </td>
-                                <td>2016/05/10 12:00:00</td>
-                                <td>待翻译</td>
-                                <td>
-                                    <div class="ui dropdown">
-                                        <div class="text">操作</div>
-                                        <i class="dropdown icon"></i>
-                                        <div class="menu">
-                                            <div class="item">删除</div>
-                                        </div>
+                        <tr>
+                            <td>app.name</td>
+                            <td>应用名称</td>
+                            <td>
+                                <textarea rows="1">测试</textarea>
+                            </td>
+                            <td>
+                                <textarea rows="1">test</textarea>
+                            </td>
+                            <td>2016/05/10 12:00:00</td>
+                            <td>待翻译</td>
+                            <td>
+                                <div class="ui dropdown">
+                                    <div class="text">操作</div>
+                                    <i class="dropdown icon"></i>
+                                    <div class="menu">
+                                        <div class="item">删除</div>
                                     </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <!-- <tfoot>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- <tfoot>
                             <tr>
                                 <td colspan="6">
                                 </td>
                             </tr>
                         </tfoot> -->
-                    </table>
+                </table>
                 <!-- </div> -->
                 <!-- <div class="ui segment"> -->
                 <div class="ui basic label">
@@ -363,8 +363,7 @@
 
         });
 
-        $('textarea.ta-translteItem').blur(function(event) {
-            var $ta = $(this);
+        function updateHandler($ta) {
 
             if (typeof($ta.attr('title')) == "undefined" && !$ta.val()) {
                 return;
@@ -386,7 +385,17 @@
                     toastr.success('更新失败!');
                 }
             });
-        });
+        }
+
+        $('textarea.ta-translteItem').blur(function(event) {
+            var $ta = $(this);
+            updateHandler($ta);
+        }).keyup(function(event) {
+            var $ta = $(this);
+            if (event.ctrlKey && event.keyCode == 13) {
+                updateHandler($ta);
+            }
+        });;
 
     });
     </script>

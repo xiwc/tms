@@ -191,8 +191,8 @@ public class TranslateController extends BaseController {
 		log(Action.Create, Target.Translate, translate);
 
 		final Mail mail = Mail.instance().addWatchers(translate)
-				.addUsers(getUser(translate.getCreator()))
-				.removeUser(getLoginUser());
+				.addUsers(getUser(translate.getCreator()));
+		// .removeUser(getLoginUser());
 
 		final String href = baseURL + translateAction + "?projectId="
 				+ projectId
@@ -262,8 +262,8 @@ public class TranslateController extends BaseController {
 			userRepository.saveAndFlush(loginUser);
 
 			final Mail mail = Mail.instance().addWatchers(translate)
-					.addUsers(getUser(translate.getCreator()))
-					.removeUser(getLoginUser());
+					.addUsers(getUser(translate.getCreator()));
+			// .removeUser(getLoginUser());
 
 			final String href = baseURL + translateAction + "?projectId="
 					+ translate.getProject().getId() + "&id="
@@ -465,8 +465,8 @@ public class TranslateController extends BaseController {
 			log(Action.Update, Target.Translate, translate);
 
 			final Mail mail = Mail.instance().addWatchers(translate)
-					.addUsers(getUser(translate.getCreator()))
-					.removeUser(getLoginUser());
+					.addUsers(getUser(translate.getCreator()));
+			// .removeUser(getLoginUser());
 
 			final String href = baseURL + translateAction + "?projectId="
 					+ translate.getProject().getId() + "&id="
@@ -503,11 +503,13 @@ public class TranslateController extends BaseController {
 
 	@RequestMapping(value = "delete", method = RequestMethod.POST)
 	@ResponseBody
-	@Secured({ "ROLE_SUPER", "ROLE_ADMIN" })
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody delete(@RequestParam("id") Long id,
 			@RequestParam("baseURL") String baseURL) {
 
 		final Translate translate = translateRepository.findOne(id);
+
+		// TODO 权限判断: 普通用户 只能删除自己创建的, 管理员可以删除所有.
 
 		Long projectId = translate.getProject().getId();
 		final Mail mail2 = Mail.instance().parseTranslate(translate);
@@ -528,8 +530,8 @@ public class TranslateController extends BaseController {
 		final User loginUser = getLoginUser();
 
 		final Mail mail = Mail.instance().addWatchers(translate)
-				.addUsers(getUser(translate.getCreator()))
-				.removeUser(loginUser);
+				.addUsers(getUser(translate.getCreator()));
+		// .removeUser(loginUser);
 
 		final String href = baseURL + translateAction + "?projectId="
 				+ projectId;
@@ -567,8 +569,8 @@ public class TranslateController extends BaseController {
 		final Translate translate = label.getTranslate();
 
 		final Mail mail = Mail.instance().addWatchers(translate)
-				.addUsers(getUser(translate.getCreator()))
-				.removeUser(getLoginUser());
+				.addUsers(getUser(translate.getCreator()));
+		// .removeUser(getLoginUser());
 
 		final String href = baseURL + translateAction + "?projectId="
 				+ translate.getProject().getId() + "&id=" + translate.getId();

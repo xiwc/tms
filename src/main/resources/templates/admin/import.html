@@ -15,6 +15,7 @@
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -88,6 +89,7 @@
         </div>
     </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
+    <div th:replace="admin/template :: ad-import-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
@@ -96,14 +98,27 @@
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
 
+        $('.ui.dropdown.dd-labels').dropdown({
+            allowAdditions: true
+        });
+
+        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+
         $('.btn-import').click(function(event) {
 
-            $('.ad-handle-confirm').modal({
+            $('.ad-import-confirm').modal({
+                autofocus: false,
+                onShow: function() {
+                    $(this).find('.ui.form').form('clear');
+                },
                 onApprove: function() {
+                    var $md = $(this);
                     var projectId = $('.dd-project').dropdown('get value');
                     var languageId = $('.dd-language').dropdown('get value');
                     var type = $('.dd-type').dropdown('get value');
                     var content = $('.ta-content').val();
+                    var data = Utils.formData('.ad-import-confirm .ui.form');
+                    var notify = $md.find('.ui.checkbox').checkbox('is checked');
 
                     if (content) {
                         if (type == 1) { // JSON
@@ -119,6 +134,9 @@
                             projectId: projectId,
                             languageId: languageId,
                             type: type,
+                            labels: data.labels,
+                            notify: notify ? 1 : 0,
+                            baseURL: baseURL,
                             content: content
                         }, function(data, textStatus, xhr) {
                             if (data.success) {

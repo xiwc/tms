@@ -142,6 +142,23 @@ public class AdminController extends BaseController {
 		return "admin/project";
 	}
 
+	@RequestMapping("language")
+	@Secured("ROLE_ADMIN")
+	public String language(Model model) {
+
+		logger.debug("Enter method...");
+
+		List<Language> languages = languageRepository.findAll();
+
+		List<User> users = userRepository.findAll();
+
+		model.addAttribute("languages", languages);
+		model.addAttribute("users", users);
+		model.addAttribute("user", getLoginUser());
+
+		return "admin/language";
+	}
+
 	@RequestMapping("feedback")
 	public String feedback(Model model) {
 		return "admin/feedback";
@@ -241,6 +258,7 @@ public class AdminController extends BaseController {
 		model.addAttribute("page", page);
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
+		model.addAttribute("user", getLoginUser());
 
 		return "admin/translate";
 	}
@@ -283,10 +301,23 @@ public class AdminController extends BaseController {
 			languages2.addAll(languages);
 		}
 
+		// login user labels
+		List<Label> labels = labelRepository
+				.findByCreator(WebUtil.getUsername());
+		Set<String> lbls = null;
+		if (labels != null) {
+			lbls = labels.stream().map((label) -> {
+				return label.getName();
+			}).collect(Collectors.toSet());
+		} else {
+			lbls = new HashSet<String>();
+		}
+
 		model.addAttribute("projects", projects);
 		model.addAttribute("translates", translates);
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
+		model.addAttribute("labels", lbls);
 
 		return "admin/import";
 	}

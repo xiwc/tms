@@ -29,6 +29,7 @@ import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
+import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
@@ -40,6 +41,8 @@ import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateItemRepository;
 import com.lhjz.portal.repository.TranslateRepository;
+import com.lhjz.portal.repository.UserRepository;
+import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.WebUtil;
 
 /**
@@ -71,6 +74,9 @@ public class ProjectController extends BaseController {
 	LabelRepository labelRepository;
 
 	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
 	AuthorityRepository authorityRepository;
 
 	private boolean isContainsMainLanguage(ProjectForm projectForm) {
@@ -96,6 +102,12 @@ public class ProjectController extends BaseController {
 					.collect(Collectors.joining("<br/>")));
 		}
 
+		Project project3 = projectRepository
+				.findOneByName(projectForm.getName());
+		if (project3 != null) {
+			return RespBody.failed("同名项目已经存在!");
+		}
+
 		if (!isContainsMainLanguage(projectForm)) {
 			return RespBody.failed("设置语言必须包含主语言!");
 		}
@@ -106,9 +118,10 @@ public class ProjectController extends BaseController {
 		project.setDescription(projectForm.getDesc());
 		project.setName(projectForm.getName());
 		project.setStatus(Status.New);
-		project.setLanguage(languageRepository.findOne(projectForm
-				.getLanguage()));
+		project.setLanguage(
+				languageRepository.findOne(projectForm.getLanguage()));
 
+		// 项目语言保存
 		String[] lngArr = projectForm.getLanguages().split(",");
 		List<Long> collect = Arrays.asList(lngArr).stream().map((lng) -> {
 			return Long.valueOf(lng);
@@ -118,14 +131,35 @@ public class ProjectController extends BaseController {
 
 		project.getLanguages().addAll(languages);
 
+		// 项目关注者保存
+		List<User> watchers = null;
+		if (StringUtil.isNotEmpty(projectForm.getWatchers())) {
+
+			watchers = userRepository.findAll(
+					Arrays.asList(projectForm.getWatchers().split(",")));
+			project.getWatchers().addAll(watchers);
+
+		}
+
 		Project project2 = projectRepository.saveAndFlush(project);
 
+		// 保存项目语言关系
 		for (Language language : languages) {
 			language.getProjects().add(project2);
 		}
 
 		languageRepository.save(languages);
 		languageRepository.flush();
+
+		// 保存项目关注者关系
+		if (watchers != null) {
+			for (User user : watchers) {
+				user.getWatcherProjects().add(project2);
+			}
+
+			userRepository.save(watchers);
+			userRepository.flush();
+		}
 
 		log(Action.Create, Target.Project, projectForm);
 
@@ -136,6 +170,16 @@ public class ProjectController extends BaseController {
 
 		for (Language language : lngs) {
 			if (language.getId().equals(lng.getId())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean isExistWatcher(Set<User> watchers, User user) {
+
+		for (User watcher : watchers) {
+			if (watcher.getUsername().equals(user.getUsername())) {
 				return true;
 			}
 		}
@@ -161,16 +205,24 @@ public class ProjectController extends BaseController {
 		Project project = projectRepository.findOne(id);
 
 		project.setDescription(projectForm.getDesc());
-		project.setName(projectForm.getName());
+
+		Project project2 = projectRepository
+				.findOneByName(projectForm.getName());
+		if (project2 == null) {
+			project.setName(projectForm.getName());
+		}
+
 		project.setStatus(Status.Updated);
 		project.setUpdateDate(new Date());
 		project.setUpdater(WebUtil.getUsername());
 
+		// 主语言如果变化,则保存
 		if (!project.getLanguage().getId().equals(projectForm.getLanguage())) {
-			project.setLanguage(languageRepository.findOne(projectForm
-					.getLanguage()));
+			project.setLanguage(
+					languageRepository.findOne(projectForm.getLanguage()));
 		}
 
+		// 项目语言保存
 		String[] lngArr = projectForm.getLanguages().split(",");
 		List<Long> collect = Arrays.asList(lngArr).stream().map((lng) -> {
 			return Long.valueOf(lng);
@@ -178,7 +230,7 @@ public class ProjectController extends BaseController {
 
 		Set<Language> languages = project.getLanguages();
 		for (Language language : languages) {
-			// 语言不存在
+			// 语言不存在,被删除了
 			if (!collect.contains(language.getId())) {
 				language.getProjects().remove(project);
 			}
@@ -188,6 +240,7 @@ public class ProjectController extends BaseController {
 				languageRepository.findAll(collect));
 
 		for (Language language : languages2) {
+			// 新添加的语言
 			if (!isExistLanguage(languages, language)) {
 				language.getProjects().add(project);
 			}
@@ -196,6 +249,40 @@ public class ProjectController extends BaseController {
 		languageRepository.save(languages);
 		languageRepository.save(languages2);
 		languageRepository.flush();
+
+		if (StringUtil.isNotEmpty(projectForm.getWatchers())) {
+			List<String> watchers = Arrays
+					.asList(projectForm.getWatchers().split(","));
+
+			Set<User> watchers2 = project.getWatchers();
+			for (User user : watchers2) {
+				if (!watchers.contains(user.getUsername())) {
+					user.getWatcherProjects().remove(project);
+				}
+			}
+
+			List<User> watcher3 = userRepository.findAll(watchers);
+			for (User user : watcher3) {
+				if (!isExistWatcher(watchers2, user)) {
+					user.getWatcherProjects().add(project);
+				}
+			}
+
+			userRepository.save(watchers2);
+			userRepository.save(watcher3);
+			languageRepository.flush();
+
+			project.setWatchers(new HashSet<User>(watcher3));
+
+		} else { // 删除全部关注者
+			project.getWatchers().stream().forEach((w) -> {
+				w.getWatcherProjects().remove(project);
+			});
+			userRepository.save(project.getWatchers());
+			userRepository.flush();
+
+			project.getWatchers().clear();
+		}
 
 		project.setLanguages(languages2);
 
@@ -217,6 +304,7 @@ public class ProjectController extends BaseController {
 			return RespBody.failed("删除项目不存在！");
 		}
 
+		// 解除项目&语言关系
 		Set<Language> languages = project.getLanguages();
 		for (Language language : languages) {
 			language.getProjects().remove(project);
@@ -225,6 +313,7 @@ public class ProjectController extends BaseController {
 		languageRepository.save(languages);
 		languageRepository.flush();
 
+		// 删除项目下全部翻译
 		Set<Translate> translates = project.getTranslates();
 		Set<TranslateItem> translateItems = new HashSet<TranslateItem>();
 		Set<Label> labels = new HashSet<Label>();
@@ -250,11 +339,26 @@ public class ProjectController extends BaseController {
 		labelRepository.deleteInBatch(labels);
 		labelRepository.flush();
 
+		// 解除项目关注者和用户关系
+		Set<User> watchers = project.getWatchers();
+		for (User user : watchers) {
+			user.getWatcherProjects().remove(project);
+		}
+		userRepository.save(watchers);
+		userRepository.flush();
+
+		// 解除项目用户&项目关系
+		Set<User> users = project.getUsers();
+		users.stream().forEach((u) -> {
+			u.getProjects().remove(project);
+		});
+		userRepository.save(users);
+		userRepository.flush();
+
 		translateRepository.deleteInBatch(translates);
 		translateRepository.flush();
 
-		// project.setTranslates(null);
-
+		// 待关系都解除后,删除项目
 		projectRepository.delete(project);
 		projectRepository.flush();
 

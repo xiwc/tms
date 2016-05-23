@@ -159,6 +159,38 @@
             <div class="ui ok positive button">确定</div>
         </div>
     </div>
+    <!-- import handle confirm -->
+    <div th:fragment="ad-import-confirm" class="ui small modal ad-import-confirm">
+        <!-- <i class="close icon"></i> -->
+        <div class="header">
+            操作确认
+        </div>
+        <div class="content">
+            <div class="ui form">
+                <div class="field">
+                    <label>标签:</label>
+                    <div class="ui fluid multiple search selection dropdown dd-labels">
+                        <input name="labels" type="hidden">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">标签</div>
+                        <div class="menu">
+                            <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <div class="ui checkbox">
+                        <input type="checkbox" name="notify">
+                        <label>邮件通知(通知项目关注者)</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
     <!-- hot news edit modal -->
     <div th:fragment="ad-news-edit" class="ui small modal ad-news-edit">
         <!-- <i class="close icon"></i> -->
@@ -408,6 +440,65 @@
                             </div>
                         </div>
                     </div>
+                    <div class="field">
+                        <label>关注者:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-watchers">
+                            <input name="watchers" type="hidden" th:value="${user.username}">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">关注者</div>
+                            <div class="menu">
+                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:text="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- language add modal -->
+    <div th:fragment="ad-language-add" class="ui small modal ad-language-add">
+        <div class="header">
+            添加语言
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="required field">
+                        <label>名称:</label>
+                        <input name="name" type="text" placeholder="2到10位字母下划线" th:value="''" value="STEP">
+                    </div>
+                    <div class="required field">
+                        <label>描述:</label>
+                        <textarea name="desc" rows="2" placeholder="描述" th:text="''">项目描述</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- language edit modal -->
+    <div th:fragment="ad-language-edit" class="ui small modal ad-language-edit">
+        <div class="header">
+            编辑语言
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="required field">
+                        <label>名称:</label>
+                        <input name="name" type="text" placeholder="2到10位字母下划线" th:value="''" value="STEP">
+                    </div>
+                    <div class="required field">
+                        <label>描述:</label>
+                        <textarea name="desc" rows="2" placeholder="描述" th:text="''">项目描述</textarea>
+                    </div>
                 </div>
             </div>
         </div>
@@ -451,6 +542,17 @@
                             <div class="default text">主语言</div>
                             <div class="menu">
                                 <div th:each="l : ${languages}" class="item" th:attr="data-value=${l.id}" th:text="${l.description + '[' + l.name + ']'}"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label>关注者:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-watchers">
+                            <input name="watchers" type="hidden">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">关注者</div>
+                            <div class="menu">
+                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:text="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}"></div>
                             </div>
                         </div>
                     </div>
