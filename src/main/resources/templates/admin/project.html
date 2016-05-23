@@ -124,9 +124,31 @@
         $('.pp').popup();
         $('.ui.dropdown.dd-actions').dropdown({
             action: 'hide'
+        });        
+        $('.ui.dropdown.dd-languages').dropdown({
+            onLabelRemove: function(value) {
+                $dd = $(this);
+                $dd2 = $dd.closest('.ui.form').find('.ui.dropdown.dd-language');
+                if($dd2.dropdown('get value') == value) {
+                    $dd2.dropdown('clear');
+                }
+                // console.log(value);
+            }
+        });        
+        $('.ui.dropdown.dd-language').dropdown({
+            onChange: function(value) {
+                $dd = $(this);
+                $dd2 = $dd.closest('.ui.form').find('.ui.dropdown.dd-languages');
+                var v2 = $dd2.dropdown('get value');
+                var arr = v2 ? v2.split(',') : [];
+                if(arr.indexOf(value) === -1) {
+                    $dd2.dropdown('set selected', value);
+                }
+                // console.log(value);
+            }
         });
 
-        $('.ad-project-add').find('input[name="name"]').keyup(function(event) {
+        $('.ad-project-add,.ad-project-edit').find('input[name="name"]').keyup(function(event) {
             $(this).val($(this).val().toUpperCase());
         });
 

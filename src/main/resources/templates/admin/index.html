@@ -27,9 +27,6 @@
     <script th:replace="admin/template :: hotNewsItemTpl"></script>
     <script th:replace="admin/template :: moreNewsItemTpl"></script>
     <script th:replace="admin/template :: articleItemTpl"></script>
-    <style type="text/css">
-        
-    </style>
 </head>
 
 <body class="admin-index">
@@ -49,9 +46,9 @@
         <a class="item ad-index-btn-menu">
             <i class="content icon"></i> 菜单
         </a>
-        <div class="title item">
+        <a class="title item" th:href="@{/admin}" href="index.html">
             <b>TMS</b>
-        </div>
+        </a>
         <div class="right menu">
             <div class="item link ad-item-feedback">
                 <div class="" th:attrappend="data-url=${#httpServletRequest.requestURI}">反馈 </div>

@@ -73,18 +73,18 @@
                     </div>
                 </div>
                 <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
-                    <table class="ui small sortable celled striped compact table segment tb-translate">
-                        <thead>
-                            <th class="three wide">名称</th>
-                            <!-- <th class="three wide">描述</th> -->
-                            <th class="five wide">翻译</th>
-                            <th class="three wide">标签</th>
-                            <th class="three wide">创建时间</th>
-                            <th class="one wide">状态</th>
-                            <th class="one wide">处理</th>
-                        </thead>
-                        <tbody th:remove="all-but-first">
-                            <!--/*/
+                <table class="ui small sortable celled striped compact table segment tb-translate">
+                    <thead>
+                        <th class="three wide">名称</th>
+                        <!-- <th class="three wide">描述</th> -->
+                        <th class="five wide">翻译</th>
+                        <th class="three wide">标签</th>
+                        <th class="three wide">创建时间</th>
+                        <th class="one wide">状态</th>
+                        <th class="one wide">处理</th>
+                    </thead>
+                    <tbody th:remove="all-but-first">
+                        <!--/*/
                             <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
                                 <td th:text="${t.key}">app.name</td>
                                 <td>
@@ -110,41 +110,41 @@
                                         <i class="dropdown icon"></i>
                                         <div class="menu">
                                             <div class="item ddmi-edit">编辑</div>
-                                            <div sec:authorize="hasRole('ROLE_ADMIN')" class="item ddmi-delete">删除</div>
+                                            <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (t.creator == user.username)}" class="item ddmi-delete">删除</div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
                             /*/-->
-                            <tr>
-                                <td>app.name</td>
-                                <td>应用名称</td>
-                                <td>
-                                    <textarea rows="1">测试</textarea>
-                                </td>
-                                <td>
-                                    <textarea rows="1">test</textarea>
-                                </td>
-                                <td>2016/05/10 12:00:00</td>
-                                <td>待翻译</td>
-                                <td>
-                                    <div class="ui dropdown">
-                                        <div class="text">操作</div>
-                                        <i class="dropdown icon"></i>
-                                        <div class="menu">
-                                            <div class="item">删除</div>
-                                        </div>
+                        <tr>
+                            <td>app.name</td>
+                            <td>应用名称</td>
+                            <td>
+                                <textarea rows="1">测试</textarea>
+                            </td>
+                            <td>
+                                <textarea rows="1">test</textarea>
+                            </td>
+                            <td>2016/05/10 12:00:00</td>
+                            <td>待翻译</td>
+                            <td>
+                                <div class="ui dropdown">
+                                    <div class="text">操作</div>
+                                    <i class="dropdown icon"></i>
+                                    <div class="menu">
+                                        <div class="item">删除</div>
                                     </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <!-- <tfoot>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <!-- <tfoot>
                             <tr>
                                 <td colspan="6">
                                 </td>
                             </tr>
                         </tfoot> -->
-                    </table>
+                </table>
                 <!-- </div> -->
                 <!-- <div class="ui segment"> -->
                 <div class="ui basic label">
@@ -363,8 +363,7 @@
 
         });
 
-        $('textarea.ta-translteItem').blur(function(event) {
-            var $ta = $(this);
+        function updateHandler($ta) {
 
             if (typeof($ta.attr('title')) == "undefined" && !$ta.val()) {
                 return;
@@ -386,7 +385,17 @@
                     toastr.success('更新失败!');
                 }
             });
-        });
+        }
+
+        $('textarea.ta-translteItem').blur(function(event) {
+            var $ta = $(this);
+            updateHandler($ta);
+        }).keyup(function(event) {
+            var $ta = $(this);
+            if (event.ctrlKey && event.keyCode == 13) {
+                updateHandler($ta);
+            }
+        });;
 
     });
     </script>
