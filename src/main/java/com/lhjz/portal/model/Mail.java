@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.lhjz.portal.entity.Label;
+import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
 import com.lhjz.portal.entity.security.User;
@@ -34,6 +35,8 @@ public class Mail {
 	static Logger logger = LoggerFactory.getLogger(Mail.class);
 
 	private Set<String> set = new HashSet<String>();
+
+	private Set<String> setHref = new HashSet<String>();
 
 	private Map<String, String> map = new HashMap<String, String>();
 
@@ -112,12 +115,7 @@ public class Mail {
 	public Mail addWatchers(Translate translate) {
 
 		// 项目关注者
-		Set<User> watchers = translate.getProject().getWatchers();
-		Set<String> watcherMails = watchers.stream().map((user) -> {
-			return user.getMails();
-		}).collect(Collectors.toSet());
-
-		this.addAll(watcherMails);
+		this.addWatchers(translate.getProject());
 
 		// 翻译关注者
 		Set<User> watchers2 = translate.getWatchers();
@@ -126,6 +124,19 @@ public class Mail {
 		}).collect(Collectors.toSet());
 
 		this.addAll(watcherMails2);
+
+		return this;
+	}
+
+	public Mail addWatchers(Project project) {
+
+		// 项目关注者
+		Set<User> watchers = project.getWatchers();
+		Set<String> watcherMails = watchers.stream().map((user) -> {
+			return user.getMails();
+		}).collect(Collectors.toSet());
+
+		this.addAll(watcherMails);
 
 		return this;
 	}
@@ -155,6 +166,29 @@ public class Mail {
 		logger.info("发送邮件对象: {}", StringUtil.join(",", mails));
 
 		return mails;
+	}
+
+	public void addHref(String baseURL, String translateAction,
+			Long projectId, List<Translate> translates) {
+
+		for (Translate translate2 : translates) {
+			this.addHref(baseURL, translateAction, projectId, translate2);
+		}
+
+	}
+
+	public void addHref(String baseURL, String translateAction,
+			Long projectId, Translate translate) {
+
+		String href = baseURL + translateAction + "?projectId=" + projectId
+				+ "&id=" + translate.getId();
+		this.setHref.add(StringUtil.replaceByKV("<a href=\"{href}\">{text}</a>",
+				"href", href, "text", href));
+	}
+
+	public String hrefs() {
+
+		return StringUtil.join("<br/>", this.setHref);
 	}
 
 }

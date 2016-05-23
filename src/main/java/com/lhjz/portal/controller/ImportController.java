@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,21 +29,30 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.lhjz.portal.base.BaseController;
+import com.lhjz.portal.component.MailSender2;
+import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
+import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.AuthorityRepository;
+import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateItemRepository;
 import com.lhjz.portal.repository.TranslateRepository;
+import com.lhjz.portal.util.DateUtil;
 import com.lhjz.portal.util.JsonUtil;
+import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
+import com.lhjz.portal.util.TemplateUtil;
+import com.lhjz.portal.util.ThreadUtil;
 import com.lhjz.portal.util.WebUtil;
 
 /**
@@ -71,13 +81,21 @@ public class ImportController extends BaseController {
 	LanguageRepository languageRepository;
 
 	@Autowired
+	LabelRepository labelRepository;
+
+	@Autowired
 	AuthorityRepository authorityRepository;
+
+	@Autowired
+	MailSender2 mailSender;
+
+	String translateAction = "admin/translate";
 
 	private void joinKV(JsonObject jsonObject, String key,
 			Map<String, String> kvMaps) {
 		for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-			String k = StringUtil.isEmpty(key) ? entry.getKey() : StringUtil
-					.join2(".", key, entry.getKey());
+			String k = StringUtil.isEmpty(key) ? entry.getKey()
+					: StringUtil.join2(".", key, entry.getKey());
 			JsonElement jsonE = entry.getValue();
 			if (jsonE.isJsonPrimitive()) {
 				kvMaps.put(k, jsonE.getAsString());
@@ -93,6 +111,9 @@ public class ImportController extends BaseController {
 	public RespBody save(@RequestParam("projectId") Long projectId,
 			@RequestParam("languageId") Long languageId,
 			@RequestParam("type") Long type,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam(value = "notify", defaultValue = "0") Boolean notify,
+			@RequestParam(value = "labels", required = false) String labels,
 			@RequestParam("content") String content) {
 
 		Project project = projectRepository.findOne(projectId);
@@ -111,24 +132,26 @@ public class ImportController extends BaseController {
 			}
 			Set<Object> keySet = properties.keySet();
 			for (Object k : keySet) {
-				kvMaps.put(String.valueOf(k), properties.getProperty(
-						String.valueOf(k), StringUtil.EMPTY));
+				kvMaps.put(String.valueOf(k), properties
+						.getProperty(String.valueOf(k), StringUtil.EMPTY));
 			}
 		}
 
 		List<TranslateItem> translateItems2 = new ArrayList<TranslateItem>();
 		List<Translate> translates2 = new ArrayList<Translate>();
+		Set<Translate> translates3 = new HashSet<Translate>();
 
 		for (String key : kvMaps.keySet()) {
 			List<Translate> translates = translateRepository
 					.findByKeyAndProject(key, project);
-			if (translates.size() > 0) {
+			if (translates.size() > 0) { // 已经存在,做更新处理
 				Translate translate2 = translates.get(0);
 				Set<TranslateItem> translateItems = translate2
 						.getTranslateItems();
 				Language language = null;
 				for (TranslateItem translateItem : translateItems) {
-					if (translateItem.getLanguage().getId().equals(languageId)) {
+					if (translateItem.getLanguage().getId()
+							.equals(languageId)) {
 						language = translateItem.getLanguage();
 						translateItem.setContent(kvMaps.get(key));
 						translateItems2.add(translateItem);
@@ -144,9 +167,14 @@ public class ImportController extends BaseController {
 					translateItem.setStatus(Status.New);
 					translateItem.setTranslate(translate2);
 
+					translate2.getTranslateItems().add(translateItem);
+
 					translateItems2.add(translateItem);
 				}
-			} else {
+
+				translates3.add(translate2);
+
+			} else { // 不存在, 做新建处理
 				Translate translate = new Translate();
 				translate.setCreateDate(new Date());
 				translate.setCreator(WebUtil.getUsername());
@@ -182,14 +210,91 @@ public class ImportController extends BaseController {
 		translateItemRepository.save(translateItems2);
 		translateItemRepository.flush();
 
+		// 更新翻译search属性
+		for (Translate translate : translates3) {
+			translate.setSearch(translate.toString());
+			translate.setUpdateDate(new Date());
+			translate.setUpdater(WebUtil.getUsername());
+		}
+		translateRepository.save(translates3);
+		translateRepository.flush();
+
+		// 只有新建的会打标签
+		String[] lbls = null;
+		if (StringUtil.isNotEmpty(labels)) {
+			lbls = labels.split(",");
+		}
+
+		// TODO 不是新建只是更新的 search 没有更新.
 		for (Translate translate : translates2) {
 			translate.setSearch(translate.toString());
 		}
 
-		translateRepository.save(translates2);
+		List<Translate> translates = translateRepository.save(translates2);
 		translateRepository.flush();
-		
+
+		Mail mail2 = Mail.instance();
+		if (lbls != null) {
+			for (Translate translate : translates) {
+
+				Set<Label> labels2 = new HashSet<>();
+				for (String lbl : lbls) {
+					Label label = new Label();
+					label.setCreateDate(new Date());
+					label.setCreator(WebUtil.getUsername());
+					label.setName(lbl);
+					label.setStatus(Status.New);
+					label.setTranslate(translate);
+
+					labels2.add(label);
+				}
+				labelRepository.save(labels2);
+				labelRepository.flush();
+
+				translate.setLabels(labels2);
+
+			}
+		}
+
+		// TODO 再次保存labels更新
+		// translates = translateRepository.save(translates2);
+		// translateRepository.flush();
+
+		mail2.addHref(baseURL, translateAction, projectId, translates);
+
 		log(Action.Import, Target.Import, content);
+
+		final Mail mail = Mail.instance().addWatchers(project);
+
+		final User loginUser = getLoginUser();
+
+		final String href = baseURL + translateAction + "?projectId="
+				+ projectId;
+
+		// 如果邮件通知
+		if (notify && mail.get().length > 0) {
+
+			ThreadUtil.exec(() -> {
+
+				try {
+					mailSender.sendHtml(
+							String.format("TMS-翻译导入_%s",
+									DateUtil.format(new Date(),
+											DateUtil.FORMAT2)),
+							TemplateUtil.process(
+									"templates/mail/translate-import",
+									MapUtil.objArr2Map("user", loginUser,
+											"importDate", new Date(), "href",
+											href, "body", mail2.hrefs())),
+							mail.get());
+					logger.info("批量导入翻译邮件发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("批量导入翻译邮件发送失败！");
+				}
+
+			});
+		}
 
 		return RespBody.succeed(kvMaps.size());
 	}
@@ -241,8 +346,9 @@ public class ImportController extends BaseController {
 			List<String> list = new ArrayList<String>();
 			for (String k : map.keySet()) {
 				String v = map.get(k);
-				v = StringUtil.join("\\\n", (StringUtil.isNotEmpty(v) ? v
-						: StringUtil.EMPTY).split("\n"));
+				v = StringUtil.join("\\\n",
+						(StringUtil.isNotEmpty(v) ? v : StringUtil.EMPTY)
+								.split("\n"));
 				list.add(k + "=" + v);
 			}
 

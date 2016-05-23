@@ -16,4 +16,5 @@ import com.lhjz.portal.entity.Language;
  */
 public interface LanguageRepository extends JpaRepository<Language, Long> {
 	
+	Language findOneByName(String name);
 }

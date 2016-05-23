@@ -191,8 +191,8 @@ public class TranslateController extends BaseController {
 		log(Action.Create, Target.Translate, translate);
 
 		final Mail mail = Mail.instance().addWatchers(translate)
-				.addUsers(getUser(translate.getCreator()))
-				.removeUser(getLoginUser());
+				.addUsers(getUser(translate.getCreator()));
+		// .removeUser(getLoginUser());
 
 		final String href = baseURL + translateAction + "?projectId="
 				+ projectId
@@ -262,8 +262,8 @@ public class TranslateController extends BaseController {
 			userRepository.saveAndFlush(loginUser);
 
 			final Mail mail = Mail.instance().addWatchers(translate)
-					.addUsers(getUser(translate.getCreator()))
-					.removeUser(getLoginUser());
+					.addUsers(getUser(translate.getCreator()));
+			// .removeUser(getLoginUser());
 
 			final String href = baseURL + translateAction + "?projectId="
 					+ translate.getProject().getId() + "&id="
@@ -465,8 +465,8 @@ public class TranslateController extends BaseController {
 			log(Action.Update, Target.Translate, translate);
 
 			final Mail mail = Mail.instance().addWatchers(translate)
-					.addUsers(getUser(translate.getCreator()))
-					.removeUser(getLoginUser());
+					.addUsers(getUser(translate.getCreator()));
+			// .removeUser(getLoginUser());
 
 			final String href = baseURL + translateAction + "?projectId="
 					+ translate.getProject().getId() + "&id="
@@ -530,8 +530,8 @@ public class TranslateController extends BaseController {
 		final User loginUser = getLoginUser();
 
 		final Mail mail = Mail.instance().addWatchers(translate)
-				.addUsers(getUser(translate.getCreator()))
-				.removeUser(loginUser);
+				.addUsers(getUser(translate.getCreator()));
+		// .removeUser(loginUser);
 
 		final String href = baseURL + translateAction + "?projectId="
 				+ projectId;
@@ -569,8 +569,8 @@ public class TranslateController extends BaseController {
 		final Translate translate = label.getTranslate();
 
 		final Mail mail = Mail.instance().addWatchers(translate)
-				.addUsers(getUser(translate.getCreator()))
-				.removeUser(getLoginUser());
+				.addUsers(getUser(translate.getCreator()));
+		// .removeUser(getLoginUser());
 
 		final String href = baseURL + translateAction + "?projectId="
 				+ translate.getProject().getId() + "&id=" + translate.getId();

@@ -15,5 +15,5 @@ import com.lhjz.portal.entity.Project;
  * 
  */
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-	
+	Project findOneByName(String name);
 }
