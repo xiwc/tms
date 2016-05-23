@@ -15,6 +15,7 @@
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -71,6 +72,16 @@
                         </tbody>
                     </table>
                 </div>
+                <div class="ui segment" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
+                    <div class="ui segment">
+                        <div class="ui blue button btn-batchCreate">批量创建用户</div>
+                    </div>
+                    <div class="ui segment form">
+                        <div class="field">
+                            <textarea name="userinfos" placeholder="格式: username,password,role,name,mail,enabled 多条换行" cols="20" rows="10"></textarea>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -96,6 +107,24 @@
             }
         });
 
+        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        $('.btn-batchCreate').click(function(event) {
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/user/batchCreate', {
+                        baseURL: baseURL,
+                        data: $('textarea[name="userinfos"]').val()
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            toastr.success('操作成功!');
+                        } else {
+                            toastr.error('操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
         $('.btn-add').click(function(event) {
 
             $('.ad-user-add').find('input[name="username"]').val('');
@@ -108,7 +137,8 @@
                         name: $('.ad-user-add').find('input[name="name"]').val(),
                         mail: $('.ad-user-add').find('input[name="mail"]').val(),
                         password: '888888',
-                        enabled: false,
+                        enabled: true,
+                        baseURL: baseURL,
                         role: $('.ad-user-add').find('input:radio:checked').val()
                     }, function(data, textStatus, xhr) {
                         if (data.success) {

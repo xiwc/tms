@@ -11,6 +11,7 @@
 	href="../../static/lib/semantic/semantic.min.css" />
 <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
 <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
 <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
 </head>
 <body>
@@ -30,12 +31,12 @@
 
 				<div class="field">
 					<div class="ui left icon input">
-						<i class="user icon"></i><input type="text" id="username" name="username" placeholder="用户名" />
+						<i class="user icon"></i><input type="text" th:value="${param.containsKey('username') ? param.username[0] : ''}" id="username" name="username" placeholder="用户名" />
 					</div>
 				</div>
 				<div class="field">
 					<div class="ui left icon input">
-						<i class="lock icon"></i> <input type="password" id="password" name="password" placeholder="密码" />
+						<i class="lock icon"></i> <input type="password" th:value="${param.containsKey('password') ? param.password[0] : ''}" id="password" name="password" placeholder="密码" />
 					</div>
 				</div>
 				<div class="ui center aligned header">
@@ -44,5 +45,12 @@
 			</div>
 		</form>
 	</div>
+	<script>
+		jQuery(document).ready(function($) {
+			if(url('?username') && url('?password')) {
+				$('form').submit();
+			}
+		});
+	</script>
 </body>
 </html>

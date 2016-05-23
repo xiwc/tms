@@ -95,11 +95,15 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="ui labels">
-                                      <a class="ui basic blue label" th:each="l : ${t.labels}">
-                                        <span th:text="${l.name}"></span> <i th:attr="data-id=${l.id}" class="icon close ico-delete"></i>
-                                      </a>
+                                <td class="td-labels">
+                                    <input type="hidden" th:each="l : ${t.labels}" th:name="${l.name}" th:value="${l.id}">
+                                    <div class="ui fluid multiple search selection dropdown dd-row-labels">
+                                        <input name="labels" type="hidden">
+                                        <i class="dropdown icon"></i>
+                                        <div class="default text">标签</div>
+                                        <div class="menu">
+                                            <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
+                                        </div>
                                     </div>
                                 </td>
                                 <td th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
@@ -198,6 +202,52 @@
             allowAdditions: true
         });
 
+        $('.ui.dropdown.dd-row-labels').each(function(index, el) {
+            var $dd = $(this);
+            var lbls = [];
+            $dd.siblings('input:hidden[name]').each(function(index, el) {
+                lbls.push($(el).attr('name'));
+            });
+            $dd.dropdown({
+                allowAdditions: true
+            }).dropdown('set selected', lbls).dropdown({
+                allowAdditions: true,
+                onAdd: function(addedValue, addedText, $addedChoice) {
+                    $.post('admin/translate/addTag', {
+                        id: $dd.closest('tr').attr('data-id'),
+                        tag: addedValue
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $dd.closest('td').prepend($('<input type="hidden">').attr('name', data.data.name).val(data.data.id));
+                            toastr.success('添加成功!');
+                        } else {
+                            $dd.dropdown('remove selected', addedValue);
+                            toastr.error(data.data, '添加失败!');
+                        }
+                    });
+                },
+                onLabelRemove: function(value) {
+                    $('.ad-delete-confirm').modal({
+                        onApprove: function() {
+                            var $h = $dd.siblings('input:hidden[name="' + value + '"]');
+                            $.post('admin/translate/deleteTag', {
+                                id: $h.val(),
+                                baseURL: baseURL
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    $h.remove();
+                                    toastr.success('删除成功!');
+                                } else {
+                                    $dd.dropdown('set selected', value);
+                                    toastr.error(data.data, '删除失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                }
+            });
+        });
+
         var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
         $(".ui.form").append($('<input name="baseURL" type="hidden" value="">').val(baseURL));
 
@@ -272,26 +322,6 @@
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
                             $btn.closest('tr').remove();
-                            toastr.success('删除成功!');
-                        } else {
-                            toastr.error('删除失败!');
-                        }
-                    });
-                }
-            }).modal('show');
-        });
-
-        $('.tb-translate').on('click', 'i.icon.ico-delete', function(event) {
-            var $icon = $(this);
-
-            $('.ad-delete-confirm').modal({
-                onApprove: function() {
-                    $.post('admin/translate/deleteTag', {
-                        id: $icon.attr('data-id'),
-                        baseURL: baseURL
-                    }, function(data, textStatus, xhr) {
-                        if (data.success) {
-                            $icon.closest('.ui.label').remove();
                             toastr.success('删除成功!');
                         } else {
                             toastr.error('删除失败!');

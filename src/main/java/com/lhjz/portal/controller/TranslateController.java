@@ -638,7 +638,10 @@ public class TranslateController extends BaseController {
 		label.setStatus(Status.New);
 		label.setTranslate(translate);
 
-		labelRepository.saveAndFlush(label);
+		Label label3 = labelRepository.saveAndFlush(label);
+		translate.getLabels().add(label3);
+
+		translateRepository.saveAndFlush(translate);
 
 		log(Action.Create, Target.Label, label);
 
