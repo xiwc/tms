@@ -4,6 +4,7 @@
 package com.lhjz.portal.controller;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
@@ -69,7 +70,8 @@ public class UserController extends BaseController {
 
 	String loginAction = "admin/login";
 
-	private RespBody createUser(String role, String baseURL, UserForm userForm) {
+	private RespBody createUser(String role, String baseURL,
+			UserForm userForm) {
 
 		if (userRepository.exists(StringUtils.trim(userForm.getUsername()))) {
 			logger.error("添加用户已经存在, ID: {}",
@@ -80,8 +82,8 @@ public class UserController extends BaseController {
 		// save username and password
 		final User user = new User();
 		user.setUsername(StringUtils.trim(userForm.getUsername()));
-		user.setPassword(passwordEncoder.encode(StringUtils.trim(userForm
-				.getPassword())));
+		user.setPassword(passwordEncoder
+				.encode(StringUtils.trim(userForm.getPassword())));
 		user.setEnabled(userForm.getEnabled());
 		user.setCreateDate(new Date());
 		user.setName(StringUtils.trim(userForm.getName()));
@@ -94,8 +96,7 @@ public class UserController extends BaseController {
 		// save default authority `ROLE_USER`
 		Authority authority = new Authority();
 		authority
-				.setId(new AuthorityId(
-						StringUtils.trim(userForm.getUsername()),
+				.setId(new AuthorityId(StringUtils.trim(userForm.getUsername()),
 						Role.ROLE_USER.name()));
 
 		authorityRepository.saveAndFlush(authority);
@@ -104,8 +105,9 @@ public class UserController extends BaseController {
 
 		if (role.equalsIgnoreCase("admin")) {
 			Authority authority2 = new Authority();
-			authority2.setId(new AuthorityId(StringUtils.trim(userForm
-					.getUsername()), Role.ROLE_ADMIN.name()));
+			authority2.setId(
+					new AuthorityId(StringUtils.trim(userForm.getUsername()),
+							Role.ROLE_ADMIN.name()));
 
 			authorityRepository.saveAndFlush(authority2);
 
@@ -125,26 +127,26 @@ public class UserController extends BaseController {
 				+ userForm.getPassword();
 
 		if (mail.get().length > 0) {
-			ThreadUtil
-					.exec(() -> {
+			ThreadUtil.exec(() -> {
 
-						try {
-							mailSender.sendHtml(String.format("TMS-用户创建_%s",
+				try {
+					Thread.sleep(3000);
+					mailSender.sendHtml(
+							String.format("TMS-用户创建_%s",
 									DateUtil.format(new Date(),
-											DateUtil.FORMAT2)), TemplateUtil
-									.process("templates/mail/user-create",
-											MapUtil.objArr2Map("user",
-													userForm2, "userRole",
-													userRole, "href", href,
-													"loginUrl", loginUrl)),
-									mail.get());
-							logger.info("创建用户邮件发送成功！");
-						} catch (Exception e) {
-							e.printStackTrace();
-							logger.error("创建用户翻译邮件发送失败！");
-						}
+											DateUtil.FORMAT7)),
+							TemplateUtil.process("templates/mail/user-create",
+									MapUtil.objArr2Map("user", userForm2,
+											"userRole", userRole, "href", href,
+											"loginUrl", loginUrl)),
+							mail.get());
+					logger.info("创建用户邮件发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("创建用户翻译邮件发送失败！");
+				}
 
-					});
+			});
 		}
 
 		return RespBody.succeed(user.getUsername());
@@ -168,8 +170,9 @@ public class UserController extends BaseController {
 				userForm.setName(StringUtils.trim(infos[3]));
 				userForm.setPassword(StringUtils.trim(infos[1]));
 				userForm.setUsername(StringUtils.trim(infos[0]));
-				userForm.setEnabled("true".equalsIgnoreCase(StringUtils
-						.trim(infos[5])) ? true : false);
+				userForm.setEnabled(
+						"true".equalsIgnoreCase(StringUtils.trim(infos[5]))
+								? true : false);
 
 				RespBody respBody = createUser(StringUtils.trim(infos[2]),
 						baseURL, userForm);
@@ -205,7 +208,9 @@ public class UserController extends BaseController {
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN" })
-	public RespBody update(@Valid UserForm userForm, BindingResult bindingResult) {
+	public RespBody update(
+			@RequestParam(value = "role", required = false) String role,
+			@Valid UserForm userForm, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			return RespBody.failed(bindingResult.getAllErrors().stream()
@@ -230,7 +235,8 @@ public class UserController extends BaseController {
 			user.setPassword(passwordEncoder.encode(userForm.getPassword()));
 		}
 
-		if (userForm.getEnabled() != null && user.getStatus() != Status.Bultin) {
+		if (userForm.getEnabled() != null
+				&& user.getStatus() != Status.Bultin) {
 			user.setEnabled(userForm.getEnabled());
 		}
 
@@ -240,6 +246,47 @@ public class UserController extends BaseController {
 
 		if (userForm.getName() != null) {
 			user.setName(userForm.getName());
+		}
+
+		if (StringUtil.isNotEmpty(role)) {
+
+			// 删除当前的权限
+			Set<Authority> authorities = user.getAuthorities();
+			authorities.stream().forEach((auth) -> {
+				auth.setUser(null);
+			});
+			authorityRepository.delete(authorities);
+			authorityRepository.flush();
+
+			user.getAuthorities().clear();
+
+			// 附加新的权限
+			// add role_user
+			Authority authority = new Authority();
+			authority.setId(
+					new AuthorityId(StringUtils.trim(userForm.getUsername()),
+							Role.ROLE_USER.name()));
+			authority.setUser(user);
+
+			Authority saveAndFlush = authorityRepository
+					.saveAndFlush(authority);
+
+			user.getAuthorities().add(saveAndFlush);
+
+			// add role_user
+			if ("admin".equalsIgnoreCase(role)) {
+				Authority authority2 = new Authority();
+				authority2.setId(new AuthorityId(
+						StringUtils.trim(userForm.getUsername()),
+						Role.ROLE_ADMIN.name()));
+				authority2.setUser(user);
+
+				Authority saveAndFlush2 = authorityRepository
+						.saveAndFlush(authority2);
+
+				user.getAuthorities().add(saveAndFlush2);
+			}
+
 		}
 
 		userRepository.saveAndFlush(user);
@@ -283,7 +330,8 @@ public class UserController extends BaseController {
 			user.setPassword(passwordEncoder.encode(userForm.getPassword()));
 		}
 
-		if (userForm.getEnabled() != null && user.getStatus() != Status.Bultin) {
+		if (userForm.getEnabled() != null
+				&& user.getStatus() != Status.Bultin) {
 			user.setEnabled(userForm.getEnabled());
 		}
 
@@ -328,7 +376,7 @@ public class UserController extends BaseController {
 
 	@RequestMapping(value = "get", method = RequestMethod.GET)
 	@ResponseBody
-	@Secured({ "ROLE_ADMIN" })
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody get(@RequestParam("username") String username) {
 
 		User user = userRepository.findOne(username);

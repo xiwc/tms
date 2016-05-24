@@ -629,6 +629,17 @@
                         <label>邮箱:</label>
                         <input name="mail" type="text" placeholder="邮箱">
                     </div>
+                    <div sec:authorize="hasRole('ROLE_SUPER')" class="inline field">
+                        <label>角色:</label>
+                        <div class="ui radio checkbox chk-user">
+                            <input type="radio" name="role" value="user" checked>
+                            <label>普通用户</label>
+                        </div>
+                        <div class="ui radio checkbox chk-admin" sec:authorize="hasRole('ROLE_SUPER')">
+                            <input type="radio" name="role" value="admin">
+                            <label>管理员</label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

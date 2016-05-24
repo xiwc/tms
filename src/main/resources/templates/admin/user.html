@@ -32,46 +32,46 @@
                 <div class="ui attached segment">
                     <div class="ui primary compact button btn-add">添加</div>
                 </div>
-                <div style="max-height: 450px; overflow-y: auto;">
-                    <table class="ui sortable celled striped compact table segment table-user">
-                        <thead>
-                            <th>用户名</th>
-                            <th>角色</th>
-                            <th>邮箱</th>
-                            <th>创建时间</th>
-                            <th>状态</th>
-                            <th>处理</th>
-                        </thead>
-                        <tbody th:remove="all-but-first">
-                            <tr th:each="user : ${users}" th:attr="data-id=${user.username}">
-                                <td th:text="${user.username}">username</td>
-                                <td>
-                                    <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small tag label user-role" th:text="${auth}"></div>
-                                </td>
-                                <td th:text="${user.mails}">test@test.com</td>
-                                <td th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
-                                <td class="user-status" th:if="${user.enabled}">
-                                    <div class="ui green small tag label">开启</div>
-                                </td>
-                                <td class="user-status" th:if="${not user.enabled}">
-                                    <div class="ui yellow small tag label">停用</div>
-                                </td>
-                                <td>
-                                    <!-- if is super role, super admin can mgr not super admin and user role -->
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                    <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny red button lhjz-btn-del">删除</div>
-                                    <!-- if is not super but admin(only can see this page, so no need judge is admin role) role, admin can only mgr user role -->
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                    <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                <!-- <div style="max-height: 450px; overflow-y: auto;"> -->
+                <table class="ui sortable celled striped compact table segment table-user">
+                    <thead>
+                        <th>用户名</th>
+                        <th>角色</th>
+                        <th>邮箱</th>
+                        <th>创建时间</th>
+                        <th>状态</th>
+                        <th>处理</th>
+                    </thead>
+                    <tbody th:remove="all-but-first">
+                        <tr th:each="user : ${users}" th:attr="data-id=${user.username}">
+                            <td class="pp" th:title="${(user.name != null) ? user.name : ''}" th:text="${user.username}">username</td>
+                            <td>
+                                <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small basic label user-role" th:text="${auth}"></div>
+                            </td>
+                            <td th:text="${user.mails}">test@test.com</td>
+                            <td th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
+                            <td class="user-status" th:if="${user.enabled}">
+                                <div class="ui green small tag label">开启</div>
+                            </td>
+                            <td class="user-status" th:if="${not user.enabled}">
+                                <div class="ui yellow small tag label">停用</div>
+                            </td>
+                            <td>
+                                <!-- if is super role, super admin can mgr not super admin and user role -->
+                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
+                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
+                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
+                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny red button lhjz-btn-del">删除</div>
+                                <!-- if is not super but admin(only can see this page, so no need judge is admin role) role, admin can only mgr user role -->
+                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
+                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
+                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
+                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- </div> -->
                 <div class="ui segment" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
                     <div class="ui segment">
                         <div class="ui blue button btn-batchCreate">批量创建用户</div>
@@ -95,6 +95,7 @@
     jQuery(function($) {
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
+        $('.pp').popup();
         $('.user-role').each(function(index, el) {
             if ($(el).text() == 'ROLE_ADMIN') {
                 $(el).text('管理员').addClass('green');
@@ -102,12 +103,12 @@
                 $(el).text('普通用户');
                 $(el).prependTo($(el).parent('td'));
             } else if ($(el).text() == 'ROLE_SUPER') {
-                $(el).text('超级管理员').addClass('black');
+                $(el).text('系统管理员').addClass('black');
                 $(el).appendTo($(el).parent('td'));
             }
         });
 
-        var baseURL = Utils.getBaseURL();//url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        var baseURL = Utils.getBaseURL(); //url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
         $('.btn-batchCreate').click(function(event) {
             $('.ad-handle-confirm').modal({
                 onApprove: function() {
@@ -226,14 +227,34 @@
                     $('.ad-user-edit').find('input[name="mail"]').val(data.data.mails);
                     $('.ad-user-edit').find('input[name="name"]').val(data.data.name);
 
+                    var authArr = data.data.authorities;
+                    var isAdmin = false;
+                    $.each(authArr, function(index, val) {
+                        if (val.id.authority == 'ROLE_ADMIN') {
+                            isAdmin = true;
+                            return false;
+                        }
+                    });
+
+                    if (($('.ad-user-edit').find('input:radio')) && isAdmin) {
+                        $('.ad-user-edit .chk-admin').checkbox('set checked');
+                    } else {
+                        $('.ad-user-edit .chk-user').checkbox('set checked');
+                    }
+
                     $('.ad-user-edit').modal({
                         onApprove: function() {
-                            $.post('admin/user/update', {
+                            var $role = $('.ad-user-edit').find('input:radio:checked');
+                            var data = {
                                 username: $btn.closest('tr').attr('data-id'),
                                 password: $('.ad-user-edit').find('input[name="password"]').val(),
                                 name: $('.ad-user-edit').find('input[name="name"]').val(),
                                 mail: $('.ad-user-edit').find('input[name="mail"]').val()
-                            }, function(data, textStatus, xhr) {
+                            };
+                            if ($role) {
+                                data.role = $role.val();
+                            }
+                            $.post('admin/user/update', data, function(data, textStatus, xhr) {
                                 if (data.success) {
                                     toastr.success('用户信息修改成功!');
                                     window.location.reload();
