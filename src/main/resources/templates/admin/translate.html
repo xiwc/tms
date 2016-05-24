@@ -79,11 +79,12 @@
                 <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
                 <table class="ui small sortable celled striped compact table segment tb-translate">
                     <thead>
-                        <th class="four wide">名称</th>
+                        <th class="three wide">名称</th>
                         <!-- <th class="three wide">描述</th> -->
                         <th class="five wide">翻译</th>
                         <th class="three wide">标签</th>
                         <th class="two wide">创建时间</th>
+                        <th class="one wide">创建者</th>
                         <th class="one wide">状态</th>
                         <th class="one wide">处理</th>
                     </thead>
@@ -111,6 +112,7 @@
                                     </div>
                                 </td>
                                 <td style="word-break: break-word;" th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td th:text="${t.creator}">admin</td>
                                 <td th:text="${t.status}">待翻译</td>
                                 <td>
                                     <div class="ui dropdown dd-actions">

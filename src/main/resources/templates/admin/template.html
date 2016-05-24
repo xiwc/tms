@@ -394,7 +394,7 @@
                     </div>
                     <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
                         <label th:text="${l.description} + ':'">中文:</label>
-                        <textarea name="zh" th:name="${l.name}" rows="1" th:placeholder="${l.description}" th:text="''">测试</textarea>
+                        <textarea name="zh" th:name="${l.name}" rows="2" th:placeholder="${l.description}" th:text="''">测试</textarea>
                     </div>
                 </div>
             </div>
@@ -595,7 +595,7 @@
                     </div>
                     <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
                         <label th:text="${l.description} + ':'">中文:</label>
-                        <textarea th:classappend="${'language'}" name="zh" th:name="${l.name}" rows="1" th:placeholder="${l.description}" th:text="''">测试</textarea>
+                        <textarea th:classappend="${'language'}" name="zh" th:name="${l.name}" rows="2" th:placeholder="${l.description}" th:text="''">测试</textarea>
                     </div>
                 </div>
             </div>
