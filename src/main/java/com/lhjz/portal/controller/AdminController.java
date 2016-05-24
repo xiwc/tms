@@ -256,6 +256,11 @@ public class AdminController extends BaseController {
 			}
 		}
 
+		if (page == null) {
+			page = new PageImpl<Translate>(new ArrayList<Translate>(),
+					pageable, 0);
+		}
+
 		List<Language> languages2 = new ArrayList<Language>();
 
 		if (languages != null && project != null
