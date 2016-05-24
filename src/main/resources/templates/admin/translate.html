@@ -36,13 +36,16 @@
                         <input type="hidden" name="project" th:value="${projectId}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">项目</div>
-                        <div class="menu" th:remove="all-but-first">
+                        <div class="menu">
+                            <a class="item" data-value="-1">全部项目</a>
                             <!--/*/
                             <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
                             /*/-->
+                            <!--/*-->
                             <a class="item" data-value="1">STEP</a>
                             <a class="item" data-value="2">WORK</a>
                             <a class="item" data-value="3">CONSOLE</a>
+                            <!--*/-->
                         </div>
                     </div>
                     <div class="ui primary compact button btn-add">添加</div>
@@ -187,7 +190,7 @@
     <input type="hidden" name="page.number" th:value="${page.number}" />
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
-    <input type="hidden" name="project.languageId" th:value="${project.language.id}" />
+    <input type="hidden" name="project.languageId" th:value="${project == null ? project.language.id : ''}" />
     <script type="text/javascript">
     jQuery(function($) {
 

@@ -185,9 +185,11 @@ public class AdminController extends BaseController {
 		Project project = null;
 		org.springframework.data.domain.Page<Translate> page = null;
 		if (projectId != null) {
-			project = projectRepository.findOne(projectId);
-			if (project == null) {
-				return "redirect:translate";
+			if (projectId != -1) {
+				project = projectRepository.findOne(projectId);
+				if (project == null) {
+					return "redirect:translate";
+				}
 			}
 		} else {
 			if (projects.size() > 0) {
@@ -196,7 +198,7 @@ public class AdminController extends BaseController {
 			}
 		}
 
-		if (project != null) {
+		if (project != null) { // 存在检索项目
 
 			languages = project.getLanguages();
 			projectId = project.getId();
@@ -223,6 +225,35 @@ public class AdminController extends BaseController {
 			} else {
 				page = translateRepository.findByProject(project, pageable);
 			}
+		} else { // 不存在指定检索项目,检索全部项目
+			projectId = projectId == -1 ? projectId : -1;
+			if (projects.size() > 0) {
+				languages = projects.get(0).getLanguages();
+
+				if (StringUtil.isNotEmpty(id)) {
+					page = translateRepository.findById(id, pageable);
+				} else if (StringUtil.isNotEmpty(my)) {
+					page = translateRepository.findByCreator(
+							WebUtil.getUsername(), pageable);
+				} else if (StringUtil.isNotEmpty(_new)) {
+					page = translateRepository.findByStatus(Status.New,
+							pageable);
+				} else if (StringUtil.isNotEmpty(languageId)) {
+					long total = translateRepository
+							.countUnTranslated(languageId);
+					List<Translate> unTranslates = translateRepository
+							.queryUnTranslated(languageId,
+									pageable.getOffset(),
+									pageable.getPageSize());
+					page = new PageImpl<Translate>(unTranslates, pageable,
+							total);
+				} else if (StringUtil.isNotEmpty(search)) {
+					String like = "%" + search + "%";
+					page = translateRepository.findBySearchLike(like, pageable);
+				} else {
+					page = translateRepository.findAll(pageable);
+				}
+			}
 		}
 
 		List<Language> languages2 = new ArrayList<Language>();
@@ -230,7 +261,7 @@ public class AdminController extends BaseController {
 		if (languages != null && project != null
 				&& project.getLanguage() != null) {
 			for (Language language : languages) {
-				if (language.getId().equals(project.getLanguage().getId())) {
+				if (language.getId().equals(project.getLanguage().getId())) { // 主语言放在第一个
 					languages2.add(0, language);
 				} else {
 					languages2.add(language);
@@ -302,8 +333,8 @@ public class AdminController extends BaseController {
 		}
 
 		// login user labels
-		List<Label> labels = labelRepository
-				.findByCreator(WebUtil.getUsername());
+		List<Label> labels = labelRepository.findByCreator(WebUtil
+				.getUsername());
 		Set<String> lbls = null;
 		if (labels != null) {
 			lbls = labels.stream().map((label) -> {
