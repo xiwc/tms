@@ -99,6 +99,10 @@
                                     <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:text="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}"></div>
                                 </div>
                             </div>
+                            <div class="ui checkbox ck-selectAll">
+                                <input type="checkbox" name="all">
+                                <label>全员发送</label>
+                            </div>
                             <div class="ui blue button btn-batchMail">群发邮件消息</div>
                         </div>
                         <div class="ui segment form">
@@ -131,6 +135,20 @@
             allowAdditions: true
         });
         $('.ui.accordion').accordion();
+        $('.ui.checkbox.ck-selectAll').checkbox({
+            onChecked: function() {
+                var $dd = $('.sg-batchMail .dd-mailUsers');
+                var alls = [];
+                $dd.find('.menu .item').each(function(index, el) {
+                    alls.push($(el).attr('data-value'));
+                });
+
+                $('.sg-batchMail .dd-mailUsers').dropdown('set selected', alls);
+            },
+            onUnchecked: function() {
+                $('.sg-batchMail .dd-mailUsers').dropdown('clear');
+            }
+        });
         $('.user-role').each(function(index, el) {
             if ($(el).text() == 'ROLE_ADMIN') {
                 $(el).text('管理员').addClass('green');
