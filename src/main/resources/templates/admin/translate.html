@@ -32,12 +32,12 @@
                 <div th:replace="admin/template :: ad-page-header ('翻译管理', 'translate')"></div>
                 <div class="ui attached segment">
                     选择项目:
-                    <div class="ui selection compact dropdown dd-project">
+                    <div class="ui selection dropdown dd-project">
                         <input type="hidden" name="project" th:value="${projectId}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">项目</div>
                         <div class="menu">
-                            <a class="item" data-value="-1">全部项目</a>
+                            <a class="item" th:href="@{/admin/translate(projectId=${'-1'})}" th:title="${'全部项目'}" data-value="-1">全部项目</a>
                             <!--/*/
                             <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
                             /*/-->
@@ -57,7 +57,7 @@
                     </div>
                     &nbsp;&nbsp;
                     <div class="ui label">语言:</div>
-                    <div class="ui selection compact dropdown dd-languages">
+                    <div class="ui selection dropdown dd-languages">
                         <input type="hidden" name="language" th:value="${param.containsKey('languageId') ? param.languageId[0] : ''}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">按未翻译语言过滤</div>
@@ -190,7 +190,7 @@
     <input type="hidden" name="page.number" th:value="${page.number}" />
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
-    <input type="hidden" name="project.languageId" th:value="${project == null ? project.language.id : ''}" />
+    <input type="hidden" name="project.languageId" th:value="${project != null ? project.language.id : ''}" />
     <script type="text/javascript">
     jQuery(function($) {
 
