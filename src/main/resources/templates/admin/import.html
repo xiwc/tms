@@ -102,7 +102,7 @@
             allowAdditions: true
         });
 
-        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        var baseURL = Utils.getBaseURL();//url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
 
         $('.btn-import').click(function(event) {
 

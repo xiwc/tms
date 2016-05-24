@@ -165,9 +165,8 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("translate")
-	public String translate(
-			Model model,
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
+	public String translate(Model model, @PageableDefault(sort = {
+			"createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "projectId", required = false) Long projectId,
 			@RequestParam(value = "my", required = false) String my,
 			@RequestParam(value = "new", required = false) String _new,
@@ -187,16 +186,17 @@ public class AdminController extends BaseController {
 		if (projectId != null) {
 			if (projectId != -1) {
 				project = projectRepository.findOne(projectId);
-				if (project == null) {
-					return "redirect:translate";
-				}
-			}
-		} else {
-			if (projects.size() > 0) {
-				project = projects.get(0);
-				projectId = projects.get(0).getId();
+				// if (project == null) {
+				// return "redirect:translate";
+				// }
 			}
 		}
+		// else {
+		// if (projects.size() > 0) {
+		// project = projects.get(0);
+		// projectId = projects.get(0).getId();
+		// }
+		// }
 
 		if (project != null) { // 存在检索项目
 
@@ -212,8 +212,8 @@ public class AdminController extends BaseController {
 				page = translateRepository.findByProjectAndStatus(project,
 						Status.New, pageable);
 			} else if (StringUtil.isNotEmpty(languageId)) {
-				long total = translateRepository.countUnTranslatedByProject(
-						languageId, projectId);
+				long total = translateRepository
+						.countUnTranslatedByProject(languageId, projectId);
 				List<Translate> unTranslates = translateRepository
 						.queryUnTranslatedByProject(languageId, projectId,
 								pageable.getOffset(), pageable.getPageSize());
@@ -226,15 +226,15 @@ public class AdminController extends BaseController {
 				page = translateRepository.findByProject(project, pageable);
 			}
 		} else { // 不存在指定检索项目,检索全部项目
-			projectId = projectId == -1 ? projectId : -1;
-			if (projects.size() > 0) {
+			projectId = Long.valueOf(-1);
+			if (projects.size() > 0) { // 如果不存在项目,也不需要检索翻译,因为翻译是关联到项目的
 				languages = projects.get(0).getLanguages();
 
 				if (StringUtil.isNotEmpty(id)) {
 					page = translateRepository.findById(id, pageable);
 				} else if (StringUtil.isNotEmpty(my)) {
-					page = translateRepository.findByCreator(
-							WebUtil.getUsername(), pageable);
+					page = translateRepository
+							.findByCreator(WebUtil.getUsername(), pageable);
 				} else if (StringUtil.isNotEmpty(_new)) {
 					page = translateRepository.findByStatus(Status.New,
 							pageable);
@@ -242,8 +242,7 @@ public class AdminController extends BaseController {
 					long total = translateRepository
 							.countUnTranslated(languageId);
 					List<Translate> unTranslates = translateRepository
-							.queryUnTranslated(languageId,
-									pageable.getOffset(),
+							.queryUnTranslated(languageId, pageable.getOffset(),
 									pageable.getPageSize());
 					page = new PageImpl<Translate>(unTranslates, pageable,
 							total);
@@ -257,8 +256,8 @@ public class AdminController extends BaseController {
 		}
 
 		if (page == null) {
-			page = new PageImpl<Translate>(new ArrayList<Translate>(),
-					pageable, 0);
+			page = new PageImpl<Translate>(new ArrayList<Translate>(), pageable,
+					0);
 		}
 
 		List<Language> languages2 = new ArrayList<Language>();
@@ -277,8 +276,8 @@ public class AdminController extends BaseController {
 		}
 
 		// login user labels
-		List<Label> labels = labelRepository.findByCreator(WebUtil
-				.getUsername());
+		List<Label> labels = labelRepository
+				.findByCreator(WebUtil.getUsername());
 		Set<String> lbls = null;
 		if (labels != null) {
 			lbls = labels.stream().map((label) -> {
@@ -338,8 +337,8 @@ public class AdminController extends BaseController {
 		}
 
 		// login user labels
-		List<Label> labels = labelRepository.findByCreator(WebUtil
-				.getUsername());
+		List<Label> labels = labelRepository
+				.findByCreator(WebUtil.getUsername());
 		Set<String> lbls = null;
 		if (labels != null) {
 			lbls = labels.stream().map((label) -> {

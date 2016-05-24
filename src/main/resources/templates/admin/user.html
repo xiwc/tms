@@ -107,7 +107,7 @@
             }
         });
 
-        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        var baseURL = Utils.getBaseURL();//url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
         $('.btn-batchCreate').click(function(event) {
             $('.ad-handle-confirm').modal({
                 onApprove: function() {

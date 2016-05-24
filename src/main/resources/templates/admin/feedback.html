@@ -52,7 +52,7 @@
     <script type="text/javascript" th:inline="javascript">
     jQuery(function($) {
 
-        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        var baseURL = Utils.getBaseURL();//url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
 
         // feedback handler
         $('.submit.button').api({

@@ -31,7 +31,7 @@
             <div id="context">
                 <div th:replace="admin/template :: ad-page-header ('翻译管理', 'translate')"></div>
                 <div class="ui attached segment">
-                    选择项目:
+                    <div class="ui label">项目:</div>
                     <div class="ui selection dropdown dd-project">
                         <input type="hidden" name="project" th:value="${projectId}" value="1">
                         <i class="dropdown icon"></i>
@@ -48,7 +48,7 @@
                             <!--*/-->
                         </div>
                     </div>
-                    <div class="ui primary compact button btn-add">添加</div>
+                    <div th:if="${(projectId != null and projectId != -1)}" class="ui primary compact button btn-add">添加</div>
                     <div class="ui label">筛选:</div>
                     <div class="ui compact basic buttons">
                         <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, my=${'1'})}" th:classappend="${(param.containsKey('my') and (not #strings.isEmpty(param.my[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
@@ -78,18 +78,18 @@
                 <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
                 <table class="ui small sortable celled striped compact table segment tb-translate">
                     <thead>
-                        <th class="three wide">名称</th>
+                        <th class="four wide">名称</th>
                         <!-- <th class="three wide">描述</th> -->
                         <th class="five wide">翻译</th>
                         <th class="three wide">标签</th>
-                        <th class="three wide">创建时间</th>
+                        <th class="two wide">创建时间</th>
                         <th class="one wide">状态</th>
                         <th class="one wide">处理</th>
                     </thead>
                     <tbody th:remove="all-but-first">
                         <!--/*/
                             <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
-                                <td th:text="${t.key}">app.name</td>
+                                <td style="word-break: break-word;" th:text="${t.key}">app.name</td>
                                 <td>
                                     <div class="ui form fm-language">
                                         <div class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
@@ -109,7 +109,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td style="word-break: break-word;" th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
                                 <td th:text="${t.status}">待翻译</td>
                                 <td>
                                     <div class="ui dropdown dd-actions">
@@ -205,6 +205,8 @@
             allowAdditions: true
         });
 
+        var baseURL = Utils.getBaseURL(); //url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+
         $('.ui.dropdown.dd-row-labels').each(function(index, el) {
             var $dd = $(this);
             var lbls = [];
@@ -217,6 +219,7 @@
                 allowAdditions: true,
                 onAdd: function(addedValue, addedText, $addedChoice) {
                     $.post('admin/translate/addTag', {
+                        baseURL: baseURL,
                         id: $dd.closest('tr').attr('data-id'),
                         tag: addedValue
                     }, function(data, textStatus, xhr) {
@@ -251,7 +254,6 @@
             });
         });
 
-        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
         $(".ui.form").append($('<input name="baseURL" type="hidden" value="">').val(baseURL));
 
         var projectLanguageId = $('input:hidden[name="project.languageId"]').val();

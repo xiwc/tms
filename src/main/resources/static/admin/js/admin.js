@@ -230,6 +230,16 @@ jQuery(function($) {
         },
         getRemember: function(name) {
             return localStorage && localStorage.getItem(name);
+        },
+        getBaseURL: function() {
+            if (typeof url == 'function') {
+                if (url('port') == 80 || url('port') == 443) {
+                    return (url('protocol') + '://' + url('hostname') + '/');
+                } else {
+                    return (url('protocol') + '://' + url('hostname') + ':' + url('port') + '/');
+                }
+            }
+            return '';
         }
     });
 
