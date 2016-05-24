@@ -4,6 +4,8 @@
 package com.lhjz.portal.controller;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -184,6 +186,70 @@ public class UserController extends BaseController {
 
 		if (cnt == 0) {
 			return RespBody.failed();
+		}
+
+		return RespBody.succeed();
+	}
+
+	@RequestMapping(value = "batchMail", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN" })
+	public RespBody batchMail(@RequestParam("baseURL") String baseURL,
+			@RequestParam("users") String users,
+			@RequestParam("title") String title,
+			@RequestParam("content") String content) {
+
+		if (StringUtil.isEmpty(users)) {
+			return RespBody.failed("发送用户不能为空!");
+		}
+
+		if (StringUtil.isEmpty(title)) {
+			return RespBody.failed("发送标题不能为空!");
+		}
+
+		if (StringUtil.isEmpty(content)) {
+			return RespBody.failed("发送内容不能为空!");
+		}
+
+		String[] usernames = users.split(",");
+		List<User> users2 = userRepository.findAll();
+		final Set<String> mails = new HashSet<>();
+		for (String username : usernames) {
+			for (User user : users2) {
+				if (user.getUsername().equals(username)) {
+					mails.add(user.getMails());
+					break;
+				}
+			}
+		}
+
+		final User loginUser = getLoginUser();
+		final String href = baseURL;
+		final String title1 = title;
+		final String content1 = content;
+
+		if (mails.size() > 0) {
+			ThreadUtil.exec(() -> {
+
+				try {
+					Thread.sleep(3000);
+					mailSender.sendHtml(
+							String.format("TMS-系统消息_%s",
+									DateUtil.format(new Date(),
+											DateUtil.FORMAT7)),
+							TemplateUtil.process("templates/mail/mail-msg",
+									MapUtil.objArr2Map("user", loginUser,
+											"date", new Date(), "href", href,
+											"href", href, "title", title1,
+											"content", content1)),
+							mails.toArray(new String[0]));
+					logger.info("邮件通知发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("邮件通知发送失败！");
+				}
+
+			});
 		}
 
 		return RespBody.succeed();

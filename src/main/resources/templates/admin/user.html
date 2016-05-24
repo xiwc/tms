@@ -72,13 +72,44 @@
                     </tbody>
                 </table>
                 <!-- </div> -->
-                <div class="ui segment" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
-                    <div class="ui segment">
-                        <div class="ui blue button btn-batchCreate">批量创建用户</div>
+                <div class="ui styled fluid accordion">
+                    <div class="title" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
+                        <i class="dropdown icon"></i> 批量创建用户
                     </div>
-                    <div class="ui segment form">
-                        <div class="field">
-                            <textarea name="userinfos" placeholder="格式: username,password,role,name,mail,enabled 多条换行" cols="20" rows="10"></textarea>
+                    <div class="content" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
+                        <div class="ui segment">
+                            <div class="ui blue button btn-batchCreate">批量创建用户</div>
+                        </div>
+                        <div class="ui segment form">
+                            <div class="field">
+                                <textarea name="userinfos" placeholder="格式: username,password,role,name,mail,enabled 多条换行" cols="20" rows="10"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="title" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                        <i class="dropdown icon"></i> 群发邮件消息
+                    </div>
+                    <div class="content sg-batchMail" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                        <div class="ui segment">
+                            <div class="ui multiple search selection dropdown dd-mailUsers">
+                                <input name="users" type="hidden" value="">
+                                <i class="dropdown icon"></i>
+                                <div class="default text">用户</div>
+                                <div class="menu">
+                                    <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:text="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}"></div>
+                                </div>
+                            </div>
+                            <div class="ui blue button btn-batchMail">群发邮件消息</div>
+                        </div>
+                        <div class="ui segment form">
+                            <div class="field">
+                                <label>标题:</label>
+                                <input type="text" name="title" th:value="${'TMS翻译协作系统公告'}" value="TMS翻译协作系统公告" />
+                            </div>
+                            <div class="field">
+                                <label>内容:</label>
+                                <textarea name="content" rows="10"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -96,6 +127,10 @@
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
         $('.pp').popup();
+        $('.ui.dropdown.dd-mailUsers').dropdown({
+            allowAdditions: true
+        });
+        $('.ui.accordion').accordion();
         $('.user-role').each(function(index, el) {
             if ($(el).text() == 'ROLE_ADMIN') {
                 $(el).text('管理员').addClass('green');
@@ -115,6 +150,25 @@
                     $.post('admin/user/batchCreate', {
                         baseURL: baseURL,
                         data: $('textarea[name="userinfos"]').val()
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            toastr.success('操作成功!');
+                        } else {
+                            toastr.error('操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.btn-batchMail').click(function(event) {
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/user/batchMail', {
+                        baseURL: baseURL,
+                        users: $('.sg-batchMail .dd-mailUsers').dropdown('get value'),
+                        title: $('.sg-batchMail input[name="title"]').val(),
+                        content: $('.sg-batchMail textarea[name="content"]').val()
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
                             toastr.success('操作成功!');

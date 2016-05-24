@@ -203,7 +203,7 @@ public class TranslateController extends BaseController {
 
 			try {
 				mailSender.sendHtml(String.format("TMS-翻译新建_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT2)),
+						DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-create",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "href", href, "body",
@@ -280,7 +280,7 @@ public class TranslateController extends BaseController {
 				try {
 					mailSender.sendHtml(String.format("TMS-翻译更新_%s",
 									DateUtil.format(new Date(),
-									DateUtil.FORMAT2)),
+									DateUtil.FORMAT7)),
 							TemplateUtil.process(
 									"templates/mail/translate-update",
 									MapUtil.objArr2Map("translate", translate,
@@ -474,7 +474,7 @@ public class TranslateController extends BaseController {
 				try {
 					mailSender.sendHtml(String.format("TMS-翻译更新_%s",
 									DateUtil.format(new Date(),
-									DateUtil.FORMAT2)),
+									DateUtil.FORMAT7)),
 							TemplateUtil.process(
 									"templates/mail/translate-update",
 									MapUtil.objArr2Map("translate", translate,
@@ -536,7 +536,7 @@ public class TranslateController extends BaseController {
 
 			try {
 				mailSender.sendHtml(String.format("TMS-翻译删除_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT2)),
+						DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-delete",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "deleter",
@@ -594,7 +594,7 @@ public class TranslateController extends BaseController {
 			try {
 				mailSender.sendHtml(
 						String.format("TMS-翻译更新_%s",
-								DateUtil.format(new Date(), DateUtil.FORMAT2)),
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-update",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "href", href, "body",
@@ -661,7 +661,7 @@ public class TranslateController extends BaseController {
 			try {
 				mailSender.sendHtml(
 						String.format("TMS-翻译更新_%s",
-								DateUtil.format(new Date(), DateUtil.FORMAT2)),
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-update",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "href", href, "body",

@@ -280,7 +280,7 @@ public class ImportController extends BaseController {
 					mailSender.sendHtml(
 							String.format("TMS-翻译导入_%s",
 									DateUtil.format(new Date(),
-											DateUtil.FORMAT2)),
+											DateUtil.FORMAT7)),
 							TemplateUtil.process(
 									"templates/mail/translate-import",
 									MapUtil.objArr2Map("user", loginUser,
