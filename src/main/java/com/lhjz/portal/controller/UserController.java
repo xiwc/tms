@@ -4,10 +4,14 @@
 package com.lhjz.portal.controller;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +25,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
+import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.entity.security.Authority;
 import com.lhjz.portal.entity.security.AuthorityId;
 import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Role;
@@ -32,7 +38,11 @@ import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.UserForm;
 import com.lhjz.portal.repository.AuthorityRepository;
 import com.lhjz.portal.repository.UserRepository;
+import com.lhjz.portal.util.DateUtil;
+import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
+import com.lhjz.portal.util.TemplateUtil;
+import com.lhjz.portal.util.ThreadUtil;
 import com.lhjz.portal.util.WebUtil;
 
 /**
@@ -57,31 +67,29 @@ public class UserController extends BaseController {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 
-	@RequestMapping(value = "save", method = RequestMethod.POST)
-	@ResponseBody
-	@Secured({ "ROLE_ADMIN" })
-	public RespBody save(@RequestParam("role") String role,
-			@Valid UserForm userForm, BindingResult bindingResult) {
+	@Autowired
+	MailSender2 mailSender;
 
-		if (bindingResult.hasErrors()) {
-			return RespBody.failed(bindingResult.getAllErrors().stream()
-					.map(err -> err.getDefaultMessage())
-					.collect(Collectors.joining("<br/>")));
-		}
+	String loginAction = "admin/login";
 
-		if (userRepository.exists(userForm.getUsername())) {
-			logger.error("添加用户已经存在, ID: {}", userForm.getUsername());
+	private RespBody createUser(String role, String baseURL,
+			UserForm userForm) {
+
+		if (userRepository.exists(StringUtils.trim(userForm.getUsername()))) {
+			logger.error("添加用户已经存在, ID: {}",
+					StringUtils.trim(userForm.getUsername()));
 			return RespBody.failed("添加用户已经存在!");
 		}
 
 		// save username and password
-		User user = new User();
-		user.setUsername(userForm.getUsername());
-		user.setPassword(passwordEncoder.encode(userForm.getPassword()));
+		final User user = new User();
+		user.setUsername(StringUtils.trim(userForm.getUsername()));
+		user.setPassword(passwordEncoder
+				.encode(StringUtils.trim(userForm.getPassword())));
 		user.setEnabled(userForm.getEnabled());
 		user.setCreateDate(new Date());
-		user.setName(userForm.getName());
-		user.setMails(userForm.getMail());
+		user.setName(StringUtils.trim(userForm.getName()));
+		user.setMails(StringUtils.trim(userForm.getMail()));
 
 		userRepository.saveAndFlush(user);
 
@@ -89,8 +97,9 @@ public class UserController extends BaseController {
 
 		// save default authority `ROLE_USER`
 		Authority authority = new Authority();
-		authority.setId(new AuthorityId(userForm.getUsername(), Role.ROLE_USER
-				.name()));
+		authority
+				.setId(new AuthorityId(StringUtils.trim(userForm.getUsername()),
+						Role.ROLE_USER.name()));
 
 		authorityRepository.saveAndFlush(authority);
 
@@ -98,21 +107,176 @@ public class UserController extends BaseController {
 
 		if (role.equalsIgnoreCase("admin")) {
 			Authority authority2 = new Authority();
-			authority2.setId(new AuthorityId(userForm.getUsername(),
-					Role.ROLE_ADMIN.name()));
+			authority2.setId(
+					new AuthorityId(StringUtils.trim(userForm.getUsername()),
+							Role.ROLE_ADMIN.name()));
 
 			authorityRepository.saveAndFlush(authority2);
 
 			log(Action.Create, Target.Authority, authority2);
 		}
 
+		final String userRole = role;
+
+		final String href = baseURL;
+
+		final Mail mail = Mail.instance().addUsers(user);
+
+		final UserForm userForm2 = userForm;
+
+		final String loginUrl = baseURL + loginAction + "?username="
+				+ userForm.getUsername() + "&password="
+				+ userForm.getPassword();
+
+		if (mail.get().length > 0) {
+			ThreadUtil.exec(() -> {
+
+				try {
+					Thread.sleep(3000);
+					mailSender.sendHtml(
+							String.format("TMS-用户创建_%s",
+									DateUtil.format(new Date(),
+											DateUtil.FORMAT7)),
+							TemplateUtil.process("templates/mail/user-create",
+									MapUtil.objArr2Map("user", userForm2,
+											"userRole", userRole, "href", href,
+											"loginUrl", loginUrl)),
+							mail.get());
+					logger.info("创建用户邮件发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("创建用户翻译邮件发送失败！");
+				}
+
+			});
+		}
+
 		return RespBody.succeed(user.getUsername());
+	}
+
+	@RequestMapping(value = "batchCreate", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN" })
+	public RespBody batchCreate(@RequestParam("baseURL") String baseURL,
+			@RequestParam("data") String data) {
+
+		// test,88888,user,测试用户,test@test.com,true
+		String[] lines = data.split("\n");
+		int cnt = 0;
+		for (String line : lines) {
+			String[] infos = line.trim().split(",");
+			if (infos.length >= 5) {
+				UserForm userForm = new UserForm();
+				userForm.setEnabled(true);
+				userForm.setMail(StringUtils.trim(infos[4]));
+				userForm.setName(StringUtils.trim(infos[3]));
+				userForm.setPassword(StringUtils.trim(infos[1]));
+				userForm.setUsername(StringUtils.trim(infos[0]));
+				userForm.setEnabled(
+						"true".equalsIgnoreCase(StringUtils.trim(infos[5]))
+								? true : false);
+
+				RespBody respBody = createUser(StringUtils.trim(infos[2]),
+						baseURL, userForm);
+				if (respBody.isSuccess()) {
+					cnt = cnt + 1;
+				}
+			}
+		}
+
+		if (cnt == 0) {
+			return RespBody.failed();
+		}
+
+		return RespBody.succeed();
+	}
+
+	@RequestMapping(value = "batchMail", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN" })
+	public RespBody batchMail(@RequestParam("baseURL") String baseURL,
+			@RequestParam("users") String users,
+			@RequestParam("title") String title,
+			@RequestParam("content") String content) {
+
+		if (StringUtil.isEmpty(users)) {
+			return RespBody.failed("发送用户不能为空!");
+		}
+
+		if (StringUtil.isEmpty(title)) {
+			return RespBody.failed("发送标题不能为空!");
+		}
+
+		if (StringUtil.isEmpty(content)) {
+			return RespBody.failed("发送内容不能为空!");
+		}
+
+		String[] usernames = users.split(",");
+		List<User> users2 = userRepository.findAll();
+		final Set<String> mails = new HashSet<>();
+		for (String username : usernames) {
+			for (User user : users2) {
+				if (user.getUsername().equals(username)) {
+					mails.add(user.getMails());
+					break;
+				}
+			}
+		}
+
+		final User loginUser = getLoginUser();
+		final String href = baseURL;
+		final String title1 = title;
+		final String content1 = content;
+
+		if (mails.size() > 0) {
+			ThreadUtil.exec(() -> {
+
+				try {
+					Thread.sleep(3000);
+					mailSender.sendHtml(
+							String.format("TMS-系统消息_%s",
+									DateUtil.format(new Date(),
+											DateUtil.FORMAT7)),
+							TemplateUtil.process("templates/mail/mail-msg",
+									MapUtil.objArr2Map("user", loginUser,
+											"date", new Date(), "href", href,
+											"href", href, "title", title1,
+											"content", content1)),
+							mails.toArray(new String[0]));
+					logger.info("邮件通知发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("邮件通知发送失败！");
+				}
+
+			});
+		}
+
+		return RespBody.succeed();
+	}
+
+	@RequestMapping(value = "save", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN" })
+	public RespBody save(@RequestParam("role") String role,
+			@RequestParam("baseURL") String baseURL, @Valid UserForm userForm,
+			BindingResult bindingResult) {
+
+		if (bindingResult.hasErrors()) {
+			return RespBody.failed(bindingResult.getAllErrors().stream()
+					.map(err -> err.getDefaultMessage())
+					.collect(Collectors.joining("<br/>")));
+		}
+
+		return createUser(role, baseURL, userForm);
 	}
 
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN" })
-	public RespBody update(@Valid UserForm userForm, BindingResult bindingResult) {
+	public RespBody update(
+			@RequestParam(value = "role", required = false) String role,
+			@Valid UserForm userForm, BindingResult bindingResult) {
 
 		if (bindingResult.hasErrors()) {
 			return RespBody.failed(bindingResult.getAllErrors().stream()
@@ -137,7 +301,8 @@ public class UserController extends BaseController {
 			user.setPassword(passwordEncoder.encode(userForm.getPassword()));
 		}
 
-		if (userForm.getEnabled() != null && user.getStatus() != Status.Bultin) {
+		if (userForm.getEnabled() != null
+				&& user.getStatus() != Status.Bultin) {
 			user.setEnabled(userForm.getEnabled());
 		}
 
@@ -147,6 +312,47 @@ public class UserController extends BaseController {
 
 		if (userForm.getName() != null) {
 			user.setName(userForm.getName());
+		}
+
+		if (StringUtil.isNotEmpty(role)) {
+
+			// 删除当前的权限
+			Set<Authority> authorities = user.getAuthorities();
+			authorities.stream().forEach((auth) -> {
+				auth.setUser(null);
+			});
+			authorityRepository.delete(authorities);
+			authorityRepository.flush();
+
+			user.getAuthorities().clear();
+
+			// 附加新的权限
+			// add role_user
+			Authority authority = new Authority();
+			authority.setId(
+					new AuthorityId(StringUtils.trim(userForm.getUsername()),
+							Role.ROLE_USER.name()));
+			authority.setUser(user);
+
+			Authority saveAndFlush = authorityRepository
+					.saveAndFlush(authority);
+
+			user.getAuthorities().add(saveAndFlush);
+
+			// add role_user
+			if ("admin".equalsIgnoreCase(role)) {
+				Authority authority2 = new Authority();
+				authority2.setId(new AuthorityId(
+						StringUtils.trim(userForm.getUsername()),
+						Role.ROLE_ADMIN.name()));
+				authority2.setUser(user);
+
+				Authority saveAndFlush2 = authorityRepository
+						.saveAndFlush(authority2);
+
+				user.getAuthorities().add(saveAndFlush2);
+			}
+
 		}
 
 		userRepository.saveAndFlush(user);
@@ -190,7 +396,8 @@ public class UserController extends BaseController {
 			user.setPassword(passwordEncoder.encode(userForm.getPassword()));
 		}
 
-		if (userForm.getEnabled() != null && user.getStatus() != Status.Bultin) {
+		if (userForm.getEnabled() != null
+				&& user.getStatus() != Status.Bultin) {
 			user.setEnabled(userForm.getEnabled());
 		}
 
@@ -235,7 +442,7 @@ public class UserController extends BaseController {
 
 	@RequestMapping(value = "get", method = RequestMethod.GET)
 	@ResponseBody
-	@Secured({ "ROLE_ADMIN" })
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody get(@RequestParam("username") String username) {
 
 		User user = userRepository.findOne(username);

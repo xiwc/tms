@@ -70,9 +70,9 @@
     </div>
     <div class="pusher ad-index-content">
         <div class="ad-index-container">
-            <div th:fragment="rail-menu" class="ui dividing close left rail ad-index-rail" style="width:160px; min-height:450px;">
+            <div th:fragment="rail-menu" class="ui dividing close left rail ad-index-rail" style="width:133px; min-height:450px;">
                 <div class="ui sticky ad-index-sticky">
-                    <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing menu" style="width: 11rem !important;">
+                    <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing menu" style="width: 9rem !important;">
                         <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
                             <i class="home icon"></i> 主页
                         </a>
@@ -98,7 +98,7 @@
                 <!-- <div th:replace="admin/template :: ad-page-header ('门户主页', 'index')"></div> -->
                 <h2 class="ui center aligned icon header">
                   <i class="circular users icon"></i>
-                  欢迎使用TMS翻译管理系统!
+                  欢迎使用TMS翻译协作系统!
                 </h2>
                 <div class="ui container four column stackable centered grid" style="margin-top:50px;">
                     <div class="aligined centered column">

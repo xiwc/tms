@@ -1,5 +1,7 @@
 package com.lhjz.portal.util;
 
+import java.util.Date;
+
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -21,4 +23,15 @@ public class CommonUtilTest {
 		Assert.assertFalse("a1".matches("^[a-z][a-z0-9]{2,3}$"));
 		Assert.assertFalse("aaaa1".matches("^[a-z][a-z0-9]{2,3}$"));
 	}
+
+	@Test
+	public void format() {
+		String d = DateUtil.format(new Date(), DateUtil.FORMAT7);
+		System.out.println(d);
+	}
+
+	// public static void main(String[] args) {
+	// String d = DateUtil.format(new Date(), DateUtil.FORMAT7);
+	// System.out.println(d);
+	// }
 }

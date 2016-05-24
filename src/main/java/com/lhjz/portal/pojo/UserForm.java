@@ -2,6 +2,7 @@ package com.lhjz.portal.pojo;
 
 import javax.validation.constraints.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -21,7 +22,7 @@ public class UserForm {
 	private Boolean enabled;
 
 	public String getUsername() {
-		return username;
+		return StringUtils.trim(username);
 	}
 
 	public void setUsername(String username) {
@@ -29,7 +30,7 @@ public class UserForm {
 	}
 
 	public String getPassword() {
-		return password;
+		return StringUtils.trim(password);
 	}
 
 	public void setPassword(String password) {
@@ -45,7 +46,7 @@ public class UserForm {
 	}
 
 	public String getMail() {
-		return mail;
+		return StringUtils.trim(mail);
 	}
 
 	public void setMail(String mail) {
@@ -53,7 +54,7 @@ public class UserForm {
 	}
 
 	public String getName() {
-		return name;
+		return StringUtils.trim(name);
 	}
 
 	public void setName(String name) {

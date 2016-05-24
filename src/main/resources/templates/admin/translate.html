@@ -17,6 +17,7 @@
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
     <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -31,21 +32,24 @@
             <div id="context">
                 <div th:replace="admin/template :: ad-page-header ('翻译管理', 'translate')"></div>
                 <div class="ui attached segment">
-                    选择项目:
-                    <div class="ui selection compact dropdown dd-project">
+                    <div class="ui label">项目:</div>
+                    <div class="ui selection dropdown dd-project">
                         <input type="hidden" name="project" th:value="${projectId}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">项目</div>
-                        <div class="menu" th:remove="all-but-first">
+                        <div class="menu">
+                            <a class="item" th:href="@{/admin/translate(projectId=${'-1'})}" th:title="${'全部项目'}" data-value="-1">全部项目</a>
                             <!--/*/
                             <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
                             /*/-->
+                            <!--/*-->
                             <a class="item" data-value="1">STEP</a>
                             <a class="item" data-value="2">WORK</a>
                             <a class="item" data-value="3">CONSOLE</a>
+                            <!--*/-->
                         </div>
                     </div>
-                    <div class="ui primary compact button btn-add">添加</div>
+                    <div th:if="${(projectId != null and projectId != -1)}" class="ui primary compact button btn-add">添加</div>
                     <div class="ui label">筛选:</div>
                     <div class="ui compact basic buttons">
                         <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, my=${'1'})}" th:classappend="${(param.containsKey('my') and (not #strings.isEmpty(param.my[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
@@ -54,7 +58,7 @@
                     </div>
                     &nbsp;&nbsp;
                     <div class="ui label">语言:</div>
-                    <div class="ui selection compact dropdown dd-languages">
+                    <div class="ui selection dropdown dd-languages">
                         <input type="hidden" name="language" th:value="${param.containsKey('languageId') ? param.languageId[0] : ''}" value="1">
                         <i class="dropdown icon"></i>
                         <div class="default text">按未翻译语言过滤</div>
@@ -79,14 +83,15 @@
                         <!-- <th class="three wide">描述</th> -->
                         <th class="five wide">翻译</th>
                         <th class="three wide">标签</th>
-                        <th class="three wide">创建时间</th>
+                        <th class="two wide">创建时间</th>
+                        <th class="one wide">创建者</th>
                         <th class="one wide">状态</th>
                         <th class="one wide">处理</th>
                     </thead>
                     <tbody th:remove="all-but-first">
                         <!--/*/
                             <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
-                                <td th:text="${t.key}">app.name</td>
+                                <td style="word-break: break-word;" th:text="${t.key}">app.name</td>
                                 <td>
                                     <div class="ui form fm-language">
                                         <div class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
@@ -95,14 +100,19 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>
-                                    <div class="ui labels">
-                                      <a class="ui basic blue label" th:each="l : ${t.labels}">
-                                        <span th:text="${l.name}"></span> <i th:attr="data-id=${l.id}" class="icon close ico-delete"></i>
-                                      </a>
+                                <td class="td-labels">
+                                    <input type="hidden" th:each="l : ${t.labels}" th:name="${l.name}" th:value="${l.id}">
+                                    <div class="ui fluid multiple search selection dropdown dd-row-labels">
+                                        <input name="labels" type="hidden">
+                                        <i class="dropdown icon"></i>
+                                        <div class="default text">标签</div>
+                                        <div class="menu">
+                                            <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
+                                        </div>
                                     </div>
                                 </td>
-                                <td th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td style="word-break: break-word;" th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td th:text="${t.creator}">admin</td>
                                 <td th:text="${t.status}">待翻译</td>
                                 <td>
                                     <div class="ui dropdown dd-actions">
@@ -183,7 +193,7 @@
     <input type="hidden" name="page.number" th:value="${page.number}" />
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
-    <input type="hidden" name="project.languageId" th:value="${project.language.id}" />
+    <input type="hidden" name="project.languageId" th:value="${project != null ? project.language.id : ''}" />
     <script type="text/javascript">
     jQuery(function($) {
 
@@ -198,7 +208,57 @@
             allowAdditions: true
         });
 
-        var baseURL = url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        autosize($('.tb-translate textarea'));
+
+        var baseURL = Utils.getBaseURL(); //url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+
+        $('.ui.dropdown.dd-row-labels').each(function(index, el) {
+            var $dd = $(this);
+            var lbls = [];
+            $dd.siblings('input:hidden[name]').each(function(index, el) {
+                lbls.push($(el).attr('name'));
+            });
+            $dd.dropdown({
+                allowAdditions: true
+            }).dropdown('set selected', lbls).dropdown({
+                allowAdditions: true,
+                onAdd: function(addedValue, addedText, $addedChoice) {
+                    $.post('admin/translate/addTag', {
+                        baseURL: baseURL,
+                        id: $dd.closest('tr').attr('data-id'),
+                        tag: addedValue
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $dd.closest('td').prepend($('<input type="hidden">').attr('name', data.data.name).val(data.data.id));
+                            toastr.success('添加成功!');
+                        } else {
+                            $dd.dropdown('remove selected', addedValue);
+                            toastr.error(data.data, '添加失败!');
+                        }
+                    });
+                },
+                onLabelRemove: function(value) {
+                    $('.ad-delete-confirm').modal({
+                        onApprove: function() {
+                            var $h = $dd.siblings('input:hidden[name="' + value + '"]');
+                            $.post('admin/translate/deleteTag', {
+                                id: $h.val(),
+                                baseURL: baseURL
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    $h.remove();
+                                    toastr.success('删除成功!');
+                                } else {
+                                    $dd.dropdown('set selected', value);
+                                    toastr.error(data.data, '删除失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                }
+            });
+        });
+
         $(".ui.form").append($('<input name="baseURL" type="hidden" value="">').val(baseURL));
 
         var projectLanguageId = $('input:hidden[name="project.languageId"]').val();
@@ -272,26 +332,6 @@
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
                             $btn.closest('tr').remove();
-                            toastr.success('删除成功!');
-                        } else {
-                            toastr.error('删除失败!');
-                        }
-                    });
-                }
-            }).modal('show');
-        });
-
-        $('.tb-translate').on('click', 'i.icon.ico-delete', function(event) {
-            var $icon = $(this);
-
-            $('.ad-delete-confirm').modal({
-                onApprove: function() {
-                    $.post('admin/translate/deleteTag', {
-                        id: $icon.attr('data-id'),
-                        baseURL: baseURL
-                    }, function(data, textStatus, xhr) {
-                        if (data.success) {
-                            $icon.closest('.ui.label').remove();
                             toastr.success('删除成功!');
                         } else {
                             toastr.error('删除失败!');

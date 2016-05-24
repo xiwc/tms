@@ -330,7 +330,9 @@
         </div>
         <div class="content">
             <div class="ui segment">
-                <div class="ui warning message">新添加的用户默认密码为 888888 并且是禁用状态,需要单独开启后才能使用.</div>
+                <div class="ui warning message">新添加的用户默认密码为:
+                    <div class="ui basic label">888888</div>
+                </div>
                 <div class="ui form">
                     <div class="required field">
                         <label>用户名:</label>
@@ -392,7 +394,7 @@
                     </div>
                     <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
                         <label th:text="${l.description} + ':'">中文:</label>
-                        <textarea name="zh" th:name="${l.name}" rows="1" th:placeholder="${l.description}" th:text="''">测试</textarea>
+                        <textarea name="zh" th:name="${l.name}" rows="2" th:placeholder="${l.description}" th:text="''">测试</textarea>
                     </div>
                 </div>
             </div>
@@ -593,7 +595,7 @@
                     </div>
                     <div class="inline field" th:each="l : ${languages}" th:attr="data-id=${l.id}">
                         <label th:text="${l.description} + ':'">中文:</label>
-                        <textarea th:classappend="${'language'}" name="zh" th:name="${l.name}" rows="1" th:placeholder="${l.description}" th:text="''">测试</textarea>
+                        <textarea th:classappend="${'language'}" name="zh" th:name="${l.name}" rows="2" th:placeholder="${l.description}" th:text="''">测试</textarea>
                     </div>
                 </div>
             </div>
@@ -626,6 +628,17 @@
                     <div class="field">
                         <label>邮箱:</label>
                         <input name="mail" type="text" placeholder="邮箱">
+                    </div>
+                    <div sec:authorize="hasRole('ROLE_SUPER')" class="inline field">
+                        <label>角色:</label>
+                        <div class="ui radio checkbox chk-user">
+                            <input type="radio" name="role" value="user" checked>
+                            <label>普通用户</label>
+                        </div>
+                        <div class="ui radio checkbox chk-admin" sec:authorize="hasRole('ROLE_SUPER')">
+                            <input type="radio" name="role" value="admin">
+                            <label>管理员</label>
+                        </div>
                     </div>
                 </div>
             </div>
