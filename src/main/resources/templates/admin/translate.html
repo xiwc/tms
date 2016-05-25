@@ -81,10 +81,10 @@
                     <thead>
                         <th class="three wide">名称</th>
                         <!-- <th class="three wide">描述</th> -->
-                        <th class="five wide">翻译</th>
+                        <th class="four wide">翻译</th>
                         <th class="three wide">标签</th>
-                        <th class="two wide">创建时间</th>
-                        <th class="one wide">创建者</th>
+                        <th class="one wide">创建时间</th>
+                        <th class="three wide">参与者</th>
                         <th class="one wide">状态</th>
                         <th class="one wide">处理</th>
                     </thead>
@@ -111,8 +111,21 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td style="word-break: break-word;" th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
-                                <td th:text="${t.creator}">admin</td>
+                                <td style="word-break: break-word;" th:title="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}" th:utext="${#calendars.format(t.createDate,'yy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td class="td-watchers">
+                                <div class="ui sub header" style="margin-top:10px;">创建者:</div>
+                                    <a class="ui basic label" th:text="${t.creator}"></a>
+                                    <div class="ui sub header" style="margin-top:10px;">关注者:</div>
+                                    <input type="hidden" th:each="w : ${t.watchers}" th:name="${w.username}" th:value="${w.username}">
+                                    <div class="ui fluid multiple search selection dropdown dd-row-watchers">
+                                        <input name="watchers" type="hidden">
+                                        <i class="dropdown icon"></i>
+                                        <div class="default text">关注者</div>
+                                        <div class="menu">
+                                            <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username}" th:text="${(u.name != null ? u.name : u.username)}"></div>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td th:text="${t.status}">待翻译</td>
                                 <td>
                                     <div class="ui dropdown dd-actions">
@@ -243,6 +256,62 @@
                             var $h = $dd.siblings('input:hidden[name="' + value + '"]');
                             $.post('admin/translate/deleteTag', {
                                 id: $h.val(),
+                                baseURL: baseURL
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    $h.remove();
+                                    toastr.success('删除成功!');
+                                } else {
+                                    $dd.dropdown('set selected', value);
+                                    toastr.error(data.data, '删除失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                }
+            });
+        });
+
+        $('body').on('click', '.ui.dropdown.dd-row-labels .ui.label', function(event) {
+            if (url('?projectId')) {
+                window.location.href = url('path') + '?projectId=' +  url('?projectId') + '&search=' + $(this).text();
+            } else {
+                window.location.href = url('path') + '?search=' + $(this).text();
+            }
+        });
+
+        $('.ui.dropdown.dd-row-watchers').each(function(index, el) {
+            var $dd = $(this);
+            var usernames = [];
+            $dd.siblings('input:hidden[name]').each(function(index, el) {
+                usernames.push($(el).attr('name'));
+            });
+            $dd.dropdown({
+                allowAdditions: true
+            }).dropdown('set selected', usernames).dropdown({
+                allowAdditions: true,
+                onAdd: function(addedValue, addedText, $addedChoice) {
+                    $.post('admin/translate/addWatcher', {
+                        baseURL: baseURL,
+                        id: $dd.closest('tr').attr('data-id'),
+                        username: addedValue
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $dd.closest('td').prepend($('<input type="hidden">').attr('name', data.data.username).val(data.data.username));
+                            toastr.success('添加成功!');
+                        } else {
+                            $dd.dropdown('remove selected', addedValue);
+                            toastr.error(data.data, '添加失败!');
+                        }
+                    });
+                },
+                onLabelRemove: function(value) {
+                    $('.ad-delete-confirm').modal({
+                        onApprove: function() {
+                            var $h = $dd.siblings('input:hidden[name="' + value + '"]');
+                            $.post('admin/translate/deleteWatcher', {
+                                id: $dd.closest('tr').attr('data-id'),
+                                username: $h.val(),
                                 baseURL: baseURL
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
