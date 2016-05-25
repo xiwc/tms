@@ -5,6 +5,8 @@ import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.lhjz.portal.pojo.Enum.Status;
+
 public class CommonUtilTest {
 
 	@Test
@@ -28,6 +30,12 @@ public class CommonUtilTest {
 	public void format() {
 		String d = DateUtil.format(new Date(), DateUtil.FORMAT7);
 		System.out.println(d);
+	}
+
+	@Test
+	public void status() {
+		System.out.println(Status.valueOf("New"));
+		// System.out.println(Status.valueOf("New_"));
 	}
 
 	// public static void main(String[] args) {
