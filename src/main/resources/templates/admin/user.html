@@ -96,7 +96,7 @@
                                 <i class="dropdown icon"></i>
                                 <div class="default text">用户</div>
                                 <div class="menu">
-                                    <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:text="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}"></div>
+                                    <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                                 </div>
                             </div>
                             <div class="ui checkbox ck-selectAll">
@@ -112,7 +112,7 @@
                             </div>
                             <div class="field">
                                 <label>内容:</label>
-                                <textarea name="content" rows="10"></textarea>
+                                <textarea placeholder="公告内容(支持markdown语法)" name="content" rows="10"></textarea>
                             </div>
                         </div>
                     </div>
@@ -186,7 +186,7 @@
                         baseURL: baseURL,
                         users: $('.sg-batchMail .dd-mailUsers').dropdown('get value'),
                         title: $('.sg-batchMail input[name="title"]').val(),
-                        content: $('.sg-batchMail textarea[name="content"]').val()
+                        content: Utils.md2html($('.sg-batchMail textarea[name="content"]').val())
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
                             toastr.success('操作成功!');
