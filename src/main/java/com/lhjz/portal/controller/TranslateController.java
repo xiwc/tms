@@ -535,8 +535,9 @@ public class TranslateController extends BaseController {
 		ThreadUtil.exec(() -> {
 
 			try {
-				mailSender.sendHtml(String.format("TMS-翻译删除_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+				mailSender.sendHtml(
+						String.format("TMS-翻译删除_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-delete",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "deleter",
@@ -611,13 +612,74 @@ public class TranslateController extends BaseController {
 		return RespBody.succeed(id);
 	}
 
+	@RequestMapping(value = "deleteWatcher", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody deleteWatcher(@RequestParam("id") Long id,
+			@RequestParam("username") String username,
+			@RequestParam("baseURL") String baseURL) {
+
+		User user = userRepository.findOne(username);
+
+		if (user == null) {
+			return RespBody.failed("删除关注者不存在!");
+		}
+
+		final Translate translate = translateRepository.findOne(id);
+
+		user.getWatcherTranslates().remove(translate);
+
+		userRepository.save(user);
+
+		translate.getWatchers().remove(user);
+
+		translateRepository.saveAndFlush(translate);
+
+		final Mail mail = Mail.instance().addUsers(getLoginUser())
+				.addUsers(user);
+		// .removeUser(getLoginUser());
+
+		final String href = baseURL + translateAction + "?projectId="
+				+ translate.getProject().getId() + "&id=" + translate.getId();
+
+		logWithProperties(Action.Delete, Target.Translate, "watchers",
+				username);
+
+		final Mail mail2 = Mail.instance().put("删除关注者",
+				user.getUsername() + (StringUtil.isNotEmpty(user.getName())
+						? "[" + user.getName() + "]" : StringUtil.EMPTY));
+
+		final User loginUser = getLoginUser();
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				mailSender.sendHtml(
+						String.format("TMS-翻译更新_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil.process("templates/mail/translate-update",
+								MapUtil.objArr2Map("translate", translate,
+										"user", loginUser, "href", href, "body",
+										mail2.body())),
+						mail.get());
+				logger.info("翻译删除关注者更新邮件发送成功！ID:{}", translate.getId());
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("翻译删除关注者更新邮件发送失败！ID:{}", translate.getId());
+			}
+
+		});
+
+		return RespBody.succeed(id);
+	}
+
 	@RequestMapping(value = "addTag", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody addTag(@RequestParam("baseURL") String baseURL,
 			@RequestParam("id") Long id, @RequestParam("tag") String tag) {
 
-		if (StringUtil.isEmail(tag)) {
+		if (StringUtil.isEmpty(tag)) {
 			return RespBody.failed("标签内容不能为空!");
 		}
 
@@ -676,6 +738,79 @@ public class TranslateController extends BaseController {
 		});
 
 		return RespBody.succeed(label);
+	}
+
+	@RequestMapping(value = "addWatcher", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody addWatcher(@RequestParam("baseURL") String baseURL,
+			@RequestParam("id") Long id,
+			@RequestParam("username") String username) {
+
+		if (StringUtil.isEmpty(username)) {
+			return RespBody.failed("添加关注者不能为空!");
+		}
+
+		Translate translate = translateRepository.findOne(id);
+
+		User user = userRepository.findOne(username);
+
+		if (user == null) {
+			return RespBody.failed("添加关注者不存在!");
+		}
+
+		Set<User> watchers = translate.getWatchers();
+
+		for (User user2 : watchers) {
+			if (user2.getUsername().equals(user.getUsername())) {
+				return RespBody.failed("添加关注者已经存在!");
+			}
+		}
+
+		watchers.add(user);
+
+		user.getWatcherTranslates().add(translate);
+
+		userRepository.saveAndFlush(user);
+
+		translateRepository.saveAndFlush(translate);
+
+		logWithProperties(Action.Create, Target.Translate, "watchers",
+				username);
+
+		final Mail mail = Mail.instance().addUsers(getLoginUser())
+				.addUsers(user);
+		// .removeUser(getLoginUser());
+
+		final String href = baseURL + translateAction + "?projectId="
+				+ translate.getProject().getId() + "&id=" + translate.getId();
+
+		final User loginUser = getLoginUser();
+
+		final Mail mail2 = Mail.instance().put("添加关注者",
+				user.getUsername() + (StringUtil.isNotEmpty(user.getName())
+						? "[" + user.getName() + "]" : StringUtil.EMPTY));
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				mailSender.sendHtml(
+						String.format("TMS-翻译更新_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil.process("templates/mail/translate-update",
+								MapUtil.objArr2Map("translate", translate,
+										"user", loginUser, "href", href, "body",
+										mail2.body())),
+						mail.get());
+				logger.info("翻译添加关注者更新邮件发送成功！ID:{}", translate.getId());
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("翻译添加关注者更新邮件发送失败！ID:{}", translate.getId());
+			}
+
+		});
+
+		return RespBody.succeed(user);
 	}
 
 	@RequestMapping(value = "get", method = RequestMethod.GET)

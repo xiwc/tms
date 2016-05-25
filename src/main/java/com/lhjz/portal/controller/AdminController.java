@@ -294,6 +294,7 @@ public class AdminController extends BaseController {
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
 		model.addAttribute("user", getLoginUser());
+		model.addAttribute("users", userRepository.findAll());
 
 		return "admin/translate";
 	}
