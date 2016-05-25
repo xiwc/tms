@@ -632,6 +632,8 @@ public class TranslateController extends BaseController {
 		userRepository.save(user);
 
 		translate.getWatchers().remove(user);
+		translate.setUpdateDate(new Date());
+		translate.setUpdater(WebUtil.getUsername());
 
 		translateRepository.saveAndFlush(translate);
 
@@ -751,7 +753,7 @@ public class TranslateController extends BaseController {
 			return RespBody.failed("添加关注者不能为空!");
 		}
 
-		Translate translate = translateRepository.findOne(id);
+		final Translate translate = translateRepository.findOne(id);
 
 		User user = userRepository.findOne(username);
 
@@ -772,6 +774,9 @@ public class TranslateController extends BaseController {
 		user.getWatcherTranslates().add(translate);
 
 		userRepository.saveAndFlush(user);
+
+		translate.setUpdateDate(new Date());
+		translate.setUpdater(WebUtil.getUsername());
 
 		translateRepository.saveAndFlush(translate);
 
