@@ -274,7 +274,7 @@
 
         $('body').on('click', '.ui.dropdown.dd-row-labels .ui.label', function(event) {
             if (url('?projectId')) {
-                window.location.href = url('path') + '?projectId=' +  url('?projectId') + '&search=' + $(this).text();
+                window.location.href = url('path') + '?projectId=' + url('?projectId') + '&search=' + $(this).text();
             } else {
                 window.location.href = url('path') + '?search=' + $(this).text();
             }
@@ -286,9 +286,7 @@
             $dd.siblings('input:hidden[name]').each(function(index, el) {
                 usernames.push($(el).attr('name'));
             });
-            $dd.dropdown({
-                allowAdditions: true
-            }).dropdown('set selected', usernames).dropdown({
+            $dd.dropdown().dropdown('set selected', usernames).dropdown({
                 allowAdditions: true,
                 onAdd: function(addedValue, addedText, $addedChoice) {
                     $.post('admin/translate/addWatcher', {

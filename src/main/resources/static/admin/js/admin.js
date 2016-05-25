@@ -240,6 +240,13 @@ jQuery(function($) {
                 }
             }
             return '';
+        },
+        md2html(markdown) {
+            if(showdown) {
+                var converter = new showdown.Converter();
+                return converter.makeHtml(markdown);
+            }
+            return markdown;
         }
     });
 

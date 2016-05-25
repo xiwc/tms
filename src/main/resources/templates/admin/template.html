@@ -449,7 +449,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:text="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}"></div>
+                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>
@@ -554,7 +554,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:text="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}"></div>
+                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>
