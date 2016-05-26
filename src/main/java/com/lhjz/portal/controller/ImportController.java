@@ -271,6 +271,9 @@ public class ImportController extends BaseController {
 		final String href = baseURL + translateAction + "?projectId="
 				+ projectId;
 
+		final String msg = "共计: " + kvMaps.size() + " 新增: " + translates.size()
+				+ " 更新: " + (kvMaps.size() - translates.size());
+
 		// 如果邮件通知
 		if (notify && mail.get().length > 0) {
 
@@ -285,7 +288,9 @@ public class ImportController extends BaseController {
 									"templates/mail/translate-import",
 									MapUtil.objArr2Map("user", loginUser,
 											"importDate", new Date(), "href",
-											href, "body", mail2.hrefs())),
+											href, "body",
+											"<h3>" + msg + "</h3>"
+													+ mail2.hrefs())),
 							mail.get());
 					logger.info("批量导入翻译邮件发送成功！");
 				} catch (Exception e) {
@@ -296,7 +301,7 @@ public class ImportController extends BaseController {
 			});
 		}
 
-		return RespBody.succeed(kvMaps.size());
+		return RespBody.succeed(msg);
 	}
 
 	@RequestMapping(value = "export", method = RequestMethod.POST)
