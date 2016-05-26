@@ -97,7 +97,8 @@
                 <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
                 <table class="ui small sortable celled striped compact table segment tb-translate">
                     <thead>
-                        <th class="three wide">名称</th>
+                        <th th:if="${projectId == -1}" class="one wide">项目</th>
+                        <th th:classappend="${(projectId == -1) ? 'two' : 'three'}" class="wide">名称</th>
                         <!-- <th class="three wide">描述</th> -->
                         <th class="four wide">翻译</th>
                         <th class="three wide">标签</th>
@@ -109,7 +110,8 @@
                     <tbody th:remove="all-but-first">
                         <!--/*/
                             <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
-                                <td style="word-break: break-word;" th:text="${t.key}">app.name</td>
+                                <td th:if="${projectId == -1}" th:title="${t.project.description}" th:text="${t.project.name}">project.name</td>
+                                <td style="word-break: break-word;" th:title="${t.key}" th:text="${t.key}">app.name</td>
                                 <td>
                                     <div class="ui form fm-language">
                                         <div class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
@@ -566,7 +568,7 @@
                 },
                 onApprove: function() {
 
-                    if(!$.trim(simplemde.value())) {
+                    if (!$.trim(simplemde.value())) {
                         toastr.error('邮件讨论内容不能为空!');
                         return false;
                     }
