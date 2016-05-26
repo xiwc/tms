@@ -140,7 +140,7 @@
                             content: content
                         }, function(data, textStatus, xhr) {
                             if (data.success) {
-                                $('.msg-content').text("导入总数: " + data.data);
+                                $('.msg-content').text("导入统计: " + data.data);
                                 toastr.success('导入成功!');
                             } else {
                                 toastr.error('导入失败!');
