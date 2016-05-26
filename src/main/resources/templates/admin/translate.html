@@ -52,16 +52,17 @@
                     <div th:if="${(projectId != null and projectId != -1)}" class="ui primary compact button btn-add">添加</div>
                     <div class="ui label">筛选:</div>
                     <div class="ui compact basic buttons">
-                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, my=${'1'})}" th:classappend="${(param.containsKey('my') and (not #strings.isEmpty(param.my[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
-                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, new=${'1'})}" th:classappend="${(param.containsKey('new') and (not #strings.isEmpty(param.new[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
-                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size})}" th:classappend="${((not param.containsKey('my')) and (not param.containsKey('new')) and (not param.containsKey('languageId')) and (not param.containsKey('search')) and (not param.containsKey('id'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, creator=${user.username})}" th:classappend="${(param.containsKey('creator') and (#strings.equals(user.username, param.creator[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, status=${'New'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('New', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, status=${'Updated'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('Updated', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-updated">更新</a>
+                        <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size})}" th:classappend="${((not param.containsKey('creator')) and (not param.containsKey('status')) and (not param.containsKey('languageId')) and (not param.containsKey('search')) and (not param.containsKey('id'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
                     </div>
                     &nbsp;&nbsp;
-                    <div class="ui label">语言:</div>
+                    <!-- <div class="ui label">过滤:</div> -->
                     <div class="ui selection dropdown dd-languages">
                         <input type="hidden" name="language" th:value="${param.containsKey('languageId') ? param.languageId[0] : ''}" value="1">
                         <i class="dropdown icon"></i>
-                        <div class="default text">按未翻译语言过滤</div>
+                        <div class="default text">未翻译语言</div>
                         <div class="menu" th:remove="all-but-first">
                             <!--/*/
                             <a th:each="l : ${languages}" class="item" th:href="@{/admin/translate(projectId=${projectId}, languageId=${l.id})}" th:title="${l.description}" th:attr="data-value=${l.id}" th:text="${l.description}">中文</a>
@@ -71,10 +72,18 @@
                             <a class="item" data-value="3">日语</a>
                         </div>
                     </div>
-                    <div class="ui icon input inp-search">
+                    <!-- <div class="ui icon input inp-search">
                         <input type="text" th:value="${param.containsKey('search') ? param.search[0] : ''}" placeholder="查找...">
                         <i class="circular search link icon"></i>
+                    </div> -->
+                    <div class="ui search sh-search" style="float:right;">
+                        <div class="ui icon input inp-search">
+                            <input class="prompt" th:value="${param.containsKey('search') ? param.search[0] : ''}" type="text" placeholder="查找...">
+                            <i class="search link icon"></i>
+                        </div>
+                        <div class="results"></div>
                     </div>
+                    <div style="clear:both;"></div>
                 </div>
                 <!-- <div style="max-height: 450px; overflow-y: auto; margin-bottom: 5px; border-bottom: 1px #DEDEDE solid;"> -->
                 <table class="ui small sortable celled striped compact table segment tb-translate">
@@ -114,7 +123,7 @@
                                 <td style="word-break: break-word;" th:title="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}" th:utext="${#calendars.format(t.createDate,'yy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
                                 <td class="td-watchers">
                                 <div class="ui sub header" style="margin-top:10px;">创建者:</div>
-                                    <a class="ui basic label" th:text="${t.creator}"></a>
+                                    <a th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, creator=${t.creator})}" class="ui basic label" th:text="${t.creator}"></a>
                                     <div class="ui sub header" style="margin-top:10px;">关注者:</div>
                                     <input type="hidden" th:each="w : ${t.watchers}" th:name="${w.username}" th:value="${w.username}">
                                     <div class="ui fluid multiple search selection dropdown dd-row-watchers">
@@ -179,19 +188,19 @@
                     <div class="detail" th:text="${'第' + (page.number + 1) + '页/共' + page.numberOfElements + '条'}">214</div>
                 </div>
                 <div class="ui right floated pagination small menu" th:if="${page.totalPages > 0}">
-                    <a class="item" th:if="${(page.totalPages > 0) and (not page.first)}" th:href="@{/admin/translate(projectId=${projectId}, page=0, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">首页</a>
-                    <a title="上一页" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
+                    <a class="item" th:if="${(page.totalPages > 0) and (not page.first)}" th:href="@{/admin/translate(projectId=${projectId}, page=0, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">首页</a>
+                    <a title="上一页" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
                         <i class="left chevron icon"></i>
                     </a>
-                    <a class="item" th:if="${page.number > 1}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number - 1}"></a>
-                    <a class="item" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number}"></a>
+                    <a class="item" th:if="${page.number > 1}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 2}, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number - 1}"></a>
+                    <a class="item" th:if="${not page.first}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number - 1}, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number}"></a>
                     <a class="item active" th:if="${page.totalPages > 0}" th:href="'javascript:void(0);'" th:text="${page.number + 1}"></a>
-                    <a class="item" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 2}"></a>
-                    <a class="item" th:if="${page.number < page.totalPages - 2}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 2}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 3}"></a>
-                    <a title="下一页" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
+                    <a class="item" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 2}"></a>
+                    <a class="item" th:if="${page.number < page.totalPages - 2}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 2}, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:text="${page.number + 3}"></a>
+                    <a title="下一页" th:if="${not page.last}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number + 1}, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" class="icon item popup">
                         <i class="right chevron icon"></i>
                     </a>
-                    <a class="item" th:if="${(page.totalPages > 0) and (not page.last)}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.totalPages - 1}, size=${page.size}, my=${param.containsKey('my') ? param.my[0] : ''}, new=${param.containsKey('new') ? param.new[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">末页</a>
+                    <a class="item" th:if="${(page.totalPages > 0) and (not page.last)}" th:href="@{/admin/translate(projectId=${projectId}, page=${page.totalPages - 1}, size=${page.size}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}">末页</a>
                 </div>
                 <!-- </div> -->
             </div>
@@ -219,6 +228,22 @@
         });
         $('.ui.dropdown.dd-tags').dropdown({
             allowAdditions: true
+        });
+
+        var source = [];
+        if (localStorage) {
+            var v = localStorage.getItem('admin/translate:search');
+            source = v ? $.parseJSON(v) : [];
+        }
+
+        $('.ui.search.sh-search').search({
+            source: source,
+            onSelect: function(result, response) {
+                searchHandler();
+            },
+            onResults: function() {
+                $(this).search('hide results');
+            }
         });
 
         autosize($('.tb-translate textarea'));
@@ -342,6 +367,21 @@
 
         function searchHandler() {
             var search = $('.inp-search > input').val();
+            // 保存检索值
+            var isExists = false;
+            $.each(source, function(index, val) {
+                if (val.title == search) {
+                    isExists = true;
+                    return false;
+                }
+            });
+            if (!isExists) {
+                source.splice(0, 0, {
+                    title: search
+                });
+            }
+            localStorage && localStorage.setItem('admin/translate:search', JSON.stringify(source));
+
             var number = $('input:hidden[name="page.number"]').val();
             var size = $('input:hidden[name="page.size"]').val();
             var projectId = $('input:hidden[name="projectId"]').val();
