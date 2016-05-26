@@ -485,6 +485,42 @@
             <div class="ui ok positive button">确定</div>
         </div>
     </div>
+    <!-- language add modal -->
+    <div th:fragment="ad-translate-mail" class="ui small modal ad-translate-mail">
+        <div class="header">
+            邮件讨论
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui multiple search selection dropdown dd-mailUsers">
+                    <input name="users" type="hidden" value="">
+                    <i class="dropdown icon"></i>
+                    <div class="default text">用户</div>
+                    <div class="menu">
+                        <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                    </div>
+                </div>
+                <div class="ui checkbox ck-selectAll">
+                    <input type="checkbox" name="all">
+                    <label>全员发送</label>
+                </div>
+            </div>
+            <div class="ui segment form">
+                <div class="field">
+                    <label>标题:</label>
+                    <input type="text" name="title" th:value="${'针对翻译的邮件讨论'}" value="针对翻译的邮件讨论" />
+                </div>
+                <div class="field markdown-body">
+                    <label>内容:</label>
+                    <textarea class="ta-markdown" name="content" rows="10"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
     <!-- language edit modal -->
     <div th:fragment="ad-language-edit" class="ui small modal ad-language-edit">
         <div class="header">
