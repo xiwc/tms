@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
@@ -66,12 +67,12 @@ public class Mail {
 		String newTags = StringUtil.join(",", tags);
 
 		if (!translate.getKey().equals(translateForm.getKey())) {
-			this.put("翻译名称",
-					translate.getKey() + " -> " + translateForm.getKey());
+			this.put("翻译名称", translate.getKey() + SysConstant.CHANGE_TO
+					+ translateForm.getKey());
 		}
 
 		if (!oldLabels.equals(newTags)) {
-			this.put("翻译标签", oldLabels + " -> " + newTags);
+			this.put("翻译标签", oldLabels + SysConstant.CHANGE_TO + newTags);
 
 		}
 

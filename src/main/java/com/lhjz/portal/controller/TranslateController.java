@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.JsonObject;
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
@@ -271,10 +272,11 @@ public class TranslateController extends BaseController {
 					+ translate.getProject().getId() + "&id="
 					+ translate.getId();
 
-			final Mail mail2 = Mail.instance().put(
-					translateItem.getLanguage().getDescription() + "["
+			final Mail mail2 = Mail.instance()
+					.put(translateItem.getLanguage().getDescription() + "["
 							+ translateItem.getLanguage().getName() + "]",
-					oldContent + " -> " + translateItemForm.getContent());
+							oldContent + SysConstant.CHANGE_TO
+									+ translateItemForm.getContent());
 
 			ThreadUtil.exec(() -> {
 
@@ -430,7 +432,7 @@ public class TranslateController extends BaseController {
 						mail2.put(
 								language.getDescription() + "["
 										+ language.getName() + "]",
-								oldContent + " -> " + content);
+								oldContent + SysConstant.CHANGE_TO + content);
 					}
 
 					logWithProperties(Action.Update, Target.TranslateItem,
@@ -451,7 +453,7 @@ public class TranslateController extends BaseController {
 						mail2.put(
 								language.getDescription() + "["
 										+ language.getName() + "]",
-								" -> " + item.getContent());
+								SysConstant.CHANGE_TO + item.getContent());
 					}
 
 					logWithProperties(Action.Create, Target.TranslateItem,
@@ -545,8 +547,9 @@ public class TranslateController extends BaseController {
 		ThreadUtil.exec(() -> {
 
 			try {
-				mailSender.sendHtml(String.format("TMS-翻译删除_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+				mailSender.sendHtml(
+						String.format("TMS-翻译删除_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-delete",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "deleter",
