@@ -41,7 +41,7 @@
                             <th class="">创建用户</th>
                             <th class="">创建时间</th>
                             <th class="">状态</th>
-                            <th class="">处理</th>
+                            <th class="" sec:authorize="hasRole('ROLE_ADMIN')">处理</th>
                         </thead>
                         <tbody th:remove="all-but-first">
                             <!--/*/
@@ -56,8 +56,9 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div th:each="w : ${p.watchers}" th:title="${w.username + (#strings.isEmpty(w.name) ? '' : '[' + w.name + ']')}" class="ui basic label pp" title="管理员[admin]">
+                                        <div th:each="w : ${p.watchers}" th:attr="data-id=${w.username}" th:title="${w.username + (#strings.isEmpty(w.name) ? '' : '[' + w.name + ']')}" class="ui basic label pp" title="管理员[admin]">
                                             <span th:text="${#strings.isEmpty(w.name) ? w.username : w.name}">管理员</span>
+                                            <i th:if="${#strings.equals(w.username, user.username) or #strings.equals(p.creator, user.username) or #authorization.expression('hasRole(''ROLE_SUPER'')')}" class="delete icon icon-delete-watcher"></i>
                                         </div>
                                     </td>
                                     <td>
@@ -65,7 +66,7 @@
                                     </td>
                                     <td th:text="${#calendars.format(p.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
                                     <td th:text="${p.status}">New</td>
-                                    <td>
+                                    <td sec:authorize="hasRole('ROLE_ADMIN')">
                                         <div class="ui dropdown dd-actions" th:if="${#strings.equals(p.creator, user.username) or #authorization.expression('hasRole(''ROLE_SUPER'')')}">
                                             <div class="text">操作</div>
                                             <i class="dropdown icon"></i>
@@ -191,6 +192,26 @@
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
                             $btn.closest('tr').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error('删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.tb-project').on('click', '.icon-delete-watcher', function(event) {
+            $btn = $(this);
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/project/deleteWatcher', {
+                        id: $btn.closest('tr').attr('data-id'),
+                        username: $btn.closest('div.ui.label').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('div.ui.label').remove();
                             toastr.success('删除成功!');
                         } else {
                             toastr.error('删除失败!');

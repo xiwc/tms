@@ -37,7 +37,7 @@
                             <th class="">创建用户</th>
                             <th class="">创建时间</th>
                             <th class="">状态</th>
-                            <th class="">处理</th>
+                            <th class="" sec:authorize="hasRole('ROLE_ADMIN')">处理</th>
                         </thead>
                         <tbody th:remove="all-but-first">
                             <!--/*/
@@ -47,7 +47,7 @@
                                     <td th:text="${l.creator}"></td>
                                     <td th:text="${#calendars.format(l.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
                                     <td th:text="${l.status}">New</td>
-                                    <td>
+                                    <td sec:authorize="hasRole('ROLE_ADMIN')">
                                         <div class="ui dropdown dd-actions" th:if="${#strings.equals(l.creator, user.username) or #authorization.expression('hasRole(''ROLE_SUPER'')')}">
                                             <div class="text">操作</div>
                                             <i class="dropdown icon"></i>

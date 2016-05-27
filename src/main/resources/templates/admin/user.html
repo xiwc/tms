@@ -32,7 +32,7 @@
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
                 <div th:replace="admin/template :: ad-page-header ('用户管理', 'user')"></div>
-                <div class="ui attached segment">
+                <div class="ui attached segment" sec:authorize="hasRole('ROLE_ADMIN')">
                     <div class="ui primary compact button btn-add">添加</div>
                 </div>
                 <!-- <div style="max-height: 450px; overflow-y: auto;"> -->
@@ -43,7 +43,7 @@
                         <th>邮箱</th>
                         <th>创建时间</th>
                         <th>状态</th>
-                        <th>处理</th>
+                        <th sec:authorize="hasRole('ROLE_ADMIN')">处理</th>
                     </thead>
                     <tbody th:remove="all-but-first">
                         <tr th:each="user : ${users}" th:attr="data-id=${user.username}">
@@ -59,7 +59,7 @@
                             <td class="user-status" th:if="${not user.enabled}">
                                 <div class="ui yellow small tag label">停用</div>
                             </td>
-                            <td>
+                            <td sec:authorize="hasRole('ROLE_ADMIN')">
                                 <!-- if is super role, super admin can mgr not super admin and user role -->
                                 <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
                                 <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
@@ -75,7 +75,7 @@
                     </tbody>
                 </table>
                 <!-- </div> -->
-                <div class="ui styled fluid accordion">
+                <div class="ui styled fluid accordion" sec:authorize="hasRole('ROLE_ADMIN')">
                     <div class="title" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
                         <i class="dropdown icon"></i> 批量创建用户
                     </div>
@@ -89,10 +89,10 @@
                             </div>
                         </div>
                     </div>
-                    <div class="title" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                    <div class="title" sec:authorize="hasRole('ROLE_ADMIN')">
                         <i class="dropdown icon"></i> 群发邮件消息
                     </div>
-                    <div class="content sg-batchMail" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">
+                    <div class="content sg-batchMail" sec:authorize="hasRole('ROLE_ADMIN')">
                         <div class="ui segment">
                             <div class="ui multiple search selection dropdown dd-mailUsers">
                                 <input name="users" type="hidden" value="">
@@ -141,15 +141,18 @@
         $('.ui.dropdown.dd-mailUsers').dropdown();
         $('.ui.accordion').accordion();
 
-        var simplemde = new SimpleMDE({
-            element: $(".ta-md")[0],
-            autoDownloadFontAwesome: false,
-            autosave: {
-                enabled: true,
-                delay: 5000,
-                uniqueId: "user-batch-mail"
-            }
-        });
+        var simplemde = null;
+        if ($(".ta-md").size() > 0) {
+            simplemde = new SimpleMDE({
+                element: $(".ta-md")[0],
+                autoDownloadFontAwesome: false,
+                autosave: {
+                    enabled: true,
+                    delay: 5000,
+                    uniqueId: "user-batch-mail"
+                }
+            });
+        }
 
         $('.ui.checkbox.ck-selectAll').checkbox({
             onChecked: function() {
@@ -199,7 +202,7 @@
             $('.ad-handle-confirm').modal({
                 onApprove: function() {
 
-                    if(!$.trim(simplemde.value())) {
+                    if (!$.trim(simplemde.value())) {
                         toastr.error('邮件内容不能为空!');
                         return;
                     }
