@@ -116,7 +116,7 @@ public class ImportController extends BaseController {
 			@RequestParam(value = "labels", required = false) String labels,
 			@RequestParam("content") String content) {
 
-		Project project = projectRepository.findOne(projectId);
+		final Project project = projectRepository.findOne(projectId);
 		Language language2 = languageRepository.findOne(languageId);
 
 		Map<String, String> kvMaps = new HashMap<>();
@@ -287,6 +287,7 @@ public class ImportController extends BaseController {
 							TemplateUtil.process(
 									"templates/mail/translate-import",
 									MapUtil.objArr2Map("user", loginUser,
+											"project", project,
 											"importDate", new Date(), "href",
 											href, "body",
 											"<h3>" + msg + "</h3>"
