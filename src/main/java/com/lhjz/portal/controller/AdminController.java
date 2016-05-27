@@ -16,7 +16,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -91,7 +90,6 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("user")
-	@Secured("ROLE_ADMIN")
 	public String user(Model model) {
 
 		logger.debug("Enter method...");
@@ -123,7 +121,6 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("project")
-	@Secured("ROLE_ADMIN")
 	public String project(Model model) {
 
 		logger.debug("Enter method...");
@@ -143,7 +140,6 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("language")
-	@Secured("ROLE_ADMIN")
 	public String language(Model model) {
 
 		logger.debug("Enter method...");

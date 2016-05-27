@@ -102,8 +102,8 @@ public class ProjectController extends BaseController {
 					.collect(Collectors.joining("<br/>")));
 		}
 
-		Project project3 = projectRepository
-				.findOneByName(projectForm.getName());
+		Project project3 = projectRepository.findOneByName(projectForm
+				.getName());
 		if (project3 != null) {
 			return RespBody.failed("同名项目已经存在!");
 		}
@@ -118,8 +118,8 @@ public class ProjectController extends BaseController {
 		project.setDescription(projectForm.getDesc());
 		project.setName(projectForm.getName());
 		project.setStatus(Status.New);
-		project.setLanguage(
-				languageRepository.findOne(projectForm.getLanguage()));
+		project.setLanguage(languageRepository.findOne(projectForm
+				.getLanguage()));
 
 		// 项目语言保存
 		String[] lngArr = projectForm.getLanguages().split(",");
@@ -135,8 +135,8 @@ public class ProjectController extends BaseController {
 		List<User> watchers = null;
 		if (StringUtil.isNotEmpty(projectForm.getWatchers())) {
 
-			watchers = userRepository.findAll(
-					Arrays.asList(projectForm.getWatchers().split(",")));
+			watchers = userRepository.findAll(Arrays.asList(projectForm
+					.getWatchers().split(",")));
 			project.getWatchers().addAll(watchers);
 
 		}
@@ -206,8 +206,8 @@ public class ProjectController extends BaseController {
 
 		project.setDescription(projectForm.getDesc());
 
-		Project project2 = projectRepository
-				.findOneByName(projectForm.getName());
+		Project project2 = projectRepository.findOneByName(projectForm
+				.getName());
 		if (project2 == null) {
 			project.setName(projectForm.getName());
 		}
@@ -218,8 +218,8 @@ public class ProjectController extends BaseController {
 
 		// 主语言如果变化,则保存
 		if (!project.getLanguage().getId().equals(projectForm.getLanguage())) {
-			project.setLanguage(
-					languageRepository.findOne(projectForm.getLanguage()));
+			project.setLanguage(languageRepository.findOne(projectForm
+					.getLanguage()));
 		}
 
 		// 项目语言保存
@@ -251,8 +251,8 @@ public class ProjectController extends BaseController {
 		languageRepository.flush();
 
 		if (StringUtil.isNotEmpty(projectForm.getWatchers())) {
-			List<String> watchers = Arrays
-					.asList(projectForm.getWatchers().split(","));
+			List<String> watchers = Arrays.asList(projectForm.getWatchers()
+					.split(","));
 
 			Set<User> watchers2 = project.getWatchers();
 			for (User user : watchers2) {
@@ -363,6 +363,34 @@ public class ProjectController extends BaseController {
 		projectRepository.flush();
 
 		log(Action.Delete, Target.Project, id);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = "deleteWatcher", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody deleteWatcher(@RequestParam("id") Long id,
+			@RequestParam("username") String username) {
+
+		Project project = projectRepository.findOne(id);
+		if (project == null) {
+			return RespBody.failed("项目不存在！");
+		}
+
+		User watcher = userRepository.findOne(username);
+		if (watcher == null) {
+			return RespBody.failed("关注者用户不存在！");
+		}
+
+		watcher.getWatcherProjects().remove(project);
+		project.getWatchers().remove(watcher);
+
+		userRepository.saveAndFlush(watcher);
+
+		projectRepository.saveAndFlush(project);
+
+		log(Action.Update, Target.Project, project);
 
 		return RespBody.succeed(id);
 	}
