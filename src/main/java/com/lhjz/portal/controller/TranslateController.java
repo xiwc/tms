@@ -240,9 +240,10 @@ public class TranslateController extends BaseController {
 			translateItem.setUpdater(WebUtil.getUsername());
 			translateItem.setUpdateDate(new Date());
 
-			translateItemRepository.saveAndFlush(translateItem);
+			TranslateItem translateItem2 = translateItemRepository
+					.saveAndFlush(translateItem);
 
-			final Translate translate = translateItem.getTranslate();
+			final Translate translate = translateItem2.getTranslate();
 			translate.setUpdateDate(new Date());
 			translate.setUpdater(WebUtil.getUsername());
 			translate.setStatus(Status.Updated);
@@ -250,14 +251,14 @@ public class TranslateController extends BaseController {
 			final User loginUser = getLoginUser();
 			translate.getWatchers().add(loginUser);
 
-			translate.setSearch(translate.toString());
-
 			if (translate.getProject().getLanguage().getId()
 					.equals(translateItem.getLanguage().getId())) {
 				if (StringUtil.isEmpty(translate.getDescription())) {
 					translate.setDescription(translateItemForm.getContent());
 				}
 			}
+
+			translate.setSearch(translate.toString());
 
 			translateRepository.saveAndFlush(translate);
 
