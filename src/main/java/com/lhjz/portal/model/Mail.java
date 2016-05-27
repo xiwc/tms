@@ -56,16 +56,24 @@ public class Mail {
 		}).collect(Collectors.toList());
 
 		Collections.sort(labels);
+		String oldLabels = StringUtil.join(",", labels);
 
 		List<String> tags = new ArrayList<>();
 		if (StringUtil.isNotEmpty(translateForm.getTags())) {
 			tags = Arrays.asList(translateForm.getTags().split(","));
 		}
 		Collections.sort(tags);
+		String newTags = StringUtil.join(",", tags);
 
-		this.put("翻译名称", translate.getKey() + " -> " + translateForm.getKey());
-		this.put("翻译标签", StringUtil.join(",", labels) + " -> "
-				+ StringUtil.join(",", tags));
+		if (!translate.getKey().equals(translateForm.getKey())) {
+			this.put("翻译名称",
+					translate.getKey() + " -> " + translateForm.getKey());
+		}
+
+		if (!oldLabels.equals(newTags)) {
+			this.put("翻译标签", oldLabels + " -> " + newTags);
+
+		}
 
 		return this;
 	}

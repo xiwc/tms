@@ -1,5 +1,6 @@
 package com.lhjz.portal.util;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.testng.Assert;
@@ -36,6 +37,12 @@ public class CommonUtilTest {
 	public void status() {
 		System.out.println(Status.valueOf("New"));
 		// System.out.println(Status.valueOf("New_"));
+	}
+
+	@Test
+	public void stringJoin() {
+		System.out.println(StringUtil.join(",", new ArrayList<>()));
+		Assert.assertEquals(StringUtil.join(",", new ArrayList<>()), "");
 	}
 
 	// public static void main(String[] args) {

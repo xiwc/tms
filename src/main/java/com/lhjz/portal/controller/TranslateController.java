@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -343,6 +344,10 @@ public class TranslateController extends BaseController {
 		final Translate translate = translateRepository.findOne(id);
 
 		if (translate != null) {
+
+			final Mail mail2 = Mail.instance()
+					.parseTranslateUpdated(translateForm, translate);
+
 			translate.setKey(translateForm.getKey());
 			translate.setDescription(translateForm.getDesc());
 			translate.setStatus(Status.Updated);
@@ -391,9 +396,6 @@ public class TranslateController extends BaseController {
 				labels.addAll(save);
 			}
 
-			final Mail mail2 = Mail.instance().parseTranslateUpdated(translateForm,
-					translate);
-
 			JsonObject jsonO = (JsonObject) JsonUtil
 					.toJsonElement(translateForm.getContent());
 			Set<Language> lngs = translate.getProject().getLanguages();
@@ -424,11 +426,12 @@ public class TranslateController extends BaseController {
 
 					translateItemRepository.saveAndFlush(exitTranslateItem);
 
-					mail2.put(
-							language.getDescription() + "[" + language.getName()
-									+ "]",
-							oldContent + " -> "
-									+ exitTranslateItem.getContent());
+					if (!StringUtils.equals(oldContent, content)) {
+						mail2.put(
+								language.getDescription() + "["
+										+ language.getName() + "]",
+								oldContent + " -> " + content);
+					}
 
 					logWithProperties(Action.Update, Target.TranslateItem,
 							"content", content, oldContent);
@@ -443,9 +446,13 @@ public class TranslateController extends BaseController {
 
 					translateItemRepository.saveAndFlush(item);
 
-					mail2.put(language.getDescription() + "["
-							+ language.getName() + "]",
-							" -> " + item.getContent());
+					if (!StringUtils.equals(StringUtil.EMPTY,
+							item.getContent())) {
+						mail2.put(
+								language.getDescription() + "["
+										+ language.getName() + "]",
+								" -> " + item.getContent());
+					}
 
 					logWithProperties(Action.Create, Target.TranslateItem,
 							"content", item);
@@ -656,8 +663,9 @@ public class TranslateController extends BaseController {
 		ThreadUtil.exec(() -> {
 
 			try {
-				mailSender.sendHtml(String.format("TMS-翻译更新_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+				mailSender.sendHtml(
+						String.format("TMS-翻译更新_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-update",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "href", href, "body",
@@ -796,8 +804,9 @@ public class TranslateController extends BaseController {
 		ThreadUtil.exec(() -> {
 
 			try {
-				mailSender.sendHtml(String.format("TMS-翻译更新_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+				mailSender.sendHtml(
+						String.format("TMS-翻译更新_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/translate-update",
 								MapUtil.objArr2Map("translate", translate,
 										"user", loginUser, "href", href, "body",
