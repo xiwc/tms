@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -277,7 +278,7 @@ public class AdminController extends BaseController {
 
 		model.addAttribute("projects", projects);
 		model.addAttribute("project", project);
-		model.addAttribute("labels", lbls);
+		model.addAttribute("labels", new TreeSet<>(lbls));
 		model.addAttribute("page", page);
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
