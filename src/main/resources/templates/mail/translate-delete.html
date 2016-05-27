@@ -30,6 +30,14 @@
                     <td th:text="${translate.description}" style="word-break: break-word; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);"></td>
                 </tr>
                 <tr style="box-sizing: border-box;">
+                    <th style="min-width:80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">项目名称:</th>
+                    <td th:text="${project.name}" style="word-break: break-word; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);"></td>
+                </tr>
+                <tr style="box-sizing: border-box; background-color: rgb(249, 249, 249);">
+                    <th style="min-width:80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">项目描述:</th>
+                    <td th:text="${project.description}" style="word-break: break-word; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);"></td>
+                </tr>
+                <tr style="box-sizing: border-box;">
                     <th style="min-width:80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">删除用户:</th>
                     <td style="word-break: break-word; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">
                         <span th:text="${user.username + (user.name ? '[' + user.name + ']' : '')}">test (测试用户)</span>

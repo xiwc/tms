@@ -4,7 +4,9 @@
 package com.lhjz.portal.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
@@ -45,6 +48,35 @@ public class Mail {
 
 	public static Mail instance() {
 		return new Mail();
+	}
+
+	public Mail parseTranslateUpdated(TranslateForm translateForm,
+			Translate translate) {
+		List<String> labels = translate.getLabels().stream().map((l) -> {
+			return l.getName();
+		}).collect(Collectors.toList());
+
+		Collections.sort(labels);
+		String oldLabels = StringUtil.join(",", labels);
+
+		List<String> tags = new ArrayList<>();
+		if (StringUtil.isNotEmpty(translateForm.getTags())) {
+			tags = Arrays.asList(translateForm.getTags().split(","));
+		}
+		Collections.sort(tags);
+		String newTags = StringUtil.join(",", tags);
+
+		if (!translate.getKey().equals(translateForm.getKey())) {
+			this.put("翻译名称", translate.getKey() + SysConstant.CHANGE_TO
+					+ translateForm.getKey());
+		}
+
+		if (!oldLabels.equals(newTags)) {
+			this.put("翻译标签", oldLabels + SysConstant.CHANGE_TO + newTags);
+
+		}
+
+		return this;
 	}
 
 	public Mail parseTranslateForm(TranslateForm translateForm) {
@@ -168,8 +200,8 @@ public class Mail {
 		return mails;
 	}
 
-	public void addHref(String baseURL, String translateAction,
-			Long projectId, List<Translate> translates) {
+	public void addHref(String baseURL, String translateAction, Long projectId,
+			List<Translate> translates) {
 
 		for (Translate translate2 : translates) {
 			this.addHref(baseURL, translateAction, projectId, translate2);
@@ -177,8 +209,8 @@ public class Mail {
 
 	}
 
-	public void addHref(String baseURL, String translateAction,
-			Long projectId, Translate translate) {
+	public void addHref(String baseURL, String translateAction, Long projectId,
+			Translate translate) {
 
 		String href = baseURL + translateAction + "?projectId=" + projectId
 				+ "&id=" + translate.getId();

@@ -118,6 +118,8 @@ public final class SysConstant {
 	public static final String CHECK_ON = "on";
 	public static final String CHECK_OFF = "off";
 
+	public static final String CHANGE_TO = " => ";
+
 	/** 店铺 - 菜单 收藏 赞不赞 **/
 	public static final Short FAVORITES_TYPE_BUSINESS = 0;
 	public static final Short FAVORITES_TYPE_BUSINESS_NOT = 6;

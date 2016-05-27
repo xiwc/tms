@@ -146,7 +146,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td th:text="${t.status}">待翻译</td>
+                                <td th:text="${t.status}" th:title="${#strings.equals('New', t.status) ? '创建于: ' + #calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss') : '更新于: ' + #calendars.format(t.updateDate,'yyyy/MM/dd HH:mm:ss')}">待翻译</td>
                                 <td>
                                     <input type="hidden" th:each="w : ${t.project.watchers}" th:name="${w.username}" th:value="${w.username}">
                                     <input type="hidden" th:name="${t.creator}" th:value="${t.creator}">
@@ -328,6 +328,14 @@
                 window.location.href = url('path') + '?projectId=' + url('?projectId') + '&search=' + $(this).text();
             } else {
                 window.location.href = url('path') + '?search=' + $(this).text();
+            }
+        });
+
+        $('body').on('click', '.ui.dropdown.dd-row-watchers .ui.label', function(event) {
+            if (url('?projectId')) {
+                window.location.href = url('path') + '?projectId=' + url('?projectId') + '&creator=' + $(this).attr('data-value');
+            } else {
+                window.location.href = url('path') + '?creator=' + $(this).attr('data-value');
             }
         });
 

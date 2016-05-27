@@ -59,12 +59,21 @@
                     <input type="hidden" name="name" value="" />
                 </form>
             </div>
-            <div class="item link">
-                <div th:attr="data-id=${#authentication.name},data-html='当前登录用户: <b>' + ${#authentication.name} + '</b>'" class="ad-index-user-edit popup-login-user">修改 </div>
-            </div>
-            <div class="item link">
-                <div class="ad-index-logout">退出 </div>
-                <form class="hidden" th:action="@{/admin/logout}" action="" method="post"></form>
+            <div class="ui floating top right pointing dropdown link item dd-top-menu-user">
+                <i class="user icon"></i>
+                <span class="" th:text="${#authentication.name}">admin</span>
+                <div class="menu">
+                    <div class="header">选择操作</div>
+                    <div class="item ad-index-user-edit" th:attr="data-id=${#authentication.name}">
+                        <i class="edit icon"></i>
+                        <span>修改 </span>
+                    </div>
+                    <div class="item ad-index-logout">
+                        <i class="sign out icon"></i>
+                        <span>退出 </span>
+                        <form class="hidden" th:action="@{/admin/logout}" action="" method="post"></form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

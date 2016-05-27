@@ -12,7 +12,7 @@ jQuery(function($) {
     }
 
     $('.ad-index-logout').click(function() {
-        $(this).siblings('form').submit();
+        $(this).children('form').submit();
     });
 
     $('.ad-index-user-edit').click(function() {
@@ -53,6 +53,9 @@ jQuery(function($) {
     $('.ui.checkbox').checkbox();
     $('.popup-login-user').popup({
         position: 'bottom right',
+    });
+    $('.ui.dropdown.dd-top-menu-user').dropdown({
+        action: 'hide'
     });
 
     // load markdown help content

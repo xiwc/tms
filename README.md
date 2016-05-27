@@ -13,6 +13,11 @@ http://translation.sh1.newtouch.com/admin/login
 数据库: mysql  
 JDK: jdk8  
 
+# DOC
+https://github.com/thymeleaf/thymeleaf-extras-springsecurity  
+http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/  
+http://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html  
+
 # 开发工具
 sts: http://spring.io/tools/sts/  
 sublime text3: http://www.sublimetext.com/3  
