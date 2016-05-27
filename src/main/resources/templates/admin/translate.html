@@ -20,7 +20,7 @@
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
-    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -58,7 +58,7 @@
                             <!--*/-->
                         </div>
                     </div>
-                    <div th:if="${(projectId != null and projectId != -1)}" class="ui primary compact button btn-add">添加</div>
+                    <div class="ui primary compact button btn-add">添加</div>
                     <div class="ui label">筛选:</div>
                     <div class="ui compact basic buttons">
                         <a title="我创建的" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, creator=${user.username})}" th:classappend="${(param.containsKey('creator') and (#strings.equals(user.username, param.creator[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
@@ -432,10 +432,30 @@
             $('.ad-translate-add').modal({
                 onShow: function() {
                     $(this).find('.dd-tags').dropdown('clear');
+                    var $dd = $('.dd-select-project');
+                    if (!$dd.dropdown('get value')) {
+                        var $items = $dd.find('.menu .item');
+                        if ($items.size() > 0) {
+                            $dd.dropdown('set selected', $items.attr('data-value'));
+                        }
+                    }
                 },
                 onApprove: function() {
+                    var pid = '';
+                    var $dd = $('.dd-select-project');
+
+                    if ($dd.size() == 1) {
+                        pid = $dd.dropdown('get value');
+                    } else {
+                        pid = $('.dd-project').dropdown('get value');
+                    }
+
+                    if (!pid || pid == -1) {
+                        toastr.error('请选择项目!');
+                        return;
+                    }
                     var data = Utils.formData('.ad-translate-add .ui.form');
-                    data.projectId = $('.dd-project').dropdown('get value');
+                    data.projectId = pid;
                     data.content = JSON.stringify(data);
                     if (!data.key) {
                         data.key = "todo.key.id" + (new Date()).getTime();

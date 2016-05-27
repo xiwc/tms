@@ -373,6 +373,24 @@
         <div class="content">
             <div class="ui segment">
                 <div class="ui form">
+                    <div th:if="${projectId == -1}" class="required field">
+                        <label>项目:</label>
+                        <div class="ui selection dropdown dd-select-project">
+                            <input type="hidden" name="projectId" value="">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">项目</div>
+                            <div class="menu">
+                                <!--/*/
+                            <div th:each="p : ${projects}" class="item" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</div>
+                            /*/-->
+                                <!--/*-->
+                                <a class="item" data-value="1">STEP</a>
+                                <a class="item" data-value="2">WORK</a>
+                                <a class="item" data-value="3">CONSOLE</a>
+                                <!--*/-->
+                            </div>
+                        </div>
+                    </div>
                     <div class="field">
                         <label>名称:</label>
                         <input name="key" type="text" placeholder="名称" th:value="''" value="app.name">
