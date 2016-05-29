@@ -16,6 +16,7 @@ JDK: jdk8
 # DOC
 https://github.com/thymeleaf/thymeleaf-extras-springsecurity  
 http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/  
+http://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/  
 http://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html  
 
 # 开发工具
