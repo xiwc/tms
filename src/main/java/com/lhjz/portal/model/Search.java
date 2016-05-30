@@ -58,7 +58,7 @@ public class Search {
 
 	@Override
 	public String toString() {
-		return StringUtil.join(StringUtil.SEARCH_SEPARATOR, list);
+		return StringUtil.join2(StringUtil.SEARCH_SEPARATOR, list);
 	}
 
 }
