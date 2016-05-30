@@ -61,10 +61,21 @@
                     <div class="ui primary compact button btn-add">添加</div>
                     <div class="ui label">筛选:</div>
                     <div class="ui compact basic buttons">
-                        <a title="我创建的" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, creator=${user.username})}" th:classappend="${(param.containsKey('creator') and (#strings.equals(user.username, param.creator[0]))) ? 'active' : ''}" class="ui button btn-filter-my">我的</a>
-                        <a title="新创建的" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, status=${'New'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('New', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
-                        <a title="更新过的" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, status=${'Updated'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('Updated', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-updated">更新</a>
-                        <a title="全部翻译" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size})}" th:classappend="${((not param.containsKey('creator')) and (not param.containsKey('status')) and (not param.containsKey('languageId')) and (not param.containsKey('search')) and (not param.containsKey('id'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
+                        <div class="ui floating dropdown search button dd-creators" th:style="${(param.containsKey('creator') and (not #strings.isEmpty(param.creator[0]))) ? 'background: rgba(0,0,0,.05) !important;' : ''}" th:title="翻译创建者">
+                            <input type="hidden" th:value="${param.containsKey('creator') ? param.creator[0] : ''}" />
+                            <span class="text">创建者</span>
+                            <div class="menu">
+                                <a th:href="@{/admin/translate(projectId=${projectId}, creator=${user.username})}" class="item" th:title="${user.name != null ? user.name : user.username}" th:attr="data-value=${user.username}" th:utext="${'当前用户'}">当前用户</a>
+                                <div class="divider"></div>
+                                <div class="header">
+                                    <i class="users icon"></i>其他创建者
+                                </div>
+                                <a th:each="u : ${users}" th:if="${u.username != user.username}" th:href="@{/admin/translate(projectId=${projectId}, creator=${u.username})}" class="item" th:title="${u.name != null ? u.name : u.username}" th:attr="data-value=${u.username}" th:text="${u.name != null ? u.name : u.username}"></a>
+                            </div>
+                        </div>
+                        <a title="新创建的" th:href="@{/admin/translate(projectId=${projectId}, status=${'New'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('New', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
+                        <a title="更新过的" th:href="@{/admin/translate(projectId=${projectId}, status=${'Updated'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('Updated', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-updated">更新</a>
+                        <a title="全部翻译" th:href="@{/admin/translate(projectId=${projectId})}" th:classappend="${((not param.containsKey('creator')) and (not param.containsKey('status')) and (not param.containsKey('languageId')) and (not param.containsKey('search')) and (not param.containsKey('id'))) ? 'active' : ''}" class="ui button btn-filter-all">全部</a>
                     </div>
                     &nbsp;&nbsp;
                     <!-- <div class="ui label">过滤:</div> -->
@@ -245,6 +256,11 @@
         $('.ui.dropdown.dd-tags').dropdown({
             allowAdditions: true
         });
+        $('.ui.dropdown.dd-creators').dropdown({
+            onChange: function(value, text, $choice) {
+                window.location.href = $choice.attr('href');
+            }
+        });
 
         var simplemde = new SimpleMDE({
             element: $(".ad-translate-mail textarea.ta-markdown")[0],
@@ -419,9 +435,9 @@
             var size = $('input:hidden[name="page.size"]').val();
             var projectId = $('input:hidden[name="projectId"]').val();
             if (search) {
-                window.location.href = "/admin/translate?projectId=" + projectId + "&page=" + number + "&size=" + size + "&search=" + search;
+                window.location.href = "/admin/translate?projectId=" + projectId + "&search=" + search;
             } else {
-                window.location.href = "/admin/translate?projectId=" + projectId + "&page=" + number + "&size=" + size;
+                window.location.href = "/admin/translate?projectId=" + projectId;
             }
         }
 
