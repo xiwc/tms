@@ -435,9 +435,9 @@
             var size = $('input:hidden[name="page.size"]').val();
             var projectId = $('input:hidden[name="projectId"]').val();
             if (search) {
-                window.location.href = "/admin/translate?projectId=" + projectId + "&page=" + number + "&size=" + size + "&search=" + search;
+                window.location.href = "/admin/translate?projectId=" + projectId + "&search=" + search;
             } else {
-                window.location.href = "/admin/translate?projectId=" + projectId + "&page=" + number + "&size=" + size;
+                window.location.href = "/admin/translate?projectId=" + projectId;
             }
         }
 
