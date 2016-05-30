@@ -34,7 +34,7 @@ import com.lhjz.portal.pojo.Enum.Status;
  * 
  */
 @Entity
-public class Project implements Serializable {
+public class Project implements Serializable, Comparable<Project> {
 
 	private static final long serialVersionUID = -278833537706540131L;
 
@@ -194,11 +194,41 @@ public class Project implements Serializable {
 	}
 
 	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Project other = (Project) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return "Project [id=" + id + ", name=" + name + ", description="
 				+ description + ", creator=" + creator + ", updater=" + updater
 				+ ", status=" + status + ", createDate=" + createDate
 				+ ", updateDate=" + updateDate + ", version=" + version + "]";
+	}
+
+	@Override
+	public int compareTo(Project o) {
+		return getName().compareToIgnoreCase(o.getName());
 	}
 
 }

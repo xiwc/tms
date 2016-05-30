@@ -276,7 +276,7 @@ public class AdminController extends BaseController {
 			lbls = new HashSet<String>();
 		}
 
-		model.addAttribute("projects", projects);
+		model.addAttribute("projects", new TreeSet<>(projects));
 		model.addAttribute("project", project);
 		model.addAttribute("labels", new TreeSet<>(lbls));
 		model.addAttribute("page", page);
@@ -338,7 +338,7 @@ public class AdminController extends BaseController {
 			lbls = new HashSet<String>();
 		}
 
-		model.addAttribute("projects", projects);
+		model.addAttribute("projects", new TreeSet<>(projects));
 		model.addAttribute("translates", translates);
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
