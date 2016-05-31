@@ -7,6 +7,7 @@ jQuery(function($) {
     if ($('#context').size() == 1) {
         $('.ui.sticky').sticky({
             offset: 70,
+            observeChanges: true,
             context: '#context'
         });
     }
