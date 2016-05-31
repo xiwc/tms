@@ -155,7 +155,7 @@
                             content: content
                         }, function(data, textStatus, xhr) {
                             if (data.success) {
-                                $('.msg-content').text("导入统计: " + data.data);
+                                $('.msg-content').html(data.data);
                                 toastr.success('导入成功!');
                             } else {
                                 toastr.error('导入失败!');

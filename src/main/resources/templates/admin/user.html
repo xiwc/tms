@@ -47,7 +47,7 @@
                     </thead>
                     <tbody th:remove="all-but-first">
                         <tr th:each="user : ${users}" th:attr="data-id=${user.username}">
-                            <td class="pp" th:title="${(user.name != null) ? user.name : ''}" th:text="${user.username}">username</td>
+                            <td class="pp" th:title="${#strings.isEmpty(user.name) ? user.name : ''}" th:text="${user.username}">username</td>
                             <td>
                                 <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small basic label user-role" th:text="${auth}"></div>
                             </td>
