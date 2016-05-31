@@ -343,6 +343,7 @@ public class AdminController extends BaseController {
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
 		model.addAttribute("labels", lbls);
+		model.addAttribute("users", userRepository.findAll());
 
 		return "admin/import";
 	}

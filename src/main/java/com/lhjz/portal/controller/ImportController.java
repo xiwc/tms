@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +113,8 @@ public class ImportController extends BaseController {
 			@RequestParam("languageId") Long languageId,
 			@RequestParam("type") Long type,
 			@RequestParam("baseURL") String baseURL,
-			@RequestParam(value = "notify", defaultValue = "0") Boolean notify,
 			@RequestParam(value = "labels", required = false) String labels,
+			@RequestParam(value = "observers", required = false) String observers,
 			@RequestParam("content") String content) {
 
 		final Project project = projectRepository.findOne(projectId);
@@ -264,7 +265,7 @@ public class ImportController extends BaseController {
 
 		log(Action.Import, Target.Import, content);
 
-		final Mail mail = Mail.instance().addWatchers(project);
+		final Mail mail = Mail.instance();
 
 		final User loginUser = getLoginUser();
 
@@ -274,8 +275,14 @@ public class ImportController extends BaseController {
 		final String msg = "共计: " + kvMaps.size() + " 新增: " + translates.size()
 				+ " 更新: " + (kvMaps.size() - translates.size());
 
+		if (StringUtil.isNotEmpty(observers)) {
+			Stream.of(observers.split(",")).forEach((observer) -> {
+				mail.addUsers(getUser(observer));
+			});
+		}
+
 		// 如果邮件通知
-		if (notify && mail.get().length > 0) {
+		if (mail.get().length > 0) {
 
 			ThreadUtil.exec(() -> {
 
@@ -287,9 +294,8 @@ public class ImportController extends BaseController {
 							TemplateUtil.process(
 									"templates/mail/translate-import",
 									MapUtil.objArr2Map("user", loginUser,
-											"project", project,
-											"importDate", new Date(), "href",
-											href, "body",
+											"project", project, "importDate",
+											new Date(), "href", href, "body",
 											"<h3>" + msg + "</h3>"
 													+ mail2.hrefs())),
 							mail.get());

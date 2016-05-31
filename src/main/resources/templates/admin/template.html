@@ -179,9 +179,17 @@
                     </div>
                 </div>
                 <div class="inline field">
-                    <div class="ui checkbox">
-                        <input type="checkbox" name="notify">
-                        <label>邮件通知(通知项目关注者)</label>
+                    <div class="ui multiple search selection dropdown dd-mailUsers">
+                        <input name="users" type="hidden" value="">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">通知用户</div>
+                        <div class="menu">
+                            <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                        </div>
+                    </div>
+                    <div class="ui checkbox ck-selectAll">
+                        <input type="checkbox" name="all">
+                        <label>全员通知</label>
                     </div>
                 </div>
             </div>

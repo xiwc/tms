@@ -102,7 +102,22 @@
             allowAdditions: true
         });
 
-        var baseURL = Utils.getBaseURL();//url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        $('.ui.checkbox.ck-selectAll').checkbox({
+            onChecked: function() {
+                var $dd = $('.ad-import-confirm .dd-mailUsers');
+                var alls = [];
+                $dd.find('.menu .item').each(function(index, el) {
+                    alls.push($(el).attr('data-value'));
+                });
+
+                $dd.dropdown('set selected', alls);
+            },
+            onUnchecked: function() {
+                $('.ad-import-confirm .dd-mailUsers').dropdown('clear');
+            }
+        });
+
+        var baseURL = Utils.getBaseURL(); //url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
 
         $('.btn-import').click(function(event) {
 
@@ -118,7 +133,7 @@
                     var type = $('.dd-type').dropdown('get value');
                     var content = $('.ta-content').val();
                     var data = Utils.formData('.ad-import-confirm .ui.form');
-                    var notify = $md.find('.ui.checkbox').checkbox('is checked');
+                    var observers = $md.find('.dd-mailUsers').dropdown('get value');
 
                     if (content) {
                         if (type == 1) { // JSON
@@ -135,7 +150,7 @@
                             languageId: languageId,
                             type: type,
                             labels: data.labels,
-                            notify: notify ? 1 : 0,
+                            observers: observers,
                             baseURL: baseURL,
                             content: content
                         }, function(data, textStatus, xhr) {
