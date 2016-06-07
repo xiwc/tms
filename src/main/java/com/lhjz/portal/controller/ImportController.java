@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +113,8 @@ public class ImportController extends BaseController {
 			@RequestParam("languageId") Long languageId,
 			@RequestParam("type") Long type,
 			@RequestParam("baseURL") String baseURL,
-			@RequestParam(value = "notify", defaultValue = "0") Boolean notify,
 			@RequestParam(value = "labels", required = false) String labels,
+			@RequestParam(value = "observers", required = false) String observers,
 			@RequestParam("content") String content) {
 
 		final Project project = projectRepository.findOne(projectId);
@@ -144,20 +145,31 @@ public class ImportController extends BaseController {
 		for (String key : kvMaps.keySet()) {
 			List<Translate> translates = translateRepository
 					.findByKeyAndProject(key, project);
+			// 翻译存在
 			if (translates.size() > 0) { // 已经存在,做更新处理
 				Translate translate2 = translates.get(0);
 				Set<TranslateItem> translateItems = translate2
 						.getTranslateItems();
 				Language language = null;
+
+				// 查找是否翻译语言已经存在,是否需要更新
 				for (TranslateItem translateItem : translateItems) {
+					// 存在导入语言翻译
 					if (translateItem.getLanguage().getId()
 							.equals(languageId)) {
 						language = translateItem.getLanguage();
-						translateItem.setContent(kvMaps.get(key));
-						translateItems2.add(translateItem);
+						// 翻译内容变动
+						if (!kvMaps.get(key)
+								.equals(translateItem.getContent())) {
+							translateItem.setContent(kvMaps.get(key));
+							translateItems2.add(translateItem);
+
+							translates3.add(translate2);
+						}
 					}
 				}
 
+				// 翻译语言不存在
 				if (language == null) {
 					TranslateItem translateItem = new TranslateItem();
 					translateItem.setContent(kvMaps.get(key));
@@ -170,9 +182,9 @@ public class ImportController extends BaseController {
 					translate2.getTranslateItems().add(translateItem);
 
 					translateItems2.add(translateItem);
-				}
 
-				translates3.add(translate2);
+					translates3.add(translate2);
+				}
 
 			} else { // 不存在, 做新建处理
 				Translate translate = new Translate();
@@ -210,72 +222,125 @@ public class ImportController extends BaseController {
 		translateItemRepository.save(translateItems2);
 		translateItemRepository.flush();
 
-		// 更新翻译search属性
+		// 更新翻译标签
+		String updateLabel = "U"
+				+ DateUtil.format(new Date(), DateUtil.FORMAT8);
+		List<Label> lblUpdated = new ArrayList<>();
+		// 更新翻译search设置属性
 		for (Translate translate : translates3) {
-			translate.setSearch(translate.toString());
+
 			translate.setUpdateDate(new Date());
 			translate.setUpdater(WebUtil.getUsername());
+
+			Label label = new Label();
+			label.setCreateDate(new Date());
+			label.setCreator(WebUtil.getUsername());
+			label.setName(updateLabel);
+			label.setStatus(Status.New);
+			label.setTranslate(translate);
+
+			lblUpdated.add(label);
+
+			translate.getLabels().add(label);
+
+			translate.setSearch(translate.toString());
 		}
+
+		Mail mail2 = Mail.instance();
+
+		if (lblUpdated.size() > 0) {
+			labelRepository.save(lblUpdated);
+			labelRepository.flush();
+
+			mail2.addHref("更新", baseURL, translateAction, projectId,
+					updateLabel);
+		}
+
 		translateRepository.save(translates3);
 		translateRepository.flush();
 
 		// 只有新建的会打标签
-		String[] lbls = null;
+		String[] lbls = new String[0];
 		if (StringUtil.isNotEmpty(labels)) {
 			lbls = labels.split(",");
-		}
-
-		// TODO 不是新建只是更新的 search 没有更新.
-		for (Translate translate : translates2) {
-			translate.setSearch(translate.toString());
 		}
 
 		List<Translate> translates = translateRepository.save(translates2);
 		translateRepository.flush();
 
-		Mail mail2 = Mail.instance();
-		if (lbls != null) {
-			for (Translate translate : translates) {
+		// 新建的翻译打标签
+		String newLabel = "N" + DateUtil.format(new Date(), DateUtil.FORMAT8);
+		List<Label> lblNew = new ArrayList<>();
+		// 新建的翻译设置search属性
+		for (Translate translate : translates) {
 
-				Set<Label> labels2 = new HashSet<>();
-				for (String lbl : lbls) {
-					Label label = new Label();
-					label.setCreateDate(new Date());
-					label.setCreator(WebUtil.getUsername());
-					label.setName(lbl);
-					label.setStatus(Status.New);
-					label.setTranslate(translate);
+			Label label = new Label();
+			label.setCreateDate(new Date());
+			label.setCreator(WebUtil.getUsername());
+			label.setName(newLabel);
+			label.setStatus(Status.New);
+			label.setTranslate(translate);
 
-					labels2.add(label);
-				}
-				labelRepository.save(labels2);
-				labelRepository.flush();
+			lblNew.add(label);
 
-				translate.setLabels(labels2);
+			translate.getLabels().add(label);
 
+			Set<Label> labels2 = new HashSet<>();
+			for (String lbl : lbls) {
+				Label label2 = new Label();
+				label2.setCreateDate(new Date());
+				label2.setCreator(WebUtil.getUsername());
+				label2.setName(lbl);
+				label2.setStatus(Status.New);
+				label2.setTranslate(translate);
+
+				labels2.add(label2);
 			}
+			labelRepository.save(labels2);
+			labelRepository.flush();
+
+			translate.getLabels().addAll(labels2);
+
+			translate.setSearch(translate.toString());
+		}
+
+		translateRepository.save(translates2);
+		translateRepository.flush();
+
+		if (lblNew.size() > 0) {
+			labelRepository.save(lblNew);
+			labelRepository.flush();
+
+			mail2.addHref("新增", baseURL, translateAction, projectId, newLabel);
 		}
 
 		// TODO 再次保存labels更新
 		// translates = translateRepository.save(translates2);
 		// translateRepository.flush();
 
-		mail2.addHref(baseURL, translateAction, projectId, translates);
+		// mail2.addHref(baseURL, translateAction, projectId, translates);
 
 		log(Action.Import, Target.Import, content);
 
-		final Mail mail = Mail.instance().addWatchers(project);
+		final Mail mail = Mail.instance();
 
 		final User loginUser = getLoginUser();
 
 		final String href = baseURL + translateAction + "?projectId="
 				+ projectId;
 
-		final String msg = "共计: " + kvMaps.size() + " 新增: " + translates.size()
-				+ " 更新: " + (kvMaps.size() - translates.size());
+		final String msg = "<h3>" + "新增/更新/合计: " + lblNew.size() + " / "
+				+ lblUpdated.size() + " / " + kvMaps.size() + "</h3><hr/>"
+				+ mail2.hrefs();
+
+		if (StringUtil.isNotEmpty(observers)) {
+			Stream.of(observers.split(",")).forEach((observer) -> {
+				mail.addUsers(getUser(observer));
+			});
+		}
 
 		// 如果邮件通知
-		if (notify && mail.get().length > 0) {
+		if (mail.get().length > 0) {
 
 			ThreadUtil.exec(() -> {
 
@@ -287,11 +352,9 @@ public class ImportController extends BaseController {
 							TemplateUtil.process(
 									"templates/mail/translate-import",
 									MapUtil.objArr2Map("user", loginUser,
-											"project", project,
-											"importDate", new Date(), "href",
-											href, "body",
-											"<h3>" + msg + "</h3>"
-													+ mail2.hrefs())),
+											"project", project, "importDate",
+											new Date(), "href", href, "body",
+											msg)),
 							mail.get());
 					logger.info("批量导入翻译邮件发送成功！");
 				} catch (Exception e) {

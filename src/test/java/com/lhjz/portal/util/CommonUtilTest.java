@@ -31,6 +31,8 @@ public class CommonUtilTest {
 	public void format() {
 		String d = DateUtil.format(new Date(), DateUtil.FORMAT7);
 		System.out.println(d);
+		d = DateUtil.format(new Date(), DateUtil.FORMAT8);
+		System.out.println(d);
 	}
 
 	@Test

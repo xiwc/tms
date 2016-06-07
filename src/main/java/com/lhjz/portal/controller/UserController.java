@@ -193,7 +193,7 @@ public class UserController extends BaseController {
 
 	@RequestMapping(value = "batchMail", method = RequestMethod.POST)
 	@ResponseBody
-	@Secured({ "ROLE_ADMIN" })
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody batchMail(@RequestParam("baseURL") String baseURL,
 			@RequestParam("users") String users,
 			@RequestParam("title") String title,

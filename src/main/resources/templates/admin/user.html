@@ -39,19 +39,21 @@
                 <table class="ui sortable celled striped compact table segment table-user">
                     <thead>
                         <th>用户名</th>
-                        <th>角色</th>
+                        <th>姓名</th>
                         <th>邮箱</th>
+                        <th>角色</th>
                         <th>创建时间</th>
                         <th>状态</th>
                         <th sec:authorize="hasRole('ROLE_ADMIN')">处理</th>
                     </thead>
                     <tbody th:remove="all-but-first">
                         <tr th:each="user : ${users}" th:attr="data-id=${user.username}">
-                            <td class="pp" th:title="${(user.name != null) ? user.name : ''}" th:text="${user.username}">username</td>
+                            <td class="pp" th:title="${#strings.isEmpty(user.name) ? user.name : ''}" th:text="${user.username}">username</td>
+                            <td th:text="${user.name}">管理员</td>
+                            <td th:text="${user.mails}">test@test.com</td>
                             <td>
                                 <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small basic label user-role" th:text="${auth}"></div>
                             </td>
-                            <td th:text="${user.mails}">test@test.com</td>
                             <td th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
                             <td class="user-status" th:if="${user.enabled}">
                                 <div class="ui green small tag label">开启</div>

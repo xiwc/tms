@@ -39,7 +39,7 @@ public class Mail {
 
 	private Set<String> set = new HashSet<String>();
 
-	private Set<String> setHref = new HashSet<String>();
+	private Map<String, String> mapHref = new HashMap<String, String>();
 
 	private Map<String, String> map = new HashMap<String, String>();
 
@@ -200,27 +200,48 @@ public class Mail {
 		return mails;
 	}
 
-	public void addHref(String baseURL, String translateAction, Long projectId,
+	public void addHref(String name, String baseURL, String translateAction,
+			Long projectId,
 			List<Translate> translates) {
 
 		for (Translate translate2 : translates) {
-			this.addHref(baseURL, translateAction, projectId, translate2);
+			this.addHref(name, baseURL, translateAction, projectId, translate2);
 		}
 
 	}
 
-	public void addHref(String baseURL, String translateAction, Long projectId,
+	public void addHref(String name, String baseURL, String translateAction,
+			Long projectId,
+			String search) {
+
+		String href = baseURL + translateAction + "?projectId=" + projectId
+				+ "&search=" + search;
+		this.mapHref.put(name,
+				StringUtil.replaceByKV("<a href=\"{href}\">{text}</a>",
+				"href", href, "text", href));
+
+	}
+
+	public void addHref(String name, String baseURL, String translateAction,
+			Long projectId,
 			Translate translate) {
 
 		String href = baseURL + translateAction + "?projectId=" + projectId
 				+ "&id=" + translate.getId();
-		this.setHref.add(StringUtil.replaceByKV("<a href=\"{href}\">{text}</a>",
+		this.mapHref.put(name, StringUtil.replaceByKV(
+				"<a href=\"{href}\">{text}</a>",
 				"href", href, "text", href));
 	}
 
 	public String hrefs() {
 
-		return StringUtil.join("<br/>", this.setHref);
+		StringBuilder sb = new StringBuilder();
+		for (String name : mapHref.keySet()) {
+			sb.append("<b>").append(name).append(": </b>")
+					.append(mapHref.get(name)).append("<br/>");
+		}
+
+		return sb.toString();
 	}
 
 }
