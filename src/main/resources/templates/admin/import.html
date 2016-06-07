@@ -125,6 +125,8 @@
                 autofocus: false,
                 onShow: function() {
                     $(this).find('.ui.form').form('clear');
+                    $(this).find('.lbl-project').text($('.dd-project').dropdown('get text'));
+                    $(this).find('.lbl-language').text($('.dd-language').dropdown('get text'));
                 },
                 onApprove: function() {
                     var $md = $(this);

@@ -293,20 +293,17 @@ public class AdminController extends BaseController {
 			@RequestParam(value = "projectId", required = false) Long projectId) {
 
 		List<Project> projects = projectRepository.findAll();
-		Set<Translate> translates = null;
 		Set<Language> languages = null;
 		Project project = null;
 		if (projectId != null) {
 			project = projectRepository.findOne(projectId);
 			if (project != null) {
-				translates = project.getTranslates();
 				languages = project.getLanguages();
 			}
 		} else {
 			if (projects.size() > 0) {
 				project = projects.get(0);
 				projectId = projects.get(0).getId();
-				translates = projects.get(0).getTranslates();
 				languages = projects.get(0).getLanguages();
 			}
 		}
@@ -339,10 +336,9 @@ public class AdminController extends BaseController {
 		}
 
 		model.addAttribute("projects", new TreeSet<>(projects));
-		model.addAttribute("translates", translates);
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
-		model.addAttribute("labels", lbls);
+		model.addAttribute("labels", new TreeSet<>(lbls));
 		model.addAttribute("users", userRepository.findAll());
 
 		return "admin/import";
