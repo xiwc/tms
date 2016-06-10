@@ -125,9 +125,28 @@
                                 <td style="word-break: break-word;" th:title="${t.key}" th:text="${t.key}">app.name</td>
                                 <td>
                                     <div class="ui form fm-language">
-                                        <div class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
+                                        <div style="position: relative;" class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
                                             <label th:text="${item.language.description} + ':'">中文:</label>
                                             <textarea class="ta-translteItem" th:attr="data-id=${item.id}" th:title="${item.content}" name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
+                                            <i style="position: absolute; right: 0px; top: 20px;" class="history link icon pp-history" th:unless="${#sets.isEmpty(item.translateItemHistories)}"></i>
+                                            <div class="ui flowing popup transition hidden" th:unless="${#sets.isEmpty(item.translateItemHistories)}">
+                                                <h3 class="ui dividing header">翻译更新历史<span th:text="${' (共: ' + #sets.size(item.translateItemHistories) + ' 条)'}"></span></h3>
+                                                <div class="ui comments" style="min-width: 350px; max-height: 300px; overflow: auto;">
+                                                    <div class="comment" th:each="h : ${item.translateItemHistories}">
+                                                        <a class="avatar">
+                                                            <i class="history icon"></i>
+                                                        </a>
+                                                        <div class="content">
+                                                            <div class="author" th:text="${h.itemCreator}">Matt</div>
+                                                            <div class="metadata">
+                                                                <span class="date" th:text="${#calendars.format(h.itemCreateDate,'yyyy/MM/dd HH:mm:ss')}" ">Today at 5:42PM</span>
+                                                            </div>
+                                                        <div class="text " th:text="${h.itemContent} ">
+                                                          How artistic!
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -250,6 +269,16 @@
         $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
         $('.popup').popup();
+        $('.pp-history').popup({
+            on: 'click',
+            inline: true,
+            hoverable: true,
+            // position: 'bottom left',
+            delay: {
+                show: 300,
+                hide: 800
+            }
+        });
         $('.ui.dropdown.dd-actions').dropdown({
             action: 'hide'
         });
