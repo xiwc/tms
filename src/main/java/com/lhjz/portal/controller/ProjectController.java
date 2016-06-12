@@ -29,6 +29,7 @@ import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
+import com.lhjz.portal.entity.TranslateItemHistory;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
@@ -39,6 +40,7 @@ import com.lhjz.portal.repository.AuthorityRepository;
 import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
+import com.lhjz.portal.repository.TranslateItemHistoryRepository;
 import com.lhjz.portal.repository.TranslateItemRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
@@ -63,6 +65,9 @@ public class ProjectController extends BaseController {
 
 	@Autowired
 	TranslateItemRepository translateItemRepository;
+	
+	@Autowired
+	TranslateItemHistoryRepository translateItemHistoryRepository;
 
 	@Autowired
 	ProjectRepository projectRepository;
@@ -316,11 +321,18 @@ public class ProjectController extends BaseController {
 		// 删除项目下全部翻译
 		Set<Translate> translates = project.getTranslates();
 		Set<TranslateItem> translateItems = new HashSet<TranslateItem>();
+		Set<TranslateItemHistory> translateItemHistories = new HashSet<TranslateItemHistory>();
 		Set<Label> labels = new HashSet<Label>();
 		translates.stream().forEach((t) -> {
 			Set<TranslateItem> translateItems2 = t.getTranslateItems();
 			translateItems2.stream().forEach((ti) -> {
 				ti.setTranslate(null);
+				
+				Set<TranslateItemHistory> translateItemHistories2 = ti.getTranslateItemHistories();
+				translateItemHistories2.stream().forEach((h -> {
+					h.setTranslateItem(null);
+				}));
+				translateItemHistories.addAll(translateItemHistories2);
 			});
 			translateItems.addAll(translateItems2);
 
@@ -333,6 +345,9 @@ public class ProjectController extends BaseController {
 			t.setProject(null);
 		});
 
+		translateItemHistoryRepository.deleteInBatch(translateItemHistories);
+		translateItemHistoryRepository.flush();
+		
 		translateItemRepository.deleteInBatch(translateItems);
 		translateItemRepository.flush();
 
