@@ -31,11 +31,19 @@
     }
     
     .box-shadow-input {
-        -webkit-box-shadow: 0 0 5px 1px #0CC;
-        -moz-box-shadow: 0 0 5px 1px #0CC;
-        box-shadow: 0 0 5px 1px #0CC;
+        -webkit-box-shadow: 0 0 5px 1px #0CC!important;
+        -moz-box-shadow: 0 0 5px 1px #0CC!important;
+        box-shadow: 0 0 5px 1px #0CC!important;
     }
-
+    
+    .fd-language textarea, .td-labels .ui.dropdown {
+        border-color: transparent!important;
+        background-color: transparent!important;
+        padding: 0!important;
+        margin-top: 5px!important;
+        border-radius: 0!important;
+        /* box-shadow: none!important; */
+    }
     </style>
 </head>
 
@@ -165,7 +173,6 @@
                                     <input type="hidden" th:each="l : ${t.labels}" th:name="${l.name}" th:value="${l.id}">
                                     <div class="ui fluid multiple search selection dropdown dd-row-labels">
                                         <input name="labels" type="hidden">
-                                        <i class="dropdown icon"></i>
                                         <div class="default text">标签</div>
                                         <div class="menu">
                                             <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
@@ -174,13 +181,12 @@
                                 </td>
                                 <td style="word-break: break-word;" th:title="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}" th:utext="${#calendars.format(t.createDate,'yy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
                                 <td class="td-watchers">
-                                <div class="ui sub header" style="margin-top:10px;">创建者:</div>
+                                    <div class="ui sub header" style="margin-top:10px; display: inline-block;">创建者:</div>
                                     <a title="点击按当前创建者查询" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, creator=${t.creator})}" class="ui basic label" th:text="${t.creator}"></a>
                                     <div class="ui sub header" style="margin-top:10px;">关注者:</div>
                                     <input type="hidden" th:each="w : ${t.watchers}" th:name="${w.username}" th:value="${w.username}">
                                     <div class="ui fluid multiple search selection dropdown dd-row-watchers">
                                         <input name="watchers" type="hidden">
-                                        <i class="dropdown icon"></i>
                                         <div class="default text">关注者</div>
                                         <div class="menu">
                                             <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username}" th:text="${(u.name != null ? u.name : u.username)}"></div>
@@ -389,6 +395,18 @@
             if (event.keyCode == 13) {
                 keyHandler(this);
             }
+        });
+
+        $('.tb-translate .fd-language textarea').hover(function() {
+            $(this).addClass('box-shadow-input');
+        }, function() {
+            $(this).removeClass('box-shadow-input');
+        });
+
+        $('.tb-translate .td-labels .ui.dropdown').hover(function() {
+            $(this).addClass('box-shadow-input');
+        }, function() {
+            $(this).removeClass('box-shadow-input');
         });
 
         function keyHandler(_this) {
