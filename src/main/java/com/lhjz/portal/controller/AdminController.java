@@ -248,6 +248,12 @@ public class AdminController extends BaseController {
 			page = new PageImpl<Translate>(new ArrayList<Translate>(),
 					pageable, 0);
 		}
+		
+		page.getContent().forEach((t) -> {
+			t.getTranslateItems().forEach((ti) -> {
+				ti.setTranslateItemHistories(new TreeSet<>(ti.getTranslateItemHistories()));
+			});
+		});
 
 		List<Language> languages2 = new ArrayList<Language>();
 

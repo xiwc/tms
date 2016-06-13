@@ -36,6 +36,7 @@ import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.TranslateItem;
+import com.lhjz.portal.entity.TranslateItemHistory;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
@@ -46,6 +47,7 @@ import com.lhjz.portal.repository.AuthorityRepository;
 import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
+import com.lhjz.portal.repository.TranslateItemHistoryRepository;
 import com.lhjz.portal.repository.TranslateItemRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.util.DateUtil;
@@ -74,6 +76,9 @@ public class ImportController extends BaseController {
 
 	@Autowired
 	TranslateItemRepository translateItemRepository;
+	
+	@Autowired
+	TranslateItemHistoryRepository translateItemHistoryRepository;
 
 	@Autowired
 	ProjectRepository projectRepository;
@@ -161,6 +166,17 @@ public class ImportController extends BaseController {
 						// 翻译内容变动
 						if (!kvMaps.get(key)
 								.equals(translateItem.getContent())) {
+							
+							TranslateItemHistory translateItemHistory = new TranslateItemHistory();
+							translateItemHistory.setCreateDate(new Date());
+							translateItemHistory.setCreator(WebUtil.getUsername());
+							translateItemHistory.setItemContent(translateItem.getContent());
+							translateItemHistory.setItemCreateDate(translateItem.getUpdateDate() != null ? translateItem.getUpdateDate() : translateItem.getCreateDate());
+							translateItemHistory.setItemCreator(translateItem.getUpdater() != null ? translateItem.getUpdater() : translateItem.getCreator());
+							translateItemHistory.setTranslateItem(translateItem);
+							
+							translateItemHistoryRepository.saveAndFlush(translateItemHistory);
+							
 							translateItem.setContent(kvMaps.get(key));
 							translateItems2.add(translateItem);
 

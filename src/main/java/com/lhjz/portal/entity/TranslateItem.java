@@ -5,7 +5,10 @@ package com.lhjz.portal.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -14,6 +17,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
@@ -70,6 +74,9 @@ public class TranslateItem implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "language_id")
 	private Language language;
+
+	@OneToMany(mappedBy = "translateItem", cascade = { CascadeType.REMOVE })
+	Set<TranslateItemHistory> translateItemHistories = new HashSet<TranslateItemHistory>();
 
 	public Long getId() {
 		return id;
@@ -171,8 +178,18 @@ public class TranslateItem implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((language == null) ? 0 : language.hashCode());
+		result = prime * result
+				+ ((language == null) ? 0 : language.hashCode());
 		return result;
+	}
+
+	public Set<TranslateItemHistory> getTranslateItemHistories() {
+		return translateItemHistories;
+	}
+
+	public void setTranslateItemHistories(
+			Set<TranslateItemHistory> translateItemHistories) {
+		this.translateItemHistories = translateItemHistories;
 	}
 
 	@Override
@@ -194,9 +211,12 @@ public class TranslateItem implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TranslateItem [id=" + id + ", content=" + content + ", creator=" + creator + ", updater=" + updater
-				+ ", translator=" + translator + ", status=" + status + ", createDate=" + createDate + ", updateDate="
-				+ updateDate + ", translateDate=" + translateDate + ", version=" + version + "]";
+		return "TranslateItem [id=" + id + ", content=" + content
+				+ ", creator=" + creator + ", updater=" + updater
+				+ ", translator=" + translator + ", status=" + status
+				+ ", createDate=" + createDate + ", updateDate=" + updateDate
+				+ ", translateDate=" + translateDate + ", version=" + version
+				+ "]";
 	}
 
 }
