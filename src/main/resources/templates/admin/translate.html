@@ -29,6 +29,13 @@
     .CodeMirror-scroll {
         min-height: 150px;
     }
+    
+    .box-shadow-input {
+        -webkit-box-shadow: 0 0 5px 1px #0CC;
+        -moz-box-shadow: 0 0 5px 1px #0CC;
+        box-shadow: 0 0 5px 1px #0CC;
+    }
+
     </style>
 </head>
 
@@ -122,7 +129,11 @@
                         <!--/*/
                             <tr th:each="t : ${page.content}" th:attr="data-id=${t.id}">
                                 <td th:if="${projectId == -1}" th:title="${t.project.description}" th:text="${t.project.name}">project.name</td>
-                                <td style="word-break: break-word;" th:title="${t.key}" th:text="${t.key}">app.name</td>
+                                <td
+                                    <div th:title="${t.key}" class="ui fluid transparent input input-key">
+                                      <input type="text" th:value="${t.key}" placeholder="">
+                                    </div>
+                                </td>
                                 <td>
                                     <div class="ui form fm-language">
                                         <div style="position: relative;" class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
@@ -367,6 +378,37 @@
                 }
             });
         });
+
+        $('.tb-translate .input-key').hover(function() {
+            $(this).addClass('box-shadow-input');
+        }, function() {
+            $(this).removeClass('box-shadow-input');
+        }).find('input').focusout(function(event) {
+            keyHandler(this);
+        }).keyup(function(event) {
+            if (event.keyCode == 13) {
+                keyHandler(this);
+            }
+        });
+
+        function keyHandler(_this) {
+            var $input = $(_this);
+            if ($input.parent('.ui.input').attr('title') != $input.val()) {
+                $.post('admin/translate/updateKey', {
+                    baseURL: baseURL,
+                    id: $input.closest('tr').attr('data-id'),
+                    key: $input.val()
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $input.parent('.ui.input').attr('title', $input.val());
+                        toastr.success('更新成功!');
+                    } else {
+                        $input.val($input.parent('.ui.input').attr('title'));
+                        toastr.error('更新失败!');
+                    }
+                });
+            }
+        }
 
         $('body').on('click', '.ui.dropdown.dd-row-labels .ui.label', function(event) {
             if (url('?projectId')) {
