@@ -141,6 +141,10 @@ public class LanguageController extends BaseController {
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN" })
 	public RespBody delete(@RequestParam("id") Long id) {
 
+		if (WebUtil.isRememberMeAuthenticated()) {
+			return RespBody.failed("因为当前是通过[记住我]登录,为了安全需要,请退出重新登录再尝试删除语言!");
+		}
+
 		Language language = languageRepository.findOne(id);
 
 		if (language == null) {

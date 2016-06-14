@@ -307,7 +307,7 @@
                             $btn.closest('tr').remove();
                             toastr.success('用户删除成功!');
                         } else {
-                            toastr.error('用户删除失败!');
+                            toastr.error(data.data, '用户删除失败!');
                         }
                     });
                 }
