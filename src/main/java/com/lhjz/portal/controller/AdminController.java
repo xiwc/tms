@@ -271,8 +271,8 @@ public class AdminController extends BaseController {
 		}
 
 		// login user labels
-		List<Label> labels = labelRepository.findByCreator(WebUtil
-				.getUsername());
+		List<Label> labels = labelRepository
+				.findByCreatorGroupByName(WebUtil.getUsername());
 		Set<String> lbls = null;
 		if (labels != null) {
 			lbls = labels.stream().map((label) -> {
