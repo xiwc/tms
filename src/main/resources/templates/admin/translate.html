@@ -62,9 +62,9 @@
                         <i class="dropdown icon"></i>
                         <div class="default text">项目</div>
                         <div class="menu">
-                            <a class="item" th:href="@{/admin/translate(projectId=${'-1'})}" th:title="${'全部项目'}" data-value="-1">全部项目</a>
+                            <a class="item" th:href="@{/admin/translate(projectId=${'-1'}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:title="${'全部项目'}" data-value="-1">全部项目</a>
                             <!--/*/
-                            <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
+                            <a th:each="p : ${projects}" class="item" th:href="@{/admin/translate(projectId=${p.id}, creator=${param.containsKey('creator') ? param.creator[0] : ''}, status=${param.containsKey('status') ? param.status[0] : ''}, languageId=${param.containsKey('languageId') ? param.languageId[0] : ''}, search=${param.containsKey('search') ? param.search[0] : ''})}" th:title="${p.description}" th:attr="data-value=${p.id}" th:text="${p.name}">STEP</a>
                             /*/-->
                             <!--/*-->
                             <a class="item" data-value="1">STEP</a>
