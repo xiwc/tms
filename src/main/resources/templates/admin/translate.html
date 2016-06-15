@@ -36,7 +36,8 @@
         box-shadow: 0 0 5px 1px #0CC!important;
     }
     
-    .fd-language textarea, .td-labels .ui.dropdown {
+    .fd-language textarea,
+    .td-labels .ui.dropdown {
         border-color: transparent!important;
         background-color: transparent!important;
         padding: 0!important;
@@ -282,6 +283,22 @@
     <script type="text/javascript">
     jQuery(function($) {
 
+        /**
+         * 精简URI(将查询参数值为空的参数移除掉)
+         * @param  {[DOM]} el [<a/> DOM]
+         */
+        function uriSimple(el) {
+            var queryObj = url('?', $(el).attr('href'));
+            if (queryObj) {
+                var params = [];
+                $.each(queryObj, function(name, val) {
+                    val && params.push(name + '=' + val);
+                });
+                var query = params.join('&');
+                $(el).attr('href', url('path') + (query ? '?' : '') + query);
+            }
+        }
+
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
@@ -306,6 +323,10 @@
             onChange: function(value, text, $choice) {
                 window.location.href = $choice.attr('href');
             }
+        });
+
+        $('.dd-project .menu a.item, .ui.pagination.menu a.item').each(function(index, el) {
+            uriSimple(el);
         });
 
         var simplemde = new SimpleMDE({
@@ -364,23 +385,23 @@
                     });
                 },
                 onLabelRemove: function(value) {
-                    $('.ad-delete-confirm').modal({
-                        onApprove: function() {
-                            var $h = $dd.siblings('input:hidden[name="' + value + '"]');
-                            $.post('admin/translate/deleteTag', {
-                                id: $h.val(),
-                                baseURL: baseURL
-                            }, function(data, textStatus, xhr) {
-                                if (data.success) {
-                                    $h.remove();
-                                    toastr.success('删除成功!');
-                                } else {
-                                    $dd.dropdown('set selected', value);
-                                    toastr.error(data.data, '删除失败!');
-                                }
-                            });
+                    // $('.ad-delete-confirm').modal({
+                    //     onApprove: function() {
+                    var $h = $dd.siblings('input:hidden[name="' + value + '"]');
+                    $.post('admin/translate/deleteTag', {
+                        id: $h.val(),
+                        baseURL: baseURL
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $h.remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            $dd.dropdown('set selected', value);
+                            toastr.error(data.data, '删除失败!');
                         }
-                    }).modal('show');
+                    });
+                    //     }
+                    // }).modal('show');
                 }
             });
         });
@@ -467,24 +488,24 @@
                     });
                 },
                 onLabelRemove: function(value) {
-                    $('.ad-delete-confirm').modal({
-                        onApprove: function() {
-                            var $h = $dd.siblings('input:hidden[name="' + value + '"]');
-                            $.post('admin/translate/deleteWatcher', {
-                                id: $dd.closest('tr').attr('data-id'),
-                                username: $h.val(),
-                                baseURL: baseURL
-                            }, function(data, textStatus, xhr) {
-                                if (data.success) {
-                                    $h.remove();
-                                    toastr.success('删除成功!');
-                                } else {
-                                    $dd.dropdown('set selected', value);
-                                    toastr.error(data.data, '删除失败!');
-                                }
-                            });
+                    // $('.ad-delete-confirm').modal({
+                    //     onApprove: function() {
+                    var $h = $dd.siblings('input:hidden[name="' + value + '"]');
+                    $.post('admin/translate/deleteWatcher', {
+                        id: $dd.closest('tr').attr('data-id'),
+                        username: $h.val(),
+                        baseURL: baseURL
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $h.remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            $dd.dropdown('set selected', value);
+                            toastr.error(data.data, '删除失败!');
                         }
-                    }).modal('show');
+                    });
+                    //     }
+                    // }).modal('show');
                 }
             });
         });
