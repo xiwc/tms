@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -198,6 +199,11 @@ public class AdminController extends BaseController {
 				page = translateRepository.findByProjectAndCreator(project,
 						creator, pageable);
 			} else if (StringUtil.isNotEmpty(status)) {
+				if (Status.valueOf(status).equals(Status.Updated)) {
+					pageable = new PageRequest(pageable.getPageNumber(),
+							pageable.getPageSize(), Direction.DESC,
+							"updateDate");
+				}
 				page = translateRepository.findByProjectAndStatus(project,
 						Status.valueOf(status), pageable);
 			} else if (StringUtil.isNotEmpty(languageId)) {
@@ -224,6 +230,11 @@ public class AdminController extends BaseController {
 				} else if (StringUtil.isNotEmpty(creator)) {
 					page = translateRepository.findByCreator(creator, pageable);
 				} else if (StringUtil.isNotEmpty(status)) {
+					if (Status.valueOf(status).equals(Status.Updated)) {
+						pageable = new PageRequest(pageable.getPageNumber(),
+								pageable.getPageSize(), Direction.DESC,
+								"updateDate");
+					}
 					page = translateRepository.findByStatus(
 							Status.valueOf(status), pageable);
 				} else if (StringUtil.isNotEmpty(languageId)) {
