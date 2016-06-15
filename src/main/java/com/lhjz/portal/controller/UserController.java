@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.lang.StringUtils;
@@ -278,6 +279,10 @@ public class UserController extends BaseController {
 			@RequestParam(value = "role", required = false) String role,
 			@Valid UserForm userForm, BindingResult bindingResult) {
 
+		if (WebUtil.isRememberMeAuthenticated()) {
+			return RespBody.failed("因为当前是通过[记住我]登录,为了安全需要,请退出重新登录再尝试修改用户信息!");
+		}
+
 		if (bindingResult.hasErrors()) {
 			return RespBody.failed(bindingResult.getAllErrors().stream()
 					.map(err -> err.getDefaultMessage())
@@ -365,8 +370,12 @@ public class UserController extends BaseController {
 	@RequestMapping(value = "update2", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_USER" })
-	public RespBody update2(@Valid UserForm userForm,
-			BindingResult bindingResult) {
+	public RespBody update2(HttpServletRequest request,
+			@Valid UserForm userForm, BindingResult bindingResult) {
+
+		if (WebUtil.isRememberMeAuthenticated()) {
+			return RespBody.failed("因为当前是通过[记住我]登录,为了安全需要,请退出重新登录再尝试修改用户信息!");
+		}
 
 		if (bindingResult.hasErrors()) {
 			return RespBody.failed(bindingResult.getAllErrors().stream()
@@ -420,6 +429,10 @@ public class UserController extends BaseController {
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN" })
 	public RespBody delete(@RequestParam("username") String username) {
+
+		if (WebUtil.isRememberMeAuthenticated()) {
+			return RespBody.failed("因为当前是通过[记住我]登录,为了安全需要,请退出重新登录再尝试删除用户信息!");
+		}
 
 		User user = userRepository.findOne(username);
 

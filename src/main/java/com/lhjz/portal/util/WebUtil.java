@@ -13,6 +13,8 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.request.RequestAttributes;
@@ -90,7 +92,8 @@ public final class WebUtil {
 	 * @param response
 	 * @param object
 	 */
-	public static void writeString(HttpServletResponse response, Object object) {
+	public static void writeString(HttpServletResponse response,
+			Object object) {
 
 		PrintWriter pw = null;
 
@@ -114,7 +117,8 @@ public final class WebUtil {
 	 * @param request
 	 * @return
 	 */
-	public static Map<String, String[]> parseParams(HttpServletRequest request) {
+	public static Map<String, String[]> parseParams(
+			HttpServletRequest request) {
 
 		Map<String, String[]> map = new HashMap<String, String[]>();
 		// 获得所有请求参数名
@@ -160,8 +164,7 @@ public final class WebUtil {
 			}
 
 			if (paramSb.length() > 0) {
-				paramSb.delete(
-						paramSb.length() - SysConstant.NEW_LINE.length(),
+				paramSb.delete(paramSb.length() - SysConstant.NEW_LINE.length(),
 						paramSb.length());
 			}
 
@@ -432,6 +435,23 @@ public final class WebUtil {
 			logger.warn("获取登录用户名错误，将返回空字符串。 错误信息 ：{}", e.getMessage());
 			return StringUtil.EMPTY;
 		}
+	}
+
+	/**
+	 * 检测用户是不是通过 remember me cookie 登录的.
+	 * 
+	 * @return
+	 */
+	public static boolean isRememberMeAuthenticated() {
+
+		Authentication authentication = SecurityContextHolder.getContext()
+				.getAuthentication();
+		if (authentication == null) {
+			return false;
+		}
+
+		return RememberMeAuthenticationToken.class
+				.isAssignableFrom(authentication.getClass());
 	}
 
 }
