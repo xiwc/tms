@@ -45,6 +45,13 @@
         border-radius: 0!important;
         /* box-shadow: none!important; */
     }
+    
+    .ui.label.lbl-creator,
+    .ui.label.lbl-updater {
+        padding: .35714286em .71428571em;
+        margin: .21428571em .28571429rem .21428571em 0;
+        box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) inset;
+    }
     </style>
 </head>
 
@@ -182,8 +189,14 @@
                                 </td>
                                 <td style="word-break: break-word;" th:title="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}" th:utext="${#calendars.format(t.createDate,'yy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
                                 <td class="td-watchers">
-                                    <div class="ui sub header" style="margin-top:10px; display: inline-block;">创建者:</div>
-                                    <a title="点击按当前创建者查询" th:href="@{/admin/translate(projectId=${projectId}, page=${page.number}, size=${page.size}, creator=${t.creator})}" class="ui basic label" th:text="${t.creator}"></a>
+                                    <div>
+                                        <div class="ui sub header" style="margin-top:10px; display: inline-block;">创建者:</div>
+                                        <a title="点击按当前创建者查询" th:href="@{/admin/translate(projectId=${projectId}, creator=${t.creator})}" class="ui label lbl-creator" th:text="${t.creator}"></a>
+                                    </div>                                    
+                                    <div th:unless="${t.updater == null}">
+                                        <div class="ui sub header" style="margin-top:10px; display: inline-block;">更新者:</div>
+                                        <a title="点击按当前更新者查询" th:href="@{/admin/translate(projectId=${projectId}, creator=${t.updater})}" class="ui label lbl-updater" th:text="${t.updater}"></a>
+                                    </div>
                                     <div class="ui sub header" style="margin-top:10px;">关注者:</div>
                                     <input type="hidden" th:each="w : ${t.watchers}" th:name="${w.username}" th:value="${w.username}">
                                     <div class="ui fluid multiple search selection dropdown dd-row-watchers">
@@ -194,7 +207,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td th:text="${t.status}" th:title="${#strings.equals('New', t.status) ? '创建于: ' + #calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss') : '更新于: ' + #calendars.format(t.updateDate,'yyyy/MM/dd HH:mm:ss')}">待翻译</td>
+                                <td><span th:text="${t.status}" th:title="${#strings.equals('New', t.status) ? '创建于: ' + #calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss') : '更新于: ' + #calendars.format(t.updateDate,'yyyy/MM/dd HH:mm:ss')}">待翻译</span></td>
                                 <td>
                                     <input type="hidden" th:each="w : ${t.project.watchers}" th:name="${w.username}" th:value="${w.username}">
                                     <input type="hidden" th:name="${t.creator}" th:value="${t.creator}">
