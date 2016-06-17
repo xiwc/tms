@@ -100,8 +100,8 @@ public class ImportController extends BaseController {
 	private void joinKV(JsonObject jsonObject, String key,
 			Map<String, String> kvMaps) {
 		for (Entry<String, JsonElement> entry : jsonObject.entrySet()) {
-			String k = StringUtil.isEmpty(key) ? entry.getKey() : StringUtil
-					.join2(".", key, entry.getKey());
+			String k = StringUtil.isEmpty(key) ? entry.getKey()
+					: StringUtil.join2(".", key, entry.getKey());
 			JsonElement jsonE = entry.getValue();
 			if (jsonE.isJsonPrimitive()) {
 				kvMaps.put(k, jsonE.getAsString());
@@ -114,8 +114,7 @@ public class ImportController extends BaseController {
 	@RequestMapping(value = "save", method = RequestMethod.POST)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
-	public RespBody save(
-			@RequestParam("projectId") Long projectId,
+	public RespBody save(@RequestParam("projectId") Long projectId,
 			@RequestParam("languageId") Long languageId,
 			@RequestParam("type") Long type,
 			@RequestParam("baseURL") String baseURL,
@@ -139,8 +138,8 @@ public class ImportController extends BaseController {
 			}
 			Set<Object> keySet = properties.keySet();
 			for (Object k : keySet) {
-				kvMaps.put(String.valueOf(k), properties.getProperty(
-						String.valueOf(k), StringUtil.EMPTY));
+				kvMaps.put(String.valueOf(k), properties
+						.getProperty(String.valueOf(k), StringUtil.EMPTY));
 			}
 		}
 
@@ -161,27 +160,27 @@ public class ImportController extends BaseController {
 				// 查找是否翻译语言已经存在,是否需要更新
 				for (TranslateItem translateItem : translateItems) {
 					// 存在导入语言翻译
-					if (translateItem.getLanguage().getId().equals(languageId)) {
+					if (translateItem.getLanguage().getId()
+							.equals(languageId)) {
 						language = translateItem.getLanguage();
 						// 翻译内容变动(如果更新翻译内容为空,则不进行更新)
-						if (StringUtil.isNotEmpty(kvMaps.get(key))
-								&& !kvMaps.get(key).equals(
-										translateItem.getContent())) {
+						if (StringUtil.isNotEmpty(kvMaps.get(key)) && !kvMaps
+								.get(key).equals(translateItem.getContent())) {
 
 							TranslateItemHistory translateItemHistory = new TranslateItemHistory();
 							translateItemHistory.setCreateDate(new Date());
-							translateItemHistory.setCreator(WebUtil
-									.getUsername());
-							translateItemHistory.setItemContent(translateItem
-									.getContent());
 							translateItemHistory
-									.setItemCreateDate(translateItem
-											.getUpdateDate() != null ? translateItem
-											.getUpdateDate() : translateItem
-											.getCreateDate());
-							translateItemHistory.setItemCreator(translateItem
-									.getUpdater() != null ? translateItem
-									.getUpdater() : translateItem.getCreator());
+									.setCreator(WebUtil.getUsername());
+							translateItemHistory
+									.setItemContent(translateItem.getContent());
+							translateItemHistory.setItemCreateDate(
+									translateItem.getUpdateDate() != null
+											? translateItem.getUpdateDate()
+											: translateItem.getCreateDate());
+							translateItemHistory.setItemCreator(
+									translateItem.getUpdater() != null
+											? translateItem.getUpdater()
+											: translateItem.getCreator());
 							translateItemHistory
 									.setTranslateItem(translateItem);
 
@@ -189,6 +188,10 @@ public class ImportController extends BaseController {
 									.saveAndFlush(translateItemHistory);
 
 							translateItem.setContent(kvMaps.get(key));
+							translateItem.setUpdateDate(new Date());
+							translateItem.setUpdater(WebUtil.getUsername());
+							translateItem.setStatus(Status.Updated);
+
 							translateItems2.add(translateItem);
 
 							translates3.add(translate2);
@@ -356,33 +359,34 @@ public class ImportController extends BaseController {
 
 		if (StringUtil.isNotEmpty(observers)) {
 			Stream.of(observers.split(",")).forEach((observer) -> {
-				mail.addUsers(getUser(observer));
+				mail.addUsers(getUser(observer)).addUsers(getLoginUser());
 			});
 		}
 
 		// 如果邮件通知
 		if (mail.get().length > 0) {
 
-			ThreadUtil
-					.exec(() -> {
+			ThreadUtil.exec(() -> {
 
-						try {
-							mailSender.sendHtml(String.format("TMS-翻译导入_%s",
+				try {
+					mailSender.sendHtml(
+							String.format("TMS-翻译导入_%s",
 									DateUtil.format(new Date(),
-											DateUtil.FORMAT7)), TemplateUtil
-									.process("templates/mail/translate-import",
-											MapUtil.objArr2Map("user",
-													loginUser, "project",
-													project, "importDate",
-													new Date(), "href", href,
-													"body", msg)), mail.get());
-							logger.info("批量导入翻译邮件发送成功！");
-						} catch (Exception e) {
-							e.printStackTrace();
-							logger.error("批量导入翻译邮件发送失败！");
-						}
+											DateUtil.FORMAT7)),
+							TemplateUtil.process(
+									"templates/mail/translate-import",
+									MapUtil.objArr2Map("user", loginUser,
+											"project", project, "importDate",
+											new Date(), "href", href, "body",
+											msg)),
+							mail.get());
+					logger.info("批量导入翻译邮件发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("批量导入翻译邮件发送失败！");
+				}
 
-					});
+			});
 		}
 
 		return RespBody.succeed(msg);
@@ -435,8 +439,9 @@ public class ImportController extends BaseController {
 			List<String> list = new ArrayList<String>();
 			for (String k : map.keySet()) {
 				String v = map.get(k);
-				v = StringUtil.join("\\\n", (StringUtil.isNotEmpty(v) ? v
-						: StringUtil.EMPTY).split("\n"));
+				v = StringUtil.join("\\\n",
+						(StringUtil.isNotEmpty(v) ? v : StringUtil.EMPTY)
+								.split("\n"));
 				list.add(k + "=" + v);
 			}
 

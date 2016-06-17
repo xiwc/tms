@@ -21,7 +21,7 @@
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译管理
         </a>
-        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
+        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item mi-import" th:href="@{/admin/import}" href="import.html"> <i class="retweet icon"></i> 导入导出
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/project')} ? 'active' : ''" class="item" th:href="@{/admin/project}" href="project.html"> <i class="suitcase icon"></i> 项目管理
         </a>
@@ -74,7 +74,7 @@
                         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html">
                             <i class="world icon"></i> 翻译管理
                         </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item" th:href="@{/admin/import}" href="import.html">
+                        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item mi-import" th:href="@{/admin/import}" href="import.html">
                             <i class="retweet icon"></i> 导入导出
                         </a>
                         <a th:classappend="${#strings.contains(uri, '/admin/project')} ? 'active' : ''" class="item" th:href="@{/admin/project}" href="project.html">
