@@ -148,10 +148,10 @@ public class AdminController extends BaseController {
 
 		List<Language> languages = languageRepository.findAll();
 
-		List<User> users = userRepository.findAll();
+		// List<User> users = userRepository.findAll();
 
 		model.addAttribute("languages", languages);
-		model.addAttribute("users", users);
+		// model.addAttribute("users", users);
 		model.addAttribute("user", getLoginUser());
 
 		return "admin/language";
@@ -163,9 +163,9 @@ public class AdminController extends BaseController {
 	}
 
 	@RequestMapping("translate")
-	public String translate(
-			Model model,
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
+	public String translate(Model model,
+			@PageableDefault(sort = {
+					"createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "projectId", required = false) Long projectId,
 			@RequestParam(value = "creator", required = false) String creator,
 			@RequestParam(value = "status", required = false) String status,
@@ -207,8 +207,8 @@ public class AdminController extends BaseController {
 				page = translateRepository.findByProjectAndStatus(project,
 						Status.valueOf(status), pageable);
 			} else if (StringUtil.isNotEmpty(languageId)) {
-				long total = translateRepository.countUnTranslatedByProject(
-						languageId, projectId);
+				long total = translateRepository
+						.countUnTranslatedByProject(languageId, projectId);
 				List<Translate> unTranslates = translateRepository
 						.queryUnTranslatedByProject(languageId, projectId,
 								pageable.getOffset(), pageable.getPageSize());
@@ -235,14 +235,13 @@ public class AdminController extends BaseController {
 								pageable.getPageSize(), Direction.DESC,
 								"updateDate");
 					}
-					page = translateRepository.findByStatus(
-							Status.valueOf(status), pageable);
+					page = translateRepository
+							.findByStatus(Status.valueOf(status), pageable);
 				} else if (StringUtil.isNotEmpty(languageId)) {
 					long total = translateRepository
 							.countUnTranslated(languageId);
 					List<Translate> unTranslates = translateRepository
-							.queryUnTranslated(languageId,
-									pageable.getOffset(),
+							.queryUnTranslated(languageId, pageable.getOffset(),
 									pageable.getPageSize());
 					page = new PageImpl<Translate>(unTranslates, pageable,
 							total);
@@ -256,13 +255,14 @@ public class AdminController extends BaseController {
 		}
 
 		if (page == null) {
-			page = new PageImpl<Translate>(new ArrayList<Translate>(),
-					pageable, 0);
+			page = new PageImpl<Translate>(new ArrayList<Translate>(), pageable,
+					0);
 		}
-		
+
 		page.getContent().forEach((t) -> {
 			t.getTranslateItems().forEach((ti) -> {
-				ti.setTranslateItemHistories(new TreeSet<>(ti.getTranslateItemHistories()));
+				ti.setTranslateItemHistories(
+						new TreeSet<>(ti.getTranslateItemHistories()));
 			});
 		});
 
@@ -341,8 +341,8 @@ public class AdminController extends BaseController {
 		}
 
 		// login user labels
-		List<Label> labels = labelRepository.findByCreator(WebUtil
-				.getUsername());
+		List<Label> labels = labelRepository
+				.findByCreatorGroupByName(WebUtil.getUsername());
 		Set<String> lbls = null;
 		if (labels != null) {
 			lbls = labels.stream().map((label) -> {
