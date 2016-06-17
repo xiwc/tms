@@ -14,16 +14,6 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
-    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
-    <!-- <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script> -->
-    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
-    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
-    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <style>
     .CodeMirror,
     .CodeMirror-scroll {
@@ -37,13 +27,13 @@
     }
     
     .fd-language textarea,
-    .td-labels .ui.dropdown {
+    .td-labels .ui.dropdown,
+    .td-watchers .ui.dropdown {
         border-color: transparent!important;
         background-color: transparent!important;
         padding: 0!important;
         margin-top: 5px!important;
         border-radius: 0!important;
-        /* box-shadow: none!important; */
     }
     
     .ui.label.lbl-creator,
@@ -293,6 +283,15 @@
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
     <input type="hidden" name="project.languageId" th:value="${project != null ? project.language.id : ''}" />
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
 
@@ -437,7 +436,7 @@
             $(this).removeClass('box-shadow-input');
         });
 
-        $('.tb-translate .td-labels .ui.dropdown').hover(function() {
+        $('.tb-translate .td-labels .ui.dropdown, .tb-translate .td-watchers .ui.dropdown').hover(function() {
             $(this).addClass('box-shadow-input');
         }, function() {
             $(this).removeClass('box-shadow-input');

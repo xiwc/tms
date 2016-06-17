@@ -66,12 +66,15 @@ public final class ImageUtil {
 
 			transform.setToScale(sx, sy);
 			AffineTransformOp ato = new AffineTransformOp(transform, null);
-			BufferedImage bid = new BufferedImage(nw, nh, BufferedImage.TYPE_3BYTE_BGR);
+			BufferedImage bid = new BufferedImage(nw, nh,
+					BufferedImage.TYPE_3BYTE_BGR);
 			ato.filter(bis, bid);
 			ImageIO.write(bid, " jpeg ", fo);
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException(" Failed in create preview image. Error:  " + e.getMessage());
+			throw new RuntimeException(
+					" Failed in create preview image. Error:  "
+							+ e.getMessage());
 		}
 	}
 
@@ -97,7 +100,8 @@ public final class ImageUtil {
 	 * @param flag
 	 *            缩放选择:true 放大; false 缩小;
 	 */
-	public final static void scale(String srcImageFile, String result, int scale, boolean flag) {
+	public final static void scale(String srcImageFile, String result,
+			int scale, boolean flag) {
 
 		try {
 			BufferedImage src = ImageIO.read(new File(srcImageFile)); // 读入文件
@@ -112,8 +116,10 @@ public final class ImageUtil {
 				height = height / scale;
 			}
 
-			Image image = src.getScaledInstance(width, height, Image.SCALE_DEFAULT);
-			BufferedImage tag = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			Image image = src.getScaledInstance(width, height,
+					Image.SCALE_DEFAULT);
+			BufferedImage tag = new BufferedImage(width, height,
+					BufferedImage.TYPE_INT_RGB);
 			Graphics g = tag.getGraphics();
 			g.drawImage(image, 0, 0, null); // 绘制缩小后的图
 			g.dispose();
@@ -137,39 +143,46 @@ public final class ImageUtil {
 	 * @param bb
 	 *            比例不对时是否需要补白：true为补白; false为不补白;
 	 */
-	public final static void scale2(String srcImageFile, String result, int height, int width, boolean bb) {
+	public final static void scale2(String srcImageFile, String result,
+			int height, int width, boolean bb) {
 
 		try {
 			double ratio = 0.0; // 缩放比例
 			File f = new File(srcImageFile);
 			BufferedImage bi = ImageIO.read(f);
-			Image itemp = bi.getScaledInstance(width, height, BufferedImage.SCALE_SMOOTH);
+			Image itemp = bi.getScaledInstance(width, height,
+					BufferedImage.SCALE_SMOOTH);
 
 			// 计算比例
 			if ((bi.getHeight() > height) || (bi.getWidth() > width)) {
 
 				if (bi.getHeight() > bi.getWidth()) {
-					ratio = (new Integer(height)).doubleValue() / bi.getHeight();
+					ratio = (new Integer(height)).doubleValue()
+							/ bi.getHeight();
 				} else {
 					ratio = (new Integer(width)).doubleValue() / bi.getWidth();
 				}
 
-				AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(ratio, ratio), null);
+				AffineTransformOp op = new AffineTransformOp(
+						AffineTransform.getScaleInstance(ratio, ratio), null);
 				itemp = op.filter(bi, null);
 			}
 
 			if (bb) {// 补白
-				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+				BufferedImage image = new BufferedImage(width, height,
+						BufferedImage.TYPE_INT_RGB);
 				Graphics2D g = image.createGraphics();
 				g.setColor(Color.white);
 				g.fillRect(0, 0, width, height);
 
 				if (width == itemp.getWidth(null)) {
-					g.drawImage(itemp, 0, (height - itemp.getHeight(null)) / 2, itemp.getWidth(null),
-							itemp.getHeight(null), Color.white, null);
+					g.drawImage(itemp, 0, (height - itemp.getHeight(null)) / 2,
+							itemp.getWidth(null), itemp.getHeight(null),
+							Color.white, null);
 				} else {
-					g.drawImage(itemp, (width - itemp.getWidth(null)) / 2, 0, itemp.getWidth(null),
-							itemp.getHeight(null), Color.white, null);
+					g.drawImage(itemp, (width - itemp.getWidth(null)) / 2, 0,
+							itemp.getWidth(null), itemp.getHeight(null),
+							Color.white, null);
 				}
 
 				g.dispose();
@@ -197,7 +210,8 @@ public final class ImageUtil {
 	 * @param height
 	 *            目标切片高度
 	 */
-	public final static void cut(String srcImageFile, String result, int x, int y, int width, int height) {
+	public final static void cut(String srcImageFile, String result, int x,
+			int y, int width, int height) {
 
 		try {
 			// 读取源图像
@@ -206,13 +220,16 @@ public final class ImageUtil {
 			int srcHeight = bi.getWidth(); // 源图高度
 
 			if (srcWidth > 0 && srcHeight > 0) {
-				Image image = bi.getScaledInstance(srcWidth, srcHeight, Image.SCALE_DEFAULT);
+				Image image = bi.getScaledInstance(srcWidth, srcHeight,
+						Image.SCALE_DEFAULT);
 				// 四个参数分别为图像起点坐标和宽高
 				// 即: CropImageFilter(int x,int y,int width,int height)
-				ImageFilter cropFilter = new CropImageFilter(x, y, width, height);
+				ImageFilter cropFilter = new CropImageFilter(x, y, width,
+						height);
 				Image img = Toolkit.getDefaultToolkit().createImage(
 						new FilteredImageSource(image.getSource(), cropFilter));
-				BufferedImage tag = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+				BufferedImage tag = new BufferedImage(width, height,
+						BufferedImage.TYPE_INT_RGB);
 				Graphics g = tag.getGraphics();
 				g.drawImage(img, 0, 0, width, height, null); // 绘制切割后的图
 				g.dispose();
@@ -236,7 +253,8 @@ public final class ImageUtil {
 	 * @param cols
 	 *            目标切片列数。默认2，必须是范围 [1, 20] 之内
 	 */
-	public final static void cut2(String srcImageFile, String descDir, int rows, int cols) {
+	public final static void cut2(String srcImageFile, String descDir, int rows,
+			int cols) {
 
 		try {
 
@@ -256,7 +274,8 @@ public final class ImageUtil {
 			if (srcWidth > 0 && srcHeight > 0) {
 				Image img = null;
 				ImageFilter cropFilter = null;
-				Image image = bi.getScaledInstance(srcWidth, srcHeight, Image.SCALE_DEFAULT);
+				Image image = bi.getScaledInstance(srcWidth, srcHeight,
+						Image.SCALE_DEFAULT);
 				int destWidth = srcWidth; // 每张切片的宽度
 				int destHeight = srcHeight; // 每张切片的高度
 
@@ -280,15 +299,19 @@ public final class ImageUtil {
 					for (int j = 0; j < cols; j++) {
 						// 四个参数分别为图像起点坐标和宽高
 						// 即: CropImageFilter(int x,int y,int width,int height)
-						cropFilter = new CropImageFilter(j * destWidth, i * destHeight, destWidth, destHeight);
+						cropFilter = new CropImageFilter(j * destWidth,
+								i * destHeight, destWidth, destHeight);
 						img = Toolkit.getDefaultToolkit().createImage(
-								new FilteredImageSource(image.getSource(), cropFilter));
-						BufferedImage tag = new BufferedImage(destWidth, destHeight, BufferedImage.TYPE_INT_RGB);
+								new FilteredImageSource(image.getSource(),
+										cropFilter));
+						BufferedImage tag = new BufferedImage(destWidth,
+								destHeight, BufferedImage.TYPE_INT_RGB);
 						Graphics g = tag.getGraphics();
 						g.drawImage(img, 0, 0, null); // 绘制缩小后的图
 						g.dispose();
 						// 输出为文件
-						ImageIO.write(tag, "JPEG", new File(descDir + "_r" + i + "_c" + j + ".jpg"));
+						ImageIO.write(tag, "JPEG", new File(
+								descDir + "_r" + i + "_c" + j + ".jpg"));
 					}
 				}
 			}
@@ -309,7 +332,8 @@ public final class ImageUtil {
 	 * @param destHeight
 	 *            目标切片高度。默认150
 	 */
-	public final static void cut3(String srcImageFile, String descDir, int destWidth, int destHeight) {
+	public final static void cut3(String srcImageFile, String descDir,
+			int destWidth, int destHeight) {
 
 		try {
 
@@ -329,7 +353,8 @@ public final class ImageUtil {
 			if (srcWidth > destWidth && srcHeight > destHeight) {
 				Image img;
 				ImageFilter cropFilter;
-				Image image = bi.getScaledInstance(srcWidth, srcHeight, Image.SCALE_DEFAULT);
+				Image image = bi.getScaledInstance(srcWidth, srcHeight,
+						Image.SCALE_DEFAULT);
 				int cols = 0; // 切片横向数量
 				int rows = 0; // 切片纵向数量
 
@@ -353,15 +378,19 @@ public final class ImageUtil {
 					for (int j = 0; j < cols; j++) {
 						// 四个参数分别为图像起点坐标和宽高
 						// 即: CropImageFilter(int x,int y,int width,int height)
-						cropFilter = new CropImageFilter(j * destWidth, i * destHeight, destWidth, destHeight);
+						cropFilter = new CropImageFilter(j * destWidth,
+								i * destHeight, destWidth, destHeight);
 						img = Toolkit.getDefaultToolkit().createImage(
-								new FilteredImageSource(image.getSource(), cropFilter));
-						BufferedImage tag = new BufferedImage(destWidth, destHeight, BufferedImage.TYPE_INT_RGB);
+								new FilteredImageSource(image.getSource(),
+										cropFilter));
+						BufferedImage tag = new BufferedImage(destWidth,
+								destHeight, BufferedImage.TYPE_INT_RGB);
 						Graphics g = tag.getGraphics();
 						g.drawImage(img, 0, 0, null); // 绘制缩小后的图
 						g.dispose();
 						// 输出为文件
-						ImageIO.write(tag, "JPEG", new File(descDir + "_r" + i + "_c" + j + ".jpg"));
+						ImageIO.write(tag, "JPEG", new File(
+								descDir + "_r" + i + "_c" + j + ".jpg"));
 					}
 				}
 			}
@@ -380,7 +409,8 @@ public final class ImageUtil {
 	 * @param destImageFile
 	 *            目标图像地址
 	 */
-	public final static void convert(String srcImageFile, String formatName, String destImageFile) {
+	public final static void convert(String srcImageFile, String formatName,
+			String destImageFile) {
 
 		try {
 			File f = new File(srcImageFile);
@@ -438,24 +468,30 @@ public final class ImageUtil {
 	 * @param alpha
 	 *            透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
 	 */
-	public final static void pressText(String pressText, String srcImageFile, String destImageFile, String fontName,
-			int fontStyle, Color color, int fontSize, int x, int y, float alpha) {
+	public final static void pressText(String pressText, String srcImageFile,
+			String destImageFile, String fontName, int fontStyle, Color color,
+			int fontSize, int x, int y, float alpha) {
 
 		try {
 			File img = new File(srcImageFile);
 			Image src = ImageIO.read(img);
 			int width = src.getWidth(null);
 			int height = src.getHeight(null);
-			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			BufferedImage image = new BufferedImage(width, height,
+					BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = image.createGraphics();
 			g.drawImage(src, 0, 0, width, height, null);
 			g.setColor(color);
 			g.setFont(new Font(fontName, fontStyle, fontSize));
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.setComposite(
+					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
 			// 在指定坐标绘制水印文字
-			g.drawString(pressText, (width - (getLength(pressText) * fontSize)) / 2 + x, (height - fontSize) / 2 + y);
+			g.drawString(pressText,
+					(width - (getLength(pressText) * fontSize)) / 2 + x,
+					(height - fontSize) / 2 + y);
 			g.dispose();
-			ImageIO.write((BufferedImage) image, "JPEG", new File(destImageFile));// 输出到文件流
+			ImageIO.write((BufferedImage) image, "JPEG",
+					new File(destImageFile));// 输出到文件流
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -485,24 +521,30 @@ public final class ImageUtil {
 	 * @param alpha
 	 *            透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
 	 */
-	public final static void pressText2(String pressText, String srcImageFile, String destImageFile, String fontName,
-			int fontStyle, Color color, int fontSize, int x, int y, float alpha) {
+	public final static void pressText2(String pressText, String srcImageFile,
+			String destImageFile, String fontName, int fontStyle, Color color,
+			int fontSize, int x, int y, float alpha) {
 
 		try {
 			File img = new File(srcImageFile);
 			Image src = ImageIO.read(img);
 			int width = src.getWidth(null);
 			int height = src.getHeight(null);
-			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			BufferedImage image = new BufferedImage(width, height,
+					BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = image.createGraphics();
 			g.drawImage(src, 0, 0, width, height, null);
 			g.setColor(color);
 			g.setFont(new Font(fontName, fontStyle, fontSize));
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.setComposite(
+					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
 			// 在指定坐标绘制水印文字
-			g.drawString(pressText, (width - (getLength(pressText) * fontSize)) / 2 + x, (height - fontSize) / 2 + y);
+			g.drawString(pressText,
+					(width - (getLength(pressText) * fontSize)) / 2 + x,
+					(height - fontSize) / 2 + y);
 			g.dispose();
-			ImageIO.write((BufferedImage) image, "JPEG", new File(destImageFile));
+			ImageIO.write((BufferedImage) image, "JPEG",
+					new File(destImageFile));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -524,27 +566,30 @@ public final class ImageUtil {
 	 * @param alpha
 	 *            透明度：alpha 必须是范围 [0.0, 1.0] 之内（包含边界值）的一个浮点数字
 	 */
-	public final static void pressImage(String pressImg, String srcImageFile, String destImageFile, int x, int y,
-			float alpha) {
+	public final static void pressImage(String pressImg, String srcImageFile,
+			String destImageFile, int x, int y, float alpha) {
 
 		try {
 			File img = new File(srcImageFile);
 			Image src = ImageIO.read(img);
 			int wideth = src.getWidth(null);
 			int height = src.getHeight(null);
-			BufferedImage image = new BufferedImage(wideth, height, BufferedImage.TYPE_INT_RGB);
+			BufferedImage image = new BufferedImage(wideth, height,
+					BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = image.createGraphics();
 			g.drawImage(src, 0, 0, wideth, height, null);
 			// 水印文件
 			Image src_biao = ImageIO.read(new File(pressImg));
 			int wideth_biao = src_biao.getWidth(null);
 			int height_biao = src_biao.getHeight(null);
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
-			g.drawImage(src_biao, (wideth - wideth_biao) / 2, (height - height_biao) / 2, wideth_biao, height_biao,
-					null);
+			g.setComposite(
+					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.drawImage(src_biao, (wideth - wideth_biao) / 2,
+					(height - height_biao) / 2, wideth_biao, height_biao, null);
 			// 水印文件结束
 			g.dispose();
-			ImageIO.write((BufferedImage) image, "JPEG", new File(destImageFile));
+			ImageIO.write((BufferedImage) image, "JPEG",
+					new File(destImageFile));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -583,22 +628,25 @@ public final class ImageUtil {
 	 * @param alpha
 	 *            透明度
 	 */
-	public final static void pressImage(String pressImg, String targetImg, int x, int y, float alpha) {
+	public final static void pressImage(String pressImg, String targetImg,
+			int x, int y, float alpha) {
 		try {
 			File img = new File(targetImg);
 			Image src = ImageIO.read(img);
 			int wideth = src.getWidth(null);
 			int height = src.getHeight(null);
-			BufferedImage image = new BufferedImage(wideth, height, BufferedImage.TYPE_INT_RGB);
+			BufferedImage image = new BufferedImage(wideth, height,
+					BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = image.createGraphics();
 			g.drawImage(src, 0, 0, wideth, height, null);
 			// 水印文件
 			Image src_biao = ImageIO.read(new File(pressImg));
 			int wideth_biao = src_biao.getWidth(null);
 			int height_biao = src_biao.getHeight(null);
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
-			g.drawImage(src_biao, (wideth - wideth_biao) / 2, (height - height_biao) / 2, wideth_biao, height_biao,
-					null);
+			g.setComposite(
+					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.drawImage(src_biao, (wideth - wideth_biao) / 2,
+					(height - height_biao) / 2, wideth_biao, height_biao, null);
 			// 水印文件结束
 			g.dispose();
 			ImageIO.write((BufferedImage) image, "jpg", img);
@@ -629,21 +677,26 @@ public final class ImageUtil {
 	 * @param alpha
 	 *            透明度
 	 */
-	public static void pressText(String pressText, String targetImg, String fontName, int fontStyle, Color color,
-			int fontSize, int x, int y, float alpha) {
+	public static void pressText(String pressText, String targetImg,
+			String fontName, int fontStyle, Color color, int fontSize, int x,
+			int y, float alpha) {
 
 		try {
 			File img = new File(targetImg);
 			Image src = ImageIO.read(img);
 			int width = src.getWidth(null);
 			int height = src.getHeight(null);
-			BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			BufferedImage image = new BufferedImage(width, height,
+					BufferedImage.TYPE_INT_RGB);
 			Graphics2D g = image.createGraphics();
 			g.drawImage(src, 0, 0, width, height, null);
 			g.setColor(color);
 			g.setFont(new Font(fontName, fontStyle, fontSize));
-			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
-			g.drawString(pressText, (width - (getLength(pressText) * fontSize)) / 2 + x, (height - fontSize) / 2 + y);
+			g.setComposite(
+					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.drawString(pressText,
+					(width - (getLength(pressText) * fontSize)) / 2 + x,
+					(height - fontSize) / 2 + y);
 			g.dispose();
 			ImageIO.write((BufferedImage) image, "jpg", img);
 		} catch (Exception e) {
@@ -663,33 +716,40 @@ public final class ImageUtil {
 	 * @param bb
 	 *            比例不对时是否需要补白
 	 */
-	public static void resize(String filePath, int height, int width, boolean bb) {
+	public static void resize(String filePath, int height, int width,
+			boolean bb) {
 		try {
 			double ratio = 0.0; // 缩放比例
 			File f = new File(filePath);
 			BufferedImage bi = ImageIO.read(f);
-			Image itemp = bi.getScaledInstance(width, height, bi.SCALE_SMOOTH);
+			Image itemp = bi.getScaledInstance(width, height,
+					BufferedImage.SCALE_SMOOTH);
 			// 计算比例
 			if ((bi.getHeight() > height) || (bi.getWidth() > width)) {
 				if (bi.getHeight() > bi.getWidth()) {
-					ratio = (new Integer(height)).doubleValue() / bi.getHeight();
+					ratio = (new Integer(height)).doubleValue()
+							/ bi.getHeight();
 				} else {
 					ratio = (new Integer(width)).doubleValue() / bi.getWidth();
 				}
-				AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(ratio, ratio), null);
+				AffineTransformOp op = new AffineTransformOp(
+						AffineTransform.getScaleInstance(ratio, ratio), null);
 				itemp = op.filter(bi, null);
 			}
 			if (bb) {
-				BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+				BufferedImage image = new BufferedImage(width, height,
+						BufferedImage.TYPE_INT_RGB);
 				Graphics2D g = image.createGraphics();
 				g.setColor(Color.white);
 				g.fillRect(0, 0, width, height);
 				if (width == itemp.getWidth(null))
-					g.drawImage(itemp, 0, (height - itemp.getHeight(null)) / 2, itemp.getWidth(null),
-							itemp.getHeight(null), Color.white, null);
+					g.drawImage(itemp, 0, (height - itemp.getHeight(null)) / 2,
+							itemp.getWidth(null), itemp.getHeight(null),
+							Color.white, null);
 				else
-					g.drawImage(itemp, (width - itemp.getWidth(null)) / 2, 0, itemp.getWidth(null),
-							itemp.getHeight(null), Color.white, null);
+					g.drawImage(itemp, (width - itemp.getWidth(null)) / 2, 0,
+							itemp.getWidth(null), itemp.getHeight(null),
+							Color.white, null);
 				g.dispose();
 				itemp = image;
 			}
@@ -709,6 +769,7 @@ public final class ImageUtil {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("restriction")
 	public static String getImageType(String path) throws IOException {
 		FileInputStream fis = new FileInputStream(path);
 
@@ -724,7 +785,7 @@ public final class ImageUtil {
 		try {
 			bais = new ByteArrayInputStream(mapObj);
 			mcis = new MemoryCacheImageInputStream(bais);
-			Iterator itr = ImageIO.getImageReaders(mcis);
+			Iterator<ImageReader> itr = ImageIO.getImageReaders(mcis);
 			while (itr.hasNext()) {
 				ImageReader reader = (ImageReader) itr.next();
 				if (reader instanceof com.sun.imageio.plugins.gif.GIFImageReader) {
@@ -738,11 +799,17 @@ public final class ImageUtil {
 				}
 			}
 		} finally {
+			if (buff != null) {
+				try {
+					buff.close();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
 			if (bais != null) {
 				try {
 					bais.close();
 				} catch (IOException ioe) {
-
 				}
 			}
 
@@ -750,7 +817,6 @@ public final class ImageUtil {
 				try {
 					mcis.close();
 				} catch (IOException ioe) {
-
 				}
 			}
 		}
@@ -777,7 +843,8 @@ public final class ImageUtil {
 		}
 
 		// 获得文件后缀名
-		String suffix = fileName.substring(fileName.lastIndexOf(".") + 1, fileName.length());
+		String suffix = fileName.substring(fileName.lastIndexOf(".") + 1,
+				fileName.length());
 
 		Set<String> typeSet = new HashSet<>();
 		typeSet.add("bmp");
