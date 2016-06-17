@@ -3,6 +3,8 @@
  */
 package com.lhjz.portal.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lhjz.portal.entity.security.User;
@@ -16,4 +18,9 @@ import com.lhjz.portal.entity.security.User;
  */
 public interface UserRepository extends JpaRepository<User, String> {
 
+	List<User> findByEnabled(boolean enabled);
+
+	List<User> findByEnabledTrue();
+
+	List<User> findByEnabledFalse();
 }
