@@ -171,11 +171,12 @@ public class AdminController extends BaseController {
 	@RequestMapping("dynamic")
 	public String dynamic(
 			Model model,
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+			@PageableDefault(sort = { "createDate" }, direction = Direction.ASC) Pageable pageable) {
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
 		
 		model.addAttribute("chats", chats);
+		model.addAttribute("user", getLoginUser());
 		
 		return "admin/dynamic";
 	}

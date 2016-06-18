@@ -11,6 +11,8 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
     .main.container {
@@ -33,6 +35,16 @@
         /*max-height: 400px;*/
         overflow: auto;
     }
+    
+    .CodeMirror,
+    .CodeMirror-scroll {
+        min-height: 150px;
+    }
+    
+    .CodeMirror-fullscreen,
+    .editor-preview-side.editor-preview-active-side {
+        z-index: 999;
+    }
     </style>
 </head>
 
@@ -46,7 +58,7 @@
                 <!-- <div th:replace="admin/template :: ad-page-header ('沟通动态', 'dynamic')"></div> -->
                 <div class="main ui container">
                     <div class="ui dividing right rail" style="min-height: 279px;">
-                        <div class="ui sticky sy-dynamic" style="left: 1040px; width: 283px !important; height: 279px !important; top: 0px;">
+                        <div class="ui sticky sy-dynamic" style="z-index: 0; left: 1040px; width: 283px !important; height: 279px !important; top: 0px;">
                             <h4 class="ui dividing header">动态</h4>
                             <div class="ui feed">
                                 <div class="event">
@@ -56,8 +68,8 @@
                                     <div class="content">
                                         <div class="summary">
                                             <a class="user">
-          Elliot Fu
-        </a> added you as a friend
+                                              Elliot Fu
+                                            </a> added you as a friend
                                             <div class="date">
                                                 1 Hour Ago
                                             </div>
@@ -98,8 +110,8 @@
                                     <div class="content">
                                         <div class="summary">
                                             <a class="user">
-          Jenny Hess
-        </a> added you as a friend
+                                              Jenny Hess
+                                            </a> added you as a friend
                                             <div class="date">
                                                 2 Days Ago
                                             </div>
@@ -160,65 +172,29 @@
                     <div class="chat" style="min-height: 1000px;">
                         <div class="ui minimal comments">
                             <h3 class="ui dividing header">沟通</h3>
-                            <div class="comment">
+                            <div class="comment" th:each="c : ${chats}" th:attr="data-id=${c.id}">
                                 <a class="avatar">
                                     <img th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
                                 <div class="content">
-                                    <a class="author">Matt</a>
+                                    <a class="author" th:text="${c.creator.name}">Matt</a>
                                     <div class="metadata">
-                                        <span class="date">Today at 5:42PM</span>
+                                        <span class="date" th:text="${c.createDate}">Today at 5:42PM</span>
                                     </div>
-                                    <div class="text">
+                                    <div class="text markdown-body" th:text="${c.content}">
                                         How artistic!
                                     </div>
-                                    <div class="actions">
-                                        <a class="edit">编辑</a>
-                                        <a class="delete">删除</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="comment">
-                                <a class="avatar">
-                                    <img th:src="@{/img/head.png}" src="../../static/img/head.png">
-                                </a>
-                                <div class="content">
-                                    <a class="author">Elliot Fu</a>
-                                    <div class="metadata">
-                                        <span class="date">Yesterday at 12:30AM</span>
-                                    </div>
-                                    <div class="text">
-                                        <p>This has been very useful for my research. Thanks as well!</p>
-                                    </div>
-                                    <div class="actions">
-                                        <a class="edit">编辑</a>
-                                        <a class="delete">删除</a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="comment">
-                                <a class="avatar">
-                                    <img th:src="@{/img/head.png}" src="../../static/img/head.png">
-                                </a>
-                                <div class="content">
-                                    <a class="author">Joe Henderson</a>
-                                    <div class="metadata">
-                                        <span class="date">5 days ago</span>
-                                    </div>
-                                    <div class="text">
-                                        Dude, this is awesome. Thanks so much
-                                    </div>
-                                    <div class="actions">
+                                    <div class="actions" th:if="${!#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">
                                         <a class="edit">编辑</a>
                                         <a class="delete">删除</a>
                                     </div>
                                 </div>
                             </div>
                             <form class="ui reply form">
-                                <div class="field">
-                                    <textarea></textarea>
+                                <div class="field markdown-body">
+                                    <textarea class="ta-md"></textarea>
                                 </div>
-                                <div class="ui blue labeled submit icon button">
+                                <div class="ui blue labeled submit icon button btn-chat-submit">
                                     <i class="icon edit"></i> 提交
                                 </div>
                             </form>
@@ -238,6 +214,7 @@
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
@@ -251,6 +228,52 @@
         $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
         $(window).resize(function(event) {
             $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        });
+
+        var simplemde = new SimpleMDE({
+            element: $(".ta-md")[0],
+            autoDownloadFontAwesome: false,
+            autosave: {
+                enabled: true,
+                delay: 5000,
+                uniqueId: "chat-content"
+            }
+        });
+
+        var $textMds = $('.comments .content .text');
+        $textMds.each(function(index, el) {
+            $(el).html(simplemde.markdown($(el).text()));
+        });
+
+        $('.btn-chat-submit').click(function(event) {
+            $.post('/admin/chat/create', {
+                content: simplemde.value()
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    toastr.success('提交成功!');
+                    window.location.reload();
+                } else {
+                    toastr.success(data.data, '提交失败!');
+                }
+            });
+        });
+
+        $('body').on('click', '.comments .actions a.delete', function(event) {
+            $btn = $(this);
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('/admin/chat/delete', {
+                        id: $btn.closest('.comment').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.closest('.comment').remove();
+                            toastr.success('删除成功!');
+                        } else {
+                            toastr.error(data.data, '删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
         });
 
     });
