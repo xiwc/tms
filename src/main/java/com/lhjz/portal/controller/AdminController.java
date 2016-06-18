@@ -161,6 +161,11 @@ public class AdminController extends BaseController {
 	public String feedback(Model model) {
 		return "admin/feedback";
 	}
+	
+	@RequestMapping("dynamic")
+	public String dynamic(Model model) {
+		return "admin/dynamic";
+	}
 
 	@RequestMapping("translate")
 	public String translate(Model model,

@@ -760,13 +760,6 @@
                 <p class="markdown-content" th:attr="data-url='admin/md/' + ${id} + '.md'"></p>
             </div>
         </div>
-        <!-- <h2 class="ui header">
-            <i class="settings icon"></i>
-            <div class="content">
-                <span th:text="${name} + '设置'">XXXX设置</span>
-                <div class="sub header" th:text="'设置' + ${name} + '各模块的内容'">设置XXXX各模块的内容</div>
-            </div>
-        </h2> -->
     </th:block>
     <div th:fragment="ad-page-basic-settings (page)" class="ui attached segment">
         <div class="ui toggle checkbox page-enable-checkbox" th:attr="data-page=${page}" th:with="chk=${not #maps.isEmpty(pageEnable)} and ${#maps.containsKey(pageEnable, page)} and ${not pageEnable[__${page}__]}">

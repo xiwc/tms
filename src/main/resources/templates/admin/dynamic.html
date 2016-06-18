@@ -1,0 +1,260 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base th:href="@{/}" href="">
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <title>TMS-沟通动态</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
+    <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <style>
+    .main.container {
+        margin-right: 460px !important;
+        margin-left: 3em !important;
+        width: auto !important;
+        max-width: 960px !important;
+        padding: 2em 0em 7em;
+        position: relative;
+    }
+    
+    .main.container .right.rail {
+        margin-left: 3em;
+        padding-top: 2em;
+        width: 420px;
+        /*overflow: auto;*/
+    }
+    
+    .main.container .right.rail .sticky {
+        /*max-height: 400px;*/
+        overflow: auto;
+    }
+    </style>
+</head>
+
+<body>
+    <div th:replace="admin/index :: sidebar-menu"></div>
+    <div th:replace="admin/index :: top-fixed-menu"></div>
+    <div class="pusher ad-index-content" style="padding-top: 40px; padding-bottom: 0;">
+        <div class="ad-index-container">
+            <div th:replace="admin/index :: rail-menu"></div>
+            <div id="context">
+                <!-- <div th:replace="admin/template :: ad-page-header ('沟通动态', 'dynamic')"></div> -->
+                <div class="main ui container">
+                    <div class="ui dividing right rail" style="min-height: 279px;">
+                        <div class="ui sticky sy-dynamic" style="left: 1040px; width: 283px !important; height: 279px !important; top: 0px;">
+                            <h4 class="ui dividing header">动态</h4>
+                            <div class="ui feed">
+                                <div class="event">
+                                    <div class="label">
+                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                    </div>
+                                    <div class="content">
+                                        <div class="summary">
+                                            <a class="user">
+          Elliot Fu
+        </a> added you as a friend
+                                            <div class="date">
+                                                1 Hour Ago
+                                            </div>
+                                        </div>
+                                        <div class="meta">
+                                            <a class="like">
+                                                <i class="like icon"></i> 4 Likes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="event">
+                                    <div class="label">
+                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                    </div>
+                                    <div class="content">
+                                        <div class="summary">
+                                            <a>Helen Troy</a> added <a>2 new illustrations</a>
+                                            <div class="date">
+                                                4 days ago
+                                            </div>
+                                        </div>
+                                        <div class="extra images">
+                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
+                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
+                                        </div>
+                                        <div class="meta">
+                                            <a class="like">
+                                                <i class="like icon"></i> 1 Like
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="event">
+                                    <div class="label">
+                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                    </div>
+                                    <div class="content">
+                                        <div class="summary">
+                                            <a class="user">
+          Jenny Hess
+        </a> added you as a friend
+                                            <div class="date">
+                                                2 Days Ago
+                                            </div>
+                                        </div>
+                                        <div class="meta">
+                                            <a class="like">
+                                                <i class="like icon"></i> 8 Likes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="event">
+                                    <div class="label">
+                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                    </div>
+                                    <div class="content">
+                                        <div class="summary">
+                                            <a>Joe Henderson</a> posted on his page
+                                            <div class="date">
+                                                3 days ago
+                                            </div>
+                                        </div>
+                                        <div class="extra text">
+                                            Ours is a life of constant reruns. We're always circling back to where we'd we started, then starting all over again. Even if we don't run extra laps that day, we surely will come back for more of the same another day soon.
+                                        </div>
+                                        <div class="meta">
+                                            <a class="like">
+                                                <i class="like icon"></i> 5 Likes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="event">
+                                    <div class="label">
+                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                    </div>
+                                    <div class="content">
+                                        <div class="summary">
+                                            <a>Justen Kitsune</a> added <a>2 new photos</a> of you
+                                            <div class="date">
+                                                4 days ago
+                                            </div>
+                                        </div>
+                                        <div class="extra images">
+                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
+                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
+                                        </div>
+                                        <div class="meta">
+                                            <a class="like">
+                                                <i class="like icon"></i> 41 Likes
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat" style="min-height: 1000px;">
+                        <div class="ui minimal comments">
+                            <h3 class="ui dividing header">沟通</h3>
+                            <div class="comment">
+                                <a class="avatar">
+                                    <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                </a>
+                                <div class="content">
+                                    <a class="author">Matt</a>
+                                    <div class="metadata">
+                                        <span class="date">Today at 5:42PM</span>
+                                    </div>
+                                    <div class="text">
+                                        How artistic!
+                                    </div>
+                                    <div class="actions">
+                                        <a class="edit">编辑</a>
+                                        <a class="delete">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment">
+                                <a class="avatar">
+                                    <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                </a>
+                                <div class="content">
+                                    <a class="author">Elliot Fu</a>
+                                    <div class="metadata">
+                                        <span class="date">Yesterday at 12:30AM</span>
+                                    </div>
+                                    <div class="text">
+                                        <p>This has been very useful for my research. Thanks as well!</p>
+                                    </div>
+                                    <div class="actions">
+                                        <a class="edit">编辑</a>
+                                        <a class="delete">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comment">
+                                <a class="avatar">
+                                    <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                </a>
+                                <div class="content">
+                                    <a class="author">Joe Henderson</a>
+                                    <div class="metadata">
+                                        <span class="date">5 days ago</span>
+                                    </div>
+                                    <div class="text">
+                                        Dude, this is awesome. Thanks so much
+                                    </div>
+                                    <div class="actions">
+                                        <a class="edit">编辑</a>
+                                        <a class="delete">删除</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <form class="ui reply form">
+                                <div class="field">
+                                    <textarea></textarea>
+                                </div>
+                                <div class="ui blue labeled submit icon button">
+                                    <i class="icon edit"></i> 提交
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="admin/template :: ad-handle-confirm"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:include="admin/template :: ad-page-common"></div>
+    <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <!-- <input type="hidden" name="user.username" th:value="${user.username}" /> -->
+    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+    <script type="text/javascript">
+    jQuery(function($) {
+        $('table').tablesort().data('tablesort');
+        $('.ui.dropdown').dropdown();
+        $('.pp').popup();
+        $('.ui.dropdown.dd-actions').dropdown({
+            action: 'hide'
+        });
+
+        $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        $(window).resize(function(event) {
+            $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        });
+
+    });
+    </script>
+</body>
+
+</html>

@@ -29,6 +29,8 @@
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="users icon"></i> 用户管理
         </a>
+        <a th:classappend="${#strings.contains(uri, '/admin/dynamic')} ? 'active' : ''" class="item" th:href="@{/admin/dynamic}" href="dynamic.html"> <i class="at icon"></i> 沟通动态
+        </a>
     </div>
     <div th:fragment="top-fixed-menu" class="ui fixed inverted main menu">
         <a class="item ad-index-btn-menu">
@@ -85,6 +87,9 @@
                         </a>
                         <a th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
                             <i class="users icon"></i> 用户管理
+                        </a>
+                        <a th:classappend="${#strings.contains(uri, '/admin/dynamic')} ? 'active' : ''" class="item" th:href="@{/admin/dynamic}" href="dynamic.html">
+                            <i class="at icon"></i> 沟通动态
                         </a>
                     </div>
                 </div>
