@@ -229,7 +229,7 @@ public class Mail {
 		String href = baseURL + translateAction + "?projectId=" + projectId
 				+ "&id=" + translate.getId();
 		this.mapHref.put(name, StringUtil.replaceByKV(
-				"<a href=\"{href}\">{text}</a>",
+				"<a target=\"_blank\" href=\"{href}\">{text}</a>",
 				"href", href, "text", href));
 	}
 

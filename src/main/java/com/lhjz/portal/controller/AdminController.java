@@ -352,11 +352,20 @@ public class AdminController extends BaseController {
 			lbls = new HashSet<String>();
 		}
 
+		Set<String> notifiers = new HashSet<>();
+		if (project != null) {
+			project.getWatchers().forEach((u) -> {
+				notifiers.add(u.getUsername());
+			});
+		}
+		notifiers.add(getLoginUser().getUsername());
+
 		model.addAttribute("projects", new TreeSet<>(projects));
 		model.addAttribute("languages", languages2);
 		model.addAttribute("projectId", projectId);
 		model.addAttribute("labels", new TreeSet<>(lbls));
 		model.addAttribute("users", userRepository.findAll());
+		model.addAttribute("notifiers", StringUtil.join(",", notifiers));
 
 		return "admin/import";
 	}

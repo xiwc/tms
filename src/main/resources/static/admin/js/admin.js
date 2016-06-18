@@ -261,4 +261,7 @@ jQuery(function($) {
     var translateUrl = Utils.getRemember('/admin/translate');
     translateUrl && $('a.item.mi-translate').attr('href', translateUrl);
 
+    var importUrl = Utils.getRemember('/admin/import');
+    importUrl && $('a.item.mi-import').attr('href', importUrl);
+
 });
