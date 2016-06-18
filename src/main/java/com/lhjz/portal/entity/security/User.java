@@ -24,6 +24,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.pojo.Enum.Status;
@@ -79,6 +80,11 @@ public class User implements java.io.Serializable {
 	@ManyToMany
 	@JoinTable(name = "watcher_translate", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "translate_id") })
 	private Set<Translate> watcherTranslates = new HashSet<Translate>();
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "voter_chat", joinColumns = { @JoinColumn(name = "user_id") }, inverseJoinColumns = { @JoinColumn(name = "chat_id") })
+	private Set<Chat> voterChats = new HashSet<Chat>();
 
 	public User() {
 	}
@@ -191,6 +197,14 @@ public class User implements java.io.Serializable {
 
 	public void setWatcherTranslates(Set<Translate> watcherTranslates) {
 		this.watcherTranslates = watcherTranslates;
+	}
+
+	public Set<Chat> getVoterChats() {
+		return voterChats;
+	}
+
+	public void setVoterChats(Set<Chat> voterChats) {
+		this.voterChats = voterChats;
 	}
 
 	@Override

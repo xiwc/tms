@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.lhjz.portal.base.BaseController;
+import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Project;
@@ -32,6 +34,7 @@ import com.lhjz.portal.entity.security.Authority;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.UserInfo;
 import com.lhjz.portal.pojo.Enum.Status;
+import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.FileRepository;
 import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LanguageRepository;
@@ -71,6 +74,9 @@ public class AdminController extends BaseController {
 
 	@Autowired
 	LabelRepository labelRepository;
+	
+	@Autowired
+	ChatRepository chatRepository;
 
 	@RequestMapping("login")
 	public String login(Model model) {
@@ -163,7 +169,14 @@ public class AdminController extends BaseController {
 	}
 	
 	@RequestMapping("dynamic")
-	public String dynamic(Model model) {
+	public String dynamic(
+			Model model,
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		Page<Chat> chats = chatRepository.findAll(pageable);
+		
+		model.addAttribute("chats", chats);
+		
 		return "admin/dynamic";
 	}
 
