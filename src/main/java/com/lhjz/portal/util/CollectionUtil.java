@@ -3,7 +3,9 @@
  */
 package com.lhjz.portal.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * CollectionUtil处理工具类.
@@ -47,6 +49,20 @@ public final class CollectionUtil {
 	 */
 	public static boolean isNotEmpty(Collection<?> collection) {
 		return isEmpty(collection);
+	}
+	
+	/**
+	 * 反向排序List
+	 * @param list
+	 * @return
+	 */
+	public static <T> List<T> reverseList(List<T> list) {
+		List<T> newList = new ArrayList<T>();
+		list.stream().forEach((l) -> {
+			newList.add(0, l);
+		});
+		
+		return newList;
 	}
 
 }

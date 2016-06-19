@@ -41,6 +41,7 @@ import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
+import com.lhjz.portal.util.CollectionUtil;
 import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.WebUtil;
 
@@ -171,10 +172,12 @@ public class AdminController extends BaseController {
 	@RequestMapping("dynamic")
 	public String dynamic(
 			Model model,
-			@PageableDefault(sort = { "createDate" }, direction = Direction.ASC) Pageable pageable) {
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
-		
+		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
+				.getContent()), pageable, 0);
+
 		model.addAttribute("chats", chats);
 		model.addAttribute("user", getLoginUser());
 		
