@@ -264,4 +264,7 @@ jQuery(function($) {
     var importUrl = Utils.getRemember('/admin/import');
     importUrl && $('a.item.mi-import').attr('href', importUrl);
 
+    var dynamicUrl = Utils.getRemember('/admin/dynamic');
+    dynamicUrl && $('a.item.mi-dynamic').attr('href', dynamicUrl);
+
 });
