@@ -17,8 +17,12 @@ public class Enum {
 		Create, Read, Update, Delete, Upload, Visit, Import, Export;
 	}
 
+	public static enum Prop {
+		Key, Content, Name, Id, Watchers, Labels, TranslateItem;
+	}
+
 	public static enum Target {
-		Translate, Label, TranslateItem, Language, Project, Article, File, Feedback, Diagnose, Settings, Page, User, Authority, Config, Feature, Case, Product, Env, Health, Job, JobApply, Import;
+		Translate, Label, TranslateItem, Language, Chat, Project, Article, File, Feedback, Diagnose, Settings, Page, User, Authority, Config, Feature, Case, Product, Env, Health, Job, JobApply, Import;
 	}
 
 	public static enum Page {

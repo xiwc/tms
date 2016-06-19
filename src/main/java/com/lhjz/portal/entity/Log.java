@@ -12,12 +12,13 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.hibernate.validator.constraints.NotBlank;
-
+import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
@@ -42,17 +43,23 @@ public class Log implements Serializable {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Action action;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Target target;
+
+	private String targetId;
+
 	private String properties;
 	@Column(length = 16777216)
 	private String oldValue;
+
 	@Column(length = 16777216)
 	private String newValue;
-	@NotBlank
-	@Column(nullable = false)
-	private String username;
+
+	@ManyToOne
+	@JoinColumn(name = "creator")
+	private User creator;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -112,14 +119,6 @@ public class Log implements Serializable {
 		this.newValue = newValue;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public Status getStatus() {
 		return status;
 	}
@@ -144,13 +143,29 @@ public class Log implements Serializable {
 		this.version = version;
 	}
 
+	public String getTargetId() {
+		return targetId;
+	}
+
+	public void setTargetId(String targetId) {
+		this.targetId = targetId;
+	}
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
+
 	@Override
 	public String toString() {
 		return "Log [id=" + id + ", action=" + action + ", target=" + target
-				+ ", properties=" + properties + ", oldValue=" + oldValue
-				+ ", newValue=" + newValue + ", username=" + username
-				+ ", status=" + status + ", createDate=" + createDate
-				+ ", version=" + version + "]";
+				+ ", targetId=" + targetId + ", properties=" + properties
+				+ ", oldValue=" + oldValue + ", newValue=" + newValue
+				+ ", status=" + status
+				+ ", createDate=" + createDate + ", version=" + version + "]";
 	}
 
 }
