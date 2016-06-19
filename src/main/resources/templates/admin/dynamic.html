@@ -246,11 +246,11 @@
             $(el).html(simplemde.markdown($(el).text()));
         });
 
-        if (!url('query')) {
-            $('html, body, .ad-index-content').animate({
-                scrollTop: $(document).height()
-            }, 300);
-        }
+        // if (!url('query')) {
+        //     $('html, body, .ad-index-content').animate({
+        //         scrollTop: $(document).height()
+        //     }, 300);
+        // }
 
         $('.btn-chat-submit').click(function(event) {
             $.post('/admin/chat/create', {
