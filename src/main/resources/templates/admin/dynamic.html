@@ -36,6 +36,8 @@
     .main.container .right.rail .sticky {
         /*max-height: 400px;*/
         overflow: auto;
+        padding-left: 5px;
+        padding-right: 5px;
     }
     
     .CodeMirror,
@@ -50,6 +52,18 @@
     
     .avatar.ui.mini.circular.image {
         cursor: pointer;
+    }
+    
+    .ui.feed>.event:hover,
+    .ui.comments .comment:hover {
+        background-color: #F3F3F3;
+        -webkit-box-shadow: 0 0 5px 1px #0CC!important;
+        -moz-box-shadow: 0 0 5px 1px #0CC!important;
+        box-shadow: 0 0 5px 1px #0CC!important;
+    }
+
+    .ui.comments .comment .text {
+        margin-top: 0.5em;
     }
     
     @media only screen and (max-width: 767px) {
