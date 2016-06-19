@@ -190,7 +190,8 @@ public class AdminController extends BaseController {
 				page--;
 			}
 
-			pageable = new PageRequest((int) page, size, Direction.DESC,
+			pageable = new PageRequest(page > -1 ? (int) page : 0, size,
+					Direction.DESC,
 					"createDate");
 		}
 
