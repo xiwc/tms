@@ -231,6 +231,7 @@
             }, function(data, textStatus, xhr) {
                 if (data.success) {
                     simplemde.value('');
+                    simplemde.autosave();
                     toastr.success('提交成功!');
                     window.location.reload();
                 } else {
