@@ -6,6 +6,7 @@ import java.util.Date;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import com.lhjz.portal.pojo.Enum.Prop;
 import com.lhjz.portal.pojo.Enum.Status;
 
 public class CommonUtilTest {
@@ -39,6 +40,8 @@ public class CommonUtilTest {
 	public void status() {
 		System.out.println(Status.valueOf("New"));
 		// System.out.println(Status.valueOf("New_"));
+
+		System.out.println(Prop.Key.name());
 	}
 
 	@Test

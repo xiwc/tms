@@ -28,16 +28,19 @@ import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
+import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.security.Authority;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.UserInfo;
 import com.lhjz.portal.pojo.Enum.Status;
+import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.FileRepository;
 import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LanguageRepository;
+import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
@@ -78,6 +81,9 @@ public class AdminController extends BaseController {
 	
 	@Autowired
 	ChatRepository chatRepository;
+
+	@Autowired
+	LogRepository logRepository;
 
 	@RequestMapping("login")
 	public String login(Model model) {
@@ -178,7 +184,11 @@ public class AdminController extends BaseController {
 		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
 				.getContent()), pageable, chats.getTotalElements());
 
+		Page<Log> logs = logRepository.findByTarget(Target.Translate,
+				new PageRequest(0, 10, Direction.DESC, "createDate"));
+
 		model.addAttribute("chats", chats);
+		model.addAttribute("logs", logs);
 		model.addAttribute("user", getLoginUser());
 		
 		return "admin/dynamic";

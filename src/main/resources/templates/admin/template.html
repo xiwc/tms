@@ -93,7 +93,13 @@
                 {{/if}}
             </a>
             <div class="content">
-                <a class="author">${creator.name}</a>
+                <a class="author">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
                 <div class="metadata">
                     <span class="date" th:text="">${createDateFormat}</span>
                 </div>
@@ -105,6 +111,45 @@
                     <a class="edit">编辑</a>
                     <a class="delete">删除</a>
                 </div>
+                {{/if}}
+            </div>
+        </div>
+    </script>
+    <script th:fragment="logMoreTpl" id="logMoreTpl" type="text/x-jquery-tmpl">
+        <div class="event">
+            <div class="label">
+                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                {{if creator.iconName}}
+                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>
+                {{else}}
+                    <img src="/img/head.png">
+                {{/if}}
+                </a>
+            </div>
+            <div class="content">
+                <div class="summary">
+                    <a class="user">
+                        {{if creator.name}}
+                            ${creator.name}
+                        {{else}}
+                            ${creator.username}
+                        {{/if}}
+                    </a>
+                    <span>${action}</span> 
+                    <a target="_blank" href="/admin/translate?id=${targetId}">翻译</a>
+                    <span>${properties}</span>
+                    <div class="date">
+                        ${createDate}
+                    </div>
+                </div>
+                {{if properties}}
+                <div class="extra text">
+                    {{if oldValue}}
+                    <div>${oldValue}</div>
+                    <div style="color: green; font-size: 12px; font-weight: bold;">变更为</div>
+                    {{/if}}
+                    <div>${newValue}</div>
+                </div>            
                 {{/if}}
             </div>
         </div>

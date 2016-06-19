@@ -47,6 +47,23 @@
     .editor-preview-side.editor-preview-active-side {
         z-index: 999;
     }
+    
+    @media only screen and (max-width: 767px) {
+        .main.container {
+            margin-right: 3em !important;
+            margin-left: 3em !important;
+            width: auto !important;
+            max-width: 960px !important;
+            padding: 2em 0em 7em;
+            position: relative;
+        }
+        .main.container .right.rail {
+            margin-left: 3em;
+            padding-top: 2em;
+            width: 420px;
+            display: none;
+        }
+    }
     </style>
 </head>
 
@@ -62,128 +79,62 @@
                     <div class="ui dividing right rail" style="min-height: 279px;">
                         <div class="ui sticky sy-dynamic" style="z-index: 0; left: 1040px; width: 283px !important; height: 279px !important; top: 0px;">
                             <h4 class="ui dividing header">动态</h4>
-                            <div class="ui feed">
-                                <div class="event">
+                            <div class="ui feed fd-dynamic">
+                                <div class="event" th:each="l : ${logs}">
                                     <div class="label">
-                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                        <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                                            <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(l.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(l.creator.name,#strings.length(l.creator.name) - 1,#strings.length(l.creator.name)))}">管理员</span>
+                                            <img th:if="${#strings.isEmpty(l.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                        </a>
                                     </div>
                                     <div class="content">
                                         <div class="summary">
-                                            <a class="user">
-                                              Elliot Fu
-                                            </a> added you as a friend
-                                            <div class="date">
+                                            <a class="user" th:text="${#strings.isEmpty(l.creator.name) ? l.creator.username : l.creator.name}">张三</a>
+                                            <span th:if="${#strings.toString(l.action) == 'Create'}">添加</span>
+                                            <span th:if="${#strings.toString(l.action) == 'Update'}">更新</span>
+                                            <span th:if="${#strings.toString(l.action) == 'Delete'}">删除</span>
+                                            <a th:if="${#strings.toString(l.target) == 'Translate'}" target="_blank" th:href="@{/admin/translate(id=${l.targetId})}">翻译</a>
+                                            <span th:if="${#strings.toString(l.properties) == 'TranslateItem'}">内容</span>
+                                            <span th:if="${#strings.toString(l.properties) == 'Key'}">名称</span>
+                                            <span th:if="${#strings.toString(l.properties) == 'Watchers'}">关注者</span>
+                                            <span th:if="${#strings.toString(l.properties) == 'Labels'}">标签</span>
+                                            <div class="date" th:text="${#calendars.format(l.createDate,'yyyy/MM/dd HH:mm:ss')}">
                                                 1 Hour Ago
                                             </div>
                                         </div>
-                                        <div class="meta">
+                                        <div th:unless="${#strings.isEmpty(l.properties)}" class="extra text">
+                                            <div th:unless="${#strings.isEmpty(l.oldValue)}" th:text="${l.oldValue}"></div>
+                                            <div style="color: green; font-size: 12px; font-weight: bold;" th:unless="${#strings.isEmpty(l.oldValue)}">变更为</div>
+                                            <div th:text="${l.newValue}"></div>
+                                        </div>
+                                        <!-- <div class="extra images">
+                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
+                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
+                                        </div> -->
+                                        <!-- <div class="meta">
                                             <a class="like">
                                                 <i class="like icon"></i> 4 Likes
                                             </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event">
-                                    <div class="label">
-                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
-                                    </div>
-                                    <div class="content">
-                                        <div class="summary">
-                                            <a>Helen Troy</a> added <a>2 new illustrations</a>
-                                            <div class="date">
-                                                4 days ago
-                                            </div>
-                                        </div>
-                                        <div class="extra images">
-                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
-                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
-                                        </div>
-                                        <div class="meta">
-                                            <a class="like">
-                                                <i class="like icon"></i> 1 Like
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event">
-                                    <div class="label">
-                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
-                                    </div>
-                                    <div class="content">
-                                        <div class="summary">
-                                            <a class="user">
-                                              Jenny Hess
-                                            </a> added you as a friend
-                                            <div class="date">
-                                                2 Days Ago
-                                            </div>
-                                        </div>
-                                        <div class="meta">
-                                            <a class="like">
-                                                <i class="like icon"></i> 8 Likes
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event">
-                                    <div class="label">
-                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
-                                    </div>
-                                    <div class="content">
-                                        <div class="summary">
-                                            <a>Joe Henderson</a> posted on his page
-                                            <div class="date">
-                                                3 days ago
-                                            </div>
-                                        </div>
-                                        <div class="extra text">
-                                            Ours is a life of constant reruns. We're always circling back to where we'd we started, then starting all over again. Even if we don't run extra laps that day, we surely will come back for more of the same another day soon.
-                                        </div>
-                                        <div class="meta">
-                                            <a class="like">
-                                                <i class="like icon"></i> 5 Likes
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event">
-                                    <div class="label">
-                                        <img th:src="@{/img/head.png}" src="../../static/img/head.png">
-                                    </div>
-                                    <div class="content">
-                                        <div class="summary">
-                                            <a>Justen Kitsune</a> added <a>2 new photos</a> of you
-                                            <div class="date">
-                                                4 days ago
-                                            </div>
-                                        </div>
-                                        <div class="extra images">
-                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
-                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
-                                        </div>
-                                        <div class="meta">
-                                            <a class="like">
-                                                <i class="like icon"></i> 41 Likes
-                                            </a>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
+                            <button th:unless="${logs.last}" class="fluid ui button btn-log-more">加载更多</button>
                         </div>
                     </div>
                     <div class="chat" style="min-height: 1000px;">
                         <div class="ui minimal comments">
                             <h3 class="ui dividing header">沟通</h3>
-                            <button class="fluid ui button btn-chat-more">加载更多</button>
+                            <button th:unless="${chats.last}" class="fluid ui button btn-chat-more">加载更多</button>
                             <div class="comment" th:each="c : ${chats}" th:attr="data-id=${c.id}">
                                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
                                 <div class="content">
-                                    <a class="author" th:text="${c.creator.name}">Matt</a>
+                                    <a class="author" style="color: #4183c4;" th:text="${c.creator.name}">Matt</a>
                                     <div class="metadata">
-                                        <span class="date" th:text="${c.createDate}">Today at 5:42PM</span>
+                                        <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                     </div>
                                     <div class="text markdown-body" th:text="${c.content}">
                                         How artistic!
@@ -213,9 +164,13 @@
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
+    <div th:replace="admin/template :: logMoreTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.size" th:value="${chats.size}" />
+    <input type="hidden" name="page.number.logs" th:value="${logs.number}" />
+    <input type="hidden" name="page.number.next.logs" th:value="${logs.number + 1}" />
+    <input type="hidden" name="page.size.logs" th:value="${logs.size}" />
     <input type="hidden" name="user.username" th:value="${user.username}" />
     <input type="hidden" name="role.admin" th:value="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" />
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
@@ -288,13 +243,15 @@
         });
 
         $('.btn-chat-more').click(function(event) {
+            $btn = $(this);
+
             $.get('/admin/chat/more', {
                 page: $('input:hidden[name="page.number.next"]').val(),
                 size: $('input:hidden[name="page.size"]').val()
             }, function(data) {
                 if (data.success) {
 
-                    if(data.data.content.length == 0) {
+                    if (data.data.content.length == 0) {
                         toastr.warning('没有更多数据了!');
                         return;
                     }
@@ -313,9 +270,58 @@
                             chat.actions = true;
                         }
                         var d = new Date(chat.createDate);
-                        chat.createDateFormat = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds() + '.' + d.getMilliseconds();
+                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
                     $("#chatMoreTpl").tmpl(data.data.content).insertAfter($('.btn-chat-more'));
+                    data.data.last && $btn.remove();
+                    toastr.success('加载成功!');
+                } else {
+                    toastr.error(data.data, '加载失败!');
+                }
+            });
+        });
+
+
+        var actionMapping = {
+            'Create': '创建',
+            'Update': '更新',
+            "Delete": '删除'
+        };
+        var propMapping = {
+            'TranslateItem': '内容',
+            'Key': '名称',
+            'Watchers': '关注者',
+            'Labels': '标签'
+        };
+
+        $('.btn-log-more').click(function(event) {
+            $btn = $(this);
+
+            $.get('/admin/chat/moreLogs', {
+                page: $('input:hidden[name="page.number.next.logs"]').val(),
+                size: $('input:hidden[name="page.size.logs"]').val()
+            }, function(data) {
+                if (data.success) {
+
+                    if (data.data.content.length == 0) {
+                        toastr.warning('没有更多数据了!');
+                        return;
+                    }
+
+                    $('input:hidden[name="page.number.next.logs"]').val(data.data.number + 1);
+                    $('input:hidden[name="page.size.logs"]').val(data.data.size);
+
+                    $.each(data.data.content, function(index, log) {
+                        if (log.creator.name) {
+                            log.creator.iconName = log.creator.name.substr(log.creator.name.length - 1).toUpperCase();
+                        }
+                        log.action = actionMapping[log.action];
+                        log.properties = propMapping[log.properties];
+                        var d = new Date(log.createDate);
+                        log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    });
+                    $("#logMoreTpl").tmpl(data.data.content).appendTo('.fd-dynamic');
+                    data.data.last && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
                     toastr.error(data.data, '加载失败!');

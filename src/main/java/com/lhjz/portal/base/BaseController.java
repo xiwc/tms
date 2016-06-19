@@ -44,6 +44,18 @@ public abstract class BaseController {
 
 	}
 
+	protected Log log(Action action, Target target, String targetId,
+			Object... vals) {
+
+		return logWithProperties(action, target, targetId, null, vals);
+	}
+
+	protected Log log(Action action, Target target, Long targetId,
+			Object... vals) {
+
+		return logWithProperties(action, target, targetId, null, vals);
+	}
+
 	protected User getLoginUser() {
 		return userRepository.findOne(WebUtil.getUsername());
 	}
@@ -55,11 +67,30 @@ public abstract class BaseController {
 	protected Log logWithProperties(Action action, Target target,
 			String properties, Object... vals) {
 
+		return logWithProperties(action, target, StringUtil.EMPTY, properties,
+				vals);
+	}
+
+	protected Log logWithProperties(Action action, Target target,
+			Long targetId, String properties, Object... vals) {
+
+		return logWithProperties(action, target, String.valueOf(targetId),
+				properties, vals);
+	}
+
+	protected Log logWithProperties(Action action, Target target,
+			String targetId,
+			String properties, Object... vals) {
+
 		Log log = new Log();
 		log.setAction(action);
 		log.setTarget(target);
 		log.setCreateDate(new Date());
 		log.setProperties(properties);
+
+		if (StringUtil.isNotEmpty(targetId)) {
+			log.setTargetId(String.valueOf(targetId));
+		}
 
 		if (vals.length > 0) {
 			log.setNewValue(String.valueOf(vals[0]));
@@ -69,12 +100,7 @@ public abstract class BaseController {
 			log.setOldValue(String.valueOf(vals[1]));
 		}
 
-		String username = WebUtil.getUsername();
-		if (StringUtil.isEmpty(username)) {
-			username = env.getProperty("lhjz.anonymous.user.name",
-					"anonymous_user");
-		}
-		log.setUsername(username);
+		log.setCreator(getLoginUser());
 
 		return logRepository.saveAndFlush(log);
 

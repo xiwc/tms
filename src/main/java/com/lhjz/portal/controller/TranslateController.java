@@ -41,6 +41,7 @@ import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
+import com.lhjz.portal.pojo.Enum.Prop;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.TranslateForm;
@@ -192,12 +193,12 @@ public class TranslateController extends BaseController {
 
 		translate.setSearch(translate.toString());
 
-		translateRepository.saveAndFlush(translate);
+		Translate translate2 = translateRepository.saveAndFlush(translate);
 
 		loginUser.getWatcherTranslates().add(translate);
 		userRepository.saveAndFlush(loginUser);
 
-		log(Action.Create, Target.Translate, translate);
+		log(Action.Create, Target.Translate, translate2.getId(), translate2);
 
 		final Mail mail = Mail.instance().addWatchers(translate)
 				.addUsers(getUser(translate.getCreator()));
@@ -288,7 +289,14 @@ public class TranslateController extends BaseController {
 
 			translate.setSearch(translate.toString());
 
-			translateRepository.saveAndFlush(translate);
+			Translate translate2 = translateRepository.saveAndFlush(translate);
+
+			logWithProperties(Action.Update, Target.TranslateItem, id,
+					Prop.Content.name(), translateItemForm.getContent(),
+					oldContent);
+			logWithProperties(Action.Update, Target.Translate,
+					translate2.getId(), Prop.TranslateItem.name(),
+					translateItemForm.getContent(), oldContent);
 
 			loginUser.getWatcherTranslates().add(translate);
 			userRepository.saveAndFlush(loginUser);
@@ -334,9 +342,6 @@ public class TranslateController extends BaseController {
 			return RespBody.failed("更新翻译条目不存在!");
 		}
 
-		logWithProperties(Action.Update, Target.TranslateItem, "content",
-				translateItemForm.getContent(), oldContent);
-
 		return RespBody.succeed(id);
 	}
 
@@ -377,6 +382,8 @@ public class TranslateController extends BaseController {
 		final Translate translate = translateRepository.findOne(id);
 
 		if (translate != null) {
+			
+			String oldTranslate = translate.toString();
 
 			final Mail mail2 = Mail.instance()
 					.parseTranslateUpdated(translateForm, translate);
@@ -484,7 +491,7 @@ public class TranslateController extends BaseController {
 					}
 
 					logWithProperties(Action.Update, Target.TranslateItem,
-							"content", content, oldContent);
+							Prop.Content.name(), content, oldContent);
 				} else {
 					TranslateItem item = new TranslateItem();
 					item.setContent(content);
@@ -505,7 +512,7 @@ public class TranslateController extends BaseController {
 					}
 
 					logWithProperties(Action.Create, Target.TranslateItem,
-							"content", item);
+							Prop.Content.name(), item);
 
 					translate.getTranslateItems().add(item);
 				}
@@ -514,12 +521,13 @@ public class TranslateController extends BaseController {
 
 			translate.setSearch(translate.toString());
 
-			translateRepository.saveAndFlush(translate);
+			Translate translate2 = translateRepository.saveAndFlush(translate);
 
 			loginUser.getWatcherTranslates().add(translate);
 			userRepository.saveAndFlush(loginUser);
 
-			log(Action.Update, Target.Translate, translate);
+			log(Action.Update, Target.Translate, translate2.getId(),
+					translate2, oldTranslate);
 
 			final Mail mail = Mail.instance().addWatchers(translate)
 					.addUsers(getUser(translate.getCreator()));
@@ -571,9 +579,11 @@ public class TranslateController extends BaseController {
 		final Translate translate = translateRepository.findOne(id);
 
 		if (translate != null) {
+			
+			String oldKey = translate.getKey();
 
 			final Mail mail2 = Mail.instance().put("翻译名称",
-					translate.getKey() + SysConstant.CHANGE_TO + key);
+					oldKey + SysConstant.CHANGE_TO + key);
 
 			translate.setKey(key);
 			translate.setStatus(Status.Updated);
@@ -585,12 +595,15 @@ public class TranslateController extends BaseController {
 
 			translate.setSearch(translate.toString());
 
-			translateRepository.saveAndFlush(translate);
+			Translate translate2 = translateRepository.saveAndFlush(translate);
 
 			loginUser.getWatcherTranslates().add(translate);
 			userRepository.saveAndFlush(loginUser);
 
-			log(Action.Update, Target.Translate, translate);
+			logWithProperties(Action.Update, Target.Translate,
+					translate2.getId(),
+					Prop.Key.name(),
+					key, oldKey);
 
 			final Mail mail = Mail.instance().addWatchers(translate)
 					.addUsers(getUser(translate.getCreator()));
@@ -638,6 +651,10 @@ public class TranslateController extends BaseController {
 
 		final Translate translate = translateRepository.findOne(id);
 
+		if (translate == null) {
+			return RespBody.failed("删除翻译不存在!");
+		}
+
 		// TODO 权限判断: 普通用户 只能删除自己创建的, 管理员可以删除所有.
 
 		Long projectId = translate.getProject().getId();
@@ -655,7 +672,7 @@ public class TranslateController extends BaseController {
 		translateRepository.delete(id);
 		translateRepository.flush();
 
-		logWithProperties(Action.Delete, Target.Translate, "id", id);
+		log(Action.Delete, Target.Translate, id, translate);
 
 		final User loginUser = getLoginUser();
 
@@ -697,14 +714,11 @@ public class TranslateController extends BaseController {
 
 		Label label = labelRepository.findOne(id);
 
+		if (label == null) {
+			return RespBody.failed("删除标签不存在!");
+		}
+
 		final Translate translate = label.getTranslate();
-
-		// final Mail mail = Mail.instance().addWatchers(translate)
-		// .addUsers(getUser(translate.getCreator()));
-		// .removeUser(getLoginUser());
-
-		// final String href = baseURL + translateAction + "?projectId="
-		// + translate.getProject().getId() + "&id=" + translate.getId();
 
 		translate.getLabels().remove(label);
 		translate.setUpdateDate(new Date());
@@ -717,28 +731,9 @@ public class TranslateController extends BaseController {
 		labelRepository.delete(label);
 		labelRepository.flush();
 
-		log(Action.Delete, Target.Label, label);
-
-		// final Mail mail2 = Mail.instance().put("删除标签", label.getName());
-		//
-		// final User loginUser = getLoginUser();
-
-		// ThreadUtil.exec(() -> {
-		//
-		// try {
-		// mailSender.sendHtml(String.format("TMS-翻译更新_%s",
-		// DateUtil.format(new Date(), DateUtil.FORMAT7)),
-		// TemplateUtil.process("templates/mail/translate-update",
-		// MapUtil.objArr2Map("translate", translate,
-		// "user", loginUser, "href", href,
-		// "body", mail2.body())), mail.get());
-		// logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// logger.error("翻译更新邮件发送失败！ID:{}", translate.getId());
-		// }
-		//
-		// });
+		log(Action.Delete, Target.Label, id, label);
+		logWithProperties(Action.Delete, Target.Translate, translate.getId(),
+				Prop.Labels.name(), label.getName());
 
 		return RespBody.succeed(id);
 	}
@@ -775,7 +770,8 @@ public class TranslateController extends BaseController {
 		final String href = baseURL + translateAction + "?projectId="
 				+ translate.getProject().getId() + "&id=" + translate.getId();
 
-		logWithProperties(Action.Delete, Target.Translate, "watchers",
+		logWithProperties(Action.Delete, Target.Translate, translate.getId(),
+				Prop.Watchers.name(),
 				username);
 
 		final Mail mail2 = Mail.instance().put("删除关注者",
@@ -845,34 +841,8 @@ public class TranslateController extends BaseController {
 		translateRepository.saveAndFlush(translate);
 
 		log(Action.Create, Target.Label, label);
-
-		// final Mail mail = Mail.instance().addWatchers(translate)
-		// .addUsers(getUser(translate.getCreator()));
-		// // .removeUser(getLoginUser());
-		//
-		// final String href = baseURL + translateAction + "?projectId="
-		// + translate.getProject().getId() + "&id=" + translate.getId();
-		//
-		// final User loginUser = getLoginUser();
-		//
-		// final Mail mail2 = Mail.instance().put("添加标签", label.getName());
-
-		// ThreadUtil.exec(() -> {
-		//
-		// try {
-		// mailSender.sendHtml(String.format("TMS-翻译更新_%s",
-		// DateUtil.format(new Date(), DateUtil.FORMAT7)),
-		// TemplateUtil.process("templates/mail/translate-update",
-		// MapUtil.objArr2Map("translate", translate,
-		// "user", loginUser, "href", href,
-		// "body", mail2.body())), mail.get());
-		// logger.info("翻译更新邮件发送成功！ID:{}", translate.getId());
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// logger.error("翻译更新邮件发送失败！ID:{}", translate.getId());
-		// }
-		//
-		// });
+		logWithProperties(Action.Create, Target.Translate, translate.getId(),
+				Prop.Labels.name(), label.getName());
 
 		return RespBody.succeed(label);
 	}
@@ -915,7 +885,8 @@ public class TranslateController extends BaseController {
 
 		translateRepository.saveAndFlush(translate);
 
-		logWithProperties(Action.Create, Target.Translate, "watchers",
+		logWithProperties(Action.Create, Target.Translate, translate.getId(),
+				Prop.Watchers.name(),
 				username);
 
 		final Mail mail = Mail.instance()

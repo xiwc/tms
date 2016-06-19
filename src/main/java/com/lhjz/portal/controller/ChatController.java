@@ -22,11 +22,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.entity.Chat;
+import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.ChatRepository;
+import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.util.CollectionUtil;
 import com.lhjz.portal.util.StringUtil;
 
@@ -45,6 +47,9 @@ public class ChatController extends BaseController {
 
 	@Autowired
 	ChatRepository chatRepository;
+
+	@Autowired
+	LogRepository logRepository;
 
 	@Autowired
 	MailSender2 mailSender;
@@ -133,5 +138,15 @@ public class ChatController extends BaseController {
 				.getContent()), pageable, chats.getTotalElements());
 
 		return RespBody.succeed(chats);
+	}
+
+	@RequestMapping(value = "moreLogs", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody moreLogs(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		Page<Log> logs = logRepository.findByTarget(Target.Translate, pageable);
+
+		return RespBody.succeed(logs);
 	}
 }

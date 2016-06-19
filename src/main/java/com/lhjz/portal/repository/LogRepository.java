@@ -3,9 +3,12 @@
  */
 package com.lhjz.portal.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lhjz.portal.entity.Log;
+import com.lhjz.portal.pojo.Enum.Target;
 
 /**
  * 
@@ -16,4 +19,5 @@ import com.lhjz.portal.entity.Log;
  */
 public interface LogRepository extends JpaRepository<Log, Long> {
 
+	Page<Log> findByTarget(Target target, Pageable pageable);
 }
