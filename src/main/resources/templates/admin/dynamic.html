@@ -55,13 +55,14 @@
     }
     
     .ui.feed>.event:hover,
-    .ui.comments .comment:hover {
+    .ui.comments .comment:hover,
+    .ui.comments .comment.marked {
         background-color: #F3F3F3;
         -webkit-box-shadow: 0 0 5px 1px #0CC!important;
         -moz-box-shadow: 0 0 5px 1px #0CC!important;
         box-shadow: 0 0 5px 1px #0CC!important;
     }
-
+    
     .ui.comments .comment .text {
         margin-top: 0.5em;
     }
@@ -144,7 +145,7 @@
                         <div class="ui minimal comments">
                             <h3 class="ui dividing header">沟通</h3>
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-more">加载更多</button>
-                            <div class="comment" th:each="c : ${chats}" th:attr="data-id=${c.id}">
+                            <div class="comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
                                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
@@ -163,6 +164,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <button th:unless="${chats.first}" class="fluid ui button btn-chat-pre-more">加载更多</button>
                             <form class="ui reply form">
                                 <div class="field markdown-body">
                                     <textarea class="ta-md"></textarea>
@@ -186,6 +188,7 @@
     <div th:replace="admin/template :: logMoreTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
+    <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
     <input type="hidden" name="page.size" th:value="${chats.size}" />
     <input type="hidden" name="page.number.logs" th:value="${logs.number}" />
     <input type="hidden" name="page.number.next.logs" th:value="${logs.number + 1}" />
@@ -199,6 +202,7 @@
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
@@ -239,6 +243,12 @@
             $(el).html(simplemde.markdown($(el).text()));
         });
 
+        if (!url('query')) {
+            $('html, body, .ad-index-content').animate({
+                scrollTop: $(document).height()
+            }, 300);
+        }
+
         $('.btn-chat-submit').click(function(event) {
             $.post('/admin/chat/create', {
                 content: simplemde.value()
@@ -247,7 +257,7 @@
                     simplemde.value('');
                     simplemde.autosave();
                     toastr.success('提交成功!');
-                    window.location.reload();
+                    window.location.href = url('path');
                 } else {
                     toastr.success(data.data, '提交失败!');
                 }
@@ -346,6 +356,44 @@
             });
         });
 
+        $('.btn-chat-pre-more').click(function(event) {
+            $btn = $(this);
+
+            $.get('/admin/chat/more', {
+                page: $('input:hidden[name="page.number.pre"]').val(),
+                size: $('input:hidden[name="page.size"]').val()
+            }, function(data) {
+                if (data.success) {
+
+                    if (data.data.content.length == 0) {
+                        toastr.warning('没有更多数据了!');
+                        return;
+                    }
+
+                    $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
+                    $('input:hidden[name="page.size"]').val(data.data.size);
+
+                    var isAdminRole = $('input:hidden[name="role.admin"]').val();
+                    var loginUsername = $('input:hidden[name="user.username"]').val();
+                    $.each(data.data.content, function(index, chat) {
+                        chat.contentMd = simplemde.markdown(chat.content);
+                        if (chat.creator.name) {
+                            chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                        }
+                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                            chat.actions = true;
+                        }
+                        var d = new Date(chat.createDate);
+                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    });
+                    $("#chatMoreTpl").tmpl(data.data.content).insertBefore($('.btn-chat-pre-more'));
+                    data.data.first && $btn.remove();
+                    toastr.success('加载成功!');
+                } else {
+                    toastr.error(data.data, '加载失败!');
+                }
+            });
+        });
 
         var actionMapping = {
             'Create': '创建',

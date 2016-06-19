@@ -4,6 +4,7 @@
 package com.lhjz.portal.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.lhjz.portal.entity.Chat;
 
@@ -16,4 +17,6 @@ import com.lhjz.portal.entity.Chat;
  */
 public interface ChatRepository extends JpaRepository<Chat, Long> {
 
+	@Query(value = "SELECT COUNT(*) FROM chat WHERE id >= ?1", nativeQuery = true)
+	long countGtId(Long id);
 }

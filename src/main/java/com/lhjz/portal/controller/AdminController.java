@@ -178,7 +178,21 @@ public class AdminController extends BaseController {
 	@RequestMapping("dynamic")
 	public String dynamic(
 			Model model,
+			@RequestParam(value = "id", required = false) Long id,
+			@RequestParam(value = "search", required = false) String search,
 			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		if (StringUtil.isNotEmpty(id)) {
+			long cntGtId = chatRepository.countGtId(id);
+			int size = pageable.getPageSize();
+			long page = cntGtId / size;
+			if (cntGtId % size == 0) {
+				page--;
+			}
+
+			pageable = new PageRequest((int) page, size, Direction.DESC,
+					"createDate");
+		}
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
 		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
