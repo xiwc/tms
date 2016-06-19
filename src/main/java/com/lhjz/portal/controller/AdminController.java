@@ -176,7 +176,7 @@ public class AdminController extends BaseController {
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
 		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
-				.getContent()), pageable, 0);
+				.getContent()), pageable, chats.getTotalElements());
 
 		model.addAttribute("chats", chats);
 		model.addAttribute("user", getLoginUser());

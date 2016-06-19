@@ -8,6 +8,11 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,6 +27,7 @@ import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.ChatRepository;
+import com.lhjz.portal.util.CollectionUtil;
 import com.lhjz.portal.util.StringUtil;
 
 /**
@@ -115,5 +121,17 @@ public class ChatController extends BaseController {
 		}
 
 		return RespBody.succeed(chat);
+	}
+
+	@RequestMapping(value = "more", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody more(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		Page<Chat> chats = chatRepository.findAll(pageable);
+		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
+				.getContent()), pageable, chats.getTotalElements());
+
+		return RespBody.succeed(chats);
 	}
 }
