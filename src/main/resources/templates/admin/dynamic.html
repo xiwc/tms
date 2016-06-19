@@ -260,6 +260,7 @@
                 content: simplemde.value()
             }, function(data, textStatus, xhr) {
                 if (data.success) {
+                    simplemde.value('');
                     toastr.success('提交成功!');
                     window.location.reload();
                 } else {
