@@ -18,8 +18,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
-import org.hibernate.validator.constraints.NotBlank;
-
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
@@ -58,10 +56,6 @@ public class Log implements Serializable {
 
 	@Column(length = 16777216)
 	private String newValue;
-
-	@NotBlank
-	@Column(nullable = false)
-	private String username;
 
 	@ManyToOne
 	@JoinColumn(name = "creator")
@@ -125,14 +119,6 @@ public class Log implements Serializable {
 		this.newValue = newValue;
 	}
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
 	public Status getStatus() {
 		return status;
 	}
@@ -178,7 +164,7 @@ public class Log implements Serializable {
 		return "Log [id=" + id + ", action=" + action + ", target=" + target
 				+ ", targetId=" + targetId + ", properties=" + properties
 				+ ", oldValue=" + oldValue + ", newValue=" + newValue
-				+ ", username=" + username + ", status=" + status
+				+ ", status=" + status
 				+ ", createDate=" + createDate + ", version=" + version + "]";
 	}
 
