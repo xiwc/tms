@@ -135,9 +135,9 @@
                             ${creator.username}
                         {{/if}}
                     </a>
-                    <span>${action}</span> 
+                    <span>${actionMapping}</span> 
                     <a target="_blank" href="/admin/translate?id=${targetId}">翻译</a>
-                    <span>${properties}</span>
+                    <span>${propertiesMapping}</span>
                     <div class="date">
                         ${createDate}
                     </div>
@@ -145,10 +145,18 @@
                 {{if properties}}
                 <div class="extra text">
                     {{if oldValue}}
-                    <div>${oldValue}</div>
-                    <div style="color: green; font-size: 12px; font-weight: bold;">变更为</div>
+                    <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${oldValue}</div>
+                    <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;">更新为</div>
                     {{/if}}
-                    <div>${newValue}</div>
+                    {{if isLabels}}
+                    <div class="ui tag label">${newValue}</div>
+                    {{else isWatchers}}
+                    <div class="ui label">
+                        <i class="user icon"></i> <span>${newValue}</span>
+                    </div>
+                    {{else}}
+                    <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${newValue}</div>
+                    {{/if}}
                 </div>            
                 {{/if}}
             </div>
