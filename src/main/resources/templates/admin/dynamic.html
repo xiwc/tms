@@ -172,7 +172,7 @@
                                 <div class="ui blue labeled submit icon button btn-chat-submit">
                                     <i class="icon edit"></i> 提交
                                 </div>
-                                <a th:href="@{/admin/dynamic}" title="刷新消息" class="pp ui black circular icon right floated button">
+                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp ui black circular icon right floated button">
                                     <i class="refresh icon"></i>
                                 </a>
                             </form>
@@ -246,11 +246,11 @@
             $(el).html(simplemde.markdown($(el).text()));
         });
 
-        // if (!url('query')) {
-        //     $('html, body, .ad-index-content').animate({
-        //         scrollTop: $(document).height()
-        //     }, 300);
-        // }
+        if (url('?scroll') || url('?scroll') == '') {
+            $('html, body, .ad-index-content').animate({
+                scrollTop: $(document).height()
+            }, 300);
+        }
 
         $('.btn-chat-submit').click(function(event) {
             $.post('/admin/chat/create', {
@@ -260,7 +260,7 @@
                     simplemde.value('');
                     simplemde.autosave();
                     toastr.success('提交成功!');
-                    window.location.href = url('path');
+                    window.location.href = url('path') + '?scroll=1';
                 } else {
                     toastr.success(data.data, '提交失败!');
                 }
