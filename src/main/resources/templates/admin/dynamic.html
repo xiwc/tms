@@ -48,6 +48,10 @@
         z-index: 999;
     }
     
+    .avatar.ui.mini.circular.image {
+        cursor: pointer;
+    }
+    
     @media only screen and (max-width: 767px) {
         .main.container {
             margin-right: 3em !important;
@@ -161,6 +165,7 @@
     </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
+    <div th:replace="admin/template :: ad-chat-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
@@ -205,6 +210,16 @@
             }
         });
 
+        var simplemdeEdit = new SimpleMDE({
+            element: $(".ad-chat-edit textarea")[0],
+            autoDownloadFontAwesome: false,
+            autosave: {
+                enabled: true,
+                delay: 5000,
+                uniqueId: "chat-edit-content"
+            }
+        });
+
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
             $(el).html(simplemde.markdown($(el).text()));
@@ -240,6 +255,41 @@
                     });
                 }
             }).modal('show');
+        });
+
+        $('body').on('click', '.comments .actions a.edit', function(event) {
+            $btn = $(this);
+
+            $.get('/admin/chat/get', {
+                id: $btn.closest('.comment').attr('data-id')
+            }, function(data) {
+                if (data.success) {
+                    $('.ad-chat-edit').modal({
+                        onShow: function() {
+                            simplemdeEdit.value(data.data.content);
+                        },
+                        onApprove: function() {
+                            if (!simplemdeEdit.value()) {
+                                toastr.error('更新内容不能为空!');
+                                return false;
+                            }
+                            $.post('/admin/chat/update', {
+                                id: $btn.closest('.comment').attr('data-id'),
+                                content: simplemdeEdit.value()
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(simplemdeEdit.value()));
+                                    toastr.success('更新成功!');
+                                } else {
+                                    toastr.error(data.data, '更新失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                } else {
+                    toastr.error(data.data, '获取失败!');
+                }
+            });
         });
 
         $('.btn-chat-more').click(function(event) {

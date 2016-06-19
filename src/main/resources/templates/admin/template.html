@@ -274,135 +274,6 @@
             <div class="ui ok positive button">确定</div>
         </div>
     </div>
-    <!-- hot news edit modal -->
-    <div th:fragment="ad-news-edit" class="ui small modal ad-news-edit">
-        <!-- <i class="close icon"></i> -->
-        <div class="header">
-            配置编辑
-        </div>
-        <div class="content">
-            <div class="ui form segment">
-                <div class="fields">
-                    <div class="fourteen wide field">
-                        <label>链接</label>
-                        <div class="ui selection floating dropdown ad-article-list">
-                            <div class="default text">动态详细链接</div>
-                            <i class="dropdown icon"></i>
-                            <input type="hidden" name="link">
-                            <div class="menu">
-                                <div class="item" data-value="1">文章1</div>
-                                <div class="item" data-value="2">文章2</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="two wide field">
-                        <label>&nbsp;</label>
-                        <div class="ui icon fluid button btn-article-detail">
-                            <i class="angle double down icon"></i>
-                        </div>
-                        <div class="ui fluid popup">
-                            <div class="ui segment" style="max-height:200px; overflow:auto;">
-                                <h3 class="ui header"></h3>
-                                <p></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="field">
-                    <label>标题</label>
-                    <input type="text" name="title" placeholder="动态标题">
-                </div>
-                <div class="field">
-                    <label>描述</label>
-                    <textarea name="content" placeholder="动态描述"></textarea>
-                </div>
-            </div>
-        </div>
-        <div class="actions">
-            <div class="ui cancel negative button">取消</div>
-            <div class="ui ok positive button">确定</div>
-        </div>
-    </div>
-    <!-- news select modal -->
-    <div th:fragment="ad-news-select" class="ui small modal ad-news-select">
-        <div class="header">
-            文章选择
-        </div>
-        <div class="content">
-            <div class="content-news">
-                <table class="ui compact unstackable striped definition table table-news-select">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>文章名</th>
-                            <th>发布日期</th>
-                            <th>发布者</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="collapsing">
-                                <div class="ui checkbox">
-                                    <input type="checkbox" value="1">
-                                    <label></label>
-                                </div>
-                            </td>
-                            <td class="article-name">John Lilki</td>
-                            <td>September 14, 2013</td>
-                            <td>jhlilk22@yahoo.com</td>
-                        </tr>
-                        <tr>
-                            <td class="collapsing">
-                                <div class="ui checkbox">
-                                    <input type="checkbox" value="2">
-                                    <label></label>
-                                </div>
-                            </td>
-                            <td>Jamie Harington</td>
-                            <td>January 11, 2014</td>
-                            <td>jamieharingonton@yahoo.com</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="actions">
-            <div class="ui cancel negative button">取消</div>
-            <div class="ui ok positive button">确定</div>
-        </div>
-    </div>
-    <!-- diagnose feedback modal -->
-    <div th:fragment="ad-diagnose-feedback" class="ui small modal ad-diagnose-feedback">
-        <div class="header">
-            在线诊断-症状反馈
-        </div>
-        <div class="content">
-            <div class="ui segment">
-                <form class="ui reply form">
-                    <div class="inline field">
-                        <label>反馈对象:</label>
-                        <div class="ui black label diagnose-mail">xiweicheng@yeah.net</div>
-                        <div class="ui icon compact small button btn-diagnose-detail">
-                            <i class="angle double down icon"></i>
-                        </div>
-                        <div class="ui popup">
-                            <div class="ui segment" style="max-height:200px; overflow:auto;">
-                                <h3 class="ui header">症状描述</h3>
-                                <p class="diagnose-description">症状内容</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <textarea name="content" placeholder="反馈内容"></textarea>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <div class="actions">
-            <div class="ui cancel negative button">取消</div>
-            <div class="ui ok positive button">确定</div>
-        </div>
-    </div>
     <div th:fragment="ad-page-dimmer" class="ui page dimmer ad-page-dimmer">
         <div class="ui large text loader">处理中...</div>
     </div>
@@ -637,6 +508,25 @@
                     <div class="required field">
                         <label>描述:</label>
                         <textarea name="desc" rows="2" placeholder="描述" th:text="''">项目描述</textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- chat edit modal -->
+    <div th:fragment="ad-chat-edit" class="ui small modal ad-chat-edit">
+        <div class="header">
+            编辑沟通内容
+        </div>
+        <div class="content" style="max-height: 295px; overflow: auto;">
+            <div class="">
+                <div class="ui form">
+                    <div class="field">
+                        <textarea class="ta-chat-edit" name="content" rows="2" placeholder="编辑沟通内容"></textarea>
                     </div>
                 </div>
             </div>
