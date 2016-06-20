@@ -180,7 +180,7 @@
                                                 <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${'全'}">全部用户</span>
                                             </a>
                                             <div class="content">
-                                                <div class="header" th:text="${'全部用户'}">全部用户 - (all)</div>
+                                                <div class="header" th:text="${'全部用户 - (all)'}">全部用户 - (all)</div>
                                             </div>
                                         </div>
                                         <div class="item" th:each="u : ${users}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
