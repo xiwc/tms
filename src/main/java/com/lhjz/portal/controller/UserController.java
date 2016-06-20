@@ -82,6 +82,11 @@ public class UserController extends BaseController {
 			return RespBody.failed("添加用户已经存在!");
 		}
 
+		// @all 使用
+		if ("all".equalsIgnoreCase(userForm.getUsername())) {
+			return RespBody.failed("该用户名不能使用,请更换其它用户名!");
+		}
+
 		// save username and password
 		final User user = new User();
 		user.setUsername(StringUtils.trim(userForm.getUsername()));
@@ -241,7 +246,7 @@ public class UserController extends BaseController {
 							TemplateUtil.process("templates/mail/mail-msg",
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
-											"href", href, "title", title1,
+											"title", title1,
 											"content", content1)),
 							mails.toArray(new String[0]));
 					logger.info("邮件通知发送成功！");

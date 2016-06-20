@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-    <title>TMS - 系统消息</title>
+    <title>TMS - 沟通动态消息</title>
 </head>
 
 <body style="background-color: rgb(255, 255, 255); box-sizing: border-box; color: rgb(51, 51, 51); display: block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; margin-top: 0px;">
@@ -16,17 +16,17 @@
         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="box-sizing: border-box; max-width: 100%; margin-bottom: 20px; color: rgb(51, 51, 51); font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 20px;">
             <thead style="box-sizing: border-box;">
                 <tr style="box-sizing: border-box; background-color: rgb(249, 249, 249);">
-                    <th style="min-width: 80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221);">网站链接:</th>
+                    <th style="min-width: 80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221);">消息链接:</th>
                     <th style="text-align: left; word-break: break-word; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 0px; border-bottom-width: 2px; border-bottom-style: solid; border-bottom-color: rgb(221, 221, 221);"><a th:href="${href}" th:text="${href}" href="http://localhost/">http://localhost</a></th>
                 </tr>
             </thead>
             <tbody style="box-sizing: border-box;">
                 <tr style="box-sizing: border-box;">
-                    <th style="min-width:80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">通知日期:</th>
+                    <th style="min-width:80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">发送日期:</th>
                     <td th:text="${#dates.format(date,'yyyy/MM/dd HH:mm:ss')}" style="word-break: break-word; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">2015/06/14 14:00:00</td>
                 </tr>
                 <tr style="box-sizing: border-box; background-color: rgb(249, 249, 249);">
-                    <th style="min-width:80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">通知用户:</th>
+                    <th style="min-width:80px; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">发送用户:</th>
                     <td style="word-break: break-word; box-sizing: border-box; padding: 8px; line-height: 1.42857143; vertical-align: middle; border-top-width: 1px; border-top-style: solid; border-top-color: rgb(221, 221, 221);">
                         <span th:text="${user.username + ((not #strings.isEmpty(user.name)) ? '[' + user.name + ']' : '')}">test (测试用户)</span>
                         <a th:if="${user.mails}" th:href="${'mailto:' + user.mails}" th:text="${'[' + user.mails + ']'}">[test@test.com]</a>
