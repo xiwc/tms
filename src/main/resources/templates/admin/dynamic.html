@@ -190,7 +190,7 @@
                                                 <img style="height:35px;" th:if="${#strings.isEmpty(u.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                             </a>
                                             <div class="content">
-                                                <div class="header" th:text="${#strings.isEmpty(u.name) ? u.username : u.name}">xiweicheng</div>
+                                                <div class="header" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name) + ' - ' + u.mails + ' (' + u.username + ')'}">张三 - weicheng.xi@newtouch.cn (xiweicheng)</div>
                                             </div>
                                         </div>
                                     </div>
