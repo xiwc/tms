@@ -202,8 +202,11 @@ public class AdminController extends BaseController {
 		Page<Log> logs = logRepository.findByTarget(Target.Translate,
 				new PageRequest(0, 10, Direction.DESC, "createDate"));
 
+		List<User> users = userRepository.findAll();
+
 		model.addAttribute("chats", chats);
 		model.addAttribute("logs", logs);
+		model.addAttribute("users", users);
 		model.addAttribute("user", getLoginUser());
 		
 		return "admin/dynamic";

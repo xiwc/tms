@@ -170,8 +170,18 @@
                             </div>
                             <button th:unless="${chats.first}" class="fluid ui button btn-chat-pre-more">加载更多</button>
                             <form class="ui reply form">
-                                <div class="field markdown-body">
+                                <div class="field markdown-body pp-users">
                                     <textarea class="ta-md"></textarea>
+                                </div>
+                                <div class="ui fluid popup bottom left transition hidden list-users-container" style="max-height:150px; overflow:auto;">
+                                    <div class="ui middle aligned selection list list-users">
+                                        <div class="item" th:each="u : ${users}" th:attr="data-value=${u.username}">
+                                            <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg">
+                                            <div class="content">
+                                                <div class="header" th:text="${#strings.isEmpty(u.name) ? u.username : u.name}">xiweicheng</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="ui blue labeled submit icon button btn-chat-submit">
                                     <i class="icon edit"></i> 提交
@@ -210,12 +220,24 @@
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
         $('.pp').popup();
+        $('.pp-users.field').popup({
+            inline: true,
+            hoverable: true,
+            position: 'bottom left',
+            distanceAway: -40,
+            on: 'manual',
+            delay: {
+                show: 300,
+                hide: 800
+            }
+        });
         $('.ui.dropdown.dd-actions').dropdown({
             action: 'hide'
         });
@@ -239,6 +261,105 @@
                 delay: 5000,
                 uniqueId: "chat-content"
             }
+        });
+
+        // TODO 临时全局变量定义
+        window.cm = simplemde.codemirror;
+        var mk = ' @';
+        var usernames = [];
+        $('.list-users > .item').each(function(index, el) {
+            usernames.push($(el).attr('data-value'));
+        });
+
+        var atHandler = function(cm, o) {
+
+            var cursor = cm.getCursor();
+            var line = cm.getLine(cursor.line);
+
+            if (line.lastIndexOf('@') == 0) {
+                mk = '@';
+            } else {
+                mk = ' @';
+            }
+
+            var mkIndex = line.lastIndexOf(mk);
+            var atFrom = mkIndex + mk.length;
+            if (mkIndex > -1 && cursor.ch >= atFrom) {
+
+                $('.pp-users').popup('is hidden') && $('.pp-users').popup('show');
+
+                var at = $.trim(line.substr(atFrom));
+
+                if (at) {
+                    $.each(usernames, function(index, username) {
+                        if (username.indexOf(at) == -1) {
+                            $('.list-users > .item[data-value="' + username + '"]').hide();
+                        } else {
+                            $('.list-users > .item[data-value="' + username + '"]').show();
+                        }
+                    });
+                } else {
+                    $('.list-users > .item').each(function(index, el) {
+                        $(el).show();
+                    });
+                }
+
+                var $s = $('.list-users > .item:visible').each(function(index, el) {
+                    $(el).removeClass('active');
+                }).first().addClass('active');
+                $('.list-users-container').scrollTo($s);
+
+            } else {
+                $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
+            }
+
+        };
+
+        cm.on('cursorActivity', atHandler);
+        // cm.on('change', atHandler);
+        cm.on('keydown', function(cm, e) {
+            // console.log(e);
+            if ($('.pp-users').popup('is visible')) {
+                e.preventDefault();
+                var cnt = $('.list-users > .item:visible').size();
+                if (cnt == 0) {
+                    return;
+                }
+                var $selected = $('.list-users > .active.item:visible');
+                // var selectIndex = $('.list-users > .item:visible').index('.item.active');
+                var selectIndex = $selected.index('.list-users > .item:visible');
+                var nextIndex = (selectIndex + 1 + cnt) % cnt;
+                var preIndex = (selectIndex - 1 + cnt) % cnt;
+                if (e.keyCode == 38) { // key up
+                    var $s = $('.list-users > .item:visible').each(function(index, el) {
+                        $(el).removeClass('active');
+                    }).eq(preIndex).addClass('active');
+                    $('.list-users-container').scrollTo($s);
+                } else if (e.keyCode == 40) { // key down
+                    var $s = $('.list-users > .item:visible').each(function(index, el) {
+                        $(el).removeClass('active');
+                    }).eq(nextIndex).addClass('active');
+                    $('.list-users-container').scrollTo($s);
+                } else if (e.keyCode == 13) { // key enter
+                    // console.log($selected.attr('data-value'));
+                    var cursor = cm.getCursor();
+                    var line = cm.getLine(cursor.line);
+                    var mkIndex = line.lastIndexOf(mk);
+                    var atFrom = mkIndex + mk.length;
+                    if (mkIndex > -1 && cursor.ch >= atFrom) {
+                        cm.replaceRange('{~' + $selected.attr('data-value') + '} ', {
+                            line: cursor.line,
+                            ch: atFrom - 1
+                        }, {
+                            line: cursor.line,
+                            ch: cursor.ch
+                        });
+                    }
+
+                    $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
+                }
+            }
+
         });
 
         var simplemdeEdit = new SimpleMDE({
