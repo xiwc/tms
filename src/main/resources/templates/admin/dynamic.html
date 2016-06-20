@@ -175,8 +175,12 @@
                                 </div>
                                 <div class="ui fluid popup bottom left transition hidden list-users-container" style="max-height:150px; overflow:auto;">
                                     <div class="ui middle aligned selection list list-users">
-                                        <div class="item" th:each="u : ${users}" th:attr="data-value=${u.username}">
-                                            <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg">
+                                        <div class="item" th:each="u : ${users}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
+                                            <!-- <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg"> -->
+                                            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                                <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(u.name)}" th:text="${#strings.toUpperCase(#strings.substring(u.name,#strings.length(u.name) - 1,#strings.length(u.name)))}">管理员</span>
+                                                <img style="height:35px;" th:if="${#strings.isEmpty(u.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                            </a>
                                             <div class="content">
                                                 <div class="header" th:text="${#strings.isEmpty(u.name) ? u.username : u.name}">xiweicheng</div>
                                             </div>
@@ -253,9 +257,38 @@
                 context: '#context'
             });
         }
+
+        function preParse(plainText) {
+
+            var users = [];
+            var atR = /\{~([^\}]*)\}/g;
+            var rs = atR.exec(plainText);
+            while (rs) {
+                users.push(rs[1]);
+                rs = atR.exec(plainText);
+            }
+
+            var txt = plainText;
+            $.each(users, function(index, username) {
+                if (userMap[username]) {
+                    txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '**`' + userMap[username] + '`**');
+                }
+            });
+
+            return txt;
+        }
+
         var simplemde = new SimpleMDE({
             element: $(".ta-md")[0],
             autoDownloadFontAwesome: false,
+            autofocus: true,
+            previewRender: function(plainText, preview) { // Async method
+                setTimeout(function() {
+                    preview.innerHTML = simplemde.markdown(preParse(plainText));
+                }, 250);
+
+                return "解释渲染中...";
+            },
             autosave: {
                 enabled: true,
                 delay: 5000,
@@ -263,12 +296,21 @@
             }
         });
 
+        simplemde.codemirror.on('keyup', function(cm, e) {
+            // console.log(e);
+            if (e.ctrlKey && e.keyCode == 13) {
+                $('.btn-chat-submit').click();
+            }
+        });
+
         // TODO 临时全局变量定义
         window.cm = simplemde.codemirror;
         var mk = ' @';
         var usernames = [];
+        var userMap = {};
         $('.list-users > .item').each(function(index, el) {
             usernames.push($(el).attr('data-value'));
+            userMap[$(el).attr('data-value')] = $(el).attr('data-label');
         });
 
         var atHandler = function(cm, o) {
@@ -320,7 +362,7 @@
         cm.on('keydown', function(cm, e) {
             // console.log(e);
             if ($('.pp-users').popup('is visible')) {
-                e.preventDefault();
+
                 var cnt = $('.list-users > .item:visible').size();
                 if (cnt == 0) {
                     return;
@@ -331,16 +373,19 @@
                 var nextIndex = (selectIndex + 1 + cnt) % cnt;
                 var preIndex = (selectIndex - 1 + cnt) % cnt;
                 if (e.keyCode == 38) { // key up
+                    e.preventDefault();
                     var $s = $('.list-users > .item:visible').each(function(index, el) {
                         $(el).removeClass('active');
                     }).eq(preIndex).addClass('active');
                     $('.list-users-container').scrollTo($s);
                 } else if (e.keyCode == 40) { // key down
+                    e.preventDefault();
                     var $s = $('.list-users > .item:visible').each(function(index, el) {
                         $(el).removeClass('active');
                     }).eq(nextIndex).addClass('active');
                     $('.list-users-container').scrollTo($s);
                 } else if (e.keyCode == 13) { // key enter
+                    e.preventDefault();
                     // console.log($selected.attr('data-value'));
                     var cursor = cm.getCursor();
                     var line = cm.getLine(cursor.line);
@@ -365,6 +410,14 @@
         var simplemdeEdit = new SimpleMDE({
             element: $(".ad-chat-edit textarea")[0],
             autoDownloadFontAwesome: false,
+            autofocus: true,
+            previewRender: function(plainText, preview) { // Async method
+                setTimeout(function() {
+                    preview.innerHTML = simplemdeEdit.markdown(preParse(plainText));
+                }, 250);
+
+                return "解释渲染中...";
+            },
             autosave: {
                 enabled: true,
                 delay: 5000,
@@ -374,7 +427,7 @@
 
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
-            $(el).html(simplemde.markdown($(el).text()));
+            $(el).html(simplemde.markdown(preParse($(el).text())));
         });
         $('.ui.comments').show();
 
@@ -438,7 +491,7 @@
                                 content: simplemdeEdit.value()
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
-                                    $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(simplemdeEdit.value()));
+                                    $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(simplemdeEdit.value())));
                                     toastr.success('更新成功!');
                                 } else {
                                     toastr.error(data.data, '更新失败!');
@@ -472,7 +525,7 @@
                     var isAdminRole = $('input:hidden[name="role.admin"]').val();
                     var loginUsername = $('input:hidden[name="user.username"]').val();
                     $.each(data.data.content, function(index, chat) {
-                        chat.contentMd = simplemde.markdown(chat.content);
+                        chat.contentMd = simplemde.markdown(preParse(chat.content));
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
@@ -511,7 +564,7 @@
                     var isAdminRole = $('input:hidden[name="role.admin"]').val();
                     var loginUsername = $('input:hidden[name="user.username"]').val();
                     $.each(data.data.content, function(index, chat) {
-                        chat.contentMd = simplemde.markdown(chat.content);
+                        chat.contentMd = simplemde.markdown(preParse(chat.content));
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
