@@ -175,6 +175,14 @@
                                 </div>
                                 <div class="ui fluid popup bottom left transition hidden list-users-container" style="max-height:150px; overflow:auto;">
                                     <div class="ui middle aligned selection list list-users">
+                                        <div class="item" th:attr="data-value=${'all'}, data-label=${'全部用户'}">
+                                            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                                <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${'全'}">全部用户</span>
+                                            </a>
+                                            <div class="content">
+                                                <div class="header" th:text="${'全部用户'}">全部用户</div>
+                                            </div>
+                                        </div>
                                         <div class="item" th:each="u : ${users}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
                                             <!-- <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg"> -->
                                             <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
@@ -280,6 +288,25 @@
                 rs = atR.exec(plainText);
             }
 
+            return users;
+        }
+
+        /**
+         * 解析要发送邮件的用户们
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function parseUsernames(plainText) {
+            var users = parseUsers(plainText);
+            if (users.indexOf('all') > -1) {
+                var users2 = [];
+                $.each(usernames, function(index, username) {
+                    if (username != 'all') {
+                        users2.push(username);
+                    }
+                });
+                return users2;
+            }
             return users;
         }
 
@@ -473,7 +500,7 @@
 
             $.post('/admin/chat/create', {
                 baseURL: baseURL,
-                usernames: parseUsers(content).join(','),
+                usernames: parseUsernames(content).join(','),
                 content: content,
                 contentHtml: html,
             }, function(data, textStatus, xhr) {
