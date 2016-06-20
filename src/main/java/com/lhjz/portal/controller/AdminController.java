@@ -4,6 +4,7 @@
 package com.lhjz.portal.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -203,6 +204,7 @@ public class AdminController extends BaseController {
 				new PageRequest(0, 10, Direction.DESC, "createDate"));
 
 		List<User> users = userRepository.findAll();
+		Collections.sort(users);
 
 		model.addAttribute("chats", chats);
 		model.addAttribute("logs", logs);
