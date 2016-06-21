@@ -67,6 +67,14 @@
         margin-top: 0.5em;
     }
     
+    .ui.feed>.event>.content .summary {
+        /*font-size: 0.9em;*/
+    }
+    
+    .ui.comments .comment .text span.at-user {
+        cursor: pointer;
+    }
+    
     @media only screen and (max-width: 767px) {
         .main.container {
             margin-right: 0 !important;
@@ -95,8 +103,8 @@
             <div id="context">
                 <!-- <div th:replace="admin/template :: ad-page-header ('沟通动态', 'dynamic')"></div> -->
                 <div class="main ui container">
-                    <div class="ui dividing right rail" style="min-height: 279px;">
-                        <div class="ui sticky sy-dynamic" style="z-index: 0; left: 1040px; width: 283px !important; height: 279px !important; top: 0px;">
+                    <div class="ui dividing right rail" style="min-height: 279px; padding-left: 1rem;">
+                        <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px;">
                             <h4 class="ui dividing header">动态</h4>
                             <div class="ui feed fd-dynamic">
                                 <div class="event" th:each="l : ${logs}">
@@ -108,11 +116,11 @@
                                     </div>
                                     <div class="content">
                                         <div class="summary">
-                                            <a class="user" th:text="${#strings.isEmpty(l.creator.name) ? l.creator.username : l.creator.name}">张三</a>
+                                            <a class="user" th:attr="data-value=${l.creator.username}" th:text="${#strings.isEmpty(l.creator.name) ? l.creator.username : l.creator.name}">张三</a>
                                             <span th:if="${#strings.toString(l.action) == 'Create'}">添加</span>
                                             <span th:if="${#strings.toString(l.action) == 'Update'}">更新</span>
                                             <span th:if="${#strings.toString(l.action) == 'Delete'}">删除</span>
-                                            <a th:if="${#strings.toString(l.target) == 'Translate'}" target="_blank" th:href="@{/admin/translate(id=${l.targetId})}">翻译</a>
+                                            <a th:if="${#strings.toString(l.target) == 'Translate'}" target="_blank" th:href="@{/admin/translate(id=${l.targetId})}" th:text="${'翻译#' + l.targetId}">翻译</a>
                                             <span th:if="${#strings.toString(l.properties) == 'TranslateItem'}">内容</span>
                                             <span th:if="${#strings.toString(l.properties) == 'Key'}">名称</span>
                                             <span th:if="${#strings.toString(l.properties) == 'Watchers'}">关注者</span>
@@ -155,7 +163,7 @@
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
                                 <div class="content">
-                                    <a class="author" style="color: #4183c4;" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
+                                    <a class="author" style="color: #4183c4;" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
                                     <div class="metadata">
                                         <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                     </div>
@@ -319,7 +327,8 @@
 
             var txt = plainText;
             $.each(parseUsers(plainText), function(index, username) {
-                txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '**`@' + userMap[username] + '`**');
+                // txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '**`@' + userMap[username] + '`**');
+                txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '<span data-value="' + username + '" class="at-user">' + '**`@' + userMap[username] + '`**' + '</span>');
             });
 
             return txt;
@@ -482,6 +491,20 @@
             cm.focus();
         }
 
+        function insertAtUser(cm, username) {
+            var cursor = cm.getCursor();
+            if (cursor) {
+                cm.replaceRange('{~' + username + '}', cursor, cursor);
+            }
+        }
+
+        function insertComment(cm, comment) {
+            var cursor = cm.getCursor();
+            if (cursor) {
+                cm.replaceRange(comment, cursor, cursor);
+            }
+        }
+
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
             $(el).html(simplemde.markdown(preParse($(el).text())));
@@ -489,9 +512,13 @@
         $('.ui.comments').show();
 
         if (url('?scroll') || url('?scroll') == '') {
-            $('html, body, .ad-index-content').animate({
-                scrollTop: $(document).height()
-            }, 300);
+            $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+            // insertComment(cm, ' ');
+            cm.focus();
+        }
+
+        if (url('?id')) {
+            $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300);
         }
 
         $('.btn-chat-submit').click(function(event) {
@@ -540,6 +567,9 @@
                 id: $btn.closest('.comment').attr('data-id')
             }, function(data) {
                 if (data.success) {
+
+                    var contentOld = data.data.content;
+
                     $('.ad-chat-edit').modal({
                         onShow: function() {
                             simplemdeEdit.value(data.data.content);
@@ -549,9 +579,18 @@
                                 toastr.error('更新内容不能为空!');
                                 return false;
                             }
+
+                            var content = simplemdeEdit.value();
+                            var htmlOld = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemdeEdit.markdown(preParse(contentOld))).wrap('<div/>').parent().html();
+                            var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemdeEdit.markdown(preParse(content))).wrap('<div/>').parent().html();
+
                             $.post('/admin/chat/update', {
                                 id: $btn.closest('.comment').attr('data-id'),
-                                content: simplemdeEdit.value()
+                                baseURL: baseURL,
+                                usernames: parseUsernames(content).join(','),
+                                content: content,
+                                contentHtmlOld: htmlOld,
+                                contentHtml: html,
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
                                     $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(simplemdeEdit.value())));
@@ -566,6 +605,13 @@
                     toastr.error(data.data, '获取失败!');
                 }
             });
+        });
+
+        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
+            event.preventDefault();
+            insertAtUser(cm, $(this).attr('data-value'));
+            $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+            cm.focus();
         });
 
         $('.btn-chat-more').click(function(event) {

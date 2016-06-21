@@ -121,8 +121,13 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody update(@RequestParam("id") Long id,
-			@RequestParam("content") String content) {
+	public RespBody update(
+			@RequestParam("id") Long id,
+			@RequestParam("content") String content,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam(value = "usernames", required = false) String usernames,
+			@RequestParam("contentHtmlOld") String contentHtmlOld,
+			@RequestParam("contentHtml") String contentHtml) {
 
 		if (StringUtil.isEmpty(content)) {
 			return RespBody.failed("修改内容不能为空!");
@@ -137,6 +142,40 @@ public class ChatController extends BaseController {
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
 		log(Action.Update, Target.Chat, chat2);
+
+		final User loginUser = getLoginUser();
+		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
+		final String html = "<h3>编辑前内容:</h3>" + contentHtmlOld
+				+ "<hr/><h3>编辑后内容:</h3>"
+				+ contentHtml;
+
+		final Mail mail = Mail.instance();
+		if (StringUtil.isNotEmpty(usernames)) {
+			String[] usernameArr = usernames.split(",");
+			Arrays.asList(usernameArr).stream().forEach((username) -> {
+				mail.addUsers(getUser(username));
+			});
+
+			ThreadUtil.exec(() -> {
+
+				try {
+					Thread.sleep(3000);
+					mailSender.sendHtml(String.format("TMS-沟通动态编辑@消息_%s",
+							DateUtil.format(new Date(), DateUtil.FORMAT7)),
+							TemplateUtil.process("templates/mail/mail-dynamic",
+									MapUtil.objArr2Map("user", loginUser,
+											"date", new Date(), "href", href,
+											"title", "下面编辑的沟通消息中有@到你",
+											"content",
+											html)), mail.get());
+					logger.info("沟通编辑邮件发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("沟通编辑邮件发送失败！");
+				}
+
+			});
+		}
 
 		return RespBody.succeed(chat2);
 	}

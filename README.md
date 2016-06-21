@@ -19,6 +19,7 @@ http://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/
 http://docs.spring.io/spring-data/jpa/docs/1.10.1.RELEASE/reference/html/  
 http://www.thymeleaf.org/doc/tutorials/2.1/usingthymeleaf.html  
 https://github.com/NextStepWebs/simplemde-markdown-editor  
+https://github.com/flesler/jquery.scrollTo  
 
 # 开发工具
 sts: http://spring.io/tools/sts/  

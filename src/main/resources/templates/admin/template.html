@@ -93,7 +93,7 @@
                 {{/if}}
             </a>
             <div class="content">
-                <a class="author">
+                <a class="author" data-value="${creator.username}">
                     {{if creator.name}}
                         ${creator.name}
                     {{else}}
@@ -128,7 +128,7 @@
             </div>
             <div class="content">
                 <div class="summary">
-                    <a class="user">
+                    <a class="user" data-value="creator.username">
                         {{if creator.name}}
                             ${creator.name}
                         {{else}}
