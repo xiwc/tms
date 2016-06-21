@@ -81,6 +81,7 @@
         right: 433px;
         bottom: 225px;
         background-color: transparent;
+        z-index: 1;
     }
     
     .ui.button.btn-get-chat-news {
@@ -89,6 +90,7 @@
         right: 430px;
         bottom: 300px;
         background-color: rgba(219, 40, 40, 0.54);
+        z-index: 1;
     }
     
     .ui.button.btn-get-chat-news:hover {
@@ -121,11 +123,11 @@
         }
         .ui.vertical.icon.buttons.btns-scroll {
             right: 13px;
-            bottom: 390px;
+            bottom: 190px;
         }
         .ui.button.btn-get-chat-news {
             right: 10px;
-            bottom: 465px;
+            bottom: 265px;
         }
     }
     </style>
@@ -253,6 +255,7 @@
                         </div>
                         <div class="ui circular red icon button btn-get-chat-news" title="获取新消息">
                             <i class="refresh icon"></i>
+                            <div class="floating ui red circular label lbl-chat-news-count">0</div>
                         </div>
                         <div class="ui vertical circular icon buttons btns-scroll">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
@@ -964,7 +967,8 @@
                 }
             });
         });
-
+        
+        // $('.btn-get-chat-news').show();
         // 轮询最新沟通消息
         var interval = setInterval(function() {
 
@@ -982,6 +986,7 @@
             }, function(data) {
                 if (data.success) {
                     if (data.data[1] > 0) {
+                        $('.btn-get-chat-news').children('.lbl-chat-news-count').text(data.data[1]);
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).show();
                     } else {
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
