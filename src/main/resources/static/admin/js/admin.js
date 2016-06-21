@@ -133,69 +133,6 @@ jQuery(function($) {
         $(this).find('form').find(':hidden[name="name"]').val($('title').text()).end().submit();
     });
 
-    $('.ad-add-image').click(function(event) {
-        window.imgSelectFor = $(this).attr('data-for');
-
-        $.post('admin/file/list', {
-                timestamp: new Date().getTime()
-            },
-            function(data, textStatus, xhr) {
-                if (data.success) {
-                    $("#imageItemTpl").tmpl(data.data.imgs, data.data).appendTo($('.ad-images .cards').empty());
-                    $('.ui.checkbox').checkbox();
-
-                    $('.ad-images').modal('show');
-                } else {
-                    toastr.error(data.data, '图片加载失败!');
-                }
-            });
-    });
-
-    $('.ad-images.modal > .content').on('click', '.image', function(event) {
-        $(this).parents('.card').find('.ui.checkbox').checkbox("toggle");
-    });
-
-    $('.ad-images.modal').modal({
-        closable: false,
-        onApprove: function() {
-            var imgSrcArr = [];
-            $('.cards').find('input:checked').parents('.card').find('img').each(function(index, el) {
-                imgSrcArr.push($(el).attr('data-src'));
-            });
-
-            if (imgSrcArr.length > 0) {
-                if (!!imgSelectedCallback) {
-                    var arr = window.imgSelectFor.split(':');
-                    imgSelectedCallback(imgSrcArr, arr[0], arr[1]);
-                }
-            } else {
-                toastr.error('您没有选择图片!');
-                return false;
-            }
-        },
-        onVisible: function() {
-            $('.ad-images.modal').modal('refresh');
-        }
-    });
-
-    $('.page-enable-checkbox').checkbox({
-
-        onChange: function() {
-            var $chk = $('.page-enable-checkbox');
-
-            $.post('admin/pageEnable', {
-                page: $chk.attr('data-page'),
-                enable: $chk.checkbox('is checked')
-            }, function(data, textStatus, xhr) {
-                if (data.success) {
-                    toastr.success('页面显示状态设置成功!');
-                } else {
-                    toastr.error('页面显示状态设置失败!');
-                }
-            });
-        }
-    });
-
 });
 
 jQuery(function($) {

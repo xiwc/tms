@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/highlight/styles/github.css}" href="../../static/lib/highlight/styles/github.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
     .main.container {
@@ -203,9 +204,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="ui blue labeled submit icon button btn-chat-submit">
-                                    <i class="icon edit"></i> 提交
+                                <div class="ui buttons">
+                                    <button class="ui button btn-chat-clear">取消</button>
+                                    <div class="or"></div>
+                                    <button class="ui positive button btn-chat-submit">提交</button>
                                 </div>
+                                <!-- <div class="ui blue labeled submit icon button btn-chat-submit">
+                                    <i class="icon edit"></i> 提交
+                                </div> -->
                                 <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp ui black circular icon right floated button">
                                     <i class="refresh icon"></i>
                                 </a>
@@ -241,6 +247,7 @@
     <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
@@ -507,8 +514,13 @@
 
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
-            $(el).html(simplemde.markdown(preParse($(el).text())));
+            var html = simplemde.markdown(preParse($(el).text()));
+            $(el).html(html).find('pre code').each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
         });
+
+        // hljs.initHighlightingOnLoad();
         $('.ui.comments').show();
 
         if (url('?scroll') || url('?scroll') == '') {
@@ -524,7 +536,12 @@
         }
 
         $('.btn-chat-submit').click(function(event) {
+            event.preventDefault();
             var content = simplemde.value();
+            if (!$.trim(content)) {
+                toastr.error('提交内容不能为空!');
+                return;
+            }
             var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemde.markdown(preParse(content))).wrap('<div/>').parent().html();
 
             $.post('/admin/chat/create', {
@@ -539,9 +556,14 @@
                     toastr.success('提交成功!');
                     window.location.href = url('path') + '?scroll=1';
                 } else {
-                    toastr.success(data.data, '提交失败!');
+                    toastr.error(data.data, '提交失败!');
                 }
             });
+        });
+
+        $('.btn-chat-clear').click(function(event) {
+            event.preventDefault();
+            simplemde.value('');
         });
 
         $('body').on('click', '.comments .actions a.delete', function(event) {
@@ -646,7 +668,12 @@
                         var d = new Date(chat.createDate);
                         chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
-                    $("#chatMoreTpl").tmpl(data.data.content).insertAfter($('.btn-chat-more'));
+                    var $more = $("#chatMoreTpl").tmpl(data.data.content);
+                    $more.find('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+
+                    $more.insertAfter($('.btn-chat-more'));
                     data.data.last && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
@@ -685,7 +712,12 @@
                         var d = new Date(chat.createDate);
                         chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
-                    $("#chatMoreTpl").tmpl(data.data.content).insertBefore($('.btn-chat-pre-more'));
+                    var $more = $("#chatMoreTpl").tmpl(data.data.content);
+                    $more.find('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+                    $more.insertBefore($('.btn-chat-pre-more'));
+                    
                     data.data.first && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
