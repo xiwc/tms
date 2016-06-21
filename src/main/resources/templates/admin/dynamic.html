@@ -88,7 +88,7 @@
         border-radius: 10em!important;
         background-color: rgba(224, 225, 226, 0.54);
     }
-
+    
     .ui.vertical.icon.buttons.btns-scroll .button:hover {
         background-color: rgba(224, 225, 226, 1);
     }
@@ -330,7 +330,7 @@
             var atR = /\{~([^\}]*)\}/g;
             var rs = atR.exec(plainText);
             while (rs) {
-                if (userMap[rs[1]]) {
+                if (userMap[rs[1]] && users.indexOf(rs[1]) == -1) {
                     users.push(rs[1]);
                 }
                 rs = atR.exec(plainText);
@@ -417,6 +417,7 @@
             }
         });
 
+        // ============================================================================ @user start
         // TODO 临时全局变量定义
         var cm = simplemde.codemirror;
         var mk = ' @';
@@ -538,12 +539,23 @@
             }
         }
 
+        /**
+         * 编辑器插入自定义沟通内容
+         * @param  {[type]} cm      [description]
+         * @param  {[type]} comment [description]
+         * @return {[type]}         [description]
+         */
         function insertComment(cm, comment) {
             var cursor = cm.getCursor();
             if (cursor) {
                 cm.replaceRange(comment, cursor, cursor);
+
+                $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+                cm.focus();
             }
         }
+
+        // ============================================================================ @user end
 
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
@@ -556,9 +568,10 @@
         // hljs.initHighlightingOnLoad();
         $('.ui.comments').show();
 
+        // ============================================================================ url? start
+
         if (url('?scroll') || url('?scroll') == '') {
             $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
-            // insertComment(cm, ' ');
             cm.focus();
         }
 
@@ -567,6 +580,26 @@
                 offset: -50
             });
         }
+
+        if (url('?at')) {
+
+            simplemde.value(''); // 首先清空编辑器
+            var atArr = url('?at').split(',');
+
+            var ats = [];
+            $.each(atArr, function(index, at) {
+                var _at = '{~{username}}'.replace(/\{username\}/g, at);
+                if (ats.indexOf(_at) == -1) {
+                    ats.push(_at);
+                }
+            });
+
+            var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
+            comment = comment.replace(/\{translateId\}/g, url('?translateId')).replace(/\{ats\}/g, ats.join(' & '));
+            insertComment(cm, comment);
+        }
+
+        // ============================================================================ url? end
 
         $('.btn-scroll-up').click(function(event) {
             $('html, body, .ad-index-content').scrollTo(0, 300);
@@ -619,8 +652,7 @@
             // [[回复#10](admin/dynamic?id=1){~xiweicheng}]
             var href = '[[回复#' + id + '](' + url('path') + '?id=' + id + '){~' + username + '}]\n\n';
             insertComment(cm, href);
-            $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
-            cm.focus();
+
         });
 
         $('body').on('click', '.comments .actions a.delete', function(event) {
