@@ -105,7 +105,7 @@
                 <!-- <div th:replace="admin/template :: ad-page-header ('沟通动态', 'dynamic')"></div> -->
                 <div class="main ui container">
                     <div class="ui dividing right rail" style="min-height: 279px; padding-left: 1rem;">
-                        <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px;">
+                        <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px; padding-bottom: 20px;">
                             <h4 class="ui dividing header">动态</h4>
                             <div class="ui feed fd-dynamic">
                                 <div class="event" th:each="l : ${logs}">
@@ -717,7 +717,7 @@
                         hljs.highlightBlock(block);
                     });
                     $more.insertBefore($('.btn-chat-pre-more'));
-                    
+
                     data.data.first && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
