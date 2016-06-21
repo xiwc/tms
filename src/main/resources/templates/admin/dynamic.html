@@ -76,6 +76,23 @@
         cursor: pointer;
     }
     
+    .ui.vertical.icon.buttons.btns-scroll {
+        position: fixed;
+        right: 433px;
+        bottom: 225px;
+        background-color: transparent;
+        /* z-index: 999; */
+    }
+    
+    .ui.vertical.icon.buttons.btns-scroll .button {
+        border-radius: 10em!important;
+        background-color: rgba(224, 225, 226, 0.54);
+    }
+
+    .ui.vertical.icon.buttons.btns-scroll .button:hover {
+        background-color: rgba(224, 225, 226, 1);
+    }
+    
     @media only screen and (max-width: 767px) {
         .main.container {
             margin-right: 0 !important;
@@ -90,6 +107,13 @@
             padding-top: 2em;
             width: 420px;
             display: none;
+        }
+        .ui.vertical.icon.buttons.btns-scroll {
+            right: 13px;
+            bottom: 390px;
+        }
+        .ui.vertical.icon.buttons.btns-scroll .button {
+            background-color: rgba(224, 225, 226, 0.54);
         }
     }
     </style>
@@ -217,6 +241,14 @@
                                     <i class="refresh icon"></i>
                                 </a>
                             </form>
+                        </div>
+                        <div class="ui vertical circular icon buttons btns-scroll">
+                            <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
+                                <i class="arrow up icon"></i>
+                            </div>
+                            <div class="ui circular icon button btn-scroll-down" title="滚动至底部">
+                                <i class="arrow down icon"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -535,6 +567,17 @@
                 offset: -50
             });
         }
+
+        $('.btn-scroll-up').click(function(event) {
+            $('html, body, .ad-index-content').scrollTo(0, 300);
+        });
+
+        $('.btn-scroll-down').click(function(event) {
+            $('html, body, .ad-index-content').scrollTo({
+                left: 0,
+                top: "100%"
+            }, 300);
+        });
 
         $('.btn-chat-submit').click(function(event) {
             event.preventDefault();
