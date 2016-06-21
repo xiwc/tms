@@ -54,7 +54,26 @@
     <script type="text/javascript" th:inline="javascript">
     jQuery(function($) {
 
-        var baseURL = Utils.getBaseURL();//url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+        var baseURL = Utils.getBaseURL(); // url('protocol') + '://' + url('hostname') + ':' + url('port') + '/';
+
+        $('textarea[name="content"]').keyup(function(event) {
+            var $ta = $(this);
+            if (event.ctrlKey && event.keyCode == 13) {
+                $.post('/admin/feedback/save', {
+                    name: $ta.closest('form').find('input[name="name"]').val(),
+                    url: $ta.closest('form').find(':hidden[name="url"]').val(),
+                    baseURL: baseURL,
+                    content: $ta.closest('form').find('textarea[name="content"]').val()
+                }, function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $ta.val('');
+                        toastr.success("反馈提交成功！");
+                    } else {
+                        toastr.success(data.data, "反馈提交失败！");
+                    }
+                });
+            }
+        });
 
         // feedback handler
         $('.submit.button').api({
@@ -75,6 +94,7 @@
                 return settings;
             },
             onSuccess: function(resp, elem) {
+                $('textarea[name="content"]').val('');
                 toastr['success']("反馈提交成功！");
             },
             onFailure: function(resp, elem) {
