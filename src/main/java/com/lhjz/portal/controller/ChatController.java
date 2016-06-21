@@ -5,6 +5,7 @@ package com.lhjz.portal.controller;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +70,8 @@ public class ChatController extends BaseController {
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
 			@RequestParam("content") String content,
+			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
+			@RequestParam("lastId") Long lastId,
 			@RequestParam("contentHtml") String contentHtml) {
 
 		if (StringUtil.isEmpty(content)) {
@@ -114,6 +117,11 @@ public class ChatController extends BaseController {
 				}
 
 			});
+		}
+
+		if (!preMore && chatRepository.countQueryRecent(lastId) <= 50) {
+			List<Chat> chats = chatRepository.queryRecent(lastId);
+			return RespBody.succeed(chats);
 		}
 
 		return RespBody.succeed(chat2);
