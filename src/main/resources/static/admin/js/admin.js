@@ -109,6 +109,10 @@ jQuery(function($) {
 
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
+        if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/countNews'))) {
+            $('.ad-page-dimmer').addClass('active');
+        }
+
         var csrf = {};
         csrf[$('.ad-csrf input:hidden').attr('name')] = $('.ad-csrf input:hidden').attr('value');
 
@@ -119,11 +123,15 @@ jQuery(function($) {
         }
     });
 
-    $(document).ajaxStart(function() {
-        $('.ad-page-dimmer').addClass('active');
-    });
+    // $(document).ajaxStart(function() {
+    //     $('.ad-page-dimmer').addClass('active');
+    // });
 
-    $(document).ajaxComplete(function() {
+    // $(document).ajaxComplete(function() {
+    //     $('.ad-page-dimmer').removeClass('active');
+    // });
+
+    $(document).on('ajaxStop', function() {
         $('.ad-page-dimmer').removeClass('active');
     });
 
@@ -183,7 +191,7 @@ jQuery(function($) {
             return '';
         },
         md2html(markdown) {
-            if(showdown) {
+            if (showdown) {
                 var converter = new showdown.Converter();
                 return converter.makeHtml(markdown);
             }

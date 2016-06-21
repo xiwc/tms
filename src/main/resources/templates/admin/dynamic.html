@@ -81,7 +81,18 @@
         right: 433px;
         bottom: 225px;
         background-color: transparent;
-        /* z-index: 999; */
+    }
+    
+    .ui.button.btn-get-chat-news {
+        display: none;
+        position: fixed;
+        right: 430px;
+        bottom: 300px;
+        background-color: rgba(219, 40, 40, 0.54);
+    }
+    
+    .ui.button.btn-get-chat-news:hover {
+        background-color: rgba(219, 40, 40, 1);
     }
     
     .ui.vertical.icon.buttons.btns-scroll .button {
@@ -112,8 +123,9 @@
             right: 13px;
             bottom: 390px;
         }
-        .ui.vertical.icon.buttons.btns-scroll .button {
-            background-color: rgba(224, 225, 226, 0.54);
+        .ui.button.btn-get-chat-news {
+            right: 10px;
+            bottom: 465px;
         }
     }
     </style>
@@ -238,6 +250,9 @@
                                     <i class="refresh icon"></i>
                                 </a>
                             </form>
+                        </div>
+                        <div class="ui circular red icon button btn-get-chat-news" title="获取新消息">
+                            <i class="refresh icon"></i>
                         </div>
                         <div class="ui vertical circular icon buttons btns-scroll">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
@@ -908,6 +923,72 @@
                 }
             });
         });
+
+        $('.btn-get-chat-news').click(function(event) {
+            event.preventDefault();
+            $.get('/admin/chat/getNews', {
+                lastId: $(this).attr('data-value')
+            }, function(data) {
+                if (data.success) {
+
+                    if ($.isArray(data.data)) { // 不刷新追加
+                        if (data.data.length == 0) {
+                            return;
+                        }
+
+                        var preMore = $('.btn-chat-pre-more').size() == 1;
+                        var $domBefore = preMore ? $('.btn-chat-pre-more') : $('.fm-reply');
+
+                        var isAdminRole = $('input:hidden[name="role.admin"]').val();
+                        var loginUsername = $('input:hidden[name="user.username"]').val();
+                        $.each(data.data, function(index, chat) {
+                            chat.contentMd = simplemde.markdown(preParse(chat.content));
+                            if (chat.creator.name) {
+                                chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                            }
+                            if (isAdminRole == 'true' || loginUsername == creator.username) {
+                                chat.actions = true;
+                            }
+                            var d = new Date(chat.createDate);
+                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                        });
+                        var $more = $("#chatMoreTpl").tmpl(data.data);
+                        $more.find('pre code').each(function(i, block) {
+                            hljs.highlightBlock(block);
+                        });
+                        $more.insertBefore($domBefore);
+                        s2b();
+                    }
+                } else {
+                    toastr.error(data.data, '获取失败!');
+                }
+            });
+        });
+
+        // 轮询最新沟通消息
+        var interval = setInterval(function() {
+
+            var preMore = $('.btn-chat-pre-more').size() == 1;
+
+            if (preMore) { // 如果有最新消息有分页, 取消轮询.
+                clearInterval(interval);
+                return;
+            }
+
+            var $last = $('.chat .comments .comment').last();
+
+            $.get('/admin/chat/countNews', {
+                lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id')
+            }, function(data) {
+                if (data.success) {
+                    if (data.data[1] > 0) {
+                        $('.btn-get-chat-news').attr('data-value', data.data[0]).show();
+                    } else {
+                        $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
+                    }
+                }
+            });
+        }, 5000);
 
     });
     </script>

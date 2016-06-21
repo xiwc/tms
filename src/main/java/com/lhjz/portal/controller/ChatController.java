@@ -217,6 +217,26 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chat);
 	}
 
+	@RequestMapping(value = "countNews", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody countNews(@RequestParam("lastId") Long lastId) {
+
+		long cnt = chatRepository.countQueryRecent(lastId);
+
+		Long[] data = new Long[] { lastId, cnt };
+
+		return RespBody.succeed(data);
+	}
+
+	@RequestMapping(value = "getNews", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody getNews(@RequestParam("lastId") Long lastId) {
+
+		List<Chat> chats = chatRepository.queryRecent(lastId);
+
+		return RespBody.succeed(chats);
+	}
+
 	@RequestMapping(value = "more", method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody more(
