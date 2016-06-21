@@ -172,6 +172,7 @@
                                         How artistic!
                                     </div>
                                     <div class="actions" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">
+                                        <a class="reply">回复</a>
                                         <a class="edit">编辑</a>
                                         <a class="delete">删除</a>
                                     </div>
@@ -564,6 +565,19 @@
         $('.btn-chat-clear').click(function(event) {
             event.preventDefault();
             simplemde.value('');
+        });
+
+        $('body').on('click', '.comments .actions a.reply', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+            var id = $btn.closest('.comment').attr('data-id');
+            var username = $btn.closest('.comment').find('.content .author').attr('data-value');
+
+            // [[回复#10](admin/dynamic?id=1){~xiweicheng}]
+            var href = '[[回复#' + id + '](' + url('path') + '?id=' + id + '){~' + username + '}]\n\n';
+            insertComment(cm, href);
+            $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+            cm.focus();
         });
 
         $('body').on('click', '.comments .actions a.delete', function(event) {
