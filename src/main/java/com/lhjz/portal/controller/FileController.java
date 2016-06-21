@@ -266,8 +266,10 @@ public class FileController extends BaseController {
 			// absolute file path
 			String filePath = realPath + path;
 
+			int index = dataURL.indexOf(",");
+
 			// 原始图保存
-			ImageUtil.GenerateImage(dataURL, filePath);
+			ImageUtil.GenerateImage(dataURL.substring(index + 1), filePath);
 			// 缩放图
 			// scale image size as thumbnail
 			// 图片缩放处理.120*120
