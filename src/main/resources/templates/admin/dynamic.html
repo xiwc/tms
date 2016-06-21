@@ -296,6 +296,7 @@
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
+    <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
@@ -997,6 +998,31 @@
                 }
             });
         }, 5000);
+
+
+        // clipboard paste image
+        // $('.fm-reply .CodeMirror-scroll').pastableNonInputable().on('pasteImage', function(ev, data) {
+        $('.fm-reply .CodeMirror-lines').pastableNonInputable().on('pasteImage', function(ev, data) {
+            console.log("dataURL: " + data.dataURL);
+            console.log("width: " + data.width);
+            console.log("height: " + data.height);
+            console.log(data.blob);
+
+            $.post('/admin/file/base64', {
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    console.log(data);
+                    insertComment(cm, '![{name}]({path}{uuidName})'
+                        .replace(/\{name\}/g, data.data.name)
+                        .replace(/\{path\}/g, data.data.path)
+                        .replace(/\{uuidName\}/g, data.data.uuidName));
+                }
+            });
+        }).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        });
 
     });
     </script>
