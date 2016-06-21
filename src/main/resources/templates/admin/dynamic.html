@@ -929,10 +929,13 @@
 
         $('.btn-get-chat-news').click(function(event) {
             event.preventDefault();
+            $btn = $(this);
             $.get('/admin/chat/getNews', {
-                lastId: $(this).attr('data-value')
+                lastId: $btn.attr('data-value')
             }, function(data) {
                 if (data.success) {
+
+                    $btn.hide();
 
                     if ($.isArray(data.data)) { // 不刷新追加
                         if (data.data.length == 0) {
@@ -967,7 +970,7 @@
                 }
             });
         });
-        
+
         // $('.btn-get-chat-news').show();
         // 轮询最新沟通消息
         var interval = setInterval(function() {
