@@ -547,7 +547,8 @@
             if (cursor) {
                 cm.replaceRange(comment, cursor, cursor);
 
-                $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+                // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+                s2b();
                 cm.focus();
             }
         }
@@ -765,7 +766,8 @@
         $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
             event.preventDefault();
             insertAtUser(cm, $(this).attr('data-value'));
-            $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+            // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+            s2b();
             cm.focus();
         });
 
