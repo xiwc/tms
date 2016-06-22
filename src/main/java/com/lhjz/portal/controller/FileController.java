@@ -224,7 +224,6 @@ public class FileController extends BaseController {
 	@RequestMapping(value = "base64", method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody base64(HttpServletRequest request,
-			HttpServletResponse response, Model model, Locale locale,
 			@RequestParam("dataURL") String dataURL,
 			@RequestParam("type") String type) {
 
@@ -269,7 +268,8 @@ public class FileController extends BaseController {
 			int index = dataURL.indexOf(",");
 
 			// 原始图保存
-			ImageUtil.GenerateImage(dataURL.substring(index + 1), filePath);
+			ImageUtil.decodeBase64ToImage(dataURL.substring(index + 1),
+					filePath);
 			// 缩放图
 			// scale image size as thumbnail
 			// 图片缩放处理.120*120

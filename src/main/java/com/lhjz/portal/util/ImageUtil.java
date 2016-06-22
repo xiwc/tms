@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -46,6 +45,7 @@ import sun.misc.BASE64Encoder;
  * @version 1.0
  * 
  */
+@SuppressWarnings("restriction")
 public final class ImageUtil {
 
 	private static final int IMAGE_SIZE = 120;
@@ -773,7 +773,6 @@ public final class ImageUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings("restriction")
 	public static String getImageType(String path) throws IOException {
 		FileInputStream fis = new FileInputStream(path);
 
@@ -862,29 +861,6 @@ public final class ImageUtil {
 	}
 
 	/**
-	 * 将网络图片进行Base64位编码
-	 * 
-	 * @param imgUrl
-	 *            图片的url路径，如http://.....xx.jpg
-	 * @return
-	 */
-	public static String encodeImgageToBase64(URL imageUrl) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
-		ByteArrayOutputStream outputStream = null;
-		try {
-			BufferedImage bufferedImage = ImageIO.read(imageUrl);
-			outputStream = new ByteArrayOutputStream();
-			ImageIO.write(bufferedImage, "jpg", outputStream);
-		} catch (MalformedURLException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		// 对字节数组Base64编码
-		BASE64Encoder encoder = new BASE64Encoder();
-		return encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
-	}
-
-	/**
 	 * 将本地图片进行Base64位编码
 	 * 
 	 * @param imgUrl
@@ -907,54 +883,18 @@ public final class ImageUtil {
 		return encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
 	}
 
-	/**
-	 * 将Base64位编码的图片进行解码，并保存到指定目录
-	 * 
-	 * @param base64
-	 *            base64编码的图片信息
-	 * @return
-	 */
-	public static void decodeBase64ToImage(String base64, String path,
-			String imgName) {
-		BASE64Decoder decoder = new BASE64Decoder();
-		try {
-			FileOutputStream write = new FileOutputStream(new File(path
-					+ imgName));
-			byte[] decoderBytes = decoder.decodeBuffer(base64);
-			write.write(decoderBytes);
-			write.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * 将Base64位编码的图片进行解码，并保存到指定目录
-	 * 
-	 * @param base64
-	 *            base64编码的图片信息
-	 * @return
-	 */
-	public static void decodeBase64ToImage(String base64, String filePath) {
-		BASE64Decoder decoder = new BASE64Decoder();
-		try {
-			FileOutputStream write = new FileOutputStream(new File(filePath));
-			byte[] decoderBytes = decoder.decodeBuffer(base64);
-			write.write(decoderBytes);
-			write.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
 	// base64字符串转化成图片
-	public static boolean GenerateImage(String imgStr, String imgFilePath) { // 对字节数组字符串进行Base64解码并生成图片
-		if (imgStr == null) // 图像数据为空
+	public static boolean decodeBase64ToImage(String base64,
+			String imgFilePath) { // 对字节数组字符串进行Base64解码并生成图片
+
+		if (base64 == null) { // 图像数据为空
 			return false;
+		}
+
 		BASE64Decoder decoder = new BASE64Decoder();
 		try {
 			// Base64解码
-			byte[] b = decoder.decodeBuffer(imgStr);
+			byte[] b = decoder.decodeBuffer(base64);
 			for (int i = 0; i < b.length; ++i) {
 				if (b[i] < 0) {// 调整异常数据
 					b[i] += 256;
