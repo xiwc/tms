@@ -349,6 +349,8 @@
         });
 
         var baseURL = Utils.getBaseURL();
+        // 是否第一次调用s2b函数
+        var isS2bFirst = true;
 
         $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
         $(window).resize(function(event) {
@@ -663,8 +665,6 @@
         function s2t() {
             $('html, body, .ad-index-content').scrollTo(0, 300);
         }
-
-        var isS2bFirst = true;
 
         function s2b() {
 
