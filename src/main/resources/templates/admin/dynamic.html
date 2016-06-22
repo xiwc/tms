@@ -75,6 +75,10 @@
     .ui.comments .comment .text span.at-user {
         cursor: pointer;
     }
+
+    .ui.comments .comment a.author {
+         color: #4183c4;
+    }
     
     .ui.vertical.icon.buttons.btns-scroll {
         position: fixed;
@@ -204,7 +208,7 @@
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
                                 <div class="content">
-                                    <a class="author" style="color: #4183c4;" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
+                                    <a class="author" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
                                     <div class="metadata">
                                         <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                     </div>
