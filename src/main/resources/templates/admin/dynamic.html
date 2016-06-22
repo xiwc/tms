@@ -621,7 +621,7 @@
             // var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
             var comment = '[[翻译#{translateId}]({baseURL}admin/translate?id={translateId}){ats}]\n\n';
             comment = comment.replace(/\{translateId\}/g, url('?translateId'))
-                .replace(/\{{baseURL}\}/g, baseURL)
+                .replace(/\{baseURL\}/g, baseURL)
                 .replace(/\{ats\}/g, ats.join(' & '));
             insertComment(cm, comment);
         }
