@@ -203,7 +203,7 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(id);
 	}
 
-	@RequestMapping(value = "get", method = RequestMethod.GET)
+	@RequestMapping(value = { "get", "get/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody get(@RequestParam("id") Long id) {
 

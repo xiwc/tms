@@ -111,6 +111,24 @@
     .ui.vertical.icon.buttons.btns-scroll .button:hover {
         background-color: rgba(224, 225, 226, 1);
     }
+    /* 翻译popup样式 start*/
+    
+    .meta {
+        border-top: 1px lightgray solid;
+        border-bottom: 1px lightgray solid;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    
+    .extra {
+        border-top: 1px lightgray solid;
+    }
+    
+    .description {
+        border-bottom: 1px lightgray solid;
+        padding-bottom: 5px;
+    }
+    /* 翻译popup样式 end */
     
     @media only screen and (max-width: 767px) {
         .main.container {
@@ -287,6 +305,7 @@
     <div th:replace="admin/template :: chatMoreTpl"></div>
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
+    <div th:replace="admin/template :: chatMsgPpTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
@@ -1042,6 +1061,8 @@
                     }
 
                 }
+            }).fail(function() {
+                toastr.error('网络连接错误!');
             });
         }, 5000);
 
@@ -1066,10 +1087,14 @@
             toastr.error(data.message, '剪贴板粘贴图片错误!');
         });
 
-
+        // 翻译popup
         $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
+            
+            if($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
 
             $(this).popup({
                 popup: $('.pp-translate'),
@@ -1083,14 +1108,57 @@
                     hide: 300
                 },
                 onShow: function() {
-                    var $pp = $(this);
-                    $pp.dimmer('show');
+                    var $pp = $(this).html('加载中...');
+                    // $pp.dimmer('show');
                     $.get('admin/translate/getById/unmask', {
                         id: url('?id', $a.attr('href'))
                     }, function(data) {
-                        $pp.dimmer('hide');
+                        // $pp.dimmer('hide');
                         if (data.success) {
                             $("#tansPpTpl").tmpl(data.data).appendTo($pp.empty());
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        });
+
+        // 消息popup
+        $('body').on('mouseover', '#context .chat a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
+            event.preventDefault();
+            var $a = $(this);
+
+            if($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
+
+            $(this).popup({
+                popup: $('.pp-translate'),
+                hoverable: true,
+                // context: 'body',
+                // inline: true,
+                // movePopup: false,
+                // position: 'bottom center',
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this).html('加载中...');
+                    // $pp.dimmer('show');
+                    $.get('admin/chat/get/unmask', {
+                        id: url('?id', $a.attr('href'))
+                    }, function(data) {
+                        // $pp.dimmer('hide');
+                        if (data.success) {
+                            var chat = data.data;
+                            chat.creatorName = chat.creator.name ? chat.creator.name : chat.creator.username;
+                            var d = new Date(chat.createDate);
+                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            chat.contentMd = simplemde.markdown(preParse(chat.content));
+
+                            $("#chatMsgPpTpl").tmpl(data.data).appendTo($pp.empty());
                         } else {
                             toastr.error(data.data, "加载失败!");
                         }

@@ -186,6 +186,30 @@
             </div>
         </div>
     </script>
+    <!-- 沟通消息popup内容模板 -->
+    <script th:fragment="chatMsgPpTpl" id="chatMsgPpTpl" type="text/x-jquery-tmpl">
+        <div class="ui items">
+            <div class="item">
+                <div class="content" style="width:300px; word-break: break-all;">
+                    <a class="header pp-not" href="admin/dynamic?id=${id}">消息#${id}</a>
+                    <div class="meta" style="width:300px; word-break: break-all;">
+                        <span>
+                            {{if creatorName}}
+                            ${creatorName}
+                            {{else}}
+                            ${creator.username}
+                            {{/if}}
+                        </span>
+                        <span>发表于</span>
+                        <span class="cinema" title="${createDateFormat}">${createDateFormat}</span>
+                    </div>
+                    <div class="description markdown-body" style="width:300px; word-break: break-all;">
+                        {{html contentMd}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
     <!-- image select modal -->
     <div th:fragment="ad-images" class="ui modal ad-images">
         <!-- <i class="close icon"></i> -->
