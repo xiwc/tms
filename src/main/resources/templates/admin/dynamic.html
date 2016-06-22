@@ -75,9 +75,9 @@
     .ui.comments .comment .text span.at-user {
         cursor: pointer;
     }
-
+    
     .ui.comments .comment a.author {
-         color: #4183c4;
+        color: #4183c4;
     }
     
     .ui.vertical.icon.buttons.btns-scroll {
@@ -619,8 +619,10 @@
             });
             // [[翻译#173](/admin/dynamic?id=173){~admin} & {~step}]
             // var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
-            var comment = '[[翻译#{translateId}](admin/translate?id={translateId}){ats}]\n\n';
-            comment = comment.replace(/\{translateId\}/g, url('?translateId')).replace(/\{ats\}/g, ats.join(' & '));
+            var comment = '[[翻译#{translateId}]({baseURL}admin/translate?id={translateId}){ats}]\n\n';
+            comment = comment.replace(/\{translateId\}/g, url('?translateId'))
+                .replace(/\{{baseURL}\}/g, baseURL)
+                .replace(/\{ats\}/g, ats.join(' & '));
             insertComment(cm, comment);
         }
 
@@ -719,8 +721,11 @@
             var username = $btn.closest('.comment').find('.content .author').attr('data-value');
 
             // [[回复#10](admin/dynamic?id=1){~xiweicheng}]
-            var href = '[[回复#' + id + '](' + url('path') + '?id=' + id + '){~' + username + '}]\n\n';
-            insertComment(cm, href);
+            var comment = '[[回复#{id}]({baseURL}admin/dynamic?id={id}){~{username}}]\n\n';
+            comment = comment.replace(/\{id\}/g, id)
+                .replace(/\{baseURL\}/g, baseURL)
+                .replace(/\{username\}/g, username);
+            insertComment(cm, comment);
 
         });
 
