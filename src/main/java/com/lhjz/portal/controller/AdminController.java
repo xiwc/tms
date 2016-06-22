@@ -4,6 +4,7 @@
 package com.lhjz.portal.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -178,7 +179,22 @@ public class AdminController extends BaseController {
 	@RequestMapping("dynamic")
 	public String dynamic(
 			Model model,
+			@RequestParam(value = "id", required = false) Long id,
+			@RequestParam(value = "search", required = false) String search,
 			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		if (StringUtil.isNotEmpty(id)) {
+			long cntGtId = chatRepository.countGtId(id);
+			int size = pageable.getPageSize();
+			long page = cntGtId / size;
+			if (cntGtId % size == 0) {
+				page--;
+			}
+
+			pageable = new PageRequest(page > -1 ? (int) page : 0, size,
+					Direction.DESC,
+					"createDate");
+		}
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
 		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
@@ -187,8 +203,12 @@ public class AdminController extends BaseController {
 		Page<Log> logs = logRepository.findByTarget(Target.Translate,
 				new PageRequest(0, 10, Direction.DESC, "createDate"));
 
+		List<User> users = userRepository.findAll();
+		Collections.sort(users);
+
 		model.addAttribute("chats", chats);
 		model.addAttribute("logs", logs);
+		model.addAttribute("users", users);
 		model.addAttribute("user", getLoginUser());
 		
 		return "admin/dynamic";

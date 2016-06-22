@@ -836,6 +836,8 @@ public class TranslateController extends BaseController {
 
 		Label label3 = labelRepository.saveAndFlush(label);
 		translate.getLabels().add(label3);
+		translate.setUpdateDate(new Date());
+		translate.setUpdater(WebUtil.getUsername());
 		translate.setSearch(translate.toString());
 
 		translateRepository.saveAndFlush(translate);

@@ -15,6 +15,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/highlight/styles/github.css}" href="../../static/lib/highlight/styles/github.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
     .main.container {
@@ -55,15 +56,54 @@
     }
     
     .ui.feed>.event:hover,
-    .ui.comments .comment:hover {
+    .ui.comments .comment:hover,
+    .ui.comments .comment.marked {
         background-color: #F3F3F3;
         -webkit-box-shadow: 0 0 5px 1px #0CC!important;
         -moz-box-shadow: 0 0 5px 1px #0CC!important;
         box-shadow: 0 0 5px 1px #0CC!important;
     }
-
+    
     .ui.comments .comment .text {
         margin-top: 0.5em;
+    }
+    
+    .ui.feed>.event>.content .summary {
+        /*font-size: 0.9em;*/
+    }
+    
+    .ui.comments .comment .text span.at-user {
+        cursor: pointer;
+    }
+    
+    .ui.vertical.icon.buttons.btns-scroll {
+        position: fixed;
+        right: 433px;
+        bottom: 225px;
+        background-color: transparent;
+        z-index: 1;
+    }
+    
+    .ui.button.btn-get-chat-news {
+        display: none;
+        position: fixed;
+        right: 430px;
+        bottom: 300px;
+        background-color: rgba(219, 40, 40, 0.54);
+        z-index: 1;
+    }
+    
+    .ui.button.btn-get-chat-news:hover {
+        background-color: rgba(219, 40, 40, 1);
+    }
+    
+    .ui.vertical.icon.buttons.btns-scroll .button {
+        border-radius: 10em!important;
+        background-color: rgba(224, 225, 226, 0.54);
+    }
+    
+    .ui.vertical.icon.buttons.btns-scroll .button:hover {
+        background-color: rgba(224, 225, 226, 1);
     }
     
     @media only screen and (max-width: 767px) {
@@ -72,7 +112,7 @@
             margin-left: 0 !important;
             width: auto !important;
             max-width: 960px !important;
-            padding: 2em 0em 7em;
+            padding: 2em 0em 2em;
             position: relative;
         }
         .main.container .right.rail {
@@ -80,6 +120,14 @@
             padding-top: 2em;
             width: 420px;
             display: none;
+        }
+        .ui.vertical.icon.buttons.btns-scroll {
+            right: 13px;
+            bottom: 190px;
+        }
+        .ui.button.btn-get-chat-news {
+            right: 10px;
+            bottom: 265px;
         }
     }
     </style>
@@ -94,8 +142,8 @@
             <div id="context">
                 <!-- <div th:replace="admin/template :: ad-page-header ('沟通动态', 'dynamic')"></div> -->
                 <div class="main ui container">
-                    <div class="ui dividing right rail" style="min-height: 279px;">
-                        <div class="ui sticky sy-dynamic" style="z-index: 0; left: 1040px; width: 283px !important; height: 279px !important; top: 0px;">
+                    <div class="ui dividing right rail" style="min-height: 279px; padding-left: 1rem;">
+                        <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px; padding-bottom: 20px;">
                             <h4 class="ui dividing header">动态</h4>
                             <div class="ui feed fd-dynamic">
                                 <div class="event" th:each="l : ${logs}">
@@ -107,11 +155,11 @@
                                     </div>
                                     <div class="content">
                                         <div class="summary">
-                                            <a class="user" th:text="${#strings.isEmpty(l.creator.name) ? l.creator.username : l.creator.name}">张三</a>
+                                            <a class="user" th:attr="data-value=${l.creator.username}" th:text="${#strings.isEmpty(l.creator.name) ? l.creator.username : l.creator.name}">张三</a>
                                             <span th:if="${#strings.toString(l.action) == 'Create'}">添加</span>
                                             <span th:if="${#strings.toString(l.action) == 'Update'}">更新</span>
                                             <span th:if="${#strings.toString(l.action) == 'Delete'}">删除</span>
-                                            <a th:if="${#strings.toString(l.target) == 'Translate'}" target="_blank" th:href="@{/admin/translate(id=${l.targetId})}">翻译</a>
+                                            <a th:if="${#strings.toString(l.target) == 'Translate'}" target="_blank" th:href="@{/admin/translate(id=${l.targetId})}" th:text="${'翻译#' + l.targetId}">翻译</a>
                                             <span th:if="${#strings.toString(l.properties) == 'TranslateItem'}">内容</span>
                                             <span th:if="${#strings.toString(l.properties) == 'Key'}">名称</span>
                                             <span th:if="${#strings.toString(l.properties) == 'Watchers'}">关注者</span>
@@ -121,9 +169,13 @@
                                             </div>
                                         </div>
                                         <div th:unless="${#strings.isEmpty(l.properties)}" class="extra text">
-                                            <div th:unless="${#strings.isEmpty(l.oldValue)}" th:text="${l.oldValue}"></div>
-                                            <div style="color: green; font-size: 12px; font-weight: bold;" th:unless="${#strings.isEmpty(l.oldValue)}">变更为</div>
-                                            <div th:text="${l.newValue}"></div>
+                                            <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${#strings.isEmpty(l.oldValue)}" th:text="${l.oldValue}"></div>
+                                            <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;" th:unless="${#strings.isEmpty(l.oldValue)}">更新为</div>
+                                            <div th:if="${#strings.toString(l.properties) == 'Labels'}" class="ui tag label" th:text="${l.newValue}"></div>
+                                            <div th:if="${#strings.toString(l.properties) == 'Watchers'}" class="ui label">
+                                                <i class="user icon"></i> <span th:text="${l.newValue}"></span>
+                                            </div>
+                                            <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${#strings.toString(l.properties) == 'Labels' or #strings.toString(l.properties) == 'Watchers'}" th:text="${l.newValue}"></div>
                                         </div>
                                         <!-- <div class="extra images">
                                             <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
@@ -140,17 +192,17 @@
                             <button th:unless="${logs.last}" class="fluid ui button btn-log-more">加载更多</button>
                         </div>
                     </div>
-                    <div class="chat" style="min-height: 1000px;">
-                        <div class="ui minimal comments">
+                    <div class="chat">
+                        <div class="ui minimal comments" style="display:none;">
                             <h3 class="ui dividing header">沟通</h3>
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-more">加载更多</button>
-                            <div class="comment" th:each="c : ${chats}" th:attr="data-id=${c.id}">
+                            <div class="comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
                                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
                                 <div class="content">
-                                    <a class="author" style="color: #4183c4;" th:text="${c.creator.name}">Matt</a>
+                                    <a class="author" style="color: #4183c4;" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
                                     <div class="metadata">
                                         <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                     </div>
@@ -158,19 +210,60 @@
                                         How artistic!
                                     </div>
                                     <div class="actions" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">
+                                        <a class="reply">回复</a>
                                         <a class="edit">编辑</a>
                                         <a class="delete">删除</a>
                                     </div>
                                 </div>
                             </div>
-                            <form class="ui reply form">
-                                <div class="field markdown-body">
-                                    <textarea class="ta-md"></textarea>
+                            <button th:unless="${chats.first}" class="fluid ui button btn-chat-pre-more">加载更多</button>
+                            <form class="ui reply form fm-reply">
+                                <div class="field markdown-body pp-users">
+                                    <textarea autofocus="autofocus" class="ta-md"></textarea>
                                 </div>
-                                <div class="ui blue labeled submit icon button btn-chat-submit">
-                                    <i class="icon edit"></i> 提交
+                                <div class="ui fluid popup bottom left transition hidden list-users-container" style="max-height:150px; overflow:auto;">
+                                    <div class="ui middle aligned selection list list-users">
+                                        <div class="item" th:attr="data-value=${'all'}, data-label=${'全部用户'}">
+                                            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                                <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${'全'}">全部用户</span>
+                                            </a>
+                                            <div class="content">
+                                                <div class="header" th:text="${'全部用户 - (all)'}">全部用户 - (all)</div>
+                                            </div>
+                                        </div>
+                                        <div class="item" th:each="u : ${users}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
+                                            <!-- <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg"> -->
+                                            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                                <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(u.name)}" th:text="${#strings.toUpperCase(#strings.substring(u.name,#strings.length(u.name) - 1,#strings.length(u.name)))}">管理员</span>
+                                                <img style="height:35px;" th:if="${#strings.isEmpty(u.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                            </a>
+                                            <div class="content">
+                                                <div class="header" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name) + ' - ' + u.mails + ' (' + u.username + ')'}">张三 - weicheng.xi@newtouch.cn (xiweicheng)</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
+                                <div class="ui buttons">
+                                    <button class="ui button btn-chat-clear">取消</button>
+                                    <div class="or"></div>
+                                    <button class="ui positive button btn-chat-submit">提交</button>
+                                </div>
+                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp ui black circular icon right floated button">
+                                    <i class="refresh icon"></i>
+                                </a>
                             </form>
+                        </div>
+                        <div class="ui circular red icon button btn-get-chat-news" title="获取新消息">
+                            <i class="refresh icon"></i>
+                            <div class="floating ui red circular label lbl-chat-news-count">0</div>
+                        </div>
+                        <div class="ui vertical circular icon buttons btns-scroll">
+                            <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
+                                <i class="arrow up icon"></i>
+                            </div>
+                            <div class="ui circular icon button btn-scroll-down" title="滚动至底部">
+                                <i class="arrow down icon"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -186,6 +279,7 @@
     <div th:replace="admin/template :: logMoreTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
+    <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
     <input type="hidden" name="page.size" th:value="${chats.size}" />
     <input type="hidden" name="page.number.logs" th:value="${logs.number}" />
     <input type="hidden" name="page.number.next.logs" th:value="${logs.number + 1}" />
@@ -199,34 +293,113 @@
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
         $('.pp').popup();
+        $('.pp-users.field').popup({
+            inline: true,
+            hoverable: true,
+            position: 'bottom left',
+            distanceAway: -40,
+            on: 'manual',
+            delay: {
+                show: 300,
+                hide: 800
+            }
+        });
         $('.ui.dropdown.dd-actions').dropdown({
             action: 'hide'
         });
+
+        var baseURL = Utils.getBaseURL();
 
         $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
         $(window).resize(function(event) {
             $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
         });
+        if ($('.main.container .right.rail').is(':visible')) {
+            $('.ui.sticky.sy-dynamic').sticky({
+                offset: 70,
+                observeChanges: true,
+                context: '#context'
+            });
+        }
 
-        var simplemde = new SimpleMDE({
-            element: $(".ta-md")[0],
-            autoDownloadFontAwesome: false,
-            autosave: {
-                enabled: true,
-                delay: 5000,
-                uniqueId: "chat-content"
-            }
+        $('.list-users').on('click', '.item', function(event) {
+            addAtUser(cm, $(this));
         });
+
+        /**
+         * 解析@users
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function parseUsers(plainText) {
+            var users = [];
+            var atR = /\{~([^\}]*)\}/g;
+            var rs = atR.exec(plainText);
+            while (rs) {
+                if (userMap[rs[1]] && users.indexOf(rs[1]) == -1) {
+                    users.push(rs[1]);
+                }
+                rs = atR.exec(plainText);
+            }
+
+            return users;
+        }
+
+        /**
+         * 解析要发送邮件的用户们
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function parseUsernames(plainText) {
+            var users = parseUsers(plainText);
+            if (users.indexOf('all') > -1) {
+                var users2 = [];
+                $.each(usernames, function(index, username) {
+                    if (username != 'all') {
+                        users2.push(username);
+                    }
+                });
+                return users2;
+            }
+            return users;
+        }
+
+        /**
+         * 替换@user解析
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function preParse(plainText) {
+
+            var txt = plainText;
+            $.each(parseUsers(plainText), function(index, username) {
+                // txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '**`@' + userMap[username] + '`**');
+                txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '<span data-value="' + username + '" class="at-user">' + '**`@' + userMap[username] + '`**' + '</span>');
+            });
+
+            return txt;
+        }
 
         var simplemdeEdit = new SimpleMDE({
             element: $(".ad-chat-edit textarea")[0],
             autoDownloadFontAwesome: false,
+            // autofocus: true,
+            previewRender: function(plainText, preview) { // Async method
+                setTimeout(function() {
+                    preview.innerHTML = simplemdeEdit.markdown(preParse(plainText));
+                }, 250);
+
+                return "解释渲染中...";
+            },
             autosave: {
                 enabled: true,
                 delay: 5000,
@@ -234,24 +407,313 @@
             }
         });
 
-        var $textMds = $('.comments .content .text');
-        $textMds.each(function(index, el) {
-            $(el).html(simplemde.markdown($(el).text()));
+        var simplemde = new SimpleMDE({
+            element: $(".ta-md")[0],
+            autoDownloadFontAwesome: false,
+            autofocus: true,
+            previewRender: function(plainText, preview) { // Async method
+                setTimeout(function() {
+                    preview.innerHTML = simplemde.markdown(preParse(plainText));
+                }, 250);
+
+                return "解释渲染中...";
+            },
+            autosave: {
+                enabled: true,
+                delay: 5000,
+                uniqueId: "chat-content"
+            }
         });
 
+        simplemde.codemirror.on('keyup', function(cm, e) {
+            // console.log(e);
+            if (e.ctrlKey && e.keyCode == 13) {
+                $('.btn-chat-submit').click();
+            }
+        });
+
+        // ============================================================================ @user start
+        // TODO 临时全局变量定义
+        var cm = simplemde.codemirror;
+        var mk = ' @';
+        var usernames = [];
+        var userMap = {};
+        $('.list-users > .item').each(function(index, el) {
+            usernames.push($(el).attr('data-value'));
+            userMap[$(el).attr('data-value')] = $(el).attr('data-label');
+        });
+
+        var atHandler = function(cm, o) {
+
+            var cursor = cm.getCursor();
+            var line = cm.getLine(cursor.line);
+
+            if (line.lastIndexOf('@') == 0) {
+                mk = '@';
+            } else {
+                mk = ' @';
+            }
+
+            var mkIndex = line.lastIndexOf(mk);
+            var atFrom = mkIndex + mk.length;
+            if (mkIndex > -1 && cursor.ch >= atFrom) {
+
+                $('.pp-users').popup('is hidden') && $('.pp-users').popup('show');
+
+                var at = $.trim(line.substr(atFrom).split(' ')[0]);
+
+                if (at) {
+                    $.each(usernames, function(index, username) {
+                        if (username.indexOf(at) == -1) {
+                            $('.list-users > .item[data-value="' + username + '"]').hide();
+                        } else {
+                            $('.list-users > .item[data-value="' + username + '"]').show();
+                        }
+                    });
+                } else {
+                    $('.list-users > .item').each(function(index, el) {
+                        $(el).show();
+                    });
+                }
+
+                var $s = $('.list-users > .item:visible').each(function(index, el) {
+                    $(el).removeClass('active');
+                }).first().addClass('active');
+                $('.list-users-container').scrollTo($s);
+
+            } else {
+                $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
+            }
+
+        };
+
+        cm.on('cursorActivity', atHandler);
+        // cm.on('change', atHandler);
+        cm.on('keydown', function(cm, e) {
+            // console.log(e);
+            if ($('.pp-users').popup('is visible')) {
+
+                var cnt = $('.list-users > .item:visible').size();
+                if (cnt == 0) {
+                    return;
+                }
+                var $selected = $('.list-users > .active.item:visible');
+                // var selectIndex = $('.list-users > .item:visible').index('.item.active');
+                var selectIndex = $selected.index('.list-users > .item:visible');
+                var nextIndex = (selectIndex + 1 + cnt) % cnt;
+                var preIndex = (selectIndex - 1 + cnt) % cnt;
+                if (e.keyCode == 38) { // key up
+                    e.preventDefault();
+                    var $s = $('.list-users > .item:visible').each(function(index, el) {
+                        $(el).removeClass('active');
+                    }).eq(preIndex).addClass('active');
+                    $('.list-users-container').scrollTo($s);
+                } else if (e.keyCode == 40) { // key down
+                    e.preventDefault();
+                    var $s = $('.list-users > .item:visible').each(function(index, el) {
+                        $(el).removeClass('active');
+                    }).eq(nextIndex).addClass('active');
+                    $('.list-users-container').scrollTo($s);
+                } else if (e.keyCode == 13) { // key enter
+                    e.preventDefault();
+                    // console.log($selected.attr('data-value'));
+                    addAtUser(cm, $selected);
+                }
+            }
+
+        });
+
+        /**
+         * 添加转换选择的@user到编辑器
+         * @param {CodeMirror} cm CodeMirror
+         */
+        function addAtUser(cm, $user) {
+            var cursor = cm.getCursor();
+            var line = cm.getLine(cursor.line);
+            var mkIndex = line.lastIndexOf(mk);
+            var atFrom = mkIndex + mk.length;
+            if (mkIndex > -1 && cursor.ch >= atFrom) {
+                cm.replaceRange('{~' + $user.attr('data-value') + '}', {
+                    line: cursor.line,
+                    ch: atFrom - 1
+                }, {
+                    line: cursor.line,
+                    ch: cursor.ch
+                });
+            }
+
+            $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
+
+            cm.focus();
+        }
+
+        function insertAtUser(cm, username) {
+            var cursor = cm.getCursor();
+            if (cursor) {
+                cm.replaceRange('{~' + username + '}', cursor, cursor);
+            }
+        }
+
+        /**
+         * 编辑器插入自定义沟通内容
+         * @param  {[type]} cm      [description]
+         * @param  {[type]} comment [description]
+         * @return {[type]}         [description]
+         */
+        function insertComment(cm, comment) {
+            var cursor = cm.getCursor();
+            if (cursor) {
+                cm.replaceRange(comment, cursor, cursor);
+
+                // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+                s2b();
+                cm.focus();
+            }
+        }
+
+        // ============================================================================ @user end
+
+        var $textMds = $('.comments .content .text');
+        $textMds.each(function(index, el) {
+            var html = simplemde.markdown(preParse($(el).text()));
+            $(el).html(html).find('pre code').each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
+        });
+
+        // hljs.initHighlightingOnLoad();
+        $('.ui.comments').show();
+
+        // ============================================================================ url? start
+
+        if (url('?scroll') || url('?scroll') == '') {
+            // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+            s2b();
+            cm.focus();
+        }
+
+        if (url('?id')) {
+            $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
+                offset: -50
+            });
+        }
+
+        if (url('?at')) {
+
+            simplemde.value(''); // 首先清空编辑器
+            var atArr = url('?at').split(',');
+
+            var ats = [];
+            $.each(atArr, function(index, at) {
+                var _at = '{~{username}}'.replace(/\{username\}/g, at);
+                if (ats.indexOf(_at) == -1) {
+                    ats.push(_at);
+                }
+            });
+
+            var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
+            comment = comment.replace(/\{translateId\}/g, url('?translateId')).replace(/\{ats\}/g, ats.join(' & '));
+            insertComment(cm, comment);
+        }
+
+        // ============================================================================ url? end
+
+        $('.btn-scroll-up').click(function(event) {
+            s2t();
+        });
+
+        $('.btn-scroll-down').click(function(event) {
+            s2b();
+        });
+
+        function s2t() {
+            $('html, body, .ad-index-content').scrollTo(0, 300);
+        }
+
+        function s2b() {
+            $('html, body, .ad-index-content').scrollTo({
+                left: 0,
+                top: "100%"
+            }, 300);
+        }
+
         $('.btn-chat-submit').click(function(event) {
+            event.preventDefault();
+            var content = simplemde.value();
+            if (!$.trim(content)) {
+                toastr.error('提交内容不能为空!');
+                return;
+            }
+            var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemde.markdown(preParse(content))).wrap('<div/>').parent().html();
+
+            var preMore = $('.btn-chat-pre-more').size() == 1;
+            var $last = $('.chat .comments .comment').last();
+
+            var $domBefore = preMore ? $('.btn-chat-pre-more') : $('.fm-reply');
+
             $.post('/admin/chat/create', {
-                content: simplemde.value()
+                preMore: preMore,
+                lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id'),
+                baseURL: baseURL,
+                usernames: parseUsernames(content).join(','),
+                content: content,
+                contentHtml: html,
             }, function(data, textStatus, xhr) {
                 if (data.success) {
+
                     simplemde.value('');
                     simplemde.autosave();
                     toastr.success('提交成功!');
-                    window.location.reload();
+
+                    if ($.isArray(data.data)) { // 不刷新追加
+                        if (data.data.length == 0) {
+                            return;
+                        }
+
+                        var isAdminRole = $('input:hidden[name="role.admin"]').val();
+                        var loginUsername = $('input:hidden[name="user.username"]').val();
+                        $.each(data.data, function(index, chat) {
+                            chat.contentMd = simplemde.markdown(preParse(chat.content));
+                            if (chat.creator.name) {
+                                chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                            }
+                            if (isAdminRole == 'true' || loginUsername == creator.username) {
+                                chat.actions = true;
+                            }
+                            var d = new Date(chat.createDate);
+                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                        });
+                        var $more = $("#chatMoreTpl").tmpl(data.data);
+                        $more.find('pre code').each(function(i, block) {
+                            hljs.highlightBlock(block);
+                        });
+                        $more.insertBefore($domBefore);
+                        s2b();
+                    } else {
+                        window.location.href = url('path') + '?scroll=1';
+                    }
+
                 } else {
-                    toastr.success(data.data, '提交失败!');
+                    toastr.error(data.data, '提交失败!');
                 }
             });
+        });
+
+        $('.btn-chat-clear').click(function(event) {
+            event.preventDefault();
+            simplemde.value('');
+        });
+
+        $('body').on('click', '.comments .actions a.reply', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+            var id = $btn.closest('.comment').attr('data-id');
+            var username = $btn.closest('.comment').find('.content .author').attr('data-value');
+
+            // [[回复#10](admin/dynamic?id=1){~xiweicheng}]
+            var href = '[[回复#' + id + '](' + url('path') + '?id=' + id + '){~' + username + '}]\n\n';
+            insertComment(cm, href);
+
         });
 
         $('body').on('click', '.comments .actions a.delete', function(event) {
@@ -279,6 +741,9 @@
                 id: $btn.closest('.comment').attr('data-id')
             }, function(data) {
                 if (data.success) {
+
+                    var contentOld = data.data.content;
+
                     $('.ad-chat-edit').modal({
                         onShow: function() {
                             simplemdeEdit.value(data.data.content);
@@ -288,12 +753,21 @@
                                 toastr.error('更新内容不能为空!');
                                 return false;
                             }
+
+                            var content = simplemdeEdit.value();
+                            var htmlOld = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemdeEdit.markdown(preParse(contentOld))).wrap('<div/>').parent().html();
+                            var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemdeEdit.markdown(preParse(content))).wrap('<div/>').parent().html();
+
                             $.post('/admin/chat/update', {
                                 id: $btn.closest('.comment').attr('data-id'),
-                                content: simplemdeEdit.value()
+                                baseURL: baseURL,
+                                usernames: parseUsernames(content).join(','),
+                                content: content,
+                                contentHtmlOld: htmlOld,
+                                contentHtml: html,
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
-                                    $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(simplemdeEdit.value()));
+                                    $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(simplemdeEdit.value())));
                                     toastr.success('更新成功!');
                                 } else {
                                     toastr.error(data.data, '更新失败!');
@@ -305,6 +779,14 @@
                     toastr.error(data.data, '获取失败!');
                 }
             });
+        });
+
+        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
+            event.preventDefault();
+            insertAtUser(cm, $(this).attr('data-value'));
+            // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
+            s2b();
+            cm.focus();
         });
 
         $('.btn-chat-more').click(function(event) {
@@ -327,7 +809,7 @@
                     var isAdminRole = $('input:hidden[name="role.admin"]').val();
                     var loginUsername = $('input:hidden[name="user.username"]').val();
                     $.each(data.data.content, function(index, chat) {
-                        chat.contentMd = simplemde.markdown(chat.content);
+                        chat.contentMd = simplemde.markdown(preParse(chat.content));
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
@@ -337,7 +819,12 @@
                         var d = new Date(chat.createDate);
                         chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
-                    $("#chatMoreTpl").tmpl(data.data.content).insertAfter($('.btn-chat-more'));
+                    var $more = $("#chatMoreTpl").tmpl(data.data.content);
+                    $more.find('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+
+                    $more.insertAfter($('.btn-chat-more'));
                     data.data.last && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
@@ -346,6 +833,49 @@
             });
         });
 
+        $('.btn-chat-pre-more').click(function(event) {
+            $btn = $(this);
+
+            $.get('/admin/chat/more', {
+                page: $('input:hidden[name="page.number.pre"]').val(),
+                size: $('input:hidden[name="page.size"]').val()
+            }, function(data) {
+                if (data.success) {
+
+                    if (data.data.content.length == 0) {
+                        toastr.warning('没有更多数据了!');
+                        return;
+                    }
+
+                    $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
+                    $('input:hidden[name="page.size"]').val(data.data.size);
+
+                    var isAdminRole = $('input:hidden[name="role.admin"]').val();
+                    var loginUsername = $('input:hidden[name="user.username"]').val();
+                    $.each(data.data.content, function(index, chat) {
+                        chat.contentMd = simplemde.markdown(preParse(chat.content));
+                        if (chat.creator.name) {
+                            chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                        }
+                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                            chat.actions = true;
+                        }
+                        var d = new Date(chat.createDate);
+                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    });
+                    var $more = $("#chatMoreTpl").tmpl(data.data.content);
+                    $more.find('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+                    $more.insertBefore($('.btn-chat-pre-more'));
+
+                    data.data.first && $btn.remove();
+                    toastr.success('加载成功!');
+                } else {
+                    toastr.error(data.data, '加载失败!');
+                }
+            });
+        });
 
         var actionMapping = {
             'Create': '创建',
@@ -380,8 +910,11 @@
                         if (log.creator.name) {
                             log.creator.iconName = log.creator.name.substr(log.creator.name.length - 1).toUpperCase();
                         }
-                        log.action = actionMapping[log.action];
-                        log.properties = propMapping[log.properties];
+                        if (log.properties == 'Labels') log.isLabels = true;
+                        if (log.properties == 'Watchers') log.isWatchers = true;
+
+                        log.actionMapping = actionMapping[log.action];
+                        log.propertiesMapping = propMapping[log.properties];
                         var d = new Date(log.createDate);
                         log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
@@ -393,6 +926,77 @@
                 }
             });
         });
+
+        $('.btn-get-chat-news').click(function(event) {
+            event.preventDefault();
+            $btn = $(this);
+            $.get('/admin/chat/getNews', {
+                lastId: $btn.attr('data-value')
+            }, function(data) {
+                if (data.success) {
+
+                    $btn.hide();
+
+                    if ($.isArray(data.data)) { // 不刷新追加
+                        if (data.data.length == 0) {
+                            return;
+                        }
+
+                        var preMore = $('.btn-chat-pre-more').size() == 1;
+                        var $domBefore = preMore ? $('.btn-chat-pre-more') : $('.fm-reply');
+
+                        var isAdminRole = $('input:hidden[name="role.admin"]').val();
+                        var loginUsername = $('input:hidden[name="user.username"]').val();
+                        $.each(data.data, function(index, chat) {
+                            chat.contentMd = simplemde.markdown(preParse(chat.content));
+                            if (chat.creator.name) {
+                                chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                            }
+                            if (isAdminRole == 'true' || loginUsername == creator.username) {
+                                chat.actions = true;
+                            }
+                            var d = new Date(chat.createDate);
+                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                        });
+                        var $more = $("#chatMoreTpl").tmpl(data.data);
+                        $more.find('pre code').each(function(i, block) {
+                            hljs.highlightBlock(block);
+                        });
+                        $more.insertBefore($domBefore);
+                        s2b();
+                    }
+                } else {
+                    toastr.error(data.data, '获取失败!');
+                }
+            });
+        });
+
+        // $('.btn-get-chat-news').show();
+        // 轮询最新沟通消息
+        var interval = setInterval(function() {
+
+            var preMore = $('.btn-chat-pre-more').size() == 1;
+
+            if (preMore) { // 如果有最新消息有分页, 取消轮询.
+                clearInterval(interval);
+                return;
+            }
+
+            var $last = $('.chat .comments .comment').last();
+
+            $.get('/admin/chat/countNews', {
+                lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id')
+            }, function(data) {
+                if (data.success) {
+                    if (data.data[1] > 0) {
+                        $('.btn-get-chat-news').children('.lbl-chat-news-count').text(data.data[1]);
+                        $('.btn-get-chat-news').attr('data-value', data.data[0]).show();
+                    } else {
+                        $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
+                    }
+                }
+            });
+        }, 5000);
 
     });
     </script>

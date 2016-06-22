@@ -3,7 +3,9 @@
  */
 package com.lhjz.portal.controller;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,8 @@ import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.Log;
+import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
@@ -30,7 +34,11 @@ import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.util.CollectionUtil;
+import com.lhjz.portal.util.DateUtil;
+import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
+import com.lhjz.portal.util.TemplateUtil;
+import com.lhjz.portal.util.ThreadUtil;
 
 /**
  * 
@@ -54,11 +62,17 @@ public class ChatController extends BaseController {
 	@Autowired
 	MailSender2 mailSender;
 
-	String translateAction = "admin/translate";
+	String dynamicAction = "admin/dynamic";
 
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody create(@RequestParam("content") String content) {
+	public RespBody create(
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam(value = "usernames", required = false) String usernames,
+			@RequestParam("content") String content,
+			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
+			@RequestParam("lastId") Long lastId,
+			@RequestParam("contentHtml") String contentHtml) {
 
 		if (StringUtil.isEmpty(content)) {
 			return RespBody.failed("提交内容不能为空!");
@@ -74,13 +88,54 @@ public class ChatController extends BaseController {
 
 		log(Action.Create, Target.Chat, chat2);
 
+		final User loginUser = getLoginUser();
+		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
+		final String html = contentHtml;
+
+		final Mail mail = Mail.instance();
+		if (StringUtil.isNotEmpty(usernames)) {
+			String[] usernameArr = usernames.split(",");
+			Arrays.asList(usernameArr).stream().forEach((username) -> {
+				mail.addUsers(getUser(username));
+			});
+
+			ThreadUtil.exec(() -> {
+
+				try {
+					Thread.sleep(3000);
+					mailSender.sendHtml(String.format("TMS-沟通动态@消息_%s",
+							DateUtil.format(new Date(), DateUtil.FORMAT7)),
+							TemplateUtil.process("templates/mail/mail-dynamic",
+									MapUtil.objArr2Map("user", loginUser,
+											"date", new Date(), "href", href,
+											"title", "下面的沟通消息中有@到你", "content",
+											html)), mail.get());
+					logger.info("沟通邮件发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("沟通邮件发送失败！");
+				}
+
+			});
+		}
+
+		if (!preMore && chatRepository.countQueryRecent(lastId) <= 50) {
+			List<Chat> chats = chatRepository.queryRecent(lastId);
+			return RespBody.succeed(chats);
+		}
+
 		return RespBody.succeed(chat2);
 	}
 
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody update(@RequestParam("id") Long id,
-			@RequestParam("content") String content) {
+	public RespBody update(
+			@RequestParam("id") Long id,
+			@RequestParam("content") String content,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam(value = "usernames", required = false) String usernames,
+			@RequestParam("contentHtmlOld") String contentHtmlOld,
+			@RequestParam("contentHtml") String contentHtml) {
 
 		if (StringUtil.isEmpty(content)) {
 			return RespBody.failed("修改内容不能为空!");
@@ -95,6 +150,40 @@ public class ChatController extends BaseController {
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
 		log(Action.Update, Target.Chat, chat2);
+
+		final User loginUser = getLoginUser();
+		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
+		final String html = "<h3>编辑前内容:</h3>" + contentHtmlOld
+				+ "<hr/><h3>编辑后内容:</h3>"
+				+ contentHtml;
+
+		final Mail mail = Mail.instance();
+		if (StringUtil.isNotEmpty(usernames)) {
+			String[] usernameArr = usernames.split(",");
+			Arrays.asList(usernameArr).stream().forEach((username) -> {
+				mail.addUsers(getUser(username));
+			});
+
+			ThreadUtil.exec(() -> {
+
+				try {
+					Thread.sleep(3000);
+					mailSender.sendHtml(String.format("TMS-沟通动态编辑@消息_%s",
+							DateUtil.format(new Date(), DateUtil.FORMAT7)),
+							TemplateUtil.process("templates/mail/mail-dynamic",
+									MapUtil.objArr2Map("user", loginUser,
+											"date", new Date(), "href", href,
+											"title", "下面编辑的沟通消息中有@到你",
+											"content",
+											html)), mail.get());
+					logger.info("沟通编辑邮件发送成功！");
+				} catch (Exception e) {
+					e.printStackTrace();
+					logger.error("沟通编辑邮件发送失败！");
+				}
+
+			});
+		}
 
 		return RespBody.succeed(chat2);
 	}
@@ -126,6 +215,26 @@ public class ChatController extends BaseController {
 		}
 
 		return RespBody.succeed(chat);
+	}
+
+	@RequestMapping(value = "countNews", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody countNews(@RequestParam("lastId") Long lastId) {
+
+		long cnt = chatRepository.countQueryRecent(lastId);
+
+		Long[] data = new Long[] { lastId, cnt };
+
+		return RespBody.succeed(data);
+	}
+
+	@RequestMapping(value = "getNews", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody getNews(@RequestParam("lastId") Long lastId) {
+
+		List<Chat> chats = chatRepository.queryRecent(lastId);
+
+		return RespBody.succeed(chats);
 	}
 
 	@RequestMapping(value = "more", method = RequestMethod.GET)

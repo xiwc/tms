@@ -34,7 +34,7 @@ import com.lhjz.portal.pojo.Enum.Status;
  */
 @Entity
 @Table(name = "users")
-public class User implements java.io.Serializable {
+public class User implements java.io.Serializable, Comparable<User> {
 
 	/** serialVersionUID long */
 	private static final long serialVersionUID = -5501393570981445761L;
@@ -239,6 +239,11 @@ public class User implements java.io.Serializable {
 				+ ", mails=" + mails + ", name=" + name + ", enabled="
 				+ enabled + ", status=" + status + ", createDate=" + createDate
 				+ ", version=" + version + "]";
+	}
+
+	@Override
+	public int compareTo(User o) {
+		return getUsername().compareTo(o.getUsername());
 	}
 
 }
