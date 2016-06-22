@@ -117,7 +117,7 @@
         </div>
     </script>
     <script th:fragment="logMoreTpl" id="logMoreTpl" type="text/x-jquery-tmpl">
-        <div class="event">
+        <div class="event" data-id="${id}">
             <div class="label">
                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}

@@ -109,7 +109,7 @@ jQuery(function($) {
 
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
-        if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/countNews'))) {
+        if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/poll'))) {
             $('.ad-page-dimmer').addClass('active');
         }
 

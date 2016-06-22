@@ -79,7 +79,8 @@
     .ui.vertical.icon.buttons.btns-scroll {
         position: fixed;
         right: 433px;
-        bottom: 225px;
+        /* bottom: 225px; */
+        bottom: 325px;
         background-color: transparent;
         z-index: 1;
     }
@@ -88,7 +89,8 @@
         display: none;
         position: fixed;
         right: 430px;
-        bottom: 300px;
+        /* bottom: 300px; */
+        bottom: 400px;
         background-color: rgba(219, 40, 40, 0.54);
         z-index: 1;
     }
@@ -146,7 +148,7 @@
                         <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px; padding-bottom: 20px;">
                             <h4 class="ui dividing header">动态</h4>
                             <div class="ui feed fd-dynamic">
-                                <div class="event" th:each="l : ${logs}">
+                                <div class="event" th:each="l : ${logs}" th:attr="data-id=${l.id}">
                                     <div class="label">
                                         <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                             <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(l.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(l.creator.name,#strings.length(l.creator.name) - 1,#strings.length(l.creator.name)))}">管理员</span>
@@ -611,8 +613,9 @@
                     ats.push(_at);
                 }
             });
-
-            var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
+            // [[翻译#173](/admin/dynamic?id=173){~admin} & {~step}]
+            // var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
+            var comment = '[[翻译#{translateId}](admin/translate?id={translateId}){ats}\n\n]';
             comment = comment.replace(/\{translateId\}/g, url('?translateId')).replace(/\{ats\}/g, ats.join(' & '));
             insertComment(cm, comment);
         }
@@ -984,9 +987,11 @@
             }
 
             var $last = $('.chat .comments .comment').last();
+            var $first = $('.fd-dynamic .event').first();
 
-            $.get('/admin/chat/countNews', {
-                lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id')
+            $.get('/admin/chat/poll', {
+                lastEvtId: $first.size() == 0 ? -1 : $first.attr('data-id'),
+                lastId: $last.size() == 0 ? -1 : $last.attr('data-id')
             }, function(data) {
                 if (data.success) {
                     if (data.data[1] > 0) {
@@ -995,6 +1000,29 @@
                     } else {
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
                     }
+
+                    if (data.msgs.length > 0) {
+
+                        if (data.msgs[0].length > 0) {
+                            $.each(data.msgs[0], function(index, log) {
+                                if (log.creator.name) {
+                                    log.creator.iconName = log.creator.name.substr(log.creator.name.length - 1).toUpperCase();
+                                }
+                                if (log.properties == 'Labels') log.isLabels = true;
+                                if (log.properties == 'Watchers') log.isWatchers = true;
+
+                                log.actionMapping = actionMapping[log.action];
+                                log.propertiesMapping = propMapping[log.properties];
+                                var d = new Date(log.createDate);
+                                log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            });
+                            $("#logMoreTpl").tmpl(data.msgs[0]).prependTo('.fd-dynamic');
+
+                            toastr.info('刚刚有' + data.msgs.length + '条动态更新');
+                        }
+
+                    }
+
                 }
             });
         }, 5000);

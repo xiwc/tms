@@ -66,8 +66,7 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody create(
-			@RequestParam("baseURL") String baseURL,
+	public RespBody create(@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
 			@RequestParam("content") String content,
 			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
@@ -109,7 +108,8 @@ public class ChatController extends BaseController {
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面的沟通消息中有@到你", "content",
-											html)), mail.get());
+											html)),
+							mail.get());
 					logger.info("沟通邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -129,8 +129,7 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody update(
-			@RequestParam("id") Long id,
+	public RespBody update(@RequestParam("id") Long id,
 			@RequestParam("content") String content,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
@@ -154,8 +153,7 @@ public class ChatController extends BaseController {
 		final User loginUser = getLoginUser();
 		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
 		final String html = "<h3>编辑前内容:</h3>" + contentHtmlOld
-				+ "<hr/><h3>编辑后内容:</h3>"
-				+ contentHtml;
+				+ "<hr/><h3>编辑后内容:</h3>" + contentHtml;
 
 		final Mail mail = Mail.instance();
 		if (StringUtil.isNotEmpty(usernames)) {
@@ -174,8 +172,8 @@ public class ChatController extends BaseController {
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面编辑的沟通消息中有@到你",
-											"content",
-											html)), mail.get());
+											"content", html)),
+							mail.get());
 					logger.info("沟通编辑邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -217,15 +215,19 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chat);
 	}
 
-	@RequestMapping(value = "countNews", method = RequestMethod.GET)
+	@RequestMapping(value = "poll", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody countNews(@RequestParam("lastId") Long lastId) {
+	public RespBody poll(@RequestParam("lastId") Long lastId,
+			@RequestParam("lastEvtId") Long lastEvtId) {
 
 		long cnt = chatRepository.countQueryRecent(lastId);
+		long cntLogs = logRepository.countQueryRecent(lastEvtId);
 
-		Long[] data = new Long[] { lastId, cnt };
+		Long[] data = new Long[] { lastId, cnt, lastEvtId, cntLogs };
 
-		return RespBody.succeed(data);
+		List<Log> logs = logRepository.queryRecent(lastEvtId);
+
+		return RespBody.succeed(data).addMsg(logs);
 	}
 
 	@RequestMapping(value = "getNews", method = RequestMethod.GET)
@@ -239,20 +241,21 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "more", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody more(
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody more(@PageableDefault(sort = {
+			"createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
-		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
-				.getContent()), pageable, chats.getTotalElements());
+		chats = new PageImpl<Chat>(
+				CollectionUtil.reverseList(chats.getContent()), pageable,
+				chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
 
 	@RequestMapping(value = "moreLogs", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody moreLogs(
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody moreLogs(@PageableDefault(sort = {
+			"createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Log> logs = logRepository.findByTarget(Target.Translate, pageable);
 
