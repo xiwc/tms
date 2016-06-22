@@ -619,7 +619,7 @@
             });
             // [[翻译#173](/admin/dynamic?id=173){~admin} & {~step}]
             // var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
-            var comment = '[[翻译#{translateId}](admin/translate?id={translateId}){ats}\n\n]';
+            var comment = '[[翻译#{translateId}](admin/translate?id={translateId}){ats}]\n\n';
             comment = comment.replace(/\{translateId\}/g, url('?translateId')).replace(/\{ats\}/g, ats.join(' & '));
             insertComment(cm, comment);
         }
