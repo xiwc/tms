@@ -277,26 +277,7 @@
         </div>
     </div>
     <div style="display: none;">
-        <div class="ui flowing popup top left transition hidden pp-translate">
-            <div class="ui items">
-                <div class="item">
-                    <div class="content">
-                        <a class="header">#1101</a>
-                        <div class="meta">
-                            <span class="cinema">projectPane.searchItemsrrdiidodfff</span>
-                        </div>
-                        <div class="description">
-                            <p>东风公司电饭锅水电费iirirffcc</p>
-                            <p>东风公司电饭锅水电费iirirffcc</p>
-                        </div>
-                        <div class="extra">
-                            <div class="ui label">IMAX</div>
-                            <div class="ui label">XXXXX</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="ui flowing popup top left transition hidden pp-translate"></div>
     </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
@@ -305,6 +286,7 @@
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
     <div th:replace="admin/template :: logMoreTpl"></div>
+    <div th:replace="admin/template :: tansPpTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
@@ -1085,16 +1067,34 @@
         });
 
 
-        $('body').on('mouseover', 'a[href*="admin/translate"]', function(event) {
+        $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
             event.preventDefault();
-            //console.log($(this));
+            var $a = $(this);
+
             $(this).popup({
                 popup: $('.pp-translate'),
                 hoverable: true,
-                position: 'top left',
+                // context: 'body',
+                // inline: true,
+                // movePopup: false,
+                // position: 'bottom center',
                 delay: {
                     show: 300,
-                    hide: 800
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this);
+                    $pp.dimmer('show');
+                    $.get('admin/translate/getById/unmask', {
+                        id: url('?id', $a.attr('href'))
+                    }, function(data) {
+                        $pp.dimmer('hide');
+                        if (data.success) {
+                            $("#tansPpTpl").tmpl(data.data).appendTo($pp.empty());
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
                 }
             }).popup('show');
         });

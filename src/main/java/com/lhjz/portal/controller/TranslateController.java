@@ -953,7 +953,8 @@ public class TranslateController extends BaseController {
 		return RespBody.succeed(page);
 	}
 
-	@RequestMapping(value = "getById", method = RequestMethod.GET)
+	@RequestMapping(value = { "getById",
+			"getById/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody getById(@RequestParam("id") Long id) {
