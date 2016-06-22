@@ -272,7 +272,7 @@
                                     <div class="or"></div>
                                     <button class="ui positive button btn-chat-submit">提交</button>
                                 </div>
-                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp ui black circular icon right floated button">
+                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp pp-not ui black circular icon right floated button">
                                     <i class="refresh icon"></i>
                                 </a>
                             </form>
@@ -1091,7 +1091,7 @@
         $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
-            
+
             if($a.closest('.pp-translate').size() != 0) {
                 return;
             }
