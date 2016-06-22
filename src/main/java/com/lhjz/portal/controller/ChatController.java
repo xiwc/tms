@@ -215,7 +215,7 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chat);
 	}
 
-	@RequestMapping(value = "poll", method = RequestMethod.GET)
+	@RequestMapping(value = { "poll", "poll/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody poll(@RequestParam("lastId") Long lastId,
 			@RequestParam("lastEvtId") Long lastEvtId) {

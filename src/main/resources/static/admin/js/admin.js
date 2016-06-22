@@ -109,12 +109,12 @@ jQuery(function($) {
 
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
-        if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/poll'))) {
+        // if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/poll'))) {
 
-            if (settings.url.lastIndexOf('/unmask') == -1) {
-                $('.ad-page-dimmer').addClass('active');
-            }
+        if (settings.url.lastIndexOf('/unmask') == -1) {
+            $('.ad-page-dimmer').addClass('active');
         }
+        // }
 
         var csrf = {};
         csrf[$('.ad-csrf input:hidden').attr('name')] = $('.ad-csrf input:hidden').attr('value');

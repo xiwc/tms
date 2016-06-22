@@ -1035,7 +1035,7 @@
             var $last = $('.chat .comments .comment').last();
             var $first = $('.fd-dynamic .event').first();
 
-            $.get('/admin/chat/poll', {
+            $.get('/admin/chat/poll/unmask', {
                 lastEvtId: $first.size() == 0 ? -1 : $first.attr('data-id'),
                 lastId: $last.size() == 0 ? -1 : $last.attr('data-id')
             }, function(data) {
