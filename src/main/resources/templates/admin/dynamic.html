@@ -1018,7 +1018,12 @@
                             });
                             $("#logMoreTpl").tmpl(data.msgs[0]).prependTo('.fd-dynamic');
 
-                            toastr.info('刚刚有' + data.msgs.length + '条动态更新');
+                            var $toast = toastr.info('刚刚有' + data.msgs.length + '条动态更新');
+                            $toast.click(function(event) {
+                                event.preventDefault();
+                                $('.main.container .right.rail .sticky').scrollTo(0, 300);
+                                $toast.remove();
+                            });
                         }
 
                     }
