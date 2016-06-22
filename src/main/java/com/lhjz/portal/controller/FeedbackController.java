@@ -94,7 +94,7 @@ public class FeedbackController extends BaseController {
 
 		final Feedback feedback2 = feedbackRepository.saveAndFlush(feedback);
 
-		log(Action.Create, Target.Feedback, feedback2);
+		log(Action.Create, Target.Feedback, feedback2.getId());
 
 		final User loginUser = getLoginUser();
 

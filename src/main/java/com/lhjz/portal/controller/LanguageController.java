@@ -97,7 +97,7 @@ public class LanguageController extends BaseController {
 
 		Language language2 = languageRepository.saveAndFlush(language);
 
-		log(Action.Create, Target.Language, languageForm);
+		log(Action.Create, Target.Language, language2.getId());
 
 		return RespBody.succeed(language2);
 	}
@@ -131,7 +131,7 @@ public class LanguageController extends BaseController {
 
 		Language language2 = languageRepository.saveAndFlush(language);
 
-		log(Action.Update, Target.Language, language2);
+		log(Action.Update, Target.Language, language2.getId());
 
 		return RespBody.succeed(language2).addMsg(msg);
 	}
@@ -163,7 +163,7 @@ public class LanguageController extends BaseController {
 
 		languageRepository.delete(language);
 
-		log(Action.Delete, Target.Language, language);
+		log(Action.Delete, Target.Language, language.getId(), language);
 
 		return RespBody.succeed(id);
 	}

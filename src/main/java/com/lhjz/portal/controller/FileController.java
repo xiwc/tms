@@ -208,7 +208,7 @@ public class FileController extends BaseController {
 				file2.setPath(storePath + sizeOriginal + "/");
 				saveFiles.add(fileRepository.save(file2));
 
-				log(Action.Upload, Target.File, file2);
+				log(Action.Upload, Target.File, file2.getId());
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -288,7 +288,7 @@ public class FileController extends BaseController {
 			file2.setPath(storePath + sizeOriginal + "/");
 			com.lhjz.portal.entity.File file = fileRepository.save(file2);
 
-			log(Action.Upload, Target.File, file2);
+			log(Action.Upload, Target.File, file2.getId());
 
 			return RespBody.succeed(file);
 		} catch (Exception e) {

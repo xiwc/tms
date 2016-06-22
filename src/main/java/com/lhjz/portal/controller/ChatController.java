@@ -85,7 +85,7 @@ public class ChatController extends BaseController {
 
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
-		log(Action.Create, Target.Chat, chat2);
+		log(Action.Create, Target.Chat, chat2.getId());
 
 		final User loginUser = getLoginUser();
 		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
@@ -148,7 +148,7 @@ public class ChatController extends BaseController {
 
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
-		log(Action.Update, Target.Chat, chat2);
+		log(Action.Update, Target.Chat, chat2.getId());
 
 		final User loginUser = getLoginUser();
 		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
@@ -198,7 +198,7 @@ public class ChatController extends BaseController {
 		chatRepository.delete(chat);
 		chatRepository.flush();
 
-		log(Action.Delete, Target.Chat, chat);
+		log(Action.Delete, Target.Chat, chat.getId(), chat);
 
 		return RespBody.succeed(id);
 	}

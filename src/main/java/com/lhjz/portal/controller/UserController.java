@@ -99,7 +99,7 @@ public class UserController extends BaseController {
 
 		userRepository.saveAndFlush(user);
 
-		log(Action.Create, Target.User, user);
+		log(Action.Create, Target.User, user.getUsername());
 
 		// save default authority `ROLE_USER`
 		Authority authority = new Authority();
@@ -109,7 +109,7 @@ public class UserController extends BaseController {
 
 		authorityRepository.saveAndFlush(authority);
 
-		log(Action.Create, Target.Authority, authority);
+		log(Action.Create, Target.Authority, authority.getId().toString());
 
 		if (role.equalsIgnoreCase("admin")) {
 			Authority authority2 = new Authority();
@@ -119,7 +119,7 @@ public class UserController extends BaseController {
 
 			authorityRepository.saveAndFlush(authority2);
 
-			log(Action.Create, Target.Authority, authority2);
+			log(Action.Create, Target.Authority, authority2.getId().toString());
 		}
 
 		final String userRole = role;
@@ -367,7 +367,7 @@ public class UserController extends BaseController {
 
 		userRepository.saveAndFlush(user);
 
-		log(Action.Update, Target.User, user);
+		log(Action.Update, Target.User, user.getUsername());
 
 		return RespBody.succeed(user.getUsername());
 	}
@@ -425,7 +425,7 @@ public class UserController extends BaseController {
 
 		userRepository.saveAndFlush(user);
 
-		log(Action.Update, Target.User, user);
+		log(Action.Update, Target.User, user.getUsername());
 
 		return RespBody.succeed(user.getUsername());
 	}
@@ -453,7 +453,7 @@ public class UserController extends BaseController {
 
 		userRepository.delete(user);
 
-		log(Action.Delete, Target.User, user);
+		log(Action.Delete, Target.User, user.getUsername(), user);
 
 		return RespBody.succeed(username);
 	}
