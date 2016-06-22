@@ -73,7 +73,7 @@
     }
     
     .ui.comments .comment .text span.at-user,
-    .pp-translate .ui.items>.item>.content>.description at-user {
+    .pp-translate .ui.items>.item>.content>.description .at-user {
         cursor: pointer;
     }
     
@@ -831,7 +831,7 @@
             });
         });
 
-        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description at-user, .fd-dynamic .event .content .summary .user', function(event) {
+        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
             event.preventDefault();
             insertAtUser(cm, $(this).attr('data-value'));
             // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
