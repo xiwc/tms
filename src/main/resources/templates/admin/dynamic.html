@@ -1046,8 +1046,9 @@
             }, function(data, textStatus, xhr) {
                 if (data.success) {
                     console.log(data);
-                    insertComment(cm, '![{name}]({path}{uuidName})'
+                    insertComment(cm, '![{name}]({baseURL}{path}{uuidName})'
                         .replace(/\{name\}/g, data.data.name)
+                        .replace(/\{baseURL\}/g, baseURL)
                         .replace(/\{path\}/g, data.data.path)
                         .replace(/\{uuidName\}/g, data.data.uuidName));
                 }
