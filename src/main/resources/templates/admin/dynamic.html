@@ -72,7 +72,8 @@
         /*font-size: 0.9em;*/
     }
     
-    .ui.comments .comment .text span.at-user {
+    .ui.comments .comment .text span.at-user,
+    .pp-translate .ui.items>.item>.content>.description at-user {
         cursor: pointer;
     }
     
@@ -663,11 +664,26 @@
             $('html, body, .ad-index-content').scrollTo(0, 300);
         }
 
+        var isS2bFirst = true;
+
         function s2b() {
-            $('html, body, .ad-index-content').scrollTo({
-                left: 0,
-                top: "100%"
-            }, 300);
+
+            if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
+                isS2bFirst = false;
+                Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
+                    $('html, body, .ad-index-content').scrollTo({
+                        left: 0,
+                        top: "100%"
+                    }, 300);
+                });
+            } else {
+                Utils.imageLoaded($('img'), function() {
+                    $('html, body, .ad-index-content').scrollTo({
+                        left: 0,
+                        top: "100%"
+                    }, 300);
+                });
+            }
         }
 
         $('.btn-chat-submit').click(function(event) {
@@ -817,7 +833,7 @@
             });
         });
 
-        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
+        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description at-user, .fd-dynamic .event .content .summary .user', function(event) {
             event.preventDefault();
             insertAtUser(cm, $(this).attr('data-value'));
             // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
@@ -1092,7 +1108,7 @@
             event.preventDefault();
             var $a = $(this);
 
-            if($a.closest('.pp-translate').size() != 0) {
+            if ($a.closest('.pp-translate').size() != 0) {
                 return;
             }
 
@@ -1129,7 +1145,7 @@
             event.preventDefault();
             var $a = $(this);
 
-            if($a.closest('.pp-translate').size() != 0) {
+            if ($a.closest('.pp-translate').size() != 0) {
                 return;
             }
 
