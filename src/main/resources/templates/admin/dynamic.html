@@ -411,7 +411,7 @@
             var search = $('.chat-search .ui.search input').val();
 
             if (!search || search.length < 2) {
-                toastr.error('检索条件长度需要大于等于2位字符!');
+                toastr.error('检索条件不能少于2位字符!');
                 return;
             }
             // 保存检索值
