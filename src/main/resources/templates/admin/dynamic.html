@@ -328,6 +328,7 @@
     <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
     <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/poll.js}" src="../../static/admin/js/poll.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
         $('table').tablesort().data('tablesort');
@@ -1023,12 +1024,12 @@
 
         // $('.btn-get-chat-news').show();
         // 轮询最新沟通消息
-        var interval = setInterval(function() {
+        window.poll.start(function(resetCb, stopCb) {
 
             var preMore = $('.btn-chat-pre-more').size() == 1;
 
             if (preMore) { // 如果有最新消息有分页, 取消轮询.
-                clearInterval(interval);
+                stopCb();
                 return;
             }
 
@@ -1040,7 +1041,9 @@
                 lastId: $last.size() == 0 ? -1 : $last.attr('data-id')
             }, function(data) {
                 if (data.success) {
+
                     if (data.data[1] > 0) {
+                        resetCb();
                         $('.btn-get-chat-news').children('.lbl-chat-news-count').text(data.data[1]);
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).show();
                     } else {
@@ -1050,6 +1053,7 @@
                     if (data.msgs.length > 0) {
 
                         if (data.msgs[0].length > 0) {
+                            resetCb();
                             $.each(data.msgs[0], function(index, log) {
                                 if (log.creator.name) {
                                     log.creator.iconName = log.creator.name.substr(log.creator.name.length - 1).toUpperCase();
@@ -1076,10 +1080,10 @@
 
                 }
             }).fail(function() {
+                stopCb();
                 toastr.error('网络连接错误!');
             });
-        }, 5000);
-
+        });
 
         // clipboard paste image
         $('.fm-reply .CodeMirror textarea').pastableTextarea().on('pasteImage', function(ev, data) {
