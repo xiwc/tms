@@ -1129,6 +1129,9 @@
                     }, function(data) {
                         // $pp.dimmer('hide');
                         if (data.success) {
+                            var translate = data.data;
+                            var d = new Date(chat.createDate);
+                            translate.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                             $("#tansPpTpl").tmpl(data.data).appendTo($pp.empty());
                         } else {
                             toastr.error(data.data, "加载失败!");
