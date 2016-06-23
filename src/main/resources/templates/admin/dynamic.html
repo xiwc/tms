@@ -114,18 +114,18 @@
     }
     /* 翻译popup样式 start*/
     
-    .meta {
+    .pp-translate .meta {
         border-top: 1px lightgray solid;
         border-bottom: 1px lightgray solid;
         padding-top: 5px;
         padding-bottom: 5px;
     }
     
-    .extra {
+    .pp-translate .extra {
         border-top: 1px lightgray solid;
     }
     
-    .description {
+    .pp-translate .description {
         border-bottom: 1px lightgray solid;
         padding-bottom: 5px;
     }
@@ -185,6 +185,9 @@
         .ui.button.btn-get-chat-news {
             right: 10px;
             bottom: 265px;
+        }
+        .chat-search {
+            display: none;
         }
     }
     </style>
@@ -305,7 +308,7 @@
                                     <div class="or"></div>
                                     <button class="ui positive button btn-chat-submit">提交</button>
                                 </div>
-                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp pp-not ui black circular icon right floated button">
+                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button">
                                     <i class="refresh icon"></i>
                                 </a>
                             </form>
@@ -325,7 +328,7 @@
                         <!-- 沟通消息检索 -->
                         <div class="chat-search">
                             <div class="ui search">
-                                <div class="ui circular icon button btn-search">
+                                <div class="ui circular icon button btn-search" title="沟通消息检索">
                                     <input style="display: none;" class="prompt" th:value="${param.containsKey('search') ? param.search[0] : ''}" type="text" placeholder="查找...">
                                     <i class="search link icon"></i>
                                 </div>
@@ -341,28 +344,7 @@
     <div class="ui flowing popup top left transition hidden pp-translate"></div>
     <div class="chat-search-loc"></div>
     <div class="ui flowing popup top left transition hidden pp-chat-search-results">
-        <div class="ui relaxed list">
-            <div class="item">
-                <!-- <img class="ui avatar image" src="/images/avatar/small/daniel.jpg"> -->
-                <div class="content">
-                    <a class="header">Daniel Louise</a>
-                    <div class="description">Last seen watching <a><b>Arrested Development</b></a> just now.</div>
-                </div>
-            </div>
-            <div class="item">
-                <!-- <img class="ui avatar image" src="/images/avatar/small/stevie.jpg"> -->
-                <div class="content">
-                    <a class="header">Stevie Feliciano</a>
-                    <div class="description">Last seen watching <a><b>Bob's Burgers</b></a> 10 hours ago.</div>
-                </div>
-            </div>
-            <div class="item">
-                <!-- <img class="ui avatar image" src="/images/avatar/small/elliot.jpg"> -->
-                <div class="content">
-                    <a class="header">Elliot Fu</a>
-                    <div class="description">Last seen watching <a><b>The Godfather Part 2</b></a> yesterday.</div>
-                </div>
-            </div>
+        <div class="ui selection divided list list-chat-search-results">
         </div>
     </div>
     <!-- popup container end -->
@@ -375,6 +357,7 @@
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
+    <div th:replace="admin/template :: chatSearchTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
@@ -404,6 +387,7 @@
         $('.chat-search').hover(function() {
             $(this).find('input').show();
             $(this).find('.btn-search').removeClass('circular button').addClass('input');
+            $(this).find('input').focus();
         }, function() {
             $(this).find('input').hide();
             $(this).find('.btn-search').removeClass('input').addClass('circular button');
@@ -425,6 +409,11 @@
 
         function searchHandler() {
             var search = $('.chat-search .ui.search input').val();
+
+            if (!search || search.length < 2) {
+                toastr.error('检索条件长度需要大于等于2位字符!');
+                return;
+            }
             // 保存检索值
             var isExists = false;
             $.each(source, function(index, val) {
@@ -449,7 +438,7 @@
             $('.btn-search i.icon').popup({
                 popup: $('.pp-chat-search-results'),
                 hoverable: true,
-                // on: 'click',
+                on: 'click',
                 // context: 'body',
                 target: '.btn-search i.icon',
                 // inline: true,
@@ -461,21 +450,32 @@
                     hide: 300
                 },
                 onShow: function() {
-                    // var $pp = $(this).html('加载中...');
-                    // $pp.dimmer('show');
-                    // $.get('admin/translate/getById/unmask', {
-                    //     id: url('?id', $a.attr('href'))
-                    // }, function(data) {
-                    //     // $pp.dimmer('hide');
-                    //     if (data.success) {
-                    //         var translate = data.data;
-                    //         var d = new Date(translate.createDate);
-                    //         translate.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                    //         $("#tansPpTpl").tmpl(data.data).appendTo($pp.empty());
-                    //     } else {
-                    //         toastr.error(data.data, "加载失败!");
-                    //     }
-                    // });
+                    var $pp = $(this);
+                    $pp.children('.ui.list').html('加载中...');
+                    $.get('admin/chat/search/unmask', {
+                        search: search
+                    }, function(data) {
+                        if (data.success) {
+                            var chats = data.data.content;
+                            if(data.data.content.length == 0) {
+                                $pp.children('.ui.list').html('检索结果不存在!');
+                                return;
+                            }
+
+                            $.each(chats, function(index, chat) {
+                                chat.contentBrief = chat.content.length > 50 ? chat.content.substr(0, 47) + '...' : chat.content;
+                                if (chat.creator.name) {
+                                    chat.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                                }
+                                var d = new Date(chat.createDate);
+                                chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            });
+                            $("#chatSearchTpl").tmpl(chats).appendTo($pp.children('.ui.list').empty());
+
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
                 }
             }).popup('show');
         }
@@ -489,6 +489,71 @@
         $('.chat-search .ui.search i').click(function(event) {
             searchHandler();
         });
+
+        $('.list-chat-search-results').on('click', '.item', function(event) {
+            event.preventDefault();
+            $item = $(this);
+            $.get('/admin/chat/searchBy', {
+                id: $item.attr('data-id')
+            }, function(data) {
+                if (data.success) {
+
+                    var chats = data.data.content;
+
+                    var $btnUp = $('.chat .btn-chat-more');
+                    var $btnDown = $('.chat .btn-chat-pre-more');
+
+                    if (data.data.last) {
+                        $btnUp.remove();
+                        $btnUp = $('.chat .btn-chat-more');
+                    } else {
+                        if ($btnUp.size() == 0) {
+                            $btnUp = $('<button class="fluid ui button btn-chat-more">加载更多</button>');
+                            $btnUp.insertAfter('.chat .comments > h3');
+                        }
+
+                        $('input:hidden[name="page.number.next"]').val(data.data.number + 1);
+                    }
+
+                    if (data.data.first) {
+                        $btnDown.remove();
+                        $btnDown = $('.chat .btn-chat-pre-more');
+                    } else {
+                        if ($btnDown.size() == 0) {
+                            $btnDown = $('<button class="fluid ui button btn-chat-pre-more">加载更多</button>');
+                            $btnDown.insertBefore('.chat .fm-reply')
+                        }
+                        $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
+                    }
+
+                    $('.chat .comments .comment').remove();
+
+                    $after = $btnUp.size() == 0 ? $('.chat .comments > h3') : $btnUp;
+
+                    var isAdminRole = $('input:hidden[name="role.admin"]').val();
+                    var loginUsername = $('input:hidden[name="user.username"]').val();
+                    $.each(chats, function(index, chat) {
+                        chat.contentMd = simplemde.markdown(preParse(chat.content));
+                        chat.marked = (chat.id == $item.attr('data-id')) ? 'marked' : '';
+                        if (chat.creator.name) {
+                            chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                        }
+                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                            chat.actions = true;
+                        }
+                        var d = new Date(chat.createDate);
+                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    });
+                    var $more = $("#chatMoreTpl").tmpl(chats);
+                    $more.find('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+                    $more.insertAfter($after);
+                    s2m();
+                }
+            });
+        });
+
         // ------------------------------------------------------------------------------------- chat search end
 
         $('table').tablesort().data('tablesort');
@@ -898,6 +963,7 @@
                         var loginUsername = $('input:hidden[name="user.username"]').val();
                         $.each(data.data, function(index, chat) {
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
+                            chat.marked = '';
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }
@@ -1016,7 +1082,9 @@
             cm.focus();
         });
 
-        $('.btn-chat-more').click(function(event) {
+        $('body').on('click', '.btn-chat-more', function(event) {
+            event.preventDefault();
+
             $btn = $(this);
 
             $.get('/admin/chat/more', {
@@ -1037,6 +1105,7 @@
                     var loginUsername = $('input:hidden[name="user.username"]').val();
                     $.each(data.data.content, function(index, chat) {
                         chat.contentMd = simplemde.markdown(preParse(chat.content));
+                        chat.marked = '';
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
@@ -1060,7 +1129,9 @@
             });
         });
 
-        $('.btn-chat-pre-more').click(function(event) {
+        $('body').on('click', '.btn-chat-pre-more', function(event) {
+            event.preventDefault();
+
             $btn = $(this);
 
             $.get('/admin/chat/more', {
@@ -1081,6 +1152,7 @@
                     var loginUsername = $('input:hidden[name="user.username"]').val();
                     $.each(data.data.content, function(index, chat) {
                         chat.contentMd = simplemde.markdown(preParse(chat.content));
+                        chat.marked = '';
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
@@ -1176,6 +1248,7 @@
                         var loginUsername = $('input:hidden[name="user.username"]').val();
                         $.each(data.data, function(index, chat) {
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
+                            chat.marked = '';
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }

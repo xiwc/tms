@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -260,5 +261,42 @@ public class ChatController extends BaseController {
 		Page<Log> logs = logRepository.findByTarget(Target.Translate, pageable);
 
 		return RespBody.succeed(logs);
+	}
+
+	@RequestMapping(value = { "search", "search/unmask" }, method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody search(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
+			@RequestParam(value = "search", required = true) String search) {
+
+		Page<Chat> chats = chatRepository.findByContentLike("%" + search + "%",
+				pageable);
+		// chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
+		// .getContent()), pageable, chats.getTotalElements());
+
+		return RespBody.succeed(chats);
+	}
+
+	@RequestMapping(value = { "searchBy", "searchBy/unmask" }, method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody searchBy(
+			@RequestParam(value = "id") Long id,
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		long cntGtId = chatRepository.countGtId(id);
+		int size = pageable.getPageSize();
+		long page = cntGtId / size;
+		if (cntGtId % size == 0) {
+			page--;
+		}
+
+		pageable = new PageRequest(page > -1 ? (int) page : 0, size,
+				Direction.DESC, "createDate");
+
+		Page<Chat> chats = chatRepository.findAll(pageable);
+		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
+				.getContent()), pageable, chats.getTotalElements());
+
+		return RespBody.succeed(chats);
 	}
 }
