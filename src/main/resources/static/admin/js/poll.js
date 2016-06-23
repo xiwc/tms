@@ -7,7 +7,7 @@
 + function() {
 
     var minInterval = 6000; // 轮询最小间隔 6s
-    var maxInterval = 30000; // 轮询最大间隔5min
+    var maxInterval = 300000; // 轮询最大间隔5min
     var incInterval = 6000; // 递增轮询间隔时间 6s
 
     var tolerate = 10; // 容忍连续获取不到新数据的(次数), 超过, 就会开始递增轮询间隔时间.
