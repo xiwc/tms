@@ -179,7 +179,7 @@
                     <div class="description" style="width:300px; word-break: break-all;">
                         <span class="cinema" title="${key}">${key}</span>
                     </div>
-                    <div class="description" style="width:300px; word-break: break-all;">
+                    <div class="description" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
                         {{each translateItems}}
                         <p title="${$value.content}">${$value.content}</p>
                         {{/each}}
@@ -210,7 +210,7 @@
                         <span>发表于</span>
                         <span class="cinema" title="${createDateFormat}">${createDateFormat}</span>
                     </div>
-                    <div class="description markdown-body" style="width:300px; word-break: break-all;">
+                    <div class="description markdown-body" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
                         {{html contentMd}}
                     </div>
                 </div>
