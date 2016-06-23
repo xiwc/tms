@@ -727,6 +727,8 @@
                     simplemde.autosave();
                     toastr.success('提交成功!');
 
+                    window.poll.reset(); // 重置轮询频率
+
                     if ($.isArray(data.data)) { // 不刷新追加
                         if (data.data.length == 0) {
                             return;
