@@ -61,7 +61,7 @@
 
     function _stop() {
         // TODO for debugging
-        console.log(poll stop...);
+        console.log("poll stop...");
 
         inc = 0;
         interval = minInterval;
@@ -70,7 +70,7 @@
 
     function _reset() {
     	// TODO for debugging
-        console.log(poll reset...);
+        console.log("poll reset...");
 
         _stop();
         _start();
