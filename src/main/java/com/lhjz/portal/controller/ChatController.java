@@ -152,8 +152,8 @@ public class ChatController extends BaseController {
 
 		final User loginUser = getLoginUser();
 		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
-		final String html = "<h3>编辑前内容:</h3>" + contentHtmlOld
-				+ "<hr/><h3>编辑后内容:</h3>" + contentHtml;
+		final String html = "<h3>编辑后内容:</h3>" + contentHtml
+				+ "<hr/><h3>编辑前内容:</h3>" + contentHtmlOld;
 
 		final Mail mail = Mail.instance();
 		if (StringUtil.isNotEmpty(usernames)) {
