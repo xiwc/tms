@@ -1095,7 +1095,11 @@
                 }
             }).fail(function() {
                 stopCb();
-                toastr.error('网络连接错误!');
+                toastr.error("请刷新浏览器,重新尝试!", "网络链接错误!", {
+                    "closeButton": true,
+                    "preventDuplicates": true,
+                    "timeOut": "0"
+                });
             });
         });
 
