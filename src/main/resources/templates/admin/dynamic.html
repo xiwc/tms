@@ -599,7 +599,6 @@
             if (cursor) {
                 cm.replaceRange(comment, cursor, cursor);
 
-                // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
                 s2b();
                 cm.focus();
             }
@@ -615,21 +614,17 @@
             });
         });
 
-        // hljs.initHighlightingOnLoad();
         $('.ui.comments').show();
 
         // ============================================================================ url? start
 
         if (url('?scroll') || url('?scroll') == '') {
-            // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
             s2b();
             cm.focus();
         }
 
         if (url('?id')) {
-            $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
-                offset: -50
-            });
+            s2m(); // 滚动到标记沟通消息处
         }
 
         if (url('?at')) {
@@ -663,10 +658,29 @@
             s2b();
         });
 
+        // 滚动到标记处
+        function s2m() {
+
+            if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
+                isS2bFirst = false;
+                Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
+                    $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
+                        offset: -50
+                    });
+                });
+            } else {
+                $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
+                    offset: -50
+                });
+            }
+        }
+
+        // 滚动到顶部
         function s2t() {
             $('html, body, .ad-index-content').scrollTo(0, 300);
         }
 
+        // 滚动到底部
         function s2b() {
 
             if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.

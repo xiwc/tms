@@ -25,7 +25,9 @@
         try { // 捕获轮询执行方法体中的异常, 防止破坏轮询的持续性.
             _pollCb && _pollCb(_reset, _stop);
         } catch (e) {
-            _errCb && _errCb(_reset, _stop);
+            _errCb && _errCb(_reset, _stop, e);
+
+            // TODO for debugging
             console.log('轮询异常: ' + e);
         }
     }
@@ -36,11 +38,13 @@
      * @param  {[Function]} errCb  轮询业务处理异常回到
      */
     function _start() {
+    	// TODO for debugging
+        console.log('poll start...');
 
         timer = setInterval(function() {
             inc++;
             oneHandler();
-            // TODO for debuging
+            // TODO for debugging
             console.log(interval);
 
             if (inc > tolerate) { // 超过轮询容忍次数内
@@ -56,12 +60,18 @@
     }
 
     function _stop() {
+        // TODO for debugging
+        console.log(poll stop...);
+
         inc = 0;
         interval = minInterval;
         clearInterval(timer);
     }
 
     function _reset() {
+    	// TODO for debugging
+        console.log(poll reset...);
+
         _stop();
         _start();
     }
