@@ -40,6 +40,8 @@
         timer = setInterval(function() {
             inc++;
             oneHandler();
+            // TODO for debuging
+            console.log(interval);
 
             if (inc > tolerate) { // 超过轮询容忍次数内
 
