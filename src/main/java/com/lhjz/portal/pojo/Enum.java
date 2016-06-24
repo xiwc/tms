@@ -17,6 +17,10 @@ public class Enum {
 		Create, Read, Update, Delete, Upload, Visit, Import, Export, Vote;
 	}
 
+	public static enum FileType {
+		Image, Attachment;
+	}
+
 	public static enum Prop {
 		Key, Content, Name, Id, Watchers, Labels, TranslateItem;
 	}

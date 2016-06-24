@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/highlight/styles/github.css}" href="../../static/lib/highlight/styles/github.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/dropzone/basic.min.css}" href="../../static/lib/dropzone/basic.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
     .main.container {
@@ -162,6 +163,19 @@
         width: 1px;
     }
     /* chat msg search end */
+    /* 文件上传 start*/
+    
+    .dz-default.dz-message {
+        height: 120px;
+        line-height: 120px;
+        width: 200px;
+        text-align: center;
+    }
+    
+    .editor-toolbar {
+        z-index: 2;
+    }
+    /* 文件上传 end*/
     
     @media only screen and (max-width: 767px) {
         .main.container {
@@ -353,6 +367,14 @@
         <div class="ui selection divided list list-chat-search-results">
         </div>
     </div>
+    <div class="ui flowing popup top left transition hidden pp-chat-upload-file">
+        <form action="/admin/file/upload" class="dropzone">
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        </form>
+    </div>
     <!-- popup container end -->
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
@@ -384,10 +406,13 @@
     <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
     <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/dropzone/dropzone.min.js}" src="../../static/lib/dropzone/dropzone.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/poll.js}" src="../../static/admin/js/poll.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
+
+        Dropzone.autoDiscover = false;
 
         // ------------------------------------------------------------------------------------- rating start
 
@@ -684,6 +709,39 @@
             element: $(".ta-md")[0],
             autoDownloadFontAwesome: false,
             autofocus: true,
+            toolbar: [
+                "bold",
+                "italic",
+                "strikethrough",
+                "heading",
+                "heading-smaller",
+                "heading-bigger",
+                "heading-1",
+                "heading-2",
+                "heading-3",
+                "|",
+                "code",
+                "quote",
+                "unordered-list",
+                "ordered-list",
+                "clean-block",
+                "|",
+                "link",
+                "image",
+                "table",
+                "horizontal-rule",
+                "|", {
+                    name: "upload",
+                    action: function(editor) {},
+                    className: "fa fa-upload",
+                    title: "上传文件",
+                }, "|",
+                "preview",
+                "side-by-side",
+                "fullscreen",
+                "guide"
+
+            ],
             previewRender: function(plainText, preview) { // Async method
                 setTimeout(function() {
                     preview.innerHTML = simplemde.markdown(preParse(plainText));
@@ -702,6 +760,57 @@
             // console.log(e);
             if (e.ctrlKey && e.keyCode == 13) {
                 $('.btn-chat-submit').click();
+            }
+        });
+
+        $('.fm-reply .editor-toolbar a.fa-upload').popup({
+            popup: $('.pp-chat-upload-file'),
+            hoverable: true,
+            on: 'click',
+            position: 'top center',
+            closable: false,
+            delay: {
+                show: 300,
+                hide: 300
+            },
+            onShow: function() {}
+        });
+
+        $(".pp-chat-upload-file form.dropzone").dropzone({
+            paramName: 'file',
+            maxFilesize: 5, // MB
+            dictDefaultMessage: '拖拽或点击上传',
+            init: function() {
+                this.on("success", function(file, data) {
+                    if (data.success) {
+
+                        $.each(data.data, function(index, item) {
+                            if (item.type == 'Image') {
+                                insertComment(cm, '![{name}]({baseURL}{path}{uuidName}) '
+                                    .replace(/\{name\}/g, item.name)
+                                    .replace(/\{baseURL\}/g, baseURL)
+                                    .replace(/\{path\}/g, item.path)
+                                    .replace(/\{uuidName\}/g, item.uuidName));
+                            } else {
+                                insertComment(cm, '[{name}]({baseURL}{path}{uuidName}) '
+                                    .replace(/\{name\}/g, item.name)
+                                    .replace(/\{baseURL\}/g, baseURL)
+                                    .replace(/\{path\}/g, item.path)
+                                    .replace(/\{uuidName\}/g, item.uuidName));
+                            }
+                        });
+                        toastr.success('上传成功!');
+                    } else {
+                        toastr.error(data.data, '上传失败!');
+                    }
+
+                });
+                this.on("error", function(file, errorMessage, xhr) {
+                    toastr.error(errorMessage, '上传失败!');
+                });
+                this.on("complete", function(file) {
+                    this.removeFile(file);
+                });
             }
         });
 
@@ -1038,6 +1147,7 @@
 
         $('.btn-chat-clear').click(function(event) {
             event.preventDefault();
+            simplemde.clearAutosavedValue();
             simplemde.value('');
         });
 
