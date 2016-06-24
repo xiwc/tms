@@ -619,18 +619,6 @@
         // 是否第一次调用s2b函数
         var isS2bFirst = true;
 
-        $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
-        $(window).resize(function(event) {
-            $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
-        });
-        if ($('.main.container .right.rail').is(':visible')) {
-            $('.ui.sticky.sy-dynamic').sticky({
-                offset: 70,
-                observeChanges: true,
-                context: '#context'
-            });
-        }
-
         $('.list-users').on('click', '.item', function(event) {
             addAtUser(cm, $(this));
         });
@@ -872,6 +860,8 @@
 
         // ============================================================================ @user end
 
+        // ============================================================================ @chat markdown to html start
+
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
             var html = simplemde.markdown(preParse($(el).text()));
@@ -881,6 +871,22 @@
         });
 
         $('.ui.comments').show();
+
+        // ============================================================================ @chat markdown to html end
+
+        // -------------------------------------------------------------------------------- sticky init start
+        $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        $(window).resize(function(event) {
+            $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        });
+        if ($('.main.container .right.rail').is(':visible')) {
+            $('.ui.sticky.sy-dynamic').sticky({
+                offset: 70,
+                observeChanges: true,
+                context: '#context'
+            });
+        }
+        // -------------------------------------------------------------------------------- sticky init end
 
         // ============================================================================ url? start
 
