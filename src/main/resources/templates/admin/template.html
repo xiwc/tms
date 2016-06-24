@@ -84,7 +84,7 @@
         </tr>
     </script>
     <script th:fragment="chatMoreTpl" id="chatMoreTpl" type="text/x-jquery-tmpl">
-        <div class="comment" data-id="${id}">
+        <div class="comment ${marked}" data-id="${id}">
             <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>
@@ -102,6 +102,18 @@
                 </a>
                 <div class="metadata">
                     <span class="date" th:text="">${createDateFormat}</span>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> 
+                        {{if voteZan}}
+                        <span title="${voteZan}">${zanCount} 赞</span>
+                        {{/if}}
+                    </div>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> 
+                        {{if voteCai}}
+                        <span title="${voteCai}">${caiCount} 踩</span>
+                        {{/if}}
+                    </div>
                 </div>
                 <div class="text markdown-body">
                     {{html contentMd}}
@@ -117,7 +129,7 @@
         </div>
     </script>
     <script th:fragment="logMoreTpl" id="logMoreTpl" type="text/x-jquery-tmpl">
-        <div class="event">
+        <div class="event" data-id="${id}">
             <div class="label">
                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
@@ -163,54 +175,87 @@
             </div>
         </div>
     </script>
-    <!-- image select modal -->
-    <div th:fragment="ad-images" class="ui modal ad-images">
-        <!-- <i class="close icon"></i> -->
-        <div class="header">
-            图片选择
-        </div>
-        <div class="content">
-            <div class="ui cards grouped" th:remove="body">
-                <div class="card">
-                    <a class="image">
-                        <img src="../../static/landing/img/img-b1.jpg">
-                    </a>
-                    <div class="content">
-                        <div class="ui checkbox">
-                            <input type="checkbox" name="image" checked="checked">
-                            <label>图片1</label>
-                        </div>
+    <!-- 翻译popup内容模板 -->
+    <script th:fragment="tansPpTpl" id="tansPpTpl" type="text/x-jquery-tmpl">
+        <div class="ui items">
+            <div class="item">
+                <div class="content" style="width:300px; word-break: break-all;">
+                    <a class="header pp-not" href="admin/translate?id=${id}">翻译#${id}</a>
+                    <div class="meta" style="width:300px; word-break: break-all;">
+                        <span>
+                            ${creator}
+                        </span>
+                        <span>创建于</span>
+                        <span class="cinema" title="${createDateFormat}">${createDateFormat}</span>
                     </div>
-                </div>
-                <div class="card">
-                    <a class="image">
-                        <img src="../../static/landing/img/img-b2.jpg">
-                    </a>
-                    <div class="content">
-                        <div class="ui radio checkbox">
-                            <input type="radio" name="image" checked="checked">
-                            <label>图片1</label>
-                        </div>
+                    <div class="description" style="width:300px; word-break: break-all;">
+                        <span class="cinema" title="${key}">${key}</span>
                     </div>
-                </div>
-                <div class="card">
-                    <a class="image">
-                        <img src="../../static/landing/img/img-b3.jpg">
-                    </a>
-                    <div class="content">
-                        <div class="ui radio checkbox">
-                            <input type="radio" name="image" checked="checked">
-                            <label>图片1</label>
-                        </div>
+                    <div class="description" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
+                        {{each translateItems}}
+                        <p title="${$value.content}">${$value.content}</p>
+                        {{/each}}
+                    </div>
+                    <div class="extra" style="width:300px; word-break: break-all;">
+                        {{each labels}}
+                        <div class="ui label" title="${$value.name}">${$value.name}</div>
+                        {{/each}}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="actions">
-            <div class="ui cancel negative button">取消</div>
-            <div class="ui ok positive button">确定</div>
+    </script>
+    <!-- 沟通消息popup内容模板 -->
+    <script th:fragment="chatMsgPpTpl" id="chatMsgPpTpl" type="text/x-jquery-tmpl">
+        <div class="ui items">
+            <div class="item">
+                <div class="content" style="width:300px; word-break: break-all;">
+                    <a class="header pp-not" href="admin/dynamic?id=${id}">消息#${id}</a>
+                    <div class="meta" style="width:300px; word-break: break-all;">
+                        <span>
+                            {{if creatorName}}
+                            ${creatorName}
+                            {{else}}
+                            ${creator.username}
+                            {{/if}}
+                        </span>
+                        <span>发表于</span>
+                        <span class="cinema" title="${createDateFormat}">${createDateFormat}</span>
+                    </div>
+                    <div class="description markdown-body" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
+                        {{html contentMd}}
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </script>
+    <!-- 沟通消息popup内容模板 -->
+    <script th:fragment="chatSearchTpl" id="chatSearchTpl" type="text/x-jquery-tmpl">
+        <div class="item" data-id="${id}">
+            <div style="float: left;">
+                <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                    {{if iconName}}
+                        <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${iconName}</span>
+                    {{else}}
+                        <img src="/img/head.png">
+                    {{/if}}
+                </a>
+            </div>
+            <div class="content" style="width: 100%;">
+                <a class="header" data-value="${creator.username}" style="display: inline;">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata" style="float: right;">
+                    <span class="date">${createDateFormat}</span>
+                </div>
+                <div class="description">${contentBrief}</div>
+            </div>
+        </div>
+    </script>
     <!-- delete confirm modal -->
     <div th:fragment="ad-delete-confirm" class="ui small modal ad-delete-confirm">
         <!-- <i class="close icon"></i> -->

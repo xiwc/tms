@@ -3,9 +3,12 @@
  */
 package com.lhjz.portal.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.pojo.Enum.Target;
@@ -20,4 +23,10 @@ import com.lhjz.portal.pojo.Enum.Target;
 public interface LogRepository extends JpaRepository<Log, Long> {
 
 	Page<Log> findByTarget(Target target, Pageable pageable);
+
+	@Query(value = "SELECT * FROM log WHERE target = 'Translate' AND id > ?1 ORDER BY id DESC", nativeQuery = true)
+	List<Log> queryRecent(Long lastEvtId);
+
+	@Query(value = "SELECT COUNT(*) FROM log WHERE target = 'Translate' AND id > ?1", nativeQuery = true)
+	long countQueryRecent(Long lastEvtId);
 }

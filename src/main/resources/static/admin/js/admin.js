@@ -109,9 +109,12 @@ jQuery(function($) {
 
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
-        if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/countNews'))) {
+        // if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/poll'))) {
+
+        if (settings.url.lastIndexOf('/unmask') == -1) {
             $('.ad-page-dimmer').addClass('active');
         }
+        // }
 
         var csrf = {};
         csrf[$('.ad-csrf input:hidden').attr('name')] = $('.ad-csrf input:hidden').attr('value');
@@ -196,6 +199,28 @@ jQuery(function($) {
                 return converter.makeHtml(markdown);
             }
             return markdown;
+        },
+        imgLoaded($imgs, callback) {
+            var imgdefereds = [];
+            $imgs.each(function() {
+                var dfd = $.Deferred();
+                $(this).bind('load', function() {
+                    dfd.resolve();
+                }).bind('error', function() {
+                    //图片加载错误，加入错误处理
+                    dfd.resolve();
+                })
+                if (this.complete) {
+                    setTimeout(function() {
+                        dfd.resolve();
+                    }, 1000);
+                }
+
+                imgdefereds.push(dfd);
+            })
+            $.when.apply(null, imgdefereds).done(function() {
+                callback && callback.call(null);
+            });
         }
     });
 

@@ -43,6 +43,12 @@ public class Chat implements Serializable {
 	@Column(length = 16777216)
 	private String content;
 
+	@Column(length = 16777216)
+	private String voteZan;
+
+	@Column(length = 16777216)
+	private String voteCai;
+
 	@ManyToOne
 	@JoinColumn(name = "creator")
 	private User creator;
@@ -139,10 +145,27 @@ public class Chat implements Serializable {
 		this.voters = voters;
 	}
 
+	public String getVoteZan() {
+		return voteZan;
+	}
+
+	public void setVoteZan(String voteZan) {
+		this.voteZan = voteZan;
+	}
+
+	public String getVoteCai() {
+		return voteCai;
+	}
+
+	public void setVoteCai(String voteCai) {
+		this.voteCai = voteCai;
+	}
+
 	@Override
 	public String toString() {
-		return "Chat [id=" + id + ", content=" + content + ", creator="
-				+ creator + ", updater=" + updater + ", status=" + status
+		return "Chat [id=" + id + ", content=" + content + ", voteZan="
+				+ voteZan + ", voteCai=" + voteCai + ", creator=" + creator
+				+ ", updater=" + updater + ", status=" + status
 				+ ", createDate=" + createDate + ", updateDate=" + updateDate
 				+ ", version=" + version + "]";
 	}

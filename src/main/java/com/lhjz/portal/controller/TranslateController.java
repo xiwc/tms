@@ -501,7 +501,8 @@ public class TranslateController extends BaseController {
 					item.setStatus(Status.New);
 					item.setTranslate(translate);
 
-					translateItemRepository.saveAndFlush(item);
+					TranslateItem translateItem = translateItemRepository
+							.saveAndFlush(item);
 
 					if (!StringUtils.equals(StringUtil.EMPTY,
 							item.getContent())) {
@@ -512,6 +513,7 @@ public class TranslateController extends BaseController {
 					}
 
 					logWithProperties(Action.Create, Target.TranslateItem,
+							translateItem.getId(),
 							Prop.Content.name(), item);
 
 					translate.getTranslateItems().add(item);
@@ -842,7 +844,7 @@ public class TranslateController extends BaseController {
 
 		translateRepository.saveAndFlush(translate);
 
-		log(Action.Create, Target.Label, label);
+		log(Action.Create, Target.Label, label.getId());
 		logWithProperties(Action.Create, Target.Translate, translate.getId(),
 				Prop.Labels.name(), label.getName());
 
@@ -951,7 +953,8 @@ public class TranslateController extends BaseController {
 		return RespBody.succeed(page);
 	}
 
-	@RequestMapping(value = "getById", method = RequestMethod.GET)
+	@RequestMapping(value = { "getById",
+			"getById/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	@Secured({ "ROLE_SUPER", "ROLE_ADMIN", "ROLE_USER" })
 	public RespBody getById(@RequestParam("id") Long id) {

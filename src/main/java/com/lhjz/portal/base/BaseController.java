@@ -38,12 +38,6 @@ public abstract class BaseController {
 	@Autowired
 	protected Environment env;
 
-	protected Log log(Action action, Target target, Object... vals) {
-
-		return logWithProperties(action, target, null, vals);
-
-	}
-
 	protected Log log(Action action, Target target, String targetId,
 			Object... vals) {
 
@@ -62,13 +56,6 @@ public abstract class BaseController {
 
 	protected User getUser(String username) {
 		return userRepository.findOne(username);
-	}
-
-	protected Log logWithProperties(Action action, Target target,
-			String properties, Object... vals) {
-
-		return logWithProperties(action, target, StringUtil.EMPTY, properties,
-				vals);
 	}
 
 	protected Log logWithProperties(Action action, Target target,

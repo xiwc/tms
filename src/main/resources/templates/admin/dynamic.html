@@ -72,14 +72,20 @@
         /*font-size: 0.9em;*/
     }
     
-    .ui.comments .comment .text span.at-user {
+    .ui.comments .comment .text span.at-user,
+    .pp-translate .ui.items>.item>.content>.description .at-user {
         cursor: pointer;
+    }
+    
+    .ui.comments .comment a.author {
+        color: #4183c4;
     }
     
     .ui.vertical.icon.buttons.btns-scroll {
         position: fixed;
         right: 433px;
-        bottom: 225px;
+        /* bottom: 225px; */
+        bottom: 325px;
         background-color: transparent;
         z-index: 1;
     }
@@ -88,7 +94,8 @@
         display: none;
         position: fixed;
         right: 430px;
-        bottom: 300px;
+        /* bottom: 300px; */
+        bottom: 400px;
         background-color: rgba(219, 40, 40, 0.54);
         z-index: 1;
     }
@@ -105,6 +112,56 @@
     .ui.vertical.icon.buttons.btns-scroll .button:hover {
         background-color: rgba(224, 225, 226, 1);
     }
+    /* 翻译popup样式 start*/
+    
+    .pp-translate .meta {
+        border-top: 1px lightgray solid;
+        border-bottom: 1px lightgray solid;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    
+    .pp-translate .extra {
+        border-top: 1px lightgray solid;
+    }
+    
+    .pp-translate .description {
+        border-bottom: 1px lightgray solid;
+        padding-bottom: 5px;
+    }
+    /* 翻译popup样式 end */
+    /* chat msg search start */
+    
+    .chat-search {
+        position: fixed;
+        top: 50px;
+        right: 433px;
+        z-index: 1;
+        /* display: none; */
+        /* width: 30px; */
+    }
+    
+    .ui.search.sh-search {
+        /* display: none; */
+    }
+    
+    .ui.circular.icon.button.btn-chat-search {
+        margin-right: 0px;
+    }
+    
+    .ui.icon.btn-search.circular.button {
+        margin-right: 0;
+    }
+    
+    .chat-search-loc {
+        position: fixed;
+        top: 50px;
+        right: 433px;
+        /* z-index: 1; */
+        height: 36px;
+        width: 1px;
+    }
+    /* chat msg search end */
     
     @media only screen and (max-width: 767px) {
         .main.container {
@@ -129,6 +186,9 @@
             right: 10px;
             bottom: 265px;
         }
+        .chat-search {
+            display: none;
+        }
     }
     </style>
 </head>
@@ -146,7 +206,7 @@
                         <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px; padding-bottom: 20px;">
                             <h4 class="ui dividing header">动态</h4>
                             <div class="ui feed fd-dynamic">
-                                <div class="event" th:each="l : ${logs}">
+                                <div class="event" th:each="l : ${logs}" th:attr="data-id=${l.id}">
                                     <div class="label">
                                         <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                             <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(l.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(l.creator.name,#strings.length(l.creator.name) - 1,#strings.length(l.creator.name)))}">管理员</span>
@@ -202,9 +262,15 @@
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
                                 <div class="content">
-                                    <a class="author" style="color: #4183c4;" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
+                                    <a class="author" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
                                     <div class="metadata">
                                         <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
+                                        <div class="rating">
+                                            <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
+                                        </div>
+                                        <div class="rating">
+                                            <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
+                                        </div>
                                     </div>
                                     <div class="text markdown-body" th:text="${c.content}">
                                         How artistic!
@@ -248,7 +314,7 @@
                                     <div class="or"></div>
                                     <button class="ui positive button btn-chat-submit">提交</button>
                                 </div>
-                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp ui black circular icon right floated button">
+                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button">
                                     <i class="refresh icon"></i>
                                 </a>
                             </form>
@@ -265,11 +331,29 @@
                                 <i class="arrow down icon"></i>
                             </div>
                         </div>
+                        <!-- 沟通消息检索 -->
+                        <div class="chat-search">
+                            <div class="ui search">
+                                <div class="ui circular icon button btn-search" title="沟通消息检索">
+                                    <input style="display: none;" class="prompt" th:value="${param.containsKey('search') ? param.search[0] : ''}" type="text" placeholder="查找...">
+                                    <i class="search link icon"></i>
+                                </div>
+                                <div class="results"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- popup container start -->
+    <div class="ui flowing popup top left transition hidden pp-translate"></div>
+    <div class="chat-search-loc"></div>
+    <div class="ui flowing popup top left transition hidden pp-chat-search-results">
+        <div class="ui selection divided list list-chat-search-results">
+        </div>
+    </div>
+    <!-- popup container end -->
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-chat-edit"></div>
@@ -277,6 +361,9 @@
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
     <div th:replace="admin/template :: logMoreTpl"></div>
+    <div th:replace="admin/template :: tansPpTpl"></div>
+    <div th:replace="admin/template :: chatMsgPpTpl"></div>
+    <div th:replace="admin/template :: chatSearchTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
@@ -296,9 +383,220 @@
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
+    <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/poll.js}" src="../../static/admin/js/poll.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
+
+        // ------------------------------------------------------------------------------------- rating start
+
+        $('body').on('click', '.chat .comments .comment .content .rating i.icon', function(event) {
+            event.preventDefault();
+            $icon = $(this).removeClass('outline');
+            $span = $icon.parent().children('span');
+
+            var chatHtml = $icon.closest('.comment').find('.content .text.markdown-body').html();
+            var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + chatHtml).wrap('<div/>').parent().html();
+
+            $.post('/admin/chat/vote/unmask', {
+                baseURL: baseURL,
+                id: $icon.closest('.comment').attr('data-id'),
+                type: $icon.attr('data-type'),
+                contentHtml: html
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    if ($span.size() == 0) {
+                        $span = $('<span>1 ' + $icon.attr('data-label') + '</span>');
+                        $icon.parent().append($span);
+                    } else {
+                        var oArr = $span.text().split(' ');
+                        $span.text((parseInt(oArr[0]) + 1) + ' ' + oArr[1]);
+                    }
+                    $span.attr('title', $icon.attr('data-type') == 'zan' ? data.data.voteZan : data.data.voteCai)
+                } else {
+                    toastr.error(data.data, "投票失败!");
+                }
+            });
+        });
+
+        // ------------------------------------------------------------------------------------- rating end
+
+        // ------------------------------------------------------------------------------------- chat search start
+        $('.chat-search').hover(function() {
+            $(this).find('input').show();
+            $(this).find('.btn-search').removeClass('circular button').addClass('input');
+            $(this).find('input').focus();
+        }, function() {
+            $(this).find('input').hide();
+            $(this).find('.btn-search').removeClass('input').addClass('circular button');
+        });
+        var source = [];
+        if (localStorage) {
+            var v = localStorage.getItem('admin/dynamic:search');
+            source = v ? $.parseJSON(v) : [];
+        }
+        $('.chat-search .ui.search').search({
+            source: source,
+            onSelect: function(result, response) {
+                searchHandler();
+            },
+            onResults: function() {
+                $(this).search('hide results');
+            }
+        });
+
+        function searchHandler() {
+            var search = $('.chat-search .ui.search input').val();
+
+            if (!search || search.length < 2) {
+                toastr.error('检索条件不能少于2位字符!');
+                return;
+            }
+            // 保存检索值
+            var isExists = false;
+            $.each(source, function(index, val) {
+                if (val.title == search) {
+                    isExists = true;
+                    return false;
+                }
+            });
+            if (!isExists) {
+                source.splice(0, 0, {
+                    title: search
+                });
+                $('.chat-search .ui.search').search({
+                    source: source
+                });
+            }
+            localStorage && localStorage.setItem('admin/dynamic:search', JSON.stringify(source));
+
+            // TODO ajax search
+            console.log('chat search...');
+
+            $('.btn-search i.icon').popup({
+                popup: $('.pp-chat-search-results'),
+                hoverable: true,
+                on: 'click',
+                // context: 'body',
+                target: '.btn-search i.icon',
+                // inline: true,
+                movePopup: false,
+                position: 'bottom right',
+                closable: false,
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this);
+                    $pp.children('.ui.list').html('加载中...');
+                    $.get('admin/chat/search/unmask', {
+                        search: search
+                    }, function(data) {
+                        if (data.success) {
+                            var chats = data.data.content;
+                            if (data.data.content.length == 0) {
+                                $pp.children('.ui.list').html('检索结果不存在!');
+                                return;
+                            }
+
+                            $.each(chats, function(index, chat) {
+                                chat.contentBrief = chat.content.length > 50 ? chat.content.substr(0, 47) + '...' : chat.content;
+                                if (chat.creator.name) {
+                                    chat.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                                }
+                                var d = new Date(chat.createDate);
+                                chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            });
+                            $("#chatSearchTpl").tmpl(chats).appendTo($pp.children('.ui.list').empty());
+
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        }
+
+        $('.chat-search .ui.search input').keyup(function(event) {
+            if (event.keyCode == 13) {
+                searchHandler();
+            }
+        });
+
+        $('.chat-search .ui.search i').click(function(event) {
+            searchHandler();
+        });
+
+        $('.list-chat-search-results').on('click', '.item', function(event) {
+            event.preventDefault();
+            $item = $(this);
+            $.get('/admin/chat/searchBy', {
+                id: $item.attr('data-id')
+            }, function(data) {
+                if (data.success) {
+
+                    var chats = data.data.content;
+
+                    var $btnUp = $('.chat .btn-chat-more');
+                    var $btnDown = $('.chat .btn-chat-pre-more');
+
+                    if (data.data.last) {
+                        $btnUp.remove();
+                        $btnUp = $('.chat .btn-chat-more');
+                    } else {
+                        if ($btnUp.size() == 0) {
+                            $btnUp = $('<button class="fluid ui button btn-chat-more">加载更多</button>');
+                            $btnUp.insertAfter('.chat .comments > h3');
+                        }
+
+                        $('input:hidden[name="page.number.next"]').val(data.data.number + 1);
+                    }
+
+                    if (data.data.first) {
+                        $btnDown.remove();
+                        $btnDown = $('.chat .btn-chat-pre-more');
+                    } else {
+                        if ($btnDown.size() == 0) {
+                            $btnDown = $('<button class="fluid ui button btn-chat-pre-more">加载更多</button>');
+                            $btnDown.insertBefore('.chat .fm-reply')
+                        }
+                        $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
+                    }
+
+                    $('.chat .comments .comment').remove();
+
+                    $after = $btnUp.size() == 0 ? $('.chat .comments > h3') : $btnUp;
+
+                    var isAdminRole = $('input:hidden[name="role.admin"]').val();
+                    var loginUsername = $('input:hidden[name="user.username"]').val();
+                    $.each(chats, function(index, chat) {
+                        chat.contentMd = simplemde.markdown(preParse(chat.content));
+                        chat.marked = (chat.id == $item.attr('data-id')) ? 'marked' : '';
+                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
+                        if (chat.creator.name) {
+                            chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                        }
+                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
+                            chat.actions = true;
+                        }
+                        var d = new Date(chat.createDate);
+                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    });
+                    var $more = $("#chatMoreTpl").tmpl(chats);
+                    $more.find('pre code').each(function(i, block) {
+                        hljs.highlightBlock(block);
+                    });
+                    $more.insertAfter($after);
+                    s2m();
+                }
+            });
+        });
+
+        // ------------------------------------------------------------------------------------- chat search end
+
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
         $('.pp').popup();
@@ -318,18 +616,8 @@
         });
 
         var baseURL = Utils.getBaseURL();
-
-        $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
-        $(window).resize(function(event) {
-            $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
-        });
-        if ($('.main.container .right.rail').is(':visible')) {
-            $('.ui.sticky.sy-dynamic').sticky({
-                offset: 70,
-                observeChanges: true,
-                context: '#context'
-            });
-        }
+        // 是否第一次调用s2b函数
+        var isS2bFirst = true;
 
         $('.list-users').on('click', '.item', function(event) {
             addAtUser(cm, $(this));
@@ -565,13 +853,14 @@
             if (cursor) {
                 cm.replaceRange(comment, cursor, cursor);
 
-                // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
                 s2b();
                 cm.focus();
             }
         }
 
         // ============================================================================ @user end
+
+        // ============================================================================ @chat markdown to html start
 
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
@@ -581,21 +870,35 @@
             });
         });
 
-        // hljs.initHighlightingOnLoad();
         $('.ui.comments').show();
+
+        // ============================================================================ @chat markdown to html end
+
+        // -------------------------------------------------------------------------------- sticky init start
+        $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        // $('.ad-index-container .left.rail.ad-index-rail .sticky').css('max-height', $(window).height() - 70);
+        $(window).resize(function(event) {
+            $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+            // $('.ad-index-container .left.rail.ad-index-rail .sticky').css('max-height', $(window).height() - 70);
+        });
+        if ($('.main.container .right.rail').is(':visible')) {
+            $('.ui.sticky.sy-dynamic').sticky({
+                offset: 70,
+                observeChanges: true,
+                context: '#context'
+            });
+        }
+        // -------------------------------------------------------------------------------- sticky init end
 
         // ============================================================================ url? start
 
         if (url('?scroll') || url('?scroll') == '') {
-            // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
             s2b();
             cm.focus();
         }
 
         if (url('?id')) {
-            $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
-                offset: -50
-            });
+            s2m(); // 滚动到标记沟通消息处
         }
 
         if (url('?at')) {
@@ -610,9 +913,12 @@
                     ats.push(_at);
                 }
             });
-
-            var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
-            comment = comment.replace(/\{translateId\}/g, url('?translateId')).replace(/\{ats\}/g, ats.join(' & '));
+            // [[翻译#173](/admin/dynamic?id=173){~admin} & {~step}]
+            // var comment = '### 沟通讨论([翻译#{translateId}](admin/translate?id={translateId}))\n---\n{ats} ';
+            var comment = '[[翻译#{translateId}]({baseURL}admin/translate?id={translateId}){ats}]\n\n';
+            comment = comment.replace(/\{translateId\}/g, url('?translateId'))
+                .replace(/\{baseURL\}/g, baseURL)
+                .replace(/\{ats\}/g, ats.join(' & '));
             insertComment(cm, comment);
         }
 
@@ -626,15 +932,45 @@
             s2b();
         });
 
+        // 滚动到标记处
+        function s2m() {
+
+            if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
+                isS2bFirst = false;
+                Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
+                    $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
+                        offset: -50
+                    });
+                });
+            } else {
+                $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
+                    offset: -50
+                });
+            }
+        }
+
+        // 滚动到顶部
         function s2t() {
             $('html, body, .ad-index-content').scrollTo(0, 300);
         }
 
+        // 滚动到底部
         function s2b() {
-            $('html, body, .ad-index-content').scrollTo({
-                left: 0,
-                top: "100%"
-            }, 300);
+
+            if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
+                isS2bFirst = false;
+                Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
+                    $('html, body, .ad-index-content').scrollTo({
+                        left: 0,
+                        top: "100%"
+                    }, 300);
+                });
+            } else {
+                $('html, body, .ad-index-content').scrollTo({
+                    left: 0,
+                    top: "100%"
+                }, 300);
+            }
         }
 
         $('.btn-chat-submit').click(function(event) {
@@ -665,6 +1001,8 @@
                     simplemde.autosave();
                     toastr.success('提交成功!');
 
+                    window.poll.reset(); // 重置轮询频率
+
                     if ($.isArray(data.data)) { // 不刷新追加
                         if (data.data.length == 0) {
                             return;
@@ -674,10 +1012,13 @@
                         var loginUsername = $('input:hidden[name="user.username"]').val();
                         $.each(data.data, function(index, chat) {
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
+                            chat.marked = '';
+                            chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                            chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }
-                            if (isAdminRole == 'true' || loginUsername == creator.username) {
+                            if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                                 chat.actions = true;
                             }
                             var d = new Date(chat.createDate);
@@ -711,8 +1052,11 @@
             var username = $btn.closest('.comment').find('.content .author').attr('data-value');
 
             // [[回复#10](admin/dynamic?id=1){~xiweicheng}]
-            var href = '[[回复#' + id + '](' + url('path') + '?id=' + id + '){~' + username + '}]\n\n';
-            insertComment(cm, href);
+            var comment = '[[回复#{id}]({baseURL}admin/dynamic?id={id}){~{username}}]\n\n';
+            comment = comment.replace(/\{id\}/g, id)
+                .replace(/\{baseURL\}/g, baseURL)
+                .replace(/\{username\}/g, username);
+            insertComment(cm, comment);
 
         });
 
@@ -781,7 +1125,7 @@
             });
         });
 
-        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
+        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
             event.preventDefault();
             insertAtUser(cm, $(this).attr('data-value'));
             // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
@@ -789,7 +1133,9 @@
             cm.focus();
         });
 
-        $('.btn-chat-more').click(function(event) {
+        $('body').on('click', '.btn-chat-more', function(event) {
+            event.preventDefault();
+
             $btn = $(this);
 
             $.get('/admin/chat/more', {
@@ -810,10 +1156,13 @@
                     var loginUsername = $('input:hidden[name="user.username"]').val();
                     $.each(data.data.content, function(index, chat) {
                         chat.contentMd = simplemde.markdown(preParse(chat.content));
+                        chat.marked = '';
+                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
-                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                             chat.actions = true;
                         }
                         var d = new Date(chat.createDate);
@@ -833,7 +1182,9 @@
             });
         });
 
-        $('.btn-chat-pre-more').click(function(event) {
+        $('body').on('click', '.btn-chat-pre-more', function(event) {
+            event.preventDefault();
+
             $btn = $(this);
 
             $.get('/admin/chat/more', {
@@ -854,10 +1205,13 @@
                     var loginUsername = $('input:hidden[name="user.username"]').val();
                     $.each(data.data.content, function(index, chat) {
                         chat.contentMd = simplemde.markdown(preParse(chat.content));
+                        chat.marked = '';
+                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
-                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                             chat.actions = true;
                         }
                         var d = new Date(chat.createDate);
@@ -949,10 +1303,13 @@
                         var loginUsername = $('input:hidden[name="user.username"]').val();
                         $.each(data.data, function(index, chat) {
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
+                            chat.marked = '';
+                            chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                            chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }
-                            if (isAdminRole == 'true' || loginUsername == creator.username) {
+                            if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                                 chat.actions = true;
                             }
                             var d = new Date(chat.createDate);
@@ -973,30 +1330,177 @@
 
         // $('.btn-get-chat-news').show();
         // 轮询最新沟通消息
-        var interval = setInterval(function() {
+        window.poll.start(function(resetCb, stopCb) {
 
             var preMore = $('.btn-chat-pre-more').size() == 1;
 
             if (preMore) { // 如果有最新消息有分页, 取消轮询.
-                clearInterval(interval);
+                stopCb();
                 return;
             }
 
             var $last = $('.chat .comments .comment').last();
+            var $first = $('.fd-dynamic .event').first();
 
-            $.get('/admin/chat/countNews', {
-                lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id')
+            $.get('/admin/chat/poll/unmask', {
+                lastEvtId: $first.size() == 0 ? -1 : $first.attr('data-id'),
+                lastId: $last.size() == 0 ? -1 : $last.attr('data-id')
             }, function(data) {
                 if (data.success) {
+
                     if (data.data[1] > 0) {
+                        resetCb();
                         $('.btn-get-chat-news').children('.lbl-chat-news-count').text(data.data[1]);
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).show();
                     } else {
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
                     }
+
+                    if (data.msgs.length > 0) {
+
+                        if (data.msgs[0].length > 0) {
+                            resetCb();
+                            $.each(data.msgs[0], function(index, log) {
+                                if (log.creator.name) {
+                                    log.creator.iconName = log.creator.name.substr(log.creator.name.length - 1).toUpperCase();
+                                }
+                                if (log.properties == 'Labels') log.isLabels = true;
+                                if (log.properties == 'Watchers') log.isWatchers = true;
+
+                                log.actionMapping = actionMapping[log.action];
+                                log.propertiesMapping = propMapping[log.properties];
+                                var d = new Date(log.createDate);
+                                log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            });
+                            $("#logMoreTpl").tmpl(data.msgs[0]).prependTo('.fd-dynamic');
+
+                            var $toast = toastr.info('刚刚有' + data.msgs.length + '条动态更新');
+                            $toast.click(function(event) {
+                                event.preventDefault();
+                                $('.main.container .right.rail .sticky').scrollTo(0, 300);
+                                $toast.remove();
+                            });
+                        }
+
+                    }
+
+                }
+            }).fail(function() {
+                stopCb();
+                toastr.error("请刷新浏览器,重新尝试!", "网络链接错误!", {
+                    "closeButton": true,
+                    "preventDuplicates": true,
+                    "timeOut": "0"
+                });
+            });
+        });
+
+        // clipboard paste image
+        $('.fm-reply .CodeMirror textarea').pastableTextarea().on('pasteImage', function(ev, data) {
+
+            $.post('/admin/file/base64', {
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    console.log(data);
+                    insertComment(cm, '![{name}]({baseURL}{path}{uuidName})'
+                        .replace(/\{name\}/g, data.data.name)
+                        .replace(/\{baseURL\}/g, baseURL)
+                        .replace(/\{path\}/g, data.data.path)
+                        .replace(/\{uuidName\}/g, data.data.uuidName));
                 }
             });
-        }, 5000);
+        }).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        });
+
+        // 翻译popup
+        $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
+            event.preventDefault();
+            var $a = $(this);
+
+            if ($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
+
+            if(!url('?id', $a.attr('href'))) {
+                return;
+            }
+
+            $(this).popup({
+                popup: $('.pp-translate'),
+                hoverable: true,
+                // context: 'body',
+                // inline: true,
+                // movePopup: false,
+                // position: 'bottom center',
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this).html('加载中...');
+                    // $pp.dimmer('show');
+                    $.get('admin/translate/getById/unmask', {
+                        id: url('?id', $a.attr('href'))
+                    }, function(data) {
+                        // $pp.dimmer('hide');
+                        if (data.success) {
+                            var translate = data.data;
+                            var d = new Date(translate.createDate);
+                            translate.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            $("#tansPpTpl").tmpl(data.data).appendTo($pp.empty());
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        });
+
+        // 消息popup
+        $('body').on('mouseover', '#context .chat a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
+            event.preventDefault();
+            var $a = $(this);
+
+            if ($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
+
+            $(this).popup({
+                popup: $('.pp-translate'),
+                hoverable: true,
+                // context: 'body',
+                // inline: true,
+                // movePopup: false,
+                // position: 'bottom center',
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this).html('加载中...');
+                    // $pp.dimmer('show');
+                    $.get('admin/chat/get/unmask', {
+                        id: url('?id', $a.attr('href'))
+                    }, function(data) {
+                        // $pp.dimmer('hide');
+                        if (data.success) {
+                            var chat = data.data;
+                            chat.creatorName = chat.creator.name ? chat.creator.name : chat.creator.username;
+                            var d = new Date(chat.createDate);
+                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            chat.contentMd = simplemde.markdown(preParse(chat.content));
+
+                            $("#chatMsgPpTpl").tmpl(data.data).appendTo($pp.empty());
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        });
 
     });
     </script>

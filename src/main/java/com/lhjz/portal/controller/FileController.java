@@ -62,7 +62,7 @@ public class FileController extends BaseController {
 	@ResponseBody
 	public RespBody list(HttpServletRequest request,
 			HttpServletResponse response, ModelMap model, Locale locale) {
-		
+
 		String storePath = env.getProperty("lhjz.upload.img.store.path");
 		int sizeLarge = env.getProperty("lhjz.upload.img.scale.size.large",
 				Integer.class);
@@ -208,7 +208,7 @@ public class FileController extends BaseController {
 				file2.setPath(storePath + sizeOriginal + "/");
 				saveFiles.add(fileRepository.save(file2));
 
-				log(Action.Upload, Target.File, file2);
+				log(Action.Upload, Target.File, file2.getId());
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -221,4 +221,81 @@ public class FileController extends BaseController {
 		return respBody.data(saveFiles);
 	}
 
+	@RequestMapping(value = "base64", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody base64(HttpServletRequest request,
+			@RequestParam("dataURL") String dataURL,
+			@RequestParam("type") String type) {
+
+		logger.debug("upload base64 start...");
+
+		try {
+
+			String realPath = WebUtil.getRealPath(request);
+
+			String storePath = env.getProperty("lhjz.upload.img.store.path");
+			int sizeOriginal = env.getProperty(
+					"lhjz.upload.img.scale.size.original", Integer.class);
+			int sizeLarge = env.getProperty("lhjz.upload.img.scale.size.large",
+					Integer.class);
+			int sizeHuge = env.getProperty("lhjz.upload.img.scale.size.huge",
+					Integer.class);
+
+			// make upload dir if not exists
+			FileUtils.forceMkdir(new File(realPath + storePath + sizeOriginal));
+			FileUtils.forceMkdir(new File(realPath + storePath + sizeLarge));
+			FileUtils.forceMkdir(new File(realPath + storePath + sizeHuge));
+
+			String uuid = UUID.randomUUID().toString();
+
+			// data:image/gif;base64,base64编码的gif图片数据
+			// data:image/png;base64,base64编码的png图片数据
+			// data:image/jpeg;base64,base64编码的jpeg图片数据
+			// data:image/x-icon;base64,base64编码的icon图片数据
+
+			String suffix = type.contains("png") ? ".png" : ".jpg";
+
+			String uuidName = StringUtil.replace("{?1}{?2}", uuid, suffix);
+
+			// relative file path
+			String path = storePath + sizeOriginal + "/" + uuidName;// 原始图片存放
+			String pathLarge = storePath + sizeLarge + "/" + uuidName;// 缩放图片存放
+			String pathHuge = storePath + sizeHuge + "/" + uuidName;// 缩放图片存放
+
+			// absolute file path
+			String filePath = realPath + path;
+
+			int index = dataURL.indexOf(",");
+
+			// 原始图保存
+			ImageUtil.decodeBase64ToImage(dataURL.substring(index + 1),
+					filePath);
+			// 缩放图
+			// scale image size as thumbnail
+			// 图片缩放处理.120*120
+			ImageUtil.scale2(filePath, realPath + pathLarge, sizeLarge,
+					sizeLarge, true);
+			// 图片缩放处理.640*640
+			ImageUtil.scale2(filePath, realPath + pathHuge, sizeHuge, sizeHuge,
+					true);
+
+			// 保存记录到数据库
+			com.lhjz.portal.entity.File file2 = new com.lhjz.portal.entity.File();
+			file2.setCreateDate(new Date());
+			file2.setName(uuidName);
+			file2.setUsername(WebUtil.getUsername());
+			file2.setUuidName(uuidName);
+			file2.setPath(storePath + sizeOriginal + "/");
+			com.lhjz.portal.entity.File file = fileRepository.save(file2);
+
+			log(Action.Upload, Target.File, file2.getId());
+
+			return RespBody.succeed(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			return RespBody.failed(e.getMessage());
+		}
+
+	}
 }

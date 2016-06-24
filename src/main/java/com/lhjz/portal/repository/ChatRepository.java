@@ -5,6 +5,8 @@ package com.lhjz.portal.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -27,4 +29,6 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
 	@Query(value = "SELECT COUNT(*) FROM chat WHERE id > ?1", nativeQuery = true)
 	long countQueryRecent(Long lastId);
+
+	Page<Chat> findByContentLike(String search, Pageable pageable);
 }

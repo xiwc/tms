@@ -215,7 +215,7 @@
                                         <i class="dropdown icon"></i>
                                         <div class="menu">
                                             <div class="item ddmi-edit">编辑</div>
-                                            <a class="item" th:href="@{/admin/dynamic(at=${t.creator + ',' + t.updater}, translateId=${t.id})}">邮件</a>
+                                            <a class="item" th:href="@{/admin/dynamic(at=${t.creator + (#strings.isEmpty(t.updater) ?  '' :  (',' + t.updater))}, translateId=${t.id})}">沟通</a>
                                             <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (t.creator == user.username)}" class="item ddmi-delete">删除</div>
                                         </div>
                                     </div>
