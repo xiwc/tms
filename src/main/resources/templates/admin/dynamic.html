@@ -579,7 +579,7 @@
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
-                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                             chat.actions = true;
                         }
                         var d = new Date(chat.createDate);
@@ -1018,7 +1018,7 @@
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }
-                            if (isAdminRole == 'true' || loginUsername == creator.username) {
+                            if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                                 chat.actions = true;
                             }
                             var d = new Date(chat.createDate);
@@ -1162,7 +1162,7 @@
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
-                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                             chat.actions = true;
                         }
                         var d = new Date(chat.createDate);
@@ -1211,7 +1211,7 @@
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
-                        if (isAdminRole == 'true' || loginUsername == creator.username) {
+                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                             chat.actions = true;
                         }
                         var d = new Date(chat.createDate);
@@ -1309,7 +1309,7 @@
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }
-                            if (isAdminRole == 'true' || loginUsername == creator.username) {
+                            if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                                 chat.actions = true;
                             }
                             var d = new Date(chat.createDate);
