@@ -406,10 +406,10 @@
                 contentHtml: html
             }, function(data, textStatus, xhr) {
                 if (data.success) {
-                    if($span.size() == 0) {
+                    if ($span.size() == 0) {
                         $span = $('<span>1 ' + $icon.attr('data-label') + '</span>');
                         $icon.parent().append($span);
-                    }else{
+                    } else {
                         var oArr = $span.text().split(' ');
                         $span.text((parseInt(oArr[0]) + 1) + ' ' + oArr[1]);
                     }
@@ -574,6 +574,8 @@
                     $.each(chats, function(index, chat) {
                         chat.contentMd = simplemde.markdown(preParse(chat.content));
                         chat.marked = (chat.id == $item.attr('data-id')) ? 'marked' : '';
+                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
@@ -1003,6 +1005,8 @@
                         $.each(data.data, function(index, chat) {
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
                             chat.marked = '';
+                            chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                            chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }
@@ -1145,6 +1149,8 @@
                     $.each(data.data.content, function(index, chat) {
                         chat.contentMd = simplemde.markdown(preParse(chat.content));
                         chat.marked = '';
+                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
@@ -1192,6 +1198,8 @@
                     $.each(data.data.content, function(index, chat) {
                         chat.contentMd = simplemde.markdown(preParse(chat.content));
                         chat.marked = '';
+                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                         if (chat.creator.name) {
                             chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                         }
@@ -1288,6 +1296,8 @@
                         $.each(data.data, function(index, chat) {
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
                             chat.marked = '';
+                            chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                            chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                             if (chat.creator.name) {
                                 chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                             }
