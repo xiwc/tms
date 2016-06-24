@@ -65,7 +65,7 @@
                                 <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
                                 <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
                                 <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div>
+                                <!-- <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div> -->
                             </td>
                         </tr>
                     </tbody>
