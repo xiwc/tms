@@ -69,8 +69,7 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody create(
-			@RequestParam("baseURL") String baseURL,
+	public RespBody create(@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
 			@RequestParam("content") String content,
 			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
@@ -112,7 +111,8 @@ public class ChatController extends BaseController {
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面的沟通消息中有@到你", "content",
-											html)), mail.get());
+											html)),
+							mail.get());
 					logger.info("沟通邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -132,8 +132,7 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody update(
-			@RequestParam("id") Long id,
+	public RespBody update(@RequestParam("id") Long id,
 			@RequestParam("content") String content,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
@@ -170,13 +169,16 @@ public class ChatController extends BaseController {
 
 				try {
 					Thread.sleep(3000);
-					mailSender.sendHtml(String.format("TMS-沟通动态编辑@消息_%s",
-							DateUtil.format(new Date(), DateUtil.FORMAT7)),
+					mailSender.sendHtml(
+							String.format("TMS-沟通动态编辑@消息_%s",
+									DateUtil.format(new Date(),
+											DateUtil.FORMAT7)),
 							TemplateUtil.process("templates/mail/mail-dynamic",
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面编辑的沟通消息中有@到你",
-											"content", html)), mail.get());
+											"content", html)),
+							mail.get());
 					logger.info("沟通编辑邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -218,7 +220,8 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chat);
 	}
 
-	@RequestMapping(value = { "poll", "poll/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "poll",
+			"poll/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody poll(@RequestParam("lastId") Long lastId,
 			@RequestParam("lastEvtId") Long lastEvtId) {
@@ -244,30 +247,33 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "more", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody more(
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody more(@PageableDefault(sort = {
+			"createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
-		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
-				.getContent()), pageable, chats.getTotalElements());
+		chats = new PageImpl<Chat>(
+				CollectionUtil.reverseList(chats.getContent()), pageable,
+				chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
 
 	@RequestMapping(value = "moreLogs", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody moreLogs(
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody moreLogs(@PageableDefault(sort = {
+			"createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Log> logs = logRepository.findByTarget(Target.Translate, pageable);
 
 		return RespBody.succeed(logs);
 	}
 
-	@RequestMapping(value = { "search", "search/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "search",
+			"search/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody search(
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
+			@PageableDefault(sort = {
+					"createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "search", required = true) String search) {
 
 		Page<Chat> chats = chatRepository.findByContentLike("%" + search + "%",
@@ -278,11 +284,12 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chats);
 	}
 
-	@RequestMapping(value = { "searchBy", "searchBy/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "searchBy",
+			"searchBy/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody searchBy(
-			@RequestParam(value = "id") Long id,
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody searchBy(@RequestParam(value = "id") Long id,
+			@PageableDefault(sort = {
+					"createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		long cntGtId = chatRepository.countGtId(id);
 		int size = pageable.getPageSize();
@@ -295,8 +302,9 @@ public class ChatController extends BaseController {
 				Direction.DESC, "createDate");
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
-		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
-				.getContent()), pageable, chats.getTotalElements());
+		chats = new PageImpl<Chat>(
+				CollectionUtil.reverseList(chats.getContent()), pageable,
+				chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
@@ -318,9 +326,12 @@ public class ChatController extends BaseController {
 		return isExits;
 	}
 
-	@RequestMapping(value = { "vote", "vote/unmask" }, method = RequestMethod.POST)
+	@RequestMapping(value = { "vote",
+			"vote/unmask" }, method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody vote(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("contentHtml") String contentHtml,
 			@RequestParam(value = "type", required = false) String type) {
 
 		Chat chat = chatRepository.findOne(id);
@@ -331,15 +342,20 @@ public class ChatController extends BaseController {
 
 		Chat chat2 = null;
 
+		String title = "";
+		final User loginUser = getLoginUser();
+
 		if (VoteType.Zan.name().equalsIgnoreCase(type)) {
 			String voteZan = chat.getVoteZan();
 			if (isVoterExists(voteZan)) {
 				return RespBody.failed("您已经投票[赞]过！");
 			} else {
-				chat.setVoteZan(voteZan == null ? loginUsername : voteZan + ','
-						+ loginUsername);
+				chat.setVoteZan(voteZan == null ? loginUsername
+						: voteZan + ',' + loginUsername);
 
 				chat2 = chatRepository.saveAndFlush(chat);
+				title = loginUser.getName() + "[" + loginUsername
+						+ "]赞了你的沟通消息!";
 			}
 
 		} else {
@@ -347,11 +363,38 @@ public class ChatController extends BaseController {
 			if (isVoterExists(voteCai)) {
 				return RespBody.failed("您已经投票[踩]过！");
 			} else {
-				chat.setVoteCai(voteCai == null ? loginUsername : voteCai + ','
-						+ loginUsername);
+				chat.setVoteCai(voteCai == null ? loginUsername
+						: voteCai + ',' + loginUsername);
 				chat2 = chatRepository.saveAndFlush(chat);
+				title = loginUser.getName() + "[" + loginUsername
+						+ "]踩了你的沟通消息!";
 			}
 		}
+
+		final String href = baseURL + dynamicAction + "?id=" + id;
+		final String titleHtml = title;
+		final String mailTo = chat.getCreator().getMails();
+		final String html = "<h3>投票沟通消息内容:</h3><hr/>" + contentHtml;
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				Thread.sleep(3000);
+				mailSender.sendHtml(
+						String.format("TMS-沟通动态投票@消息_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil.process("templates/mail/mail-dynamic",
+								MapUtil.objArr2Map("user", loginUser, "date",
+										new Date(), "href", href, "title",
+										titleHtml, "content", html)),
+						mailTo);
+				logger.info("沟通消息投票邮件发送成功！");
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("沟通消息投票邮件发送失败！");
+			}
+
+		});
 
 		log(Action.Vote, Target.Chat, chat.getId(), chat2);
 
