@@ -538,6 +538,10 @@
                 if (data.success) {
 
                     var chats = data.data.content;
+                    if (chats.length == 0) {
+                        toastr.error("检索结果不存在!");
+                        return;
+                    }
 
                     var $btnUp = $('.chat .btn-chat-more');
                     var $btnDown = $('.chat .btn-chat-pre-more');
@@ -569,26 +573,7 @@
 
                     $after = $btnUp.size() == 0 ? $('.chat .comments > h3') : $btnUp;
 
-                    var isAdminRole = $('input:hidden[name="role.admin"]').val();
-                    var loginUsername = $('input:hidden[name="user.username"]').val();
-                    $.each(chats, function(index, chat) {
-                        chat.contentMd = simplemde.markdown(preParse(chat.content));
-                        chat.marked = (chat.id == $item.attr('data-id')) ? 'marked' : '';
-                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
-                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
-                        if (chat.creator.name) {
-                            chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
-                        }
-                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
-                            chat.actions = true;
-                        }
-                        var d = new Date(chat.createDate);
-                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                    });
-                    var $more = $("#chatMoreTpl").tmpl(chats);
-                    $more.find('pre code').each(function(i, block) {
-                        hljs.highlightBlock(block);
-                    });
+                    var $more = convertChat(chats);
                     $more.insertAfter($after);
                     s2m();
                 }
@@ -973,6 +958,36 @@
             }
         }
 
+        /**
+         * chat 内容转换
+         * @param  {[type]} chats 沟通消息数组
+         * @return {[type]}       返回模板编译后的jquery dom
+         */
+        function convertChat(chats) {
+            var isAdminRole = $('input:hidden[name="role.admin"]').val();
+            var loginUsername = $('input:hidden[name="user.username"]').val();
+            $.each(chats, function(index, chat) {
+                chat.contentMd = simplemde.markdown(preParse(chat.content));
+                chat.marked = '';
+                chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
+                if (chat.creator.name) {
+                    chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                }
+                if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
+                    chat.actions = true;
+                }
+                var d = new Date(chat.createDate);
+                chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+            });
+            var $more = $("#chatMoreTpl").tmpl(chats);
+            $more.find('pre code').each(function(i, block) {
+                hljs.highlightBlock(block);
+            });
+
+            return $more;
+        }
+
         $('.btn-chat-submit').click(function(event) {
             event.preventDefault();
             var content = simplemde.value();
@@ -1008,26 +1023,7 @@
                             return;
                         }
 
-                        var isAdminRole = $('input:hidden[name="role.admin"]').val();
-                        var loginUsername = $('input:hidden[name="user.username"]').val();
-                        $.each(data.data, function(index, chat) {
-                            chat.contentMd = simplemde.markdown(preParse(chat.content));
-                            chat.marked = '';
-                            chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
-                            chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
-                            if (chat.creator.name) {
-                                chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
-                            }
-                            if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
-                                chat.actions = true;
-                            }
-                            var d = new Date(chat.createDate);
-                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                        });
-                        var $more = $("#chatMoreTpl").tmpl(data.data);
-                        $more.find('pre code').each(function(i, block) {
-                            hljs.highlightBlock(block);
-                        });
+                        var $more = convertChat(data.data);
                         $more.insertBefore($domBefore);
                         s2b();
                     } else {
@@ -1128,7 +1124,6 @@
         $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
             event.preventDefault();
             insertAtUser(cm, $(this).attr('data-value'));
-            // $('html, body, .ad-index-content').scrollTo($(".ui.reply.form"), 300);
             s2b();
             cm.focus();
         });
@@ -1152,26 +1147,7 @@
                     $('input:hidden[name="page.number.next"]').val(data.data.number + 1);
                     $('input:hidden[name="page.size"]').val(data.data.size);
 
-                    var isAdminRole = $('input:hidden[name="role.admin"]').val();
-                    var loginUsername = $('input:hidden[name="user.username"]').val();
-                    $.each(data.data.content, function(index, chat) {
-                        chat.contentMd = simplemde.markdown(preParse(chat.content));
-                        chat.marked = '';
-                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
-                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
-                        if (chat.creator.name) {
-                            chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
-                        }
-                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
-                            chat.actions = true;
-                        }
-                        var d = new Date(chat.createDate);
-                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                    });
-                    var $more = $("#chatMoreTpl").tmpl(data.data.content);
-                    $more.find('pre code').each(function(i, block) {
-                        hljs.highlightBlock(block);
-                    });
+                    var $more = convertChat(data.data.content);
 
                     $more.insertAfter($('.btn-chat-more'));
                     data.data.last && $btn.remove();
@@ -1201,26 +1177,7 @@
                     $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
                     $('input:hidden[name="page.size"]').val(data.data.size);
 
-                    var isAdminRole = $('input:hidden[name="role.admin"]').val();
-                    var loginUsername = $('input:hidden[name="user.username"]').val();
-                    $.each(data.data.content, function(index, chat) {
-                        chat.contentMd = simplemde.markdown(preParse(chat.content));
-                        chat.marked = '';
-                        chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
-                        chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
-                        if (chat.creator.name) {
-                            chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
-                        }
-                        if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
-                            chat.actions = true;
-                        }
-                        var d = new Date(chat.createDate);
-                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                    });
-                    var $more = $("#chatMoreTpl").tmpl(data.data.content);
-                    $more.find('pre code').each(function(i, block) {
-                        hljs.highlightBlock(block);
-                    });
+                    var $more = convertChat(data.data.content);
                     $more.insertBefore($('.btn-chat-pre-more'));
 
                     data.data.first && $btn.remove();
@@ -1299,26 +1256,7 @@
                         var preMore = $('.btn-chat-pre-more').size() == 1;
                         var $domBefore = preMore ? $('.btn-chat-pre-more') : $('.fm-reply');
 
-                        var isAdminRole = $('input:hidden[name="role.admin"]').val();
-                        var loginUsername = $('input:hidden[name="user.username"]').val();
-                        $.each(data.data, function(index, chat) {
-                            chat.contentMd = simplemde.markdown(preParse(chat.content));
-                            chat.marked = '';
-                            chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
-                            chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
-                            if (chat.creator.name) {
-                                chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
-                            }
-                            if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
-                                chat.actions = true;
-                            }
-                            var d = new Date(chat.createDate);
-                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                        });
-                        var $more = $("#chatMoreTpl").tmpl(data.data);
-                        $more.find('pre code').each(function(i, block) {
-                            hljs.highlightBlock(block);
-                        });
+                        var $more = convertChat(data.data);
                         $more.insertBefore($domBefore);
                         s2b();
                     }
@@ -1424,7 +1362,7 @@
                 return;
             }
 
-            if(!url('?id', $a.attr('href'))) {
+            if (!url('?id', $a.attr('href'))) {
                 return;
             }
 
