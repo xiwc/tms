@@ -14,7 +14,7 @@ public class Enum {
 	}
 
 	public static enum Action {
-		Create, Read, Update, Delete, Upload, Visit, Import, Export;
+		Create, Read, Update, Delete, Upload, Visit, Import, Export, Vote;
 	}
 
 	public static enum Prop {
@@ -39,5 +39,9 @@ public class Enum {
 
 	public static enum Role {
 		ROLE_USER, ROLE_ADMIN;
+	}
+
+	public static enum VoteType {
+		Zan, Cai;
 	}
 }

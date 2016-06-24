@@ -265,6 +265,12 @@
                                     <a class="author" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
                                     <div class="metadata">
                                         <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
+                                        <div class="rating" style="cursor: pointer;">
+                                            <i class="thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
+                                        </div>
+                                        <div class="rating" style="cursor: pointer;">
+                                            <i class="thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
+                                        </div>
                                     </div>
                                     <div class="text markdown-body" th:text="${c.content}">
                                         How artistic!
@@ -383,6 +389,32 @@
     <script type="text/javascript">
     jQuery(function($) {
 
+        // ------------------------------------------------------------------------------------- rating start
+
+        $('body').on('click', '.chat .comments .comment .content .rating .i.icon', function(event) {
+            event.preventDefault();
+            $icon = $(this).removeClass('outline');
+            $span = $icon.parent().children('span');
+            var typeLabel = 
+            $.post('/admin/chat/vote/unmask', {
+                type: $icon.attr('data-type')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    if(!$span) {
+                        $icon.parent().append('<span>1 ' + $icon.attr('data-label') + '</span>')
+                    }else{
+                        var otxt = $span.text();
+                        var oArr = otxt.split(' ');
+                        $span.text(parseInt(oArr(' ')[0]) + 1 + ' ' + oArr[1]);
+                    }
+                } else {
+                    toastr.error(data.data, "投票失败!");
+                }
+            });
+        });
+
+        // ------------------------------------------------------------------------------------- rating end
+
         // ------------------------------------------------------------------------------------- chat search start
         $('.chat-search').hover(function() {
             $(this).find('input').show();
@@ -457,7 +489,7 @@
                     }, function(data) {
                         if (data.success) {
                             var chats = data.data.content;
-                            if(data.data.content.length == 0) {
+                            if (data.data.content.length == 0) {
                                 $pp.children('.ui.list').html('检索结果不存在!');
                                 return;
                             }

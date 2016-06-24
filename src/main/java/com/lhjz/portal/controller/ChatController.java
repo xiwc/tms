@@ -32,6 +32,7 @@ import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
+import com.lhjz.portal.pojo.Enum.VoteType;
 import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.util.CollectionUtil;
@@ -40,6 +41,7 @@ import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.TemplateUtil;
 import com.lhjz.portal.util.ThreadUtil;
+import com.lhjz.portal.util.WebUtil;
 
 /**
  * 
@@ -67,7 +69,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody create(@RequestParam("baseURL") String baseURL,
+	public RespBody create(
+			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
 			@RequestParam("content") String content,
 			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
@@ -109,8 +112,7 @@ public class ChatController extends BaseController {
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面的沟通消息中有@到你", "content",
-											html)),
-							mail.get());
+											html)), mail.get());
 					logger.info("沟通邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -130,7 +132,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody update(@RequestParam("id") Long id,
+	public RespBody update(
+			@RequestParam("id") Long id,
 			@RequestParam("content") String content,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
@@ -173,8 +176,7 @@ public class ChatController extends BaseController {
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面编辑的沟通消息中有@到你",
-											"content", html)),
-							mail.get());
+											"content", html)), mail.get());
 					logger.info("沟通编辑邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -242,21 +244,20 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "more", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody more(@PageableDefault(sort = {
-			"createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody more(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
-		chats = new PageImpl<Chat>(
-				CollectionUtil.reverseList(chats.getContent()), pageable,
-				chats.getTotalElements());
+		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
+				.getContent()), pageable, chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
 
 	@RequestMapping(value = "moreLogs", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody moreLogs(@PageableDefault(sort = {
-			"createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody moreLogs(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Log> logs = logRepository.findByTarget(Target.Translate, pageable);
 
@@ -298,5 +299,62 @@ public class ChatController extends BaseController {
 				.getContent()), pageable, chats.getTotalElements());
 
 		return RespBody.succeed(chats);
+	}
+
+	private boolean isVoterExists(String voters) {
+		boolean isExits = false;
+		if (voters != null) {
+			String loginUsername = WebUtil.getUsername();
+			String[] voterArr = voters.split(",");
+
+			for (String voter : voterArr) {
+				if (voter.equals(loginUsername)) {
+					isExits = true;
+					break;
+				}
+			}
+		}
+
+		return isExits;
+	}
+
+	@RequestMapping(value = { "vote", "vote/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody vote(@RequestParam("id") Long id,
+			@RequestParam(value = "type", required = false) String type) {
+
+		Chat chat = chatRepository.findOne(id);
+		if (chat == null) {
+			return RespBody.failed("投票聊天内容不存在!");
+		}
+		String loginUsername = WebUtil.getUsername();
+
+		Chat chat2 = null;
+
+		if (VoteType.Zan.name().equalsIgnoreCase(type)) {
+			String voteZan = chat.getVoteZan();
+			if (isVoterExists(voteZan)) {
+				return RespBody.failed("您已经投票[赞]过！");
+			} else {
+				chat.setVoteZan(voteZan == null ? loginUsername : voteZan + ','
+						+ loginUsername);
+
+				chat2 = chatRepository.saveAndFlush(chat);
+			}
+
+		} else {
+			String voteCai = chat.getVoteCai();
+			if (isVoterExists(voteCai)) {
+				return RespBody.failed("您已经投票[踩]过！");
+			} else {
+				chat.setVoteCai(voteCai == null ? loginUsername : voteCai + ','
+						+ loginUsername);
+				chat2 = chatRepository.saveAndFlush(chat);
+			}
+		}
+
+		log(Action.Vote, Target.Chat, chat.getId(), chat2);
+
+		return RespBody.succeed(chat2);
 	}
 }
