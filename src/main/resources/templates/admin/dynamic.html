@@ -266,10 +266,10 @@
                                     <div class="metadata">
                                         <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                         <div class="rating">
-                                            <i style="cursor: pointer;" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
+                                            <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
                                         </div>
-                                        <div style="cursor: pointer;" class="rating">
-                                            <i class="thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
+                                        <div class="rating">
+                                            <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
                                         </div>
                                     </div>
                                     <div class="text markdown-body" th:text="${c.content}">
