@@ -1424,6 +1424,10 @@
                 return;
             }
 
+            if(!url('?id', $a.attr('href'))) {
+                return;
+            }
+
             $(this).popup({
                 popup: $('.pp-translate'),
                 hoverable: true,
