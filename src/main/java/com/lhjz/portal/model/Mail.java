@@ -211,14 +211,14 @@ public class Mail {
 	}
 
 	public void addHref(String name, String baseURL, String translateAction,
-			Long projectId,
-			String search) {
+			Long projectId, String search) {
 
 		String href = baseURL + translateAction + "?projectId=" + projectId
 				+ "&search=" + search;
 		this.mapHref.put(name,
-				StringUtil.replaceByKV("<a href=\"{href}\">{text}</a>",
-				"href", href, "text", href));
+				StringUtil.replaceByKV(
+						"<a target=\"_blank\" href=\"{href}\">{text}</a>",
+						"href", href, "text", href));
 
 	}
 
