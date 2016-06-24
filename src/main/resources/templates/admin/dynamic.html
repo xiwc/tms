@@ -874,20 +874,6 @@
 
         // ============================================================================ @chat markdown to html end
 
-        // -------------------------------------------------------------------------------- sticky init start
-        $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
-        $(window).resize(function(event) {
-            $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
-        });
-        if ($('.main.container .right.rail').is(':visible')) {
-            $('.ui.sticky.sy-dynamic').sticky({
-                offset: 70,
-                observeChanges: true,
-                context: '#context'
-            });
-        }
-        // -------------------------------------------------------------------------------- sticky init end
-
         // ============================================================================ url? start
 
         if (url('?scroll') || url('?scroll') == '') {
@@ -1495,6 +1481,20 @@
                 }
             }).popup('show');
         });
+
+        // -------------------------------------------------------------------------------- sticky init start
+        $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        $(window).resize(function(event) {
+            $('.main.container .right.rail .sticky').css('max-height', $(window).height() - 70);
+        });
+        if ($('.main.container .right.rail').is(':visible')) {
+            $('.ui.sticky.sy-dynamic').sticky({
+                offset: 70,
+                observeChanges: true,
+                context: '#context'
+            });
+        }
+        // -------------------------------------------------------------------------------- sticky init end
 
     });
     </script>
