@@ -1282,6 +1282,8 @@
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
                                     $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(simplemdeEdit.value())));
+                                    simplemdeEdit.value('');
+                                    simplemdeEdit.clearAutosavedValue();
                                     toastr.success('更新成功!');
                                 } else {
                                     toastr.error(data.data, '更新失败!');
