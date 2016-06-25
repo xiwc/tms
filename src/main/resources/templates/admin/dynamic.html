@@ -804,6 +804,9 @@
                 "guide"
 
             ],
+            renderingConfig: {
+                codeSyntaxHighlighting: true,
+            },
             previewRender: function(plainText, preview) { // Async method
                 setTimeout(function() {
                     preview.innerHTML = simplemde.markdown(preParse(plainText));
@@ -1021,9 +1024,10 @@
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
             var html = simplemde.markdown(preParse($(el).text()));
-            $(el).html(html).find('pre code').each(function(i, block) {
-                hljs.highlightBlock(block);
-            });
+            $(el).html(html);
+            // $(el).html(html).find('pre code').each(function(i, block) {
+            //     hljs.highlightBlock(block);
+            // });
         });
 
         $('.ui.comments').show();
@@ -1154,9 +1158,9 @@
                 chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
             });
             var $more = $("#chatMoreTpl").tmpl(chats);
-            $more.find('pre code').each(function(i, block) {
-                hljs.highlightBlock(block);
-            });
+            // $more.find('pre code').each(function(i, block) {
+            //     hljs.highlightBlock(block);
+            // });
 
             return $more;
         }
@@ -1261,6 +1265,8 @@
                     $('.ad-chat-edit').modal({
                         onShow: function() {
                             simplemdeEdit.value(data.data.content);
+                        },
+                        onVisible: function() {
                             simplemdeEdit.codemirror.focus();
                         },
                         onApprove: function() {
