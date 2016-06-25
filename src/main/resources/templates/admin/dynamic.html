@@ -1261,6 +1261,7 @@
                     $('.ad-chat-edit').modal({
                         onShow: function() {
                             simplemdeEdit.value(data.data.content);
+                            simplemdeEdit.codemirror.focus();
                         },
                         onApprove: function() {
                             if (!simplemdeEdit.value()) {
