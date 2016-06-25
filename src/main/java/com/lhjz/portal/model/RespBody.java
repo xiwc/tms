@@ -3,6 +3,9 @@ package com.lhjz.portal.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.beanutils.BeanMap;
 
 public class RespBody implements Serializable {
 
@@ -25,6 +28,10 @@ public class RespBody implements Serializable {
 	public RespBody status(boolean success) {
 		this.success = success;
 		return this;
+	}
+
+	public Map<?, ?> asMap() {
+		return new BeanMap(this);
 	}
 
 	public RespBody toggle() {

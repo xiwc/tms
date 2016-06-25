@@ -471,12 +471,16 @@
             }
         });
 
-        function searchHandler() {
+        // 检索前检查
+        function searchPreCheck() {
             var search = $('.chat-search .ui.search input').val();
 
-            if (!search || search.length < 2) {
+            if (!search) {
+                return false;
+            }
+            if (search.length < 2) {
                 toastr.error('检索条件不能少于2位字符!');
-                return;
+                return false;
             }
             // 保存检索值
             var isExists = false;
@@ -495,54 +499,66 @@
                 });
             }
             localStorage && localStorage.setItem('admin/dynamic:search', JSON.stringify(source));
-
-            // TODO ajax search
-            console.log('chat search...');
-
-            $('.btn-search i.icon').popup({
-                popup: $('.pp-chat-search-results'),
-                hoverable: true,
-                on: 'click',
-                // context: 'body',
-                target: '.btn-search i.icon',
-                // inline: true,
-                movePopup: false,
-                position: 'bottom right',
-                closable: false,
-                delay: {
-                    show: 300,
-                    hide: 300
-                },
-                onShow: function() {
-                    var $pp = $(this);
-                    $pp.children('.ui.list').html('加载中...');
-                    $.get('admin/chat/search/unmask', {
-                        search: search
-                    }, function(data) {
-                        if (data.success) {
-                            var chats = data.data.content;
-                            if (data.data.content.length == 0) {
-                                $pp.children('.ui.list').html('检索结果不存在!');
-                                return;
-                            }
-
-                            $.each(chats, function(index, chat) {
-                                chat.contentBrief = chat.content.length > 50 ? chat.content.substr(0, 47) + '...' : chat.content;
-                                if (chat.creator.name) {
-                                    chat.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
-                                }
-                                var d = new Date(chat.createDate);
-                                chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                            });
-                            $("#chatSearchTpl").tmpl(chats).appendTo($pp.children('.ui.list').empty());
-
-                        } else {
-                            toastr.error(data.data, "加载失败!");
-                        }
-                    });
-                }
-            }).popup('show');
+            return true;
         }
+
+        function searchHandler() {
+            $ppSearch.popup('hide');
+            if ($ppSearch.popup('is visible')) {
+                $ppSearch.popup('hide');
+                setTimeout(function() {
+                    $ppSearch.popup('show');
+                }, 300);
+            } else {
+                $ppSearch.popup('show');
+            }
+        }
+
+        var $ppSearch = $('.btn-search i.icon').popup({
+            popup: $('.pp-chat-search-results'),
+            hoverable: true,
+            on: 'click',
+            target: '.btn-search i.icon',
+            movePopup: false,
+            position: 'bottom right',
+            closable: false,
+            delay: {
+                show: 300,
+                hide: 300
+            },
+            onShow: function() {
+                if (!searchPreCheck()) {
+                    return false;
+                }
+                var $pp = $(this);
+                var search = $('.chat-search .ui.search input').val();
+                $pp.children('.ui.list').html('加载中...');
+                $.get('admin/chat/search/unmask', {
+                    search: search
+                }, function(data) {
+                    if (data.success) {
+                        var chats = data.data.content;
+                        if (data.data.content.length == 0) {
+                            $pp.children('.ui.list').html('检索结果不存在!');
+                            return;
+                        }
+
+                        $.each(chats, function(index, chat) {
+                            chat.contentBrief = chat.content.length > 50 ? chat.content.substr(0, 47) + '...' : chat.content;
+                            if (chat.creator.name) {
+                                chat.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                            }
+                            var d = new Date(chat.createDate);
+                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                        });
+                        $("#chatSearchTpl").tmpl(chats).appendTo($pp.children('.ui.list').empty());
+
+                    } else {
+                        toastr.error(data.data, "加载失败!");
+                    }
+                });
+            }
+        });
 
         $('.chat-search .ui.search input').keyup(function(event) {
             if (event.keyCode == 13) {
@@ -550,9 +566,9 @@
             }
         });
 
-        $('.chat-search .ui.search i').click(function(event) {
-            searchHandler();
-        });
+        // $('.chat-search .ui.search i').click(function(event) {
+        //     searchHandler();
+        // });
 
         $('.list-chat-search-results').on('click', '.item', function(event) {
             event.preventDefault();
@@ -598,7 +614,7 @@
 
                     $after = $btnUp.size() == 0 ? $('.chat .comments > h3') : $btnUp;
 
-                    var $more = convertChat(chats);
+                    var $more = convertChat(chats, $item.attr('data-id'));
                     $more.insertAfter($after);
                     s2m();
                 }
@@ -1072,12 +1088,12 @@
          * @param  {[type]} chats 沟通消息数组
          * @return {[type]}       返回模板编译后的jquery dom
          */
-        function convertChat(chats) {
+        function convertChat(chats, markId) {
             var isAdminRole = $('input:hidden[name="role.admin"]').val();
             var loginUsername = $('input:hidden[name="user.username"]').val();
             $.each(chats, function(index, chat) {
                 chat.contentMd = simplemde.markdown(preParse(chat.content));
-                chat.marked = '';
+                chat.marked = (chat.id == markId) ? 'marked' : '';
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
                 chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                 if (chat.creator.name) {
@@ -1437,7 +1453,6 @@
                 stopCb();
                 toastr.error("请刷新浏览器,重新尝试!", "网络链接错误!", {
                     "closeButton": true,
-                    "preventDuplicates": true,
                     "timeOut": "0"
                 });
             });
