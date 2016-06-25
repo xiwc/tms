@@ -1070,18 +1070,18 @@
             if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
                 isS2bFirst = false;
                 Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
-                    $('.ui.sticky').sticky('refresh');
                     $('html, body, .ad-index-content').scrollTo({
                         left: 0,
                         top: "100%"
                     }, 300);
+                    $('.ui.sticky').sticky('refresh');
                 });
             } else {
-                $('.ui.sticky').sticky('refresh');
                 $('html, body, .ad-index-content').scrollTo({
                     left: 0,
                     top: "100%"
                 }, 300);
+                $('.ui.sticky').sticky('refresh');
             }
         }
 
