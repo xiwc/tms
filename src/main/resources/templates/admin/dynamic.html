@@ -18,7 +18,6 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/highlight/styles/github.css}" href="../../static/lib/highlight/styles/github.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/dropzone/basic.min.css}" href="../../static/lib/dropzone/basic.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/fancybox/jquery.fancybox.min.css}" href="../../static/lib/fancybox/jquery.fancybox.min.css" />
-    <!-- <link rel="stylesheet" type="text/css" th:href="@{http://fancyapps.com/fancybox/source/jquery.fancybox.css?v=2.1.5}" href="../../static/lib/fancybox/jquery.fancybox.min.css" /> -->
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
     body,
@@ -245,7 +244,7 @@
                                             <span th:if="${#strings.toString(l.properties) == 'Key'}">名称</span>
                                             <span th:if="${#strings.toString(l.properties) == 'Watchers'}">关注者</span>
                                             <span th:if="${#strings.toString(l.properties) == 'Labels'}">标签</span>
-                                            <div class="date" th:text="${#calendars.format(l.createDate,'yyyy/MM/dd HH:mm:ss')}">
+                                            <div class="date timeago" th:title="${#calendars.format(l.createDate,'yyyy/MM/dd HH:mm:ss')}" th:text="${#calendars.format(l.createDate,'yyyy/MM/dd HH:mm:ss')}">
                                                 1 Hour Ago
                                             </div>
                                         </div>
@@ -258,15 +257,6 @@
                                             </div>
                                             <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${#strings.toString(l.properties) == 'Labels' or #strings.toString(l.properties) == 'Watchers'}" th:text="${l.newValue}"></div>
                                         </div>
-                                        <!-- <div class="extra images">
-                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
-                                            <a><img th:src="@{/img/image.png}" src="../../static/img/image.png"></a>
-                                        </div> -->
-                                        <!-- <div class="meta">
-                                            <a class="like">
-                                                <i class="like icon"></i> 4 Likes
-                                            </a>
-                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -285,7 +275,7 @@
                                 <div class="content">
                                     <a class="author" th:attr="data-value=${c.creator.username}" th:text="${#strings.isEmpty(c.creator.name) ? c.creator.username : c.creator.name}">Matt</a>
                                     <div class="metadata">
-                                        <span class="date" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
+                                        <span class="date timeago" th:title="${c.createDate}" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                         <div class="rating">
                                             <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
                                         </div>
@@ -423,13 +413,15 @@
     <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/dropzone/dropzone.min.js}" src="../../static/lib/dropzone/dropzone.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/fancybox/jquery.fancybox.pack.js}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script>
-    <!-- <script type="text/javascript" th:src="@{http://fancyapps.com/fancybox/source/jquery.fancybox.pack.js?v=2.1.5}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script> -->
+    <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/poll.js}" src="../../static/admin/js/poll.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
 
         Dropzone.autoDiscover = false;
+
+        jQuery(".timeago").timeago();
 
         // ------------------------------------------------------------------------------------- fancybox image start
 
@@ -606,6 +598,7 @@
                             chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                         });
                         $("#chatSearchTpl").tmpl(chats).appendTo($pp.children('.ui.list').empty());
+                        $('.pp-chat-search-results .timeago').timeago();
 
                     } else {
                         toastr.error(data.data, "加载失败!");
@@ -1232,6 +1225,7 @@
 
                         var $more = convertChat(data.data);
                         $more.insertBefore($domBefore);
+                        jQuery(".timeago").timeago();
                         s2b();
                     } else {
                         window.location.href = url('path') + '?scroll=1';
@@ -1364,6 +1358,7 @@
                     var $more = convertChat(data.data.content);
 
                     $more.insertAfter($('.btn-chat-more'));
+                    jQuery(".timeago").timeago();
                     data.data.last && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
@@ -1393,6 +1388,7 @@
 
                     var $more = convertChat(data.data.content);
                     $more.insertBefore($('.btn-chat-pre-more'));
+                    jQuery(".timeago").timeago();
 
                     data.data.first && $btn.remove();
                     toastr.success('加载成功!');
@@ -1444,6 +1440,7 @@
                         log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
                     $("#logMoreTpl").tmpl(data.data.content).appendTo('.fd-dynamic');
+                    jQuery(".timeago").timeago();
                     data.data.last && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
@@ -1472,6 +1469,7 @@
 
                         var $more = convertChat(data.data);
                         $more.insertBefore($domBefore);
+                        jQuery(".timeago").timeago();
                         s2b();
                     }
                 } else {
@@ -1525,6 +1523,7 @@
                                 log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                             });
                             $("#logMoreTpl").tmpl(data.msgs[0]).prependTo('.fd-dynamic');
+                            jQuery(".timeago").timeago();
 
                             var $toast = toastr.info('刚刚有' + data.msgs.length + '条动态更新');
                             $toast.click(function(event) {
@@ -1582,26 +1581,24 @@
             $(this).popup({
                 popup: $('.pp-translate'),
                 hoverable: true,
-                // context: 'body',
-                // inline: true,
-                // movePopup: false,
-                // position: 'bottom center',
+                inline: false,
+                movePopup: false,
+                position: 'top left',
                 delay: {
                     show: 300,
                     hide: 300
                 },
                 onShow: function() {
                     var $pp = $(this).html('加载中...');
-                    // $pp.dimmer('show');
                     $.get('admin/translate/getById/unmask', {
                         id: url('?id', $a.attr('href'))
                     }, function(data) {
-                        // $pp.dimmer('hide');
                         if (data.success) {
                             var translate = data.data;
                             var d = new Date(translate.createDate);
                             translate.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                             $("#tansPpTpl").tmpl(data.data).appendTo($pp.empty());
+                            $('.pp-translate .timeago').timeago();
                         } else {
                             toastr.error(data.data, "加载失败!");
                         }
@@ -1622,21 +1619,18 @@
             $(this).popup({
                 popup: $('.pp-translate'),
                 hoverable: true,
-                // context: 'body',
-                // inline: true,
-                // movePopup: false,
-                // position: 'bottom center',
+                inline: false,
+                movePopup: false,
+                position: 'top left',
                 delay: {
                     show: 300,
                     hide: 300
                 },
                 onShow: function() {
                     var $pp = $(this).html('加载中...');
-                    // $pp.dimmer('show');
                     $.get('admin/chat/get/unmask', {
                         id: url('?id', $a.attr('href'))
                     }, function(data) {
-                        // $pp.dimmer('hide');
                         if (data.success) {
                             var chat = data.data;
                             chat.creatorName = chat.creator.name ? chat.creator.name : chat.creator.username;
@@ -1645,6 +1639,7 @@
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
 
                             $("#chatMsgPpTpl").tmpl(data.data).appendTo($pp.empty());
+                            $('.pp-translate .timeago').timeago();
                         } else {
                             toastr.error(data.data, "加载失败!");
                         }

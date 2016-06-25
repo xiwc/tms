@@ -101,7 +101,7 @@
                     {{/if}}
                 </a>
                 <div class="metadata">
-                    <span class="date" th:text="">${createDateFormat}</span>
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
                     <div class="rating">
                         <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> 
                         {{if voteZan}}
@@ -151,7 +151,7 @@
                     <span>${actionMapping}</span> 
                     <a target="_blank" href="/admin/translate?id=${targetId}">翻译</a>
                     <span>${propertiesMapping}</span>
-                    <div class="date">
+                    <div class="date timeago" title="${createDate}">
                         ${createDate}
                     </div>
                 </div>
@@ -186,7 +186,7 @@
                             ${creator}
                         </span>
                         <span>创建于</span>
-                        <span class="cinema" title="${createDateFormat}">${createDateFormat}</span>
+                        <span class="cinema timeago" title="${createDateFormat}">${createDateFormat}</span>
                     </div>
                     <div class="description" style="width:300px; word-break: break-all;">
                         <span class="cinema" title="${key}">${key}</span>
@@ -220,7 +220,7 @@
                             {{/if}}
                         </span>
                         <span>发表于</span>
-                        <span class="cinema" title="${createDateFormat}">${createDateFormat}</span>
+                        <span class="cinema timeago" title="${createDateFormat}">${createDateFormat}</span>
                     </div>
                     <div class="description markdown-body" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
                         {{html contentMd}}
@@ -250,7 +250,7 @@
                     {{/if}}
                 </a>
                 <div class="metadata" style="float: right;">
-                    <span class="date">${createDateFormat}</span>
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
                 </div>
                 <div class="description">${contentBrief}</div>
             </div>
