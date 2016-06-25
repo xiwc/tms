@@ -94,7 +94,7 @@ jQuery(function($) {
             "newestOnTop": true,
             "progressBar": false,
             "positionClass": "toast-bottom-center",
-            "preventDuplicates": false,
+            "preventDuplicates": true,
             "onclick": null,
             "showDuration": "300",
             "hideDuration": "1000",
@@ -211,9 +211,10 @@ jQuery(function($) {
                     dfd.resolve();
                 })
                 if (this.complete) {
-                    setTimeout(function() {
-                        dfd.resolve();
-                    }, 1000);
+                    // setTimeout(function() {
+                    //     dfd.resolve();
+                    // }, 1000);
+                    dfd.resolve();
                 }
 
                 imgdefereds.push(dfd);

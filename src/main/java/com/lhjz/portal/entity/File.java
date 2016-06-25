@@ -18,6 +18,7 @@ import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.lhjz.portal.pojo.Enum.FileType;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -45,6 +46,9 @@ public class File implements Serializable {
 	private String username;
 	@NotBlank
 	private String path;
+
+	@Enumerated(EnumType.STRING)
+	private FileType type;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -120,12 +124,20 @@ public class File implements Serializable {
 		this.path = path;
 	}
 
+	public FileType getType() {
+		return type;
+	}
+
+	public void setType(FileType type) {
+		this.type = type;
+	}
+
 	@Override
 	public String toString() {
 		return "File [id=" + id + ", name=" + name + ", uuidName=" + uuidName
-				+ ", username=" + username + ", path=" + path + ", status="
-				+ status + ", createDate=" + createDate + ", version="
-				+ version + "]";
+				+ ", username=" + username + ", path=" + path + ", type="
+				+ type + ", status=" + status + ", createDate=" + createDate
+				+ ", version=" + version + "]";
 	}
 
 }
