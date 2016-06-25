@@ -4,7 +4,6 @@
 package com.lhjz.portal.controller;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -134,7 +133,7 @@ public class UserController extends BaseController {
 				+ userForm.getUsername() + "&password="
 				+ userForm.getPassword();
 
-		if (mail.get().length > 0) {
+		if (!mail.isEmpty()) {
 			ThreadUtil.exec(() -> {
 
 				try {
@@ -219,11 +218,11 @@ public class UserController extends BaseController {
 
 		String[] usernames = users.split(",");
 		List<User> users2 = userRepository.findAll();
-		final Set<String> mails = new HashSet<>();
+		final Mail mail = Mail.instance();
 		for (String username : usernames) {
 			for (User user : users2) {
 				if (user.getUsername().equals(username)) {
-					mails.add(user.getMails());
+					mail.addUsers(user);
 					break;
 				}
 			}
@@ -234,21 +233,18 @@ public class UserController extends BaseController {
 		final String title1 = title;
 		final String content1 = content;
 
-		if (mails.size() > 0) {
+		if (!mail.isEmpty()) {
 			ThreadUtil.exec(() -> {
 
 				try {
 					Thread.sleep(3000);
-					mailSender.sendHtml(
-							String.format("TMS-系统消息_%s",
-									DateUtil.format(new Date(),
-											DateUtil.FORMAT7)),
+					mailSender.sendHtml(String.format("TMS-系统消息_%s",
+							DateUtil.format(new Date(), DateUtil.FORMAT7)),
 							TemplateUtil.process("templates/mail/mail-msg",
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
-											"title", title1,
-											"content", content1)),
-							mails.toArray(new String[0]));
+											"title", title1, "content",
+											content1)), mail.get());
 					logger.info("邮件通知发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
