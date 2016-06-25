@@ -1147,14 +1147,19 @@
                         left: 0,
                         top: "100%"
                     }, 300);
-                    $('.ui.sticky').sticky('refresh');
+                    if ($('.main.container .right.rail').is(':visible')) {
+                        $('.ui.sticky').sticky('refresh');
+                    }
+
                 });
             } else {
                 $('html, body, .ad-index-content').scrollTo({
                     left: 0,
                     top: "100%"
                 }, 300);
-                $('.ui.sticky').sticky('refresh');
+                if ($('.main.container .right.rail').is(':visible')) {
+                    $('.ui.sticky').sticky('refresh');
+                }
             }
         }
 
