@@ -21,6 +21,11 @@
     <!-- <link rel="stylesheet" type="text/css" th:href="@{http://fancyapps.com/fancybox/source/jquery.fancybox.css?v=2.1.5}" href="../../static/lib/fancybox/jquery.fancybox.min.css" /> -->
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
+    body,
+    html {
+        height: auto;
+    }
+    
     .main.container {
         margin-right: 460px !important;
         margin-left: 3em !important;
@@ -438,12 +443,14 @@
             $img = $(this);
             var imgArr = [];
             var $imgs = $img.closest('.text.markdown-body').find('img').each(function(index, img) {
+                // $(this).attr('title', $(img).attr('alt'));
                 imgArr.push({
                     href: $(img).attr('src'),
                     title: $(img).attr('alt')
                 });
             });
             var index = $imgs.index($img);
+            // $.fancybox.open($imgs.clone().toArray(), {
             $.fancybox.open(imgArr, {
                 loop: false,
                 index: index
@@ -1113,9 +1120,9 @@
                         left: 0,
                         top: "100%"
                     }, 300);
-                    setTimeout(function() {
-                        $('.ui.sticky').sticky('refresh');
-                    }, 500);
+                    // setTimeout(function() {
+                    //     $('.ui.sticky').sticky('refresh');
+                    // }, 500);
                 });
             } else {
                 $('html, body, .ad-index-content').scrollTo({
@@ -1123,9 +1130,9 @@
                     top: "100%"
                 }, 300);
                 $('.ui.sticky').sticky('refresh');
-                setTimeout(function() {
-                    $('.ui.sticky').sticky('refresh');
-                }, 500);
+                // setTimeout(function() {
+                //     $('.ui.sticky').sticky('refresh');
+                // }, 500);
             }
         }
 
