@@ -1294,13 +1294,11 @@
 
                     $('.ad-chat-edit').modal({
                         onShow: function() {
-                            simplemdeEdit.value(data.data.content);
+                            // simplemdeEdit.value(data.data.content);
                         },
                         onVisible: function() {
                             simplemdeEdit.codemirror.focus();
-                            // $(this).find('.CodeMirror textarea').focus();
-                            // $(this).find('.CodeMirror-scroll').trigger('focus');
-                            // $(this).find('.CodeMirror-scroll').trigger('mousedown');
+                            simplemdeEdit.value(data.data.content);
                         },
                         onApprove: function() {
                             if (!simplemdeEdit.value()) {
