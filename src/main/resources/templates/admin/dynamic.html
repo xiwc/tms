@@ -382,6 +382,14 @@
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         </form>
     </div>
+    <div class="ui flowing popup top left transition hidden pp-chat-edit-upload-file">
+        <form action="/admin/file/upload" class="dropzone">
+            <div class="fallback">
+                <input name="file" type="file" multiple />
+            </div>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        </form>
+    </div>
     <!-- popup container end -->
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
@@ -742,146 +750,168 @@
 
             var txt = plainText;
             $.each(parseUsers(plainText), function(index, username) {
-                // txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '**`@' + userMap[username] + '`**');
                 txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '<span data-value="' + username + '" class="at-user">' + '**`@' + userMap[username] + '`**' + '</span>');
             });
 
             return txt;
         }
 
-        var simplemdeEdit = new SimpleMDE({
-            element: $(".ad-chat-edit textarea")[0],
-            autoDownloadFontAwesome: false,
-            // autofocus: true,
-            previewRender: function(plainText, preview) { // Async method
-                setTimeout(function() {
-                    preview.innerHTML = simplemdeEdit.markdown(preParse(plainText));
-                }, 250);
+        var simplemdeEdit = initIDE($(".ad-chat-edit textarea")[0], "chat-edit-content");
+        var simplemde = initIDE($(".ta-md")[0], "chat-content");
+        var cm = simplemde.codemirror;
+        var cme = simplemdeEdit.codemirror;
 
-                return "解释渲染中...";
-            },
-            autosave: {
-                enabled: true,
-                delay: 5000,
-                uniqueId: "chat-edit-content"
-            }
-        });
+        /**
+         * 出事markdown ide
+         * @param  {[type]} $elem [description]
+         * @return {[type]}       [description]
+         */
+        function initIDE($elem, uniqueId) {
+            var mde = new SimpleMDE({
+                element: $elem,
+                autoDownloadFontAwesome: false,
+                autofocus: true,
+                toolbar: [
+                    "bold",
+                    "italic",
+                    "strikethrough",
+                    "heading",
+                    "heading-smaller",
+                    "heading-bigger",
+                    "heading-1",
+                    "heading-2",
+                    "heading-3",
+                    "|",
+                    "code",
+                    "quote",
+                    "unordered-list",
+                    "ordered-list",
+                    "clean-block",
+                    "|",
+                    "link",
+                    "image",
+                    "table",
+                    "horizontal-rule",
+                    "|", {
+                        name: "upload",
+                        action: function(editor) {},
+                        className: "fa fa-upload",
+                        title: "上传文件",
+                    }, "|",
+                    "preview",
+                    "side-by-side",
+                    "fullscreen",
+                    "guide"
 
-        var simplemde = new SimpleMDE({
-            element: $(".ta-md")[0],
-            autoDownloadFontAwesome: false,
-            autofocus: true,
-            toolbar: [
-                "bold",
-                "italic",
-                "strikethrough",
-                "heading",
-                "heading-smaller",
-                "heading-bigger",
-                "heading-1",
-                "heading-2",
-                "heading-3",
-                "|",
-                "code",
-                "quote",
-                "unordered-list",
-                "ordered-list",
-                "clean-block",
-                "|",
-                "link",
-                "image",
-                "table",
-                "horizontal-rule",
-                "|", {
-                    name: "upload",
-                    action: function(editor) {},
-                    className: "fa fa-upload",
-                    title: "上传文件",
-                }, "|",
-                "preview",
-                "side-by-side",
-                "fullscreen",
-                "guide"
+                ],
+                renderingConfig: {
+                    codeSyntaxHighlighting: true,
+                },
+                previewRender: function(plainText, preview) { // Async method
+                    setTimeout(function() {
+                        preview.innerHTML = mde.markdown(preParse(plainText));
+                    }, 250);
 
-            ],
-            renderingConfig: {
-                codeSyntaxHighlighting: true,
-            },
-            previewRender: function(plainText, preview) { // Async method
-                setTimeout(function() {
-                    preview.innerHTML = simplemde.markdown(preParse(plainText));
-                }, 250);
+                    return "解释渲染中...";
+                },
+                autosave: {
+                    enabled: true,
+                    delay: 5000,
+                    uniqueId: uniqueId
+                }
+            });
 
-                return "解释渲染中...";
-            },
-            autosave: {
-                enabled: true,
-                delay: 5000,
-                uniqueId: "chat-content"
-            }
-        });
+            return mde;
+        }
 
+        // TODO simplemde edit also keyup
         simplemde.codemirror.on('keyup', function(cm, e) {
-            // console.log(e);
             if (e.ctrlKey && e.keyCode == 13) {
                 $('.btn-chat-submit').click();
             }
         });
-
-        $('.fm-reply .editor-toolbar a.fa-upload').popup({
-            popup: $('.pp-chat-upload-file'),
-            hoverable: true,
-            on: 'click',
-            position: 'top center',
-            closable: false,
-            delay: {
-                show: 300,
-                hide: 300
-            },
-            onShow: function() {}
-        });
-
-        $(".pp-chat-upload-file form.dropzone").dropzone({
-            paramName: 'file',
-            maxFilesize: 5, // MB
-            dictDefaultMessage: '拖拽或点击上传',
-            init: function() {
-                this.on("success", function(file, data) {
-                    if (data.success) {
-
-                        $.each(data.data, function(index, item) {
-                            if (item.type == 'Image') {
-                                insertComment(cm, '![{name}]({baseURL}{path}{uuidName}) '
-                                    .replace(/\{name\}/g, item.name)
-                                    .replace(/\{baseURL\}/g, baseURL)
-                                    .replace(/\{path\}/g, item.path)
-                                    .replace(/\{uuidName\}/g, item.uuidName));
-                            } else {
-                                insertComment(cm, '[{name}]({baseURL}{path}{uuidName}) '
-                                    .replace(/\{name\}/g, item.name)
-                                    .replace(/\{baseURL\}/g, baseURL)
-                                    .replace(/\{path\}/g, item.path)
-                                    .replace(/\{uuidName\}/g, item.uuidName));
-                            }
-                        });
-                        toastr.success('上传成功!');
-                    } else {
-                        toastr.error(data.data, '上传失败!');
-                    }
-
-                });
-                this.on("error", function(file, errorMessage, xhr) {
-                    toastr.error(errorMessage, '上传失败!');
-                });
-                this.on("complete", function(file) {
-                    this.removeFile(file);
-                });
+        simplemdeEdit.codemirror.on('keyup', function(cm, e) {
+            if (e.ctrlKey && e.keyCode == 13) {
+                $('.ad-chat-edit .btn-chat-edit-submit').click();
             }
         });
 
+        initUploadPp4IDE($('.fm-reply .editor-toolbar a.fa-upload'), $('.pp-chat-upload-file'));
+        initUploadPp4IDE($('.fm-edit-reply .editor-toolbar a.fa-upload'), $('.pp-chat-edit-upload-file'));
+
+        initDropzone4IDE($(".pp-chat-upload-file form.dropzone"), cm);
+        initDropzone4IDE($(".pp-chat-edit-upload-file form.dropzone"), cme);
+
+        /**
+         * 初始化上传区域弹出框
+         * @param  {[type]} $ppTarget [description]
+         * @param  {[type]} $pp       [description]
+         * @return {[type]}           [description]
+         */
+        function initUploadPp4IDE($ppTarget, $pp) {
+            $ppTarget.popup({
+                popup: $pp,
+                hoverable: true,
+                on: 'click',
+                // position: 'top center',
+                position: 'bottom right',
+                closable: false,
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {}
+            });
+        }
+
+        /**
+         * 初始化上传组件
+         * @param  {[type]} $dz [description]
+         * @param  {[type]} cm  [description]
+         * @return {[type]}     [description]
+         */
+        function initDropzone4IDE($dz, cm) {
+            $dz.dropzone({
+                paramName: 'file',
+                maxFilesize: 10, // MB
+                dictDefaultMessage: '拖拽或点击上传',
+                init: function() {
+                    this.on("success", function(file, data) {
+                        if (data.success) {
+
+                            $.each(data.data, function(index, item) {
+                                if (item.type == 'Image') {
+                                    insertComment(cm, '![{name}]({baseURL}{path}{uuidName}) '
+                                        .replace(/\{name\}/g, item.name)
+                                        .replace(/\{baseURL\}/g, baseURL)
+                                        .replace(/\{path\}/g, item.path)
+                                        .replace(/\{uuidName\}/g, item.uuidName));
+                                } else {
+                                    insertComment(cm, '[{name}]({baseURL}{path}{uuidName}) '
+                                        .replace(/\{name\}/g, item.name)
+                                        .replace(/\{baseURL\}/g, baseURL)
+                                        .replace(/\{path\}/g, item.path)
+                                        .replace(/\{uuidName\}/g, item.uuidName));
+                                }
+                            });
+                            toastr.success('上传成功!');
+                        } else {
+                            toastr.error(data.data, '上传失败!');
+                        }
+
+                    });
+                    this.on("error", function(file, errorMessage, xhr) {
+                        toastr.error(errorMessage, '上传失败!');
+                    });
+                    this.on("complete", function(file) {
+                        this.removeFile(file);
+                    });
+                }
+            });
+        }
+
         // ============================================================================ @user start
         // TODO 临时全局变量定义
-        var cm = simplemde.codemirror;
         var mk = ' @';
         var usernames = [];
         var userMap = {};
@@ -1268,6 +1298,9 @@
                         },
                         onVisible: function() {
                             simplemdeEdit.codemirror.focus();
+                            // $(this).find('.CodeMirror textarea').focus();
+                            // $(this).find('.CodeMirror-scroll').trigger('focus');
+                            // $(this).find('.CodeMirror-scroll').trigger('mousedown');
                         },
                         onApprove: function() {
                             if (!simplemdeEdit.value()) {
