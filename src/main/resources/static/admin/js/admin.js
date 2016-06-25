@@ -211,9 +211,10 @@ jQuery(function($) {
                     dfd.resolve();
                 })
                 if (this.complete) {
-                    setTimeout(function() {
-                        dfd.resolve();
-                    }, 1000);
+                    // setTimeout(function() {
+                    //     dfd.resolve();
+                    // }, 1000);
+                    dfd.resolve();
                 }
 
                 imgdefereds.push(dfd);
