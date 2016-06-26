@@ -13,8 +13,10 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
-    <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
-    <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" /> -->
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/dropzone/basic.min.css}" href="../../static/lib/dropzone/basic.min.css" />
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/fancybox/jquery.fancybox.min.css}" href="../../static/lib/fancybox/jquery.fancybox.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
     .CodeMirror,
@@ -43,6 +45,10 @@
         padding: .35714286em .71428571em;
         margin: .21428571em .28571429rem .21428571em 0;
         box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) inset;
+    }
+
+    .ad-hidden {
+        display: none;
     }
     
     @media only screen and (max-width: 767px) {
@@ -148,7 +154,21 @@
                                       <input type="text" th:value="${t.key}" placeholder="">
                                     </div>
                                 </td>
-                                <td>
+                                <td title="翻译文本输入框可以直接粘贴截图">
+                                    <div class="files-container" th:classappend="${#sets.isEmpty(t.files) ? 'ad-hidden' : ''}" style="height:20px;">
+                                        <i class="file image outline icon pp-files" style="float:right;"></i>
+                                        <div class="ui flowing popup transition hidden" style="max-width: 290px;">
+                                            <h3 class="ui dividing header">翻译项截图<span th:text="${' (共: ' + #sets.size(t.files) + ' 张)'}"></span></h3>
+                                            <div class="ui tiny images">
+                                                <a th:each="f : ${t.files}" th:attr="data-id=${f.id}, rel=${'fancybox-group-' + t.id}" th:href="${f.path + f.uuidName}" class="ui bordered image fancybox-image">
+                                                  <a class="ui left link corner label btn-delete-file">
+                                                    <i class="remove circle icon"></i>
+                                                  </a>
+                                                  <img th:src="${#strings.replace(f.path,'/0/','/120/') + f.uuidName}">
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="ui form fm-language">
                                         <div style="position: relative;" class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
                                             <label th:text="${item.language.description} + ':'">中文:</label>
@@ -294,6 +314,10 @@
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
      -->
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
+    <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/dropzone/dropzone.min.js}" src="../../static/lib/dropzone/dropzone.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/fancybox/jquery.fancybox.pack.js}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script>
     <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -301,6 +325,37 @@
     jQuery(function($) {
 
         jQuery('.timeago').timeago();
+        $(".fancybox-image").fancybox();
+
+        // clipboard paste image
+        $('.tb-translate .fm-language textarea').pastableTextarea().on('pasteImage', function(evt, data) {
+
+            var $txt = $(evt.currentTarget);
+            var tid = $txt.closest('tr').attr('data-id');
+
+            $.post('/admin/translate/base64', {
+                id: tid,
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    // console.log(data);
+                    $imgs = $txt.closest('td').find('.files-container').removeClass('ad-hidden').find('.images');
+                                                  
+                    var $img = $('<a rel="" href="" class="ui bordered image fancybox-image"><a class="ui left link corner label btn-delete-file"><i class="remove circle icon"></i></a><img src=""></a>')
+                    .attr('rel', 'fancybox-group-' + tid)
+                    .attr('href', data.data.path + data.data.uuidName);
+
+                    $img.find('img').attr('src', data.data.path.replace('/0/', '/120/') + data.data.uuidName);
+
+                    $imgs.append($img);
+
+                    toastr.success('上传图片成功!');
+                }
+            });
+        }).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        });
 
         /**
          * 精简URI(将查询参数值为空的参数移除掉)
@@ -321,8 +376,8 @@
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
-        $('.popup').popup();
-        $('.pp-history').popup({
+        // $('.popup').popup();
+        $('.pp-history,.pp-files').popup({
             on: 'click',
             inline: true,
             hoverable: true,

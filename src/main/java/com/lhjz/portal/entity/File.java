@@ -5,6 +5,8 @@ package com.lhjz.portal.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,12 +14,16 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lhjz.portal.pojo.Enum.FileType;
 import com.lhjz.portal.pojo.Enum.Status;
 
@@ -56,6 +62,11 @@ public class File implements Serializable {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "file_translate", joinColumns = { @JoinColumn(name = "file_id") }, inverseJoinColumns = { @JoinColumn(name = "translate_id") })
+	private Set<Translate> fileTranslates = new HashSet<Translate>();
 
 	@Version
 	private long version;
@@ -130,6 +141,14 @@ public class File implements Serializable {
 
 	public void setType(FileType type) {
 		this.type = type;
+	}
+
+	public Set<Translate> getFileTranslates() {
+		return fileTranslates;
+	}
+
+	public void setFileTranslates(Set<Translate> fileTranslates) {
+		this.fileTranslates = fileTranslates;
 	}
 
 	@Override

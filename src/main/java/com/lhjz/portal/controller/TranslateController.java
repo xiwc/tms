@@ -3,14 +3,18 @@
  */
 package com.lhjz.portal.controller;
 
+import java.io.File;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +51,7 @@ import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.TranslateForm;
 import com.lhjz.portal.pojo.TranslateItemForm;
 import com.lhjz.portal.repository.AuthorityRepository;
+import com.lhjz.portal.repository.FileRepository;
 import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.ProjectRepository;
 import com.lhjz.portal.repository.TranslateItemHistoryRepository;
@@ -55,6 +60,7 @@ import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.CommonUtil;
 import com.lhjz.portal.util.DateUtil;
+import com.lhjz.portal.util.ImageUtil;
 import com.lhjz.portal.util.JsonUtil;
 import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
@@ -101,6 +107,9 @@ public class TranslateController extends BaseController {
 
 	@Autowired
 	MailSender2 mailSender;
+
+	@Autowired
+	FileRepository fileRepository;
 
 	String translateAction = "admin/translate";
 
@@ -967,5 +976,89 @@ public class TranslateController extends BaseController {
 		}
 
 		return RespBody.succeed(translate);
+	}
+
+	@RequestMapping(value = "base64", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody base64(HttpServletRequest request,
+			@RequestParam("id") Long id,
+			@RequestParam("dataURL") String dataURL,
+			@RequestParam("type") String type) {
+
+		logger.debug("upload base64 start...");
+
+		try {
+
+			String realPath = WebUtil.getRealPath(request);
+
+			String storePath = env.getProperty("lhjz.upload.img.store.path");
+			int sizeOriginal = env.getProperty(
+					"lhjz.upload.img.scale.size.original", Integer.class);
+			int sizeLarge = env.getProperty("lhjz.upload.img.scale.size.large",
+					Integer.class);
+			int sizeHuge = env.getProperty("lhjz.upload.img.scale.size.huge",
+					Integer.class);
+
+			// make upload dir if not exists
+			FileUtils.forceMkdir(new File(realPath + storePath + sizeOriginal));
+			FileUtils.forceMkdir(new File(realPath + storePath + sizeLarge));
+			FileUtils.forceMkdir(new File(realPath + storePath + sizeHuge));
+
+			String uuid = UUID.randomUUID().toString();
+
+			// data:image/gif;base64,base64编码的gif图片数据
+			// data:image/png;base64,base64编码的png图片数据
+			// data:image/jpeg;base64,base64编码的jpeg图片数据
+			// data:image/x-icon;base64,base64编码的icon图片数据
+
+			String suffix = type.contains("png") ? ".png" : ".jpg";
+
+			String uuidName = StringUtil.replace("{?1}{?2}", uuid, suffix);
+
+			// relative file path
+			String path = storePath + sizeOriginal + "/" + uuidName;// 原始图片存放
+			String pathLarge = storePath + sizeLarge + "/" + uuidName;// 缩放图片存放
+			String pathHuge = storePath + sizeHuge + "/" + uuidName;// 缩放图片存放
+
+			// absolute file path
+			String filePath = realPath + path;
+
+			int index = dataURL.indexOf(",");
+
+			// 原始图保存
+			ImageUtil.decodeBase64ToImage(dataURL.substring(index + 1),
+					filePath);
+			// 缩放图
+			// scale image size as thumbnail
+			// 图片缩放处理.120*120
+			ImageUtil.scale2(filePath, realPath + pathLarge, sizeLarge,
+					sizeLarge, true);
+			// 图片缩放处理.640*640
+			ImageUtil.scale2(filePath, realPath + pathHuge, sizeHuge, sizeHuge,
+					true);
+
+			// 保存记录到数据库
+			com.lhjz.portal.entity.File file2 = new com.lhjz.portal.entity.File();
+			file2.setCreateDate(new Date());
+			file2.setName(uuidName);
+			file2.setUsername(WebUtil.getUsername());
+			file2.setUuidName(uuidName);
+			file2.setPath(storePath + sizeOriginal + "/");
+
+			Translate translate = translateRepository.findOne(id);
+			file2.getFileTranslates().add(translate);
+
+			com.lhjz.portal.entity.File file = fileRepository
+					.saveAndFlush(file2);
+
+			log(Action.Upload, Target.File, file2.getId());
+
+			return RespBody.succeed(file);
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(e.getMessage(), e);
+			return RespBody.failed(e.getMessage());
+		}
+
 	}
 }
