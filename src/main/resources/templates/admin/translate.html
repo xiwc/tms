@@ -91,7 +91,7 @@
                                 <div class="header">
                                     <i class="users icon"></i>其他创建者
                                 </div>
-                                <a th:each="u : ${users}" th:if="${u.enabled}" th:if="${u.username != user.username}" th:href="@{/admin/translate(projectId=${projectId}, creator=${u.username})}" class="item" th:title="${(not #strings.isEmpty(u.name)) ? u.name : u.username}" th:attr="data-value=${u.username}" th:text="${(not #strings.isEmpty(u.name)) ? u.name : u.username}"></a>
+                                <a th:each="u : ${users}" th:if="${u.enabled and (u.username != user.username)}" th:href="@{/admin/translate(projectId=${projectId}, creator=${u.username})}" class="item" th:title="${(not #strings.isEmpty(u.name)) ? u.name : u.username}" th:attr="data-value=${u.username}" th:text="${(not #strings.isEmpty(u.name)) ? u.name : u.username}"></a>
                             </div>
                         </div>
                         <a title="新创建的" th:href="@{/admin/translate(projectId=${projectId}, status=${'New'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('New', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
