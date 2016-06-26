@@ -451,6 +451,8 @@
                 $autoCR.attr('title', '关闭自动刷新消息');
                 $('.btn-custom-chat-refresh').hide();
                 localStorage && localStorage.setItem('admin/dynamic:auto-chat-refresh', 1);
+                window.poll.reset(); // 重置轮询频率
+                getChatNews(); // 立即获取异常新消息
             },
             onUnchecked: function() {
                 $autoCR.attr('title', '开启自动刷新消息');
@@ -1514,6 +1516,10 @@
 
             var url = isAuto ? '/admin/chat/getNews/unmask' : '/admin/chat/getNews';
             var $btn = $('.btn-get-chat-news');
+
+            if (!$btn.attr('data-value')) {
+                return;
+            }
 
             isFetchNews = true;
 
