@@ -95,7 +95,7 @@
                                 <i class="dropdown icon"></i>
                                 <div class="default text">用户</div>
                                 <div class="menu">
-                                    <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                    <div th:each="u : ${users}" class="item" th:if="${u.enabled}" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                                 </div>
                             </div>
                             <div class="ui checkbox ck-selectAll">
@@ -109,10 +109,6 @@
                                 <label>标题:</label>
                                 <input type="text" name="title" th:value="${'TMS翻译协作系统公告'}" value="TMS翻译协作系统公告" />
                             </div>
-                            <!-- <div class="field">
-                                <label>内容:</label>
-                                <textarea placeholder="公告内容(支持markdown语法)" name="content" rows="10"></textarea>
-                            </div> -->
                             <div class="field markdown-body">
                                 <label>内容:</label>
                                 <textarea class="ta-md" name="content" rows="10"></textarea>
