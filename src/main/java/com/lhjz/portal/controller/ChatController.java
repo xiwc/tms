@@ -236,7 +236,7 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(data).addMsg(logs);
 	}
 
-	@RequestMapping(value = "getNews", method = RequestMethod.GET)
+	@RequestMapping(value = { "getNews", "getNews/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody getNews(@RequestParam("lastId") Long lastId) {
 
