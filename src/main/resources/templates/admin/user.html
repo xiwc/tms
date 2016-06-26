@@ -270,7 +270,7 @@
                             $btn.remove();
                             toastr.success('停用操作成功!');
                         } else {
-                            toastr.error('停用操作失败!');
+                            toastr.error(data.data, '停用操作失败!');
                         }
                     });
                 }
@@ -291,7 +291,7 @@
                             $btn.remove();
                             toastr.success('开启操作成功!');
                         } else {
-                            toastr.error('开启操作失败!');
+                            toastr.error(data.data, '开启操作失败!');
                         }
                     });
                 }
@@ -367,7 +367,7 @@
                         }
                     }).modal('show');
                 } else {
-                    toastr.error("获取用户信息失败!");
+                    toastr.error(data.data, "获取用户信息失败!");
                 }
             });
 
