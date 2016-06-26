@@ -20,8 +20,14 @@
 
     var _pollCb = null;
     var _errCb = null;
+    var _isPause = false; // 是否暂停
 
     function oneHandler() {
+
+        if (_isPause) {
+            return;
+        }
+
         try { // 捕获轮询执行方法体中的异常, 防止破坏轮询的持续性.
             _pollCb && _pollCb(_reset, _stop);
         } catch (e) {
@@ -38,8 +44,10 @@
      * @param  {[Function]} errCb  轮询业务处理异常回到
      */
     function _start() {
-    	// TODO for debugging
+        // TODO for debugging
         console.log('poll start...');
+
+        _isPause = false;
 
         timer = setInterval(function() {
             inc++;
@@ -65,15 +73,22 @@
 
         inc = 0;
         interval = minInterval;
+        _isPause = false;
         clearInterval(timer);
     }
 
     function _reset() {
-    	// TODO for debugging
+        // TODO for debugging
         console.log("poll reset...");
 
         _stop();
         _start();
+    }
+
+    function _pause() {
+        // TODO for debugging
+        console.log("pause reset...");
+        _isPause = true;
     }
 
     window.poll = {
@@ -87,6 +102,9 @@
         },
         stop: function() {
             _stop();
+        },
+        pause: function() {
+            _pause();
         }
     };
 

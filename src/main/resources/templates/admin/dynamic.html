@@ -1258,6 +1258,8 @@
 
             var $domBefore = preMore ? $('.btn-chat-pre-more') : $('.fm-reply');
 
+            window.poll.pause(); // 因为提交消息,会顺便拉取新消息, 所以暂停轮询
+
             $.post('/admin/chat/create', {
                 preMore: preMore,
                 lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id'),
@@ -1272,8 +1274,7 @@
                     simplemde.autosave();
                     toastr.success('提交成功!');
 
-                    window.poll.reset(); // 重置轮询频率
-                    $('.btn-get-chat-news').hide(); // 已经顺便拉取了更新,所以异常获取更新按钮
+                    $('.btn-get-chat-news').hide(); // 已经顺便拉取了更新,所以隐藏获取更新按钮
 
                     if ($.isArray(data.data)) { // 不刷新追加
                         if (data.data.length == 0) {
@@ -1291,6 +1292,8 @@
                 } else {
                     toastr.error(data.data, '提交失败!');
                 }
+            }).always(function() {
+                window.poll.reset(); // 重置轮询频率
             });
         });
 
