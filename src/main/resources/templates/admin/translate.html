@@ -167,7 +167,7 @@
                                         <i class="file image outline icon pp-files" style="float:right;"></i>
                                         <div class="ui flowing popup transition hidden" style="max-width: 315px;">
                                             <h3 class="ui dividing header">翻译项截图</h3>
-                                            <div class="ui tiny images" style="max-height: 200px; overflow-y: auto; padding-top: 10px; padding-right: 12px;">
+                                            <div class="ui tiny images" style="max-height: 211px; overflow-y: auto; padding-top: 10px; padding-right: 13px;">
                                                 <a th:each="f : ${t.files}" th:attr="data-id=${f.id}, rel=${'fancybox-group-' + t.id}" th:href="${f.path + f.uuidName}" class="ui bordered image fancybox-image">
                                                   <i class="remove circle link big red icon btn-delete-file"></i>
                                                   <img th:src="${#strings.replace(f.path,'/0/','/120/') + f.uuidName}" />
