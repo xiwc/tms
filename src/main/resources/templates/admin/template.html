@@ -313,7 +313,7 @@
                         <i class="dropdown icon"></i>
                         <div class="default text">通知用户</div>
                         <div class="menu">
-                            <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                            <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                         </div>
                     </div>
                     <div class="ui checkbox ck-selectAll">
@@ -475,7 +475,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>
@@ -523,7 +523,7 @@
                     <i class="dropdown icon"></i>
                     <div class="default text">用户</div>
                     <div class="menu">
-                        <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                        <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                     </div>
                 </div>
                 <div class="ui checkbox ck-selectAll">
@@ -635,7 +635,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>
