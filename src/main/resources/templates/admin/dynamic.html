@@ -52,7 +52,7 @@
     .CodeMirror-scroll {
         min-height: 150px;
         /*max-height: 150px;*/
-    }    
+    }
     
     .fm-edit-reply .CodeMirror,
     .fm-edit-reply .CodeMirror-scroll {
@@ -93,7 +93,7 @@
     .ui.comments .comment a.author {
         color: #4183c4;
     }
-
+    
     .ui.comments .comment {
         padding-right: 7px;
         padding-bottom: 1px;
@@ -730,7 +730,7 @@
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
         $('.pp').popup();
-        $('.pp-users.field').popup({
+        $('.pp-users.field,.pp-edit-users.field').popup({
             inline: true,
             hoverable: true,
             position: 'bottom left',
@@ -749,8 +749,11 @@
         // 是否第一次调用s2b函数
         var isS2bFirst = true;
 
-        $('.list-users').on('click', '.item', function(event) {
-            addAtUser(cm, $(this));
+        $('.list-users-container .list-users').on('click', '.item', function(event) {
+            addAtUser(cm, $('.pp-users'), $(this));
+        });
+        $('.list-edit-users-container .list-users').on('click', '.item', function(event) {
+            addAtUser(cme, $('.pp-edit-users'), $(this));
         });
 
         /**
@@ -965,96 +968,103 @@
         var mk = ' @';
         var usernames = [];
         var userMap = {};
-        $('.list-users > .item').each(function(index, el) {
+        $('.list-users-container .list-users > .item').each(function(index, el) {
             usernames.push($(el).attr('data-value'));
             userMap[$(el).attr('data-value')] = $(el).attr('data-label');
         });
 
-        var atHandler = function(cm, o) {
+        function atUserHandler($pp, $usersContainer) {
 
-            var cursor = cm.getCursor();
-            var line = cm.getLine(cursor.line);
+            return function(cm, o) {
 
-            if (line.lastIndexOf('@') == 0) {
-                mk = '@';
-            } else {
-                mk = ' @';
-            }
+                var cursor = cm.getCursor();
+                var line = cm.getLine(cursor.line);
 
-            var mkIndex = line.lastIndexOf(mk);
-            var atFrom = mkIndex + mk.length;
-            if (mkIndex > -1 && cursor.ch >= atFrom) {
-
-                $('.pp-users').popup('is hidden') && $('.pp-users').popup('show');
-
-                var at = $.trim(line.substr(atFrom).split(' ')[0]);
-
-                if (at) {
-                    $.each(usernames, function(index, username) {
-                        if (username.indexOf(at) == -1) {
-                            $('.list-users > .item[data-value="' + username + '"]').hide();
-                        } else {
-                            $('.list-users > .item[data-value="' + username + '"]').show();
-                        }
-                    });
+                if (line.lastIndexOf('@') == 0) {
+                    mk = '@';
                 } else {
-                    $('.list-users > .item').each(function(index, el) {
-                        $(el).show();
-                    });
+                    mk = ' @';
                 }
 
-                var $s = $('.list-users > .item:visible').each(function(index, el) {
-                    $(el).removeClass('active');
-                }).first().addClass('active');
-                $('.list-users-container').scrollTo($s);
+                var mkIndex = line.lastIndexOf(mk);
+                var atFrom = mkIndex + mk.length;
+                if (mkIndex > -1 && cursor.ch >= atFrom) {
 
-            } else {
-                $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
-            }
+                    $pp.popup('is hidden') && $pp.popup('show');
 
-        };
+                    var at = $.trim(line.substr(atFrom).split(' ')[0]);
 
-        cm.on('cursorActivity', atHandler);
-        // cm.on('change', atHandler);
-        cm.on('keydown', function(cm, e) {
-            // console.log(e);
-            if ($('.pp-users').popup('is visible')) {
+                    if (at) {
+                        $.each(usernames, function(index, username) {
+                            if (username.indexOf(at) == -1) {
+                                $usersContainer.find('.list-users > .item[data-value="' + username + '"]').hide();
+                            } else {
+                                $usersContainer.find('.list-users > .item[data-value="' + username + '"]').show();
+                            }
+                        });
+                    } else {
+                        $('.list-users > .item').each(function(index, el) {
+                            $(el).show();
+                        });
+                    }
 
-                var cnt = $('.list-users > .item:visible').size();
-                if (cnt == 0) {
-                    return;
-                }
-                var $selected = $('.list-users > .active.item:visible');
-                // var selectIndex = $('.list-users > .item:visible').index('.item.active');
-                var selectIndex = $selected.index('.list-users > .item:visible');
-                var nextIndex = (selectIndex + 1 + cnt) % cnt;
-                var preIndex = (selectIndex - 1 + cnt) % cnt;
-                if (e.keyCode == 38) { // key up
-                    e.preventDefault();
-                    var $s = $('.list-users > .item:visible').each(function(index, el) {
+                    var $s = $usersContainer.find('.list-users > .item:visible').each(function(index, el) {
                         $(el).removeClass('active');
-                    }).eq(preIndex).addClass('active');
-                    $('.list-users-container').scrollTo($s);
-                } else if (e.keyCode == 40) { // key down
-                    e.preventDefault();
-                    var $s = $('.list-users > .item:visible').each(function(index, el) {
-                        $(el).removeClass('active');
-                    }).eq(nextIndex).addClass('active');
-                    $('.list-users-container').scrollTo($s);
-                } else if (e.keyCode == 13) { // key enter
-                    e.preventDefault();
-                    // console.log($selected.attr('data-value'));
-                    addAtUser(cm, $selected);
-                }
-            }
+                    }).first().addClass('active');
+                    $usersContainer.scrollTo($s);
 
-        });
+                } else {
+                    $pp.popup('is visible') && $pp.popup('hide');
+                }
+
+            };
+        }
+
+        cm.on('cursorActivity', atUserHandler($('.pp-users'), $('.list-users-container')));
+        cme.on('cursorActivity', atUserHandler($('.pp-edit-users'), $('.list-edit-users-container')));
+
+        function atUserKDHandler($pp, $usersContainer) {
+
+            return function(cm, e) {
+                if ($pp.popup('is visible')) {
+
+                    var cnt = $usersContainer.find('.list-users > .item:visible').size();
+                    if (cnt == 0) {
+                        return;
+                    }
+                    var $selected = $usersContainer.find('.list-users > .active.item:visible');
+                    var selectIndex = $usersContainer.find('.list-users > .item:visible').index($selected); //$selected.index('.list-users > .item:visible');
+                    var nextIndex = (selectIndex + 1 + cnt) % cnt;
+                    var preIndex = (selectIndex - 1 + cnt) % cnt;
+                    if (e.keyCode == 38) { // key up
+                        e.preventDefault();
+                        var $s = $usersContainer.find('.list-users > .item:visible').each(function(index, el) {
+                            $(el).removeClass('active');
+                        }).eq(preIndex).addClass('active');
+                        $usersContainer.scrollTo($s);
+                    } else if (e.keyCode == 40) { // key down
+                        e.preventDefault();
+                        var $s = $usersContainer.find('.list-users > .item:visible').each(function(index, el) {
+                            $(el).removeClass('active');
+                        }).eq(nextIndex).addClass('active');
+                        $usersContainer.scrollTo($s);
+                    } else if (e.keyCode == 13) { // key enter
+                        e.preventDefault();
+                        addAtUser(cm, $pp, $selected);
+                    }
+                }
+
+            };
+        }
+
+        cm.on('keydown', atUserKDHandler($('.pp-users'), $('.list-users-container')));
+        cme.on('keydown', atUserKDHandler($('.pp-edit-users'), $('.list-edit-users-container')));
 
         /**
          * 添加转换选择的@user到编辑器
          * @param {CodeMirror} cm CodeMirror
          */
-        function addAtUser(cm, $user) {
+        function addAtUser(cm, $pp, $user) {
             var cursor = cm.getCursor();
             var line = cm.getLine(cursor.line);
             var mkIndex = line.lastIndexOf(mk);
@@ -1069,7 +1079,7 @@
                 });
             }
 
-            $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
+            $pp.popup('is visible') && $pp.popup('hide');
 
             cm.focus();
         }
@@ -1181,11 +1191,15 @@
                     $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
                         offset: -50
                     });
+
+                    // $('.ui.sticky').sticky('refresh');
                 });
             } else {
                 $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
                     offset: -50
                 });
+
+                // $('.ui.sticky').sticky('refresh');
             }
         }
 
