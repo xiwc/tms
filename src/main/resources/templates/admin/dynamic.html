@@ -286,10 +286,10 @@
                                     <div class="text markdown-body" th:text="${c.content}">
                                         How artistic!
                                     </div>
-                                    <div class="actions" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">
+                                    <div class="actions">
                                         <a class="reply">回复</a>
-                                        <a class="edit">编辑</a>
-                                        <a class="delete">删除</a>
+                                        <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</a>
+                                        <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</a>
                                     </div>
                                 </div>
                             </div>

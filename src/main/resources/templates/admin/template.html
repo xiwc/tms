@@ -118,13 +118,14 @@
                 <div class="text markdown-body">
                     {{html contentMd}}
                 </div>
-                {{if actions}}
                 <div class="actions">
                     <a class="reply">回复</a>
+                    {{if actions}}
                     <a class="edit">编辑</a>
                     <a class="delete">删除</a>
+                    {{/if}}
                 </div>
-                {{/if}}
+                
             </div>
         </div>
     </script>
