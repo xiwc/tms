@@ -124,20 +124,34 @@ public class Mail {
 		return StringUtil.join("<br/>", list);
 	}
 
-	public Mail add(String... objs) {
+	/**
+	 * 添加发邮件用户的邮件地址
+	 * 
+	 * @param objs
+	 * @return
+	 */
+	private Mail add(String... mails) {
 
-		for (String object : objs) {
-			set.add(object);
+		for (String mail : mails) {
+			this.set.add(mail);
 		}
 
 		return this;
 	}
 
+	/**
+	 * 添加发邮件用户
+	 * 
+	 * @param users
+	 * @return
+	 */
 	public Mail addUsers(User... users) {
 
 		if (users != null) {
 			for (User user : users) {
-				this.add(user.getMails());
+				if (user.isEnabled()) {
+					this.add(user.getMails());
+				}
 			}
 		}
 
@@ -152,7 +166,7 @@ public class Mail {
 		// 翻译关注者
 		Set<User> watchers2 = translate.getWatchers();
 		Set<String> watcherMails2 = watchers2.stream().map((user) -> {
-			return user.getMails();
+			return user.isEnabled() ? user.getMails() : StringUtil.EMPTY;
 		}).collect(Collectors.toSet());
 
 		this.addAll(watcherMails2);
@@ -165,7 +179,7 @@ public class Mail {
 		// 项目关注者
 		Set<User> watchers = project.getWatchers();
 		Set<String> watcherMails = watchers.stream().map((user) -> {
-			return user.getMails();
+			return user.isEnabled() ? user.getMails() : StringUtil.EMPTY;
 		}).collect(Collectors.toSet());
 
 		this.addAll(watcherMails);
@@ -173,31 +187,49 @@ public class Mail {
 		return this;
 	}
 
-	public Mail addAll(Collection<String> collection) {
+	public Mail addAll(Collection<String> mails) {
 
-		if (collection != null) {
-			for (String object : collection) {
-				this.set.add(object);
+		if (mails != null) {
+			for (String mail : mails) {
+				this.add(mail);
 			}
 		}
 
 		return this;
 	}
 
-	public Mail removeUser(User user) {
+	public Mail removeUsers(User... users) {
 
-		this.set.remove(user.getMails());
+		for (User user : users) {
+			this.remove(user.getMails());
+		}
+
+		return this;
+	}
+
+	public Mail remove(String... mails) {
+
+		for (String mail : mails) {
+			this.set.remove(mail);
+		}
 
 		return this;
 	}
 
 	public String[] get() {
 
+		this.remove(StringUtil.EMPTY);
+
 		String[] mails = this.set.toArray(new String[0]);
 
 		logger.info("发送邮件对象: {}", StringUtil.join(",", mails));
 
 		return mails;
+	}
+
+	public boolean isEmpty() {
+		this.remove(StringUtil.EMPTY);
+		return this.set.size() == 0;
 	}
 
 	public void addHref(String name, String baseURL, String translateAction,

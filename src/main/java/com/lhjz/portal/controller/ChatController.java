@@ -236,7 +236,7 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(data).addMsg(logs);
 	}
 
-	@RequestMapping(value = "getNews", method = RequestMethod.GET)
+	@RequestMapping(value = { "getNews", "getNews/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody getNews(@RequestParam("lastId") Long lastId) {
 
@@ -373,21 +373,20 @@ public class ChatController extends BaseController {
 
 		final String href = baseURL + dynamicAction + "?id=" + id;
 		final String titleHtml = title;
-		final String mailTo = chat.getCreator().getMails();
+		final Mail mail = Mail.instance().addUsers(chat.getCreator());
 		final String html = "<h3>投票沟通消息内容:</h3><hr/>" + contentHtml;
 
 		ThreadUtil.exec(() -> {
 
 			try {
 				Thread.sleep(3000);
-				mailSender.sendHtml(
-						String.format("TMS-沟通动态投票@消息_%s",
-								DateUtil.format(new Date(), DateUtil.FORMAT7)),
+				mailSender.sendHtml(String.format("TMS-沟通动态投票@消息_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/mail-dynamic",
 								MapUtil.objArr2Map("user", loginUser, "date",
 										new Date(), "href", href, "title",
-										titleHtml, "content", html)),
-						mailTo);
+										titleHtml, "content", html)), mail
+								.get());
 				logger.info("沟通消息投票邮件发送成功！");
 			} catch (Exception e) {
 				e.printStackTrace();

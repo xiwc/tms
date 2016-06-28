@@ -51,6 +51,12 @@
     .CodeMirror,
     .CodeMirror-scroll {
         min-height: 150px;
+        /*max-height: 150px;*/
+    }
+    
+    .fm-edit-reply .CodeMirror,
+    .fm-edit-reply .CodeMirror-scroll {
+        height: 200px;
     }
     
     .CodeMirror-fullscreen,
@@ -86,6 +92,12 @@
     
     .ui.comments .comment a.author {
         color: #4183c4;
+    }
+    
+    .ui.comments .comment {
+        padding-right: 7px;
+        padding-bottom: 1px;
+        margin-top: 0;
     }
     
     .ui.vertical.icon.buttons.btns-scroll {
@@ -286,10 +298,10 @@
                                     <div class="text markdown-body" th:text="${c.content}">
                                         How artistic!
                                     </div>
-                                    <div class="actions" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">
+                                    <div class="actions">
                                         <a class="reply">回复</a>
-                                        <a class="edit">编辑</a>
-                                        <a class="delete">删除</a>
+                                        <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</a>
+                                        <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</a>
                                     </div>
                                 </div>
                             </div>
@@ -308,7 +320,7 @@
                                                 <div class="header" th:text="${'全部用户 - (all)'}">全部用户 - (all)</div>
                                             </div>
                                         </div>
-                                        <div class="item" th:each="u : ${users}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
+                                        <div class="item" th:each="u : ${users}" th:if="${u.enabled}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
                                             <!-- <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg"> -->
                                             <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
                                                 <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(u.name)}" th:text="${#strings.toUpperCase(#strings.substring(u.name,#strings.length(u.name) - 1,#strings.length(u.name)))}">管理员</span>
@@ -325,9 +337,15 @@
                                     <div class="or"></div>
                                     <button class="ui positive button btn-chat-submit">提交</button>
                                 </div>
-                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button">
+                                <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
                                     <i class="refresh icon"></i>
                                 </a>
+                                <div class="ui right floated compact basic segment" style="margin-top: 0px; padding-top: 8px;">
+                                    <div class="ui fitted toggle checkbox ck-auto-chat-refresh" title="开启自动刷新消息">
+                                        <input type="checkbox">
+                                        <label></label>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                         <div class="ui circular red icon button btn-get-chat-news" title="获取新消息">
@@ -381,6 +399,13 @@
         </form>
     </div>
     <!-- popup container end -->
+    <div th:fragment="ad-page-dimmer" style="z-index: 99999;" class="ui page dimmer ad-comment-page-dimmer">
+        <div class="container" style="display: flex; display: -webkit-flex; justify-content: center; align-items: center; max-width: 650px; margin: auto; overflow-y: auto;">
+            <div class="content">
+                <div class="text" style="max-width: 633px; background-color: white; padding: 15px; text-align: left;"></div>
+            </div>
+        </div>
+    </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-chat-edit"></div>
@@ -400,20 +425,27 @@
     <input type="hidden" name="page.size.logs" th:value="${logs.size}" />
     <input type="hidden" name="user.username" th:value="${user.username}" />
     <input type="hidden" name="role.admin" th:value="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" />
+    <!--     
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
+     -->
+    <!--     
     <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/dropzone/dropzone.min.js}" src="../../static/lib/dropzone/dropzone.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/fancybox/jquery.fancybox.pack.js}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script>
+     -->
+    <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
+    <script type="text/javascript" th:src="@{/admin/js/deps-dynamic.js}" src="../../static/admin/js/deps-dynamic.js"></script>
+    <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/desktop-notify-min.js}" src="../../static/lib/desktop-notify-min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/poll.js}" src="../../static/admin/js/poll.js"></script>
     <script type="text/javascript">
@@ -422,6 +454,39 @@
         Dropzone.autoDiscover = false;
 
         jQuery(".timeago").timeago();
+
+        // ------------------------------------------------------------------------------------- ck-auto-chat-refresh start
+
+        var isFetchNews = false; // 是否正在获取沟通消息中
+        var isOn = 0; // 聊天消息自动刷新开关状态
+
+        if (localStorage) {
+            var v = localStorage.getItem('admin/dynamic:auto-chat-refresh');
+            isOn = v ? v : 0;
+        }
+
+        var $autoCR = $('.ck-auto-chat-refresh');
+        $autoCR.checkbox({
+            onChecked: function() {
+                $autoCR.attr('title', '关闭自动刷新消息');
+                $('.btn-custom-chat-refresh').hide();
+                localStorage && localStorage.setItem('admin/dynamic:auto-chat-refresh', 1);
+                window.poll.reset(); // 重置轮询频率
+                getChatNews(); // 立即获取异常新消息
+            },
+            onUnchecked: function() {
+                $autoCR.attr('title', '开启自动刷新消息');
+                $('.btn-custom-chat-refresh').show();
+                localStorage && localStorage.setItem('admin/dynamic:auto-chat-refresh', 0);
+            }
+        });
+
+        if (isOn != 0) {
+            $autoCR.checkbox('check');
+        }
+
+        // ------------------------------------------------------------------------------------- ck-auto-chat-refresh end
+
 
         // ------------------------------------------------------------------------------------- fancybox image start
 
@@ -673,7 +738,7 @@
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
         $('.pp').popup();
-        $('.pp-users.field').popup({
+        $('.pp-users.field,.pp-edit-users.field').popup({
             inline: true,
             hoverable: true,
             position: 'bottom left',
@@ -692,8 +757,11 @@
         // 是否第一次调用s2b函数
         var isS2bFirst = true;
 
-        $('.list-users').on('click', '.item', function(event) {
-            addAtUser(cm, $(this));
+        $('.list-users-container .list-users').on('click', '.item', function(event) {
+            addAtUser(cm, $('.pp-users'), $(this));
+        });
+        $('.list-edit-users-container .list-users').on('click', '.item', function(event) {
+            addAtUser(cme, $('.pp-edit-users'), $(this));
         });
 
         /**
@@ -908,96 +976,103 @@
         var mk = ' @';
         var usernames = [];
         var userMap = {};
-        $('.list-users > .item').each(function(index, el) {
+        $('.list-users-container .list-users > .item').each(function(index, el) {
             usernames.push($(el).attr('data-value'));
             userMap[$(el).attr('data-value')] = $(el).attr('data-label');
         });
 
-        var atHandler = function(cm, o) {
+        function atUserHandler($pp, $usersContainer) {
 
-            var cursor = cm.getCursor();
-            var line = cm.getLine(cursor.line);
+            return function(cm, o) {
 
-            if (line.lastIndexOf('@') == 0) {
-                mk = '@';
-            } else {
-                mk = ' @';
-            }
+                var cursor = cm.getCursor();
+                var line = cm.getLine(cursor.line);
 
-            var mkIndex = line.lastIndexOf(mk);
-            var atFrom = mkIndex + mk.length;
-            if (mkIndex > -1 && cursor.ch >= atFrom) {
-
-                $('.pp-users').popup('is hidden') && $('.pp-users').popup('show');
-
-                var at = $.trim(line.substr(atFrom).split(' ')[0]);
-
-                if (at) {
-                    $.each(usernames, function(index, username) {
-                        if (username.indexOf(at) == -1) {
-                            $('.list-users > .item[data-value="' + username + '"]').hide();
-                        } else {
-                            $('.list-users > .item[data-value="' + username + '"]').show();
-                        }
-                    });
+                if (line.lastIndexOf('@') == 0) {
+                    mk = '@';
                 } else {
-                    $('.list-users > .item').each(function(index, el) {
-                        $(el).show();
-                    });
+                    mk = ' @';
                 }
 
-                var $s = $('.list-users > .item:visible').each(function(index, el) {
-                    $(el).removeClass('active');
-                }).first().addClass('active');
-                $('.list-users-container').scrollTo($s);
+                var mkIndex = line.lastIndexOf(mk);
+                var atFrom = mkIndex + mk.length;
+                if (mkIndex > -1 && cursor.ch >= atFrom) {
 
-            } else {
-                $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
-            }
+                    $pp.popup('is hidden') && $pp.popup('show');
 
-        };
+                    var at = $.trim(line.substr(atFrom).split(' ')[0]);
 
-        cm.on('cursorActivity', atHandler);
-        // cm.on('change', atHandler);
-        cm.on('keydown', function(cm, e) {
-            // console.log(e);
-            if ($('.pp-users').popup('is visible')) {
+                    if (at) {
+                        $.each(usernames, function(index, username) {
+                            if (username.indexOf(at) == -1) {
+                                $usersContainer.find('.list-users > .item[data-value="' + username + '"]').hide();
+                            } else {
+                                $usersContainer.find('.list-users > .item[data-value="' + username + '"]').show();
+                            }
+                        });
+                    } else {
+                        $('.list-users > .item').each(function(index, el) {
+                            $(el).show();
+                        });
+                    }
 
-                var cnt = $('.list-users > .item:visible').size();
-                if (cnt == 0) {
-                    return;
-                }
-                var $selected = $('.list-users > .active.item:visible');
-                // var selectIndex = $('.list-users > .item:visible').index('.item.active');
-                var selectIndex = $selected.index('.list-users > .item:visible');
-                var nextIndex = (selectIndex + 1 + cnt) % cnt;
-                var preIndex = (selectIndex - 1 + cnt) % cnt;
-                if (e.keyCode == 38) { // key up
-                    e.preventDefault();
-                    var $s = $('.list-users > .item:visible').each(function(index, el) {
+                    var $s = $usersContainer.find('.list-users > .item:visible').each(function(index, el) {
                         $(el).removeClass('active');
-                    }).eq(preIndex).addClass('active');
-                    $('.list-users-container').scrollTo($s);
-                } else if (e.keyCode == 40) { // key down
-                    e.preventDefault();
-                    var $s = $('.list-users > .item:visible').each(function(index, el) {
-                        $(el).removeClass('active');
-                    }).eq(nextIndex).addClass('active');
-                    $('.list-users-container').scrollTo($s);
-                } else if (e.keyCode == 13) { // key enter
-                    e.preventDefault();
-                    // console.log($selected.attr('data-value'));
-                    addAtUser(cm, $selected);
-                }
-            }
+                    }).first().addClass('active');
+                    $usersContainer.scrollTo($s);
 
-        });
+                } else {
+                    $pp.popup('is visible') && $pp.popup('hide');
+                }
+
+            };
+        }
+
+        cm.on('cursorActivity', atUserHandler($('.pp-users'), $('.list-users-container')));
+        cme.on('cursorActivity', atUserHandler($('.pp-edit-users'), $('.list-edit-users-container')));
+
+        function atUserKDHandler($pp, $usersContainer) {
+
+            return function(cm, e) {
+                if ($pp.popup('is visible')) {
+
+                    var cnt = $usersContainer.find('.list-users > .item:visible').size();
+                    if (cnt == 0) {
+                        return;
+                    }
+                    var $selected = $usersContainer.find('.list-users > .active.item:visible');
+                    var selectIndex = $usersContainer.find('.list-users > .item:visible').index($selected); //$selected.index('.list-users > .item:visible');
+                    var nextIndex = (selectIndex + 1 + cnt) % cnt;
+                    var preIndex = (selectIndex - 1 + cnt) % cnt;
+                    if (e.keyCode == 38) { // key up
+                        e.preventDefault();
+                        var $s = $usersContainer.find('.list-users > .item:visible').each(function(index, el) {
+                            $(el).removeClass('active');
+                        }).eq(preIndex).addClass('active');
+                        $usersContainer.scrollTo($s);
+                    } else if (e.keyCode == 40) { // key down
+                        e.preventDefault();
+                        var $s = $usersContainer.find('.list-users > .item:visible').each(function(index, el) {
+                            $(el).removeClass('active');
+                        }).eq(nextIndex).addClass('active');
+                        $usersContainer.scrollTo($s);
+                    } else if (e.keyCode == 13) { // key enter
+                        e.preventDefault();
+                        addAtUser(cm, $pp, $selected);
+                    }
+                }
+
+            };
+        }
+
+        cm.on('keydown', atUserKDHandler($('.pp-users'), $('.list-users-container')));
+        cme.on('keydown', atUserKDHandler($('.pp-edit-users'), $('.list-edit-users-container')));
 
         /**
          * 添加转换选择的@user到编辑器
          * @param {CodeMirror} cm CodeMirror
          */
-        function addAtUser(cm, $user) {
+        function addAtUser(cm, $pp, $user) {
             var cursor = cm.getCursor();
             var line = cm.getLine(cursor.line);
             var mkIndex = line.lastIndexOf(mk);
@@ -1012,7 +1087,7 @@
                 });
             }
 
-            $('.pp-users').popup('is visible') && $('.pp-users').popup('hide');
+            $pp.popup('is visible') && $pp.popup('hide');
 
             cm.focus();
         }
@@ -1118,18 +1193,31 @@
         // 滚动到标记处
         function s2m() {
 
-            if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
-                isS2bFirst = false;
-                Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
-                    $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
-                        offset: -50
-                    });
-                });
-            } else {
+            Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
                 $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
                     offset: -50
                 });
-            }
+
+                if ($('.main.container .right.rail').is(':visible')) {
+                    $('.ui.sticky').sticky('refresh');
+                }
+            });
+            // if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
+            //     isS2bFirst = false;
+            //     Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
+            //         $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
+            //             offset: -50
+            //         });
+
+            //         // $('.ui.sticky').sticky('refresh');
+            //     });
+            // } else {
+            //     $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
+            //         offset: -50
+            //     });
+
+            //     // $('.ui.sticky').sticky('refresh');
+            // }
         }
 
         // 滚动到顶部
@@ -1200,12 +1288,20 @@
                 toastr.error('提交内容不能为空!');
                 return;
             }
+
+            if (isFetchNews) {
+                toastr.warning('自动刷新沟通消息中,请稍后再尝试...');
+                return;
+            }
+
             var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemde.markdown(preParse(content))).wrap('<div/>').parent().html();
 
             var preMore = $('.btn-chat-pre-more').size() == 1;
             var $last = $('.chat .comments .comment').last();
 
             var $domBefore = preMore ? $('.btn-chat-pre-more') : $('.fm-reply');
+
+            window.poll.pause(); // 因为提交消息,会顺便拉取新消息, 所以暂停轮询
 
             $.post('/admin/chat/create', {
                 preMore: preMore,
@@ -1221,7 +1317,7 @@
                     simplemde.autosave();
                     toastr.success('提交成功!');
 
-                    window.poll.reset(); // 重置轮询频率
+                    $('.btn-get-chat-news').hide(); // 已经顺便拉取了更新,所以隐藏获取更新按钮
 
                     if ($.isArray(data.data)) { // 不刷新追加
                         if (data.data.length == 0) {
@@ -1239,6 +1335,8 @@
                 } else {
                     toastr.error(data.data, '提交失败!');
                 }
+            }).always(function() {
+                window.poll.reset(); // 重置轮询频率
             });
         });
 
@@ -1454,10 +1552,24 @@
             });
         });
 
-        $('.btn-get-chat-news').click(function(event) {
-            event.preventDefault();
-            $btn = $(this);
-            $.get('/admin/chat/getNews', {
+        /**
+         * 获取沟通新消息
+         * @param  {[type]}  lastId [description]
+         * @param  {Boolean} isAuto [description]
+         * @return {[type]}         [description]
+         */
+        function getChatNews(isAuto) {
+
+            var url = isAuto ? '/admin/chat/getNews/unmask' : '/admin/chat/getNews';
+            var $btn = $('.btn-get-chat-news');
+
+            if (!$btn.attr('data-value')) {
+                return;
+            }
+
+            isFetchNews = true;
+
+            $.get(url, {
                 lastId: $btn.attr('data-value')
             }, function(data) {
                 if (data.success) {
@@ -1477,11 +1589,45 @@
                         jQuery(".timeago").timeago();
                         s2b();
                     }
+                    toastr.success('刚刚刷新获取到' + data.data.length + '条新消息!');
                 } else {
                     toastr.error(data.data, '获取失败!');
                 }
+            }).always(function() {
+                isFetchNews = false;
             });
+        }
+
+        $('.btn-get-chat-news').click(function(event) {
+            event.preventDefault();
+
+            getChatNews(false);
         });
+
+        function deskNotify(msg) {
+
+            if (notify.isSupported) {
+                var level = notify.permissionLevel();
+                if (level == notify.PERMISSION_GRANTED) {
+                    notify.createNotification("TMS沟通动态消息通知", {
+                        body: msg,
+                        icon: {
+                            x16: '/img/tms-x16.ico',
+                            x32: '/img/tms-x32.png'
+                        },
+                        tag: 'tms-admin-dynamic-chat-new-msg',
+                    });
+                } else if (level == notify.PERMISSION_DEFAULT) {
+                    notify.requestPermission(function() {
+                        deskNotify(msg);
+                    });
+                } else {
+                    console.log('用户拒绝桌面通知!')
+                }
+            } else {
+                console.log('浏览器不支持桌面通知!')
+            }
+        }
 
         // $('.btn-get-chat-news').show();
         // 轮询最新沟通消息
@@ -1505,8 +1651,16 @@
 
                     if (data.data[1] > 0) {
                         resetCb();
+                        var lastCnt = $('.btn-get-chat-news').children('.lbl-chat-news-count').text();
                         $('.btn-get-chat-news').children('.lbl-chat-news-count').text(data.data[1]);
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).show();
+                        // 如果自动刷新消息开启,则立即获取消息
+                        $autoCR.checkbox('is checked') && getChatNews(true);
+
+                        if (lastCnt != data.data[1]) {
+                            deskNotify('您有' + data.data[1] + '条沟通新消息!');
+                        }
+
                     } else {
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
                     }
@@ -1536,6 +1690,8 @@
                                 $('.main.container .right.rail .sticky').scrollTo(0, 300);
                                 $toast.remove();
                             });
+
+                            deskNotify('您刚刚有' + data.msgs.length + '条动态更新!');
                         }
 
                     }
@@ -1651,6 +1807,33 @@
                     });
                 }
             }).popup('show');
+        });
+
+        $('.ad-comment-page-dimmer').dimmer({
+            onShow: function() {
+                $('body').addClass('blurring');
+            },
+            onHide: function() {
+                $('body').removeClass('blurring');
+            }
+        });
+        $('body').on('dblclick', '.chat .comments .comment', function(event) {
+            event.preventDefault();
+            var $md = $(this).find('.content .markdown-body');
+            $('.ad-comment-page-dimmer')
+                .find('.container').css({
+                    'height': $(window).height(),
+                    'align-items': $md.height() < $(window).height() ? 'center' : 'inherit'
+                })
+                .find('.text')
+                .empty()
+                .append($md.clone());
+            $('.ad-comment-page-dimmer').dimmer('show');
+        });
+        $('body').on('click', '.ad-comment-page-dimmer .container', function(event) {
+            if (event.target == event.currentTarget) {
+                $(this).closest('.page.dimmer').dimmer('hide');
+            }
         });
 
     });

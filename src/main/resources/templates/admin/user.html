@@ -95,7 +95,7 @@
                                 <i class="dropdown icon"></i>
                                 <div class="default text">用户</div>
                                 <div class="menu">
-                                    <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                    <div th:each="u : ${users}" class="item" th:if="${u.enabled}" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                                 </div>
                             </div>
                             <div class="ui checkbox ck-selectAll">
@@ -109,10 +109,6 @@
                                 <label>标题:</label>
                                 <input type="text" name="title" th:value="${'TMS翻译协作系统公告'}" value="TMS翻译协作系统公告" />
                             </div>
-                            <!-- <div class="field">
-                                <label>内容:</label>
-                                <textarea placeholder="公告内容(支持markdown语法)" name="content" rows="10"></textarea>
-                            </div> -->
                             <div class="field markdown-body">
                                 <label>内容:</label>
                                 <textarea class="ta-md" name="content" rows="10"></textarea>
@@ -129,12 +125,15 @@
     <div th:replace="admin/template :: ad-user-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <!-- 
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
-    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+     -->
+    <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
@@ -270,7 +269,7 @@
                             $btn.remove();
                             toastr.success('停用操作成功!');
                         } else {
-                            toastr.error('停用操作失败!');
+                            toastr.error(data.data, '停用操作失败!');
                         }
                     });
                 }
@@ -291,7 +290,7 @@
                             $btn.remove();
                             toastr.success('开启操作成功!');
                         } else {
-                            toastr.error('开启操作失败!');
+                            toastr.error(data.data, '开启操作失败!');
                         }
                     });
                 }
@@ -367,7 +366,7 @@
                         }
                     }).modal('show');
                 } else {
-                    toastr.error("获取用户信息失败!");
+                    toastr.error(data.data, "获取用户信息失败!");
                 }
             });
 

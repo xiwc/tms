@@ -13,10 +13,17 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
-    <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
-    <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/dropzone/basic.min.css}" href="../../static/lib/dropzone/basic.min.css" /> -->
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/fancybox/jquery.fancybox.min.css}" href="../../static/lib/fancybox/jquery.fancybox.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
+    body,
+    html {
+        height: auto;
+    }
+    
     .CodeMirror,
     .CodeMirror-scroll {
         min-height: 150px;
@@ -45,10 +52,26 @@
         box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) inset;
     }
     
+    .ad-hidden {
+        display: none;
+    }
+    
+    .btn-delete-file {
+        position: absolute;
+        z-index: 100;
+        top: -0.5em;
+        left: 130%;
+        margin: 0 0 0 -1.5em!important;
+    }
+    
     @media only screen and (max-width: 767px) {
         .hide-mobile {
             display: none!important;
         }
+        .pp-translate-history {
+            /*max-width: 315px!important;*/
+        }
+        .pp-translate-file {}
     }
     </style>
 </head>
@@ -91,7 +114,7 @@
                                 <div class="header">
                                     <i class="users icon"></i>其他创建者
                                 </div>
-                                <a th:each="u : ${users}" th:if="${u.username != user.username}" th:href="@{/admin/translate(projectId=${projectId}, creator=${u.username})}" class="item" th:title="${(not #strings.isEmpty(u.name)) ? u.name : u.username}" th:attr="data-value=${u.username}" th:text="${(not #strings.isEmpty(u.name)) ? u.name : u.username}"></a>
+                                <a th:each="u : ${users}" th:if="${u.enabled and (u.username != user.username)}" th:href="@{/admin/translate(projectId=${projectId}, creator=${u.username})}" class="item" th:title="${(not #strings.isEmpty(u.name)) ? u.name : u.username}" th:attr="data-value=${u.username}" th:text="${(not #strings.isEmpty(u.name)) ? u.name : u.username}"></a>
                             </div>
                         </div>
                         <a title="新创建的" th:href="@{/admin/translate(projectId=${projectId}, status=${'New'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('New', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
@@ -149,14 +172,26 @@
                                     </div>
                                 </td>
                                 <td>
+                                    <div class="files-container" th:classappend="${#sets.isEmpty(t.files) ? 'ad-hidden' : ''}" style="height:20px;">
+                                        <i class="file image outline icon pp-files" style="float:right;"></i>
+                                        <div class="ui flowing popup transition hidden pp-translate-file" style="width: 315px;">
+                                            <h3 class="ui dividing header">翻译项截图</h3>
+                                            <div class="ui tiny images" style="max-height: 211px; overflow-y: auto; padding-top: 10px; padding-right: 13px;">
+                                                <a th:each="f : ${t.files}" th:attr="data-id=${f.id}, rel=${'fancybox-group-' + t.id}" th:href="${f.path + f.uuidName}" class="ui bordered image fancybox-image">
+                                                  <i class="remove circle link big red icon btn-delete-file"></i>
+                                                  <img th:src="${#strings.replace(f.path,'/0/','/120/') + f.uuidName}" />
+                                                </a>    
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="ui form fm-language">
                                         <div style="position: relative;" class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
-                                            <label th:text="${item.language.description} + ':'">中文:</label>
+                                            <label th:title="${'提示:输入文本框可以直接粘贴图片'}" th:text="${item.language.description} + ':'">中文:</label>
                                             <textarea class="ta-translteItem" th:attr="data-id=${item.id}" th:title="${item.content}" name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
                                             <i style="position: absolute; right: 0px; top: 20px;" class="history link icon pp-history" th:unless="${#sets.isEmpty(item.translateItemHistories)}"></i>
-                                            <div class="ui flowing popup transition hidden" th:unless="${#sets.isEmpty(item.translateItemHistories)}">
+                                            <div class="ui flowing popup transition hidden pp-translate-history" style="width: 315px;" th:unless="${#sets.isEmpty(item.translateItemHistories)}">
                                                 <h3 class="ui dividing header">翻译更新历史<span th:text="${' (共: ' + #sets.size(item.translateItemHistories) + ' 条)'}"></span></h3>
-                                                <div class="ui comments" style="min-width: 350px; max-height: 300px; overflow: auto;">
+                                                <div class="ui comments" style="max-height: 300px; overflow-y: auto;">
                                                     <div class="comment" th:each="h : ${item.translateItemHistories}">
                                                         <a class="avatar">
                                                             <i class="history icon"></i>
@@ -189,11 +224,11 @@
                                 <td class="td-watchers">
                                     <div>
                                         <div class="ui sub header" style="margin-top:10px; display: inline-block;">创建者:</div>
-                                        <a title="点击和创建者沟通" th:href="@{/admin/dynamic(at=${t.creator}, translateId=${t.id})}" class="ui label lbl-creator" th:text="${t.creator}"></a>
+                                        <a title="点击和创建者沟通" th:href="@{/admin/dynamic(at=${t.creator}, translateId=${t.id})}" class="ui label lbl-creator mapping-user" th:text="${t.creator}"></a>
                                     </div>                                    
                                     <div th:unless="${t.updater == null}">
                                         <div class="ui sub header" style="margin-top:10px; display: inline-block;">更新者:</div>
-                                        <a title="点击和更新者沟通" th:href="@{/admin/dynamic(at=${t.updater}, translateId=${t.id})}" class="ui label lbl-updater" th:text="${t.updater}"></a>
+                                        <a title="点击和更新者沟通" th:href="@{/admin/dynamic(at=${t.updater}, translateId=${t.id})}" class="ui label lbl-updater mapping-user" th:text="${t.updater}"></a>
                                     </div>
                                     <div class="ui sub header" style="margin-top:10px;">关注者:</div>
                                     <input type="hidden" th:each="w : ${t.watchers}" th:name="${w.username}" th:value="${w.username}">
@@ -201,7 +236,7 @@
                                         <input name="watchers" type="hidden">
                                         <div class="default text">关注者</div>
                                         <div class="menu">
-                                            <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username}" th:text="${((not #strings.isEmpty(u.name)) ? u.name : u.username)}"></div>
+                                            <div th:each="u : ${users}" class="item" th:if="${u.enabled}" th:attr="data-value=${u.username}" th:title="${u.username}" th:text="${((not #strings.isEmpty(u.name)) ? u.name : u.username)}"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -285,19 +320,106 @@
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
     <input type="hidden" name="project.languageId" th:value="${project != null ? project.language.id : ''}" />
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:name="${u.username}" th:value="${u.name}" />
+    <!-- 
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+     -->
+    <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
+    <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
+    <!-- <script type="text/javascript" th:src="@{/lib/dropzone/dropzone.min.js}" src="../../static/lib/dropzone/dropzone.min.js"></script> -->
+    <script type="text/javascript" th:src="@{/lib/fancybox/jquery.fancybox.pack.js}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
 
         jQuery('.timeago').timeago();
+        $(".fancybox-image").fancybox({
+            loop: false
+        });
+
+        // --------------------------------------------------------------------------------- username mapping to name start
+        var userMap = {};
+        $('input:hidden[data-group="users"]').each(function(index, el) {
+            userMap[$(this).attr('name')] = $(this).attr('value');
+        });
+
+        $('.mapping-user').each(function(index, el) {
+            var username = $(this).text();
+            var name = userMap[username];
+            if (name) {
+                $(this).text(name);
+            }
+        });
+        // --------------------------------------------------------------------------------- username mapping to name end
+
+        // ---------------------------------------------------------------------------------clipboard paste image start
+        function pasteImage(evt, data) {
+            var $txt = $(evt.currentTarget);
+            var tid = $txt.closest('tr').attr('data-id');
+
+            $.post('/admin/translate/base64', {
+                id: tid,
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    // console.log(data);
+                    $imgs = $txt.closest('td').find('.files-container').removeClass('ad-hidden').find('.images');
+
+                    var $img = $('<a rel="" href="" class="ui bordered image fancybox-image"><i class="remove circle link big red icon btn-delete-file"></i><img src=""></a>')
+                        .attr('rel', 'fancybox-group-' + tid)
+                        .attr('data-id', data.data.id)
+                        .attr('href', data.data.path + data.data.uuidName);
+
+                    $img.find('img').attr('src', data.data.path.replace('/0/', '/120/') + data.data.uuidName);
+
+                    $imgs.append($img);
+
+                    toastr.success('上传图片成功!');
+                }
+            });
+        }
+
+        $('.tb-translate .pp-translate-file').pastableNonInputable().on('pasteImage', pasteImage).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        }).on('mouseover', function(event) {
+            event.preventDefault();
+            $(this).click();
+        });;
+
+        $('.tb-translate .fm-language textarea').pastableTextarea().on('pasteImage', pasteImage).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        });
+        // ---------------------------------------------------------------------------------clipboard paste image end
+
+        $('body').on('click', '.btn-delete-file', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            $btn = $(this);
+            $.post('/admin/translate/deleteFile', {
+                fileId: $btn.closest('.image').attr('data-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    $imgs = $btn.closest('.images').find('.image');
+                    if ($imgs.size() == 1) {
+                        $btn.closest('.files-container').addClass('ad-hidden');
+                    }
+                    $btn.closest('.image').remove();
+
+                    toastr.success('图片删除成功!');
+                } else {
+                    toastr.error('图片删除失败!');
+                }
+            });
+        });
 
         /**
          * 精简URI(将查询参数值为空的参数移除掉)
@@ -318,8 +440,8 @@
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
-        $('.popup').popup();
-        $('.pp-history').popup({
+        // $('.popup').popup();
+        $('.pp-history,.pp-files').popup({
             on: 'click',
             inline: true,
             hoverable: true,

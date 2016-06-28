@@ -93,6 +93,9 @@ public class Translate implements Serializable {
 	@OneToMany(mappedBy = "translate", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	Set<Label> labels = new HashSet<Label>();
 
+	@ManyToMany(mappedBy = "fileTranslates", cascade = CascadeType.REMOVE)
+	Set<File> files = new HashSet<File>();
+
 	public Long getId() {
 		return id;
 	}
@@ -219,6 +222,14 @@ public class Translate implements Serializable {
 
 	public void setLabels(Set<Label> labels) {
 		this.labels = labels;
+	}
+
+	public Set<File> getFiles() {
+		return files;
+	}
+
+	public void setFiles(Set<File> files) {
+		this.files = files;
 	}
 
 	@Override

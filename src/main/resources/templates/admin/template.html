@@ -103,28 +103,22 @@
                 <div class="metadata">
                     <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
                     <div class="rating">
-                        <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> 
-                        {{if voteZan}}
-                        <span title="${voteZan}">${zanCount} 赞</span>
-                        {{/if}}
+                        <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZan}}
+                        <span title="${voteZan}">${zanCount} 赞</span> {{/if}}
                     </div>
                     <div class="rating">
-                        <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> 
-                        {{if voteCai}}
-                        <span title="${voteCai}">${caiCount} 踩</span>
-                        {{/if}}
+                        <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCai}}
+                        <span title="${voteCai}">${caiCount} 踩</span> {{/if}}
                     </div>
                 </div>
                 <div class="text markdown-body">
                     {{html contentMd}}
                 </div>
-                {{if actions}}
                 <div class="actions">
-                    <a class="reply">回复</a>
+                    <a class="reply">回复</a> {{if actions}}
                     <a class="edit">编辑</a>
-                    <a class="delete">删除</a>
+                    <a class="delete">删除</a> {{/if}}
                 </div>
-                {{/if}}
             </div>
         </div>
     </script>
@@ -148,7 +142,7 @@
                             ${creator.username}
                         {{/if}}
                     </a>
-                    <span>${actionMapping}</span> 
+                    <span>${actionMapping}</span>
                     <a target="_blank" href="/admin/translate?id=${targetId}">翻译</a>
                     <span>${propertiesMapping}</span>
                     <div class="date timeago" title="${createDate}">
@@ -160,8 +154,7 @@
                     {{if oldValue}}
                     <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${oldValue}</div>
                     <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;">更新为</div>
-                    {{/if}}
-                    {{if isLabels}}
+                    {{/if}} {{if isLabels}}
                     <div class="ui tag label">${newValue}</div>
                     {{else isWatchers}}
                     <div class="ui label">
@@ -170,7 +163,7 @@
                     {{else}}
                     <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${newValue}</div>
                     {{/if}}
-                </div>            
+                </div>
                 {{/if}}
             </div>
         </div>
@@ -313,7 +306,7 @@
                         <i class="dropdown icon"></i>
                         <div class="default text">通知用户</div>
                         <div class="menu">
-                            <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                            <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                         </div>
                     </div>
                     <div class="ui checkbox ck-selectAll">
@@ -328,7 +321,7 @@
             <div class="ui ok positive button">确定</div>
         </div>
     </div>
-    <div th:fragment="ad-page-dimmer" class="ui page dimmer ad-page-dimmer">
+    <div th:fragment="ad-page-dimmer" style="z-index: 99999;" class="ui page dimmer ad-page-dimmer">
         <div class="ui large text loader">处理中...</div>
     </div>
     <!-- user add modal -->
@@ -475,7 +468,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>
@@ -523,7 +516,7 @@
                     <i class="dropdown icon"></i>
                     <div class="default text">用户</div>
                     <div class="menu">
-                        <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                        <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                     </div>
                 </div>
                 <div class="ui checkbox ck-selectAll">
@@ -576,11 +569,33 @@
         <div class="header">
             编辑沟通内容
         </div>
-        <div class="content" style="max-height: 295px; overflow: auto;">
+        <div class="content">
             <div class="">
                 <div class="ui form fm-edit-reply markdown-body">
-                    <div class="field">
+                    <div class="field pp-edit-users">
                         <textarea class="ta-chat-edit" name="content" rows="2" placeholder="编辑沟通内容"></textarea>
+                    </div>
+                    <div class="ui fluid popup bottom left transition hidden list-edit-users-container" style="max-height:150px; overflow:auto;">
+                        <div class="ui middle aligned selection list list-users">
+                            <div class="item" th:attr="data-value=${'all'}, data-label=${'全部用户'}">
+                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${'全'}">全部用户</span>
+                                </a>
+                                <div class="content">
+                                    <div class="header" th:text="${'全部用户 - (all)'}">全部用户 - (all)</div>
+                                </div>
+                            </div>
+                            <div class="item" th:each="u : ${users}" th:if="${u.enabled}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
+                                <!-- <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg"> -->
+                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(u.name)}" th:text="${#strings.toUpperCase(#strings.substring(u.name,#strings.length(u.name) - 1,#strings.length(u.name)))}">管理员</span>
+                                    <img style="height:35px;" th:if="${#strings.isEmpty(u.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                </a>
+                                <div class="content">
+                                    <div class="header" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name) + ' - ' + u.mails + ' (' + u.username + ')'}">张三 - weicheng.xi@newtouch.cn (xiweicheng)</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -635,7 +650,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>

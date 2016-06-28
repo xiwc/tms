@@ -179,26 +179,18 @@
             </div>
         </div>
     </div>
-    <div th:replace="admin/template :: ad-images"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
-    <div th:replace="admin/template :: ad-news-edit"></div>
-    <div th:replace="admin/template :: ad-news-select"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <!-- script -->
+    <!--     
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/date.format.js}" src="../../static/lib/date.format.js"></script>
-    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
-    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+     -->
+    <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
-    <!-- template html segment used by jquery.tmpl -->
-    <script th:replace="admin/template :: imageItemTpl"></script>
-    <script th:replace="admin/template :: bigImgItemTpl"></script>
-    <script th:replace="admin/template :: hotNewsItemTpl"></script>
-    <script th:replace="admin/template :: moreNewsItemTpl"></script>
-    <script th:replace="admin/template :: articleItemTpl"></script>
     <script type="text/javascript">
     jQuery(document).ready(function($) {
 
