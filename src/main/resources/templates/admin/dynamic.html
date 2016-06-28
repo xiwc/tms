@@ -1651,12 +1651,16 @@
 
                     if (data.data[1] > 0) {
                         resetCb();
+                        var lastCnt = $('.btn-get-chat-news').children('.lbl-chat-news-count').text();
                         $('.btn-get-chat-news').children('.lbl-chat-news-count').text(data.data[1]);
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).show();
                         // 如果自动刷新消息开启,则立即获取消息
                         $autoCR.checkbox('is checked') && getChatNews(true);
 
-                        deskNotify('您有' + data.data[1] + '条沟通新消息!');
+                        if (lastCnt != data.data[1]) {
+                            deskNotify('您有' + data.data[1] + '条沟通新消息!');
+                        }
+
                     } else {
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
                     }
