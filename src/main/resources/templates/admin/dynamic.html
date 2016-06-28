@@ -399,6 +399,13 @@
         </form>
     </div>
     <!-- popup container end -->
+    <div th:fragment="ad-page-dimmer" style="z-index: 99999;" class="ui page dimmer ad-comment-page-dimmer">
+        <div class="container" style="display: flex; justify-content: center; align-items: center; max-width: 650px; margin: auto; overflow-y: auto;">
+            <div class="content">
+                <div class="text" style="max-width: 633px; background-color: white; padding: 15px; text-align: left;"></div>
+            </div>
+        </div>
+    </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-chat-edit"></div>
@@ -1766,6 +1773,33 @@
                     });
                 }
             }).popup('show');
+        });
+
+        $('.ad-comment-page-dimmer').dimmer({
+            onShow: function() {
+                $('body').addClass('blurring');
+            },
+            onHide: function() {
+                $('body').removeClass('blurring');
+            }
+        });
+        $('body').on('dblclick', '.chat .comments .comment', function(event) {
+            event.preventDefault();
+            var $md = $(this).find('.content .markdown-body');
+            $('.ad-comment-page-dimmer')
+                .find('.container').css({
+                    'height': $(window).height(),
+                    'align-items': $md.height() < $(window).height() ? 'center' : 'inherit'
+                })
+                .find('.text')
+                .empty()
+                .append($md.clone());
+            $('.ad-comment-page-dimmer').dimmer('show');
+        });
+        $('body').on('click', '.ad-comment-page-dimmer .container', function(event) {
+            if (event.target == event.currentTarget) {
+                $(this).closest('.page.dimmer').dimmer('hide');
+            }
         });
 
     });
