@@ -224,11 +224,11 @@
                                 <td class="td-watchers">
                                     <div>
                                         <div class="ui sub header" style="margin-top:10px; display: inline-block;">创建者:</div>
-                                        <a title="点击和创建者沟通" th:href="@{/admin/dynamic(at=${t.creator}, translateId=${t.id})}" class="ui label lbl-creator" th:text="${t.creator}"></a>
+                                        <a title="点击和创建者沟通" th:href="@{/admin/dynamic(at=${t.creator}, translateId=${t.id})}" class="ui label lbl-creator mapping-user" th:text="${t.creator}"></a>
                                     </div>                                    
                                     <div th:unless="${t.updater == null}">
                                         <div class="ui sub header" style="margin-top:10px; display: inline-block;">更新者:</div>
-                                        <a title="点击和更新者沟通" th:href="@{/admin/dynamic(at=${t.updater}, translateId=${t.id})}" class="ui label lbl-updater" th:text="${t.updater}"></a>
+                                        <a title="点击和更新者沟通" th:href="@{/admin/dynamic(at=${t.updater}, translateId=${t.id})}" class="ui label lbl-updater mapping-user" th:text="${t.updater}"></a>
                                     </div>
                                     <div class="ui sub header" style="margin-top:10px;">关注者:</div>
                                     <input type="hidden" th:each="w : ${t.watchers}" th:name="${w.username}" th:value="${w.username}">
@@ -320,6 +320,7 @@
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
     <input type="hidden" name="project.languageId" th:value="${project != null ? project.language.id : ''}" />
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:name="${u.username}" th:value="${u.name}" />
     <!-- 
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
@@ -343,6 +344,21 @@
         $(".fancybox-image").fancybox({
             loop: false
         });
+
+        // --------------------------------------------------------------------------------- username mapping to name start
+        var userMap = {};
+        $('input:hidden[data-group="users"]').each(function(index, el) {
+            userMap[$(this).attr('name')] = $(this).attr('value');
+        });
+
+        $('.mapping-user').each(function(index, el) {
+            var username = $(this).text();
+            var name = userMap[username];
+            if (name) {
+                $(this).text(name);
+            }
+        });
+        // --------------------------------------------------------------------------------- username mapping to name end
 
         // ---------------------------------------------------------------------------------clipboard paste image start
         function pasteImage(evt, data) {
