@@ -366,6 +366,56 @@
             <div class="ui ok positive button">确定</div>
         </div>
     </div>
+    <!-- user group add modal -->
+    <div th:fragment="ad-user-group-add" class="ui small modal ad-user-group-add">
+        <div class="header">
+            添加用户组
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="required field">
+                        <label>组名:</label>
+                        <input name="groupName" type="text" placeholder="组名">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- user group edit modal -->
+    <div th:fragment="ad-user-group-edit" class="ui small modal ad-user-group-edit">
+        <div class="header">
+            用户组成员编辑
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="ui message">
+                        当前编辑用户组: <span></span>
+                    </div>
+                    <div class="required field">
+                        <label>组成员:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-group-member">
+                            <input type="hidden" name="usernames" value="">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">组成员</div>
+                            <div class="menu">
+                                <div th:each="u : ${users}" class="item" th:title="${u.name}" th:attr="data-value=${u.username}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
     <!-- translate add modal -->
     <div th:fragment="ad-translate-add" class="ui small modal ad-translate-add">
         <div class="header">

@@ -72,6 +72,38 @@
                 </table>
                 <!-- </div> -->
                 <div class="ui styled fluid accordion" sec:authorize="hasRole('ROLE_ADMIN')">
+                    <div class="title">
+                        <i class="dropdown icon"></i> 用户组管理
+                    </div>
+                    <div class="content">
+                        <div class="ui segment">
+                            <div class="ui blue button btn-add-group">添加</div>
+                        </div>
+                        <table class="ui sortable celled striped compact table segment table-user-group">
+                            <thead>
+                                <th>组名</th>
+                                <th>成员</th>
+                                <!-- <th>角色</th> -->
+                                <th>创建时间</th>
+                                <th>状态</th>
+                                <th sec:authorize="hasRole('ROLE_ADMIN')">处理</th>
+                            </thead>
+                            <tbody th:remove="all-but-first">
+                                <tr th:each="g : ${groups}" th:attr="data-id=${g.id}">
+                                    <td class="groupName" th:title="${g.groupName}" th:text="${g.groupName}">groupName</td>
+                                    <td>
+                                        <div class="ui basic label" th:each="m : ${g.groupMembers}" th:text="${m.username}"></div>
+                                    </td>
+                                    <td th:text="${#calendars.format(g.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
+                                    <td th:text="${g.status}"></td>
+                                    <td sec:authorize="hasRole('ROLE_ADMIN')">
+                                        <div class="ui compact tiny primary button btn-edit-group">编辑</div>
+                                        <div class="ui compact tiny red button btn-del-group">删除</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="title" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
                         <i class="dropdown icon"></i> 批量创建用户
                     </div>
@@ -123,6 +155,8 @@
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-user-add"></div>
     <div th:replace="admin/template :: ad-user-edit"></div>
+    <div th:replace="admin/template :: ad-user-group-add"></div>
+    <div th:replace="admin/template :: ad-user-group-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <!-- 
@@ -142,7 +176,91 @@
         $('.ui.checkbox').checkbox();
         $('.pp').popup();
         $('.ui.dropdown.dd-mailUsers').dropdown();
+        $('.ui.dropdown.dd-group-member').dropdown();
         $('.ui.accordion').accordion();
+
+        // -------------------------------------------------------------user group start
+        $('.btn-add-group').click(function(event) {
+            $('.ad-user-group-add').modal({
+                onApprove: function() {
+                    $.post('admin/user/createGroup', {
+                        baseURL: baseURL,
+                        groupName: $(this).find('input[name="groupName"]').val()
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            toastr.success('操作成功!');
+                            window.location.reload();
+                        } else {
+                            toastr.error(data.data, '操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-user-group').on('click', '.btn-del-group', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/user/deleteGroup', {
+                        baseURL: baseURL,
+                        groupId: $btn.closest('tr').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            toastr.success('操作成功!');
+                            $btn.closest('tr').remove();
+                        } else {
+                            toastr.error(data.data, '操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-user-group').on('click', '.btn-edit-group', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+
+            $.get('/admin/user/groupMemembers', {
+                groupId: $btn.closest('tr').attr('data-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    $('.ad-user-group-edit').modal({
+                        onShow: function() {
+                            var gms = data.data;
+                            var gmArr = [];
+                            $.each(gms, function(index, gm) {
+                                gmArr.push(gm.username);
+                            });
+                            $(this).find('.dd-group-member').dropdown('clear').dropdown('set selected', gmArr);
+                            $(this).find('.ui.message span').text($btn.closest('tr').find('td.groupName').text());
+                        },
+                        onApprove: function() {
+                            var $md = $(this);
+                            $.post('admin/user/updateGroupMembers', {
+                                baseURL: baseURL,
+                                groupId: $btn.closest('tr').attr('data-id'),
+                                usernames: $md.find('.dd-group-member').dropdown('get value')
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    toastr.success('操作成功!');
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.data, '操作失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                } else {
+                    toastr.error(data.data, '操作失败!');
+                }
+            });
+
+        });
+
+        // -------------------------------------------------------------user group end
 
         var simplemde = null;
         if ($(".ta-md").size() > 0) {
