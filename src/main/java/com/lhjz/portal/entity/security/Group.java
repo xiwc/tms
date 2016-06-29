@@ -28,7 +28,7 @@ import com.lhjz.portal.pojo.Enum.Status;
  */
 @Entity
 @Table(name = "groups")
-public class Group implements java.io.Serializable {
+public class Group implements java.io.Serializable, Comparable<Group> {
 
 	/** serialVersionUID long */
 	private static final long serialVersionUID = 3805010763422813183L;
@@ -154,6 +154,11 @@ public class Group implements java.io.Serializable {
 				+ creator + ", updater=" + updater + ", status=" + status
 				+ ", createDate=" + createDate + ", updateDate=" + updateDate
 				+ "]";
+	}
+
+	@Override
+	public int compareTo(Group o) {
+		return getGroupName().compareTo(o.getGroupName());
 	}
 
 }

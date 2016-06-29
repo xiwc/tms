@@ -330,6 +330,14 @@
                                                 <div class="header" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name) + ' - ' + u.mails + ' (' + u.username + ')'}">张三 - weicheng.xi@newtouch.cn (xiweicheng)</div>
                                             </div>
                                         </div>
+                                        <div class="item" th:each="g : ${groups}" th:attr="data-type=${'group'}, data-value=${g.groupName}, data-label=${g.groupName}">
+                                            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                                <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${#strings.toUpperCase(#strings.substring(g.groupName,#strings.length(g.groupName) - 1,#strings.length(g.groupName)))}">管理员</span>
+                                            </a>
+                                            <div class="content">
+                                                <div class="header" th:text="${(g.groupName) + ' - (用户组)'}">张三 - (用户组)</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="ui buttons">
@@ -678,10 +686,6 @@
             }
         });
 
-        // $('.chat-search .ui.search i').click(function(event) {
-        //     searchHandler();
-        // });
-
         $('.list-chat-search-results').on('click', '.item', function(event) {
             event.preventDefault();
             $item = $(this);
@@ -784,6 +788,25 @@
         }
 
         /**
+         * 解析@groups
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function parseGroups(plainText) {
+            var groups = [];
+            var atR = /\{!~([^\}]*)\}/g;
+            var rs = atR.exec(plainText);
+            while (rs) {
+                if (userMap[rs[1]] && groups.indexOf(rs[1]) == -1) {
+                    groups.push(rs[1]);
+                }
+                rs = atR.exec(plainText);
+            }
+
+            return groups;
+        }
+
+        /**
          * 解析要发送邮件的用户们
          * @param  {[type]} plainText [description]
          * @return {[type]}           [description]
@@ -803,6 +826,21 @@
         }
 
         /**
+         * 解析要发送邮件的用户组们
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function parseGroupNames(plainText) {
+            var groupNameArr = [];
+            var groups = parseGroups(plainText);
+            $.each(groups, function(index, group) {
+                if (groupNameArr.indexOf(group) == -1) {
+                    groupNameArr.push(group);
+                }
+            });
+            return groupNameArr;
+        }
+        /**
          * 替换@user解析
          * @param  {[type]} plainText [description]
          * @return {[type]}           [description]
@@ -812,6 +850,9 @@
             var txt = plainText;
             $.each(parseUsers(plainText), function(index, username) {
                 txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '<span data-value="' + username + '" class="at-user">' + '**`@' + userMap[username] + '`**' + '</span>');
+            });
+            $.each(parseGroups(plainText), function(index, groupName) {
+                txt = txt.replace(new RegExp('{!~' + groupName + '}', 'g'), '<span data-value="' + groupName + '" class="at-group">' + '**`@' + userMap[groupName] + '(组)`**' + '</span>');
             });
 
             return txt;
@@ -1078,7 +1119,11 @@
             var mkIndex = line.lastIndexOf(mk);
             var atFrom = mkIndex + mk.length;
             if (mkIndex > -1 && cursor.ch >= atFrom) {
-                cm.replaceRange('{~' + $user.attr('data-value') + '}', {
+
+                var type = $user.attr('data-type');
+                var showTxt = (type == 'group') ? '{!~' + $user.attr('data-value') + '}' : '{~' + $user.attr('data-value') + '}';
+
+                cm.replaceRange(showTxt, {
                     line: cursor.line,
                     ch: atFrom - 1
                 }, {
@@ -1092,10 +1137,15 @@
             cm.focus();
         }
 
-        function insertAtUser(cm, username) {
+        function insertAtUserOrGroup(cm, username, isGroup) {
             var cursor = cm.getCursor();
             if (cursor) {
-                cm.replaceRange('{~' + username + '}', cursor, cursor);
+                if (!isGroup) {
+                    cm.replaceRange('{~' + username + '}', cursor, cursor);
+                } else {
+                    cm.replaceRange('{!~' + username + '}', cursor, cursor);
+                }
+
             }
         }
 
@@ -1308,6 +1358,7 @@
                 lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id'),
                 baseURL: baseURL,
                 usernames: parseUsernames(content).join(','),
+                groups: parseGroupNames(content).join(','),
                 content: content,
                 contentHtml: html,
             }, function(data, textStatus, xhr) {
@@ -1411,6 +1462,7 @@
                                 id: $btn.closest('.comment').attr('data-id'),
                                 baseURL: baseURL,
                                 usernames: parseUsernames(content).join(','),
+                                groups: parseGroupNames(content).join(','),
                                 content: content,
                                 contentHtmlOld: htmlOld,
                                 contentHtml: html,
@@ -1434,7 +1486,14 @@
 
         $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
             event.preventDefault();
-            insertAtUser(cm, $(this).attr('data-value'));
+            insertAtUserOrGroup(cm, $(this).attr('data-value'));
+            s2b();
+            cm.focus();
+        });
+
+        $('body').on('click', '.ui.comments .comment .text span.at-group', function(event) {
+            event.preventDefault();
+            insertAtUserOrGroup(cm, $(this).attr('data-value'), true);
             s2b();
             cm.focus();
         });

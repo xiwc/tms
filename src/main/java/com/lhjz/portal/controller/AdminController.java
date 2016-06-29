@@ -214,9 +214,13 @@ public class AdminController extends BaseController {
 		List<User> users = userRepository.findAll();
 		Collections.sort(users);
 
+		List<Group> groups = groupRepository.findAll();
+		Collections.sort(groups);
+
 		model.addAttribute("chats", chats);
 		model.addAttribute("logs", logs);
 		model.addAttribute("users", users);
+		model.addAttribute("groups", groups);
 		model.addAttribute("user", getLoginUser());
 		
 		return "admin/dynamic";

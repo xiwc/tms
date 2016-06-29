@@ -109,28 +109,25 @@ public class ChatController extends BaseController {
 		if (StringUtil.isNotEmpty(usernames) || StringUtil.isNotEmpty(groups)) {
 
 			if (StringUtil.isNotEmpty(usernames)) {
-				usernames = "";
+				String[] usernameArr = usernames.split(",");
+				Arrays.asList(usernameArr).stream().forEach((username) -> {
+					mail.addUsers(getUser(username));
+				});
 			}
 			if (StringUtil.isNotEmpty(groups)) {
-				groups = "";
+				String[] groupArr = groups.split(",");
+				Arrays.asList(groupArr).stream().forEach((group) -> {
+					List<Group> groupList = groupRepository
+							.findByGroupName(group);
+					if (groupList.size() > 0) {
+						List<GroupMember> groupMembers = groupMemberRepository
+								.findByGroup(groupList.get(0));
+						groupMembers.stream().forEach(gm -> {
+							mail.addUsers(getUser(gm.getUsername()));
+						});
+					}
+				});
 			}
-
-			String[] usernameArr = usernames.split(",");
-			Arrays.asList(usernameArr).stream().forEach((username) -> {
-				mail.addUsers(getUser(username));
-			});
-
-			String[] groupArr = groups.split(",");
-			Arrays.asList(groupArr).stream().forEach((group) -> {
-				List<Group> groupList = groupRepository.findByGroupName(group);
-				if (groupList.size() > 0) {
-					List<GroupMember> groupMembers = groupMemberRepository
-							.findByGroup(groupList.get(0));
-					groupMembers.stream().forEach(gm -> {
-						mail.addUsers(getUser(gm.getUsername()));
-					});
-				}
-			});
 
 			ThreadUtil.exec(() -> {
 
@@ -195,28 +192,25 @@ public class ChatController extends BaseController {
 		if (StringUtil.isNotEmpty(usernames) || StringUtil.isNotEmpty(groups)) {
 
 			if (StringUtil.isNotEmpty(usernames)) {
-				usernames = "";
+				String[] usernameArr = usernames.split(",");
+				Arrays.asList(usernameArr).stream().forEach((username) -> {
+					mail.addUsers(getUser(username));
+				});
 			}
 			if (StringUtil.isNotEmpty(groups)) {
-				groups = "";
+				String[] groupArr = groups.split(",");
+				Arrays.asList(groupArr).stream().forEach((group) -> {
+					List<Group> groupList = groupRepository
+							.findByGroupName(group);
+					if (groupList.size() > 0) {
+						List<GroupMember> groupMembers = groupMemberRepository
+								.findByGroup(groupList.get(0));
+						groupMembers.stream().forEach(gm -> {
+							mail.addUsers(getUser(gm.getUsername()));
+						});
+					}
+				});
 			}
-
-			String[] usernameArr = usernames.split(",");
-			Arrays.asList(usernameArr).stream().forEach((username) -> {
-				mail.addUsers(getUser(username));
-			});
-
-			String[] groupArr = groups.split(",");
-			Arrays.asList(groupArr).stream().forEach((group) -> {
-				List<Group> groupList = groupRepository.findByGroupName(group);
-				if (groupList.size() > 0) {
-					List<GroupMember> groupMembers = groupMemberRepository
-							.findByGroup(groupList.get(0));
-					groupMembers.stream().forEach(gm -> {
-						mail.addUsers(getUser(gm.getUsername()));
-					});
-				}
-			});
 
 			ThreadUtil.exec(() -> {
 
