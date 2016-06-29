@@ -71,12 +71,12 @@
                     </tbody>
                 </table>
                 <!-- </div> -->
-                <div class="ui styled fluid accordion" sec:authorize="hasRole('ROLE_ADMIN')">
+                <div class="ui styled fluid accordion">
                     <div class="title">
                         <i class="dropdown icon"></i> 用户组管理
                     </div>
                     <div class="content">
-                        <div class="ui segment">
+                        <div class="ui segment" sec:authorize="hasRole('ROLE_ADMIN')">
                             <div class="ui blue button btn-add-group">添加</div>
                         </div>
                         <table class="ui sortable celled striped compact table segment table-user-group">
