@@ -193,14 +193,14 @@ jQuery(function($) {
             }
             return '';
         },
-        md2html(markdown) {
+        md2html: function(markdown) {
             if (showdown) {
                 var converter = new showdown.Converter();
                 return converter.makeHtml(markdown);
             }
             return markdown;
         },
-        imgLoaded($imgs, callback) {
+        imgLoaded: function($imgs, callback) {
             var imgdefereds = [];
             $imgs.each(function() {
                 var dfd = $.Deferred();
@@ -221,6 +221,20 @@ jQuery(function($) {
             })
             $.when.apply(null, imgdefereds).done(function() {
                 callback && callback.call(null);
+            });
+        },
+        showMappedTxt: function(filter) {
+            var userMap = {};
+            $('input:hidden[data-group="users"]').each(function(index, el) {
+                userMap[$(this).attr('name')] = $(this).attr('value');
+            });
+
+            $(filter).each(function(index, el) {
+                var username = $(this).text();
+                var name = userMap[username];
+                if (name) {
+                    $(this).text(name);
+                }
             });
         }
     });

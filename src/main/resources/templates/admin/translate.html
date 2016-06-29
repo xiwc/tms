@@ -346,18 +346,7 @@
         });
 
         // --------------------------------------------------------------------------------- username mapping to name start
-        var userMap = {};
-        $('input:hidden[data-group="users"]').each(function(index, el) {
-            userMap[$(this).attr('name')] = $(this).attr('value');
-        });
-
-        $('.mapping-user').each(function(index, el) {
-            var username = $(this).text();
-            var name = userMap[username];
-            if (name) {
-                $(this).text(name);
-            }
-        });
+        Utils.showMappedTxt('.mapping-user');
         // --------------------------------------------------------------------------------- username mapping to name end
 
         // ---------------------------------------------------------------------------------clipboard paste image start

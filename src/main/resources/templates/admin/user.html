@@ -92,7 +92,7 @@
                                 <tr th:each="g : ${groups}" th:attr="data-id=${g.id}">
                                     <td class="groupName" th:title="${g.groupName}" th:text="${g.groupName}">groupName</td>
                                     <td>
-                                        <div class="ui basic label" th:each="m : ${g.groupMembers}" th:text="${m.username}"></div>
+                                        <div class="ui basic label mapping-user" th:each="m : ${g.groupMembers}" th:title="${m.username}" th:text="${m.username}"></div>
                                     </td>
                                     <td th:text="${#calendars.format(g.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
                                     <td th:text="${g.status}"></td>
@@ -159,6 +159,7 @@
     <div th:replace="admin/template :: ad-user-group-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:name="${u.username}" th:value="${u.name}" />
     <!-- 
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
@@ -178,6 +179,11 @@
         $('.ui.dropdown.dd-mailUsers').dropdown();
         $('.ui.dropdown.dd-group-member').dropdown();
         $('.ui.accordion').accordion();
+
+        // --------------------------------------------------------------------------------- username mapping to name start
+        Utils.showMappedTxt('.mapping-user');
+        // --------------------------------------------------------------------------------- username mapping to name end
+
 
         // -------------------------------------------------------------user group start
         $('.btn-add-group').click(function(event) {
