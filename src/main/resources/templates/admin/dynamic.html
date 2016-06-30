@@ -265,8 +265,8 @@
                                             </div>
                                         </div>
                                         <div th:unless="${#strings.isEmpty(l.properties)}" class="extra text">
-                                            <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${#strings.isEmpty(l.oldValue)}" th:text="${l.oldValue}"></div>
-                                            <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;" th:unless="${#strings.isEmpty(l.oldValue)}">更新为</div>
+                                            <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${l.oldValue == null}" th:text="${l.oldValue}"></div>
+                                            <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;" th:unless="${l.oldValue == null}">更新为</div>
                                             <div th:if="${#strings.toString(l.properties) == 'Labels'}" class="ui tag label" th:text="${l.newValue}"></div>
                                             <div th:if="${#strings.toString(l.properties) == 'Watchers'}" class="ui label">
                                                 <i class="user icon"></i> <span class="mapping-user" th:text="${l.newValue}"></span>
@@ -1603,8 +1603,10 @@
                         if (log.creator.name) {
                             log.creator.iconName = log.creator.name.substr(log.creator.name.length - 1).toUpperCase();
                         }
+
                         if (log.properties == 'Labels') log.isLabels = true;
                         if (log.properties == 'Watchers') log.isWatchers = true;
+                        if (log.oldValue != null) log.isOldValue = true;
 
                         log.actionMapping = actionMapping[log.action];
                         log.propertiesMapping = propMapping[log.properties];
@@ -1746,6 +1748,7 @@
                                 }
                                 if (log.properties == 'Labels') log.isLabels = true;
                                 if (log.properties == 'Watchers') log.isWatchers = true;
+                                if (log.oldValue != null) log.isOldValue = true;
 
                                 log.actionMapping = actionMapping[log.action];
                                 log.propertiesMapping = propMapping[log.properties];
