@@ -415,8 +415,8 @@
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-chat-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
-    <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
@@ -1863,14 +1863,6 @@
             }).popup('show');
         });
 
-        $('.ad-comment-page-dimmer').dimmer({
-            onShow: function() {
-                $('body').addClass('blurring');
-            },
-            onHide: function() {
-                $('body').removeClass('blurring');
-            }
-        });
         $('body').on('dblclick', '.chat .comments .comment', function(event) {
             event.preventDefault();
             var $md = $(this).find('.content .markdown-body');
@@ -1882,7 +1874,16 @@
                 .find('.text')
                 .empty()
                 .append($md.clone());
-            $('.ad-comment-page-dimmer').dimmer('show');
+
+            $('.ad-comment-page-dimmer').addClass('dimmer').dimmer({
+                onShow: function() {
+                    $('body').addClass('blurring');
+                },
+                onHide: function() {
+                    $('body').removeClass('blurring');
+                    $('.ad-comment-page-dimmer').removeClass('dimmer');
+                }
+            }).dimmer('show');
         });
         $('body').on('click', '.ad-comment-page-dimmer .container', function(event) {
             if (event.target == event.currentTarget) {

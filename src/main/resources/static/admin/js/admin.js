@@ -107,14 +107,10 @@ jQuery(function($) {
         };
     }
 
-    var $loadingDimmer = $('<div style="z-index: 99999;" class="ui page active dimmer ad-loading-page-dimmer"> <div class="ui large text loader">处理中...</div> </div>');
-
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
         if (settings.url.lastIndexOf('/unmask') == -1) {
-            if ($('.ad-loading-page-dimmer').size() == 0) {
-                $('body').append($loadingDimmer);
-            }
+            $('.ad-page-dimmer').addClass('active');
         }
 
         var csrf = {};
@@ -128,7 +124,7 @@ jQuery(function($) {
     });
 
     $(document).on('ajaxStop', function() {
-        $('.ad-loading-page-dimmer').remove();
+        $('.ad-page-dimmer').removeClass('active');
     });
 
 
