@@ -1768,7 +1768,6 @@
                 type: data.blob.type
             }, function(data, textStatus, xhr) {
                 if (data.success) {
-                    console.log(data);
                     insertComment(cm, '![{name}]({baseURL}{path}{uuidName})'
                         .replace(/\{name\}/g, data.data.name)
                         .replace(/\{baseURL\}/g, baseURL)
@@ -1779,6 +1778,26 @@
         }).on('pasteImageError', function(ev, data) {
             toastr.error(data.message, '剪贴板粘贴图片错误!');
         });
+
+        // clipboard paste image
+        $('.fm-edit-reply .CodeMirror textarea').pastableTextarea().on('pasteImage', function(ev, data) {
+
+            $.post('/admin/file/base64', {
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    insertComment(cme, '![{name}]({baseURL}{path}{uuidName})'
+                        .replace(/\{name\}/g, data.data.name)
+                        .replace(/\{baseURL\}/g, baseURL)
+                        .replace(/\{path\}/g, data.data.path)
+                        .replace(/\{uuidName\}/g, data.data.uuidName));
+                }
+            });
+        }).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        });
+
 
         // 翻译popup
         $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
