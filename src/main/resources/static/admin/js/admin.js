@@ -212,17 +212,17 @@ jQuery(function($) {
                 callback && callback.call(null);
             });
         },
-        showMappedTxt: function(filter) {
+        showMappedTxt: function(filterCls) {
             var userMap = {};
             $('input:hidden[data-group="users"]').each(function(index, el) {
                 userMap[$(this).attr('name')] = $(this).attr('value');
             });
 
-            $(filter).each(function(index, el) {
+            $(filterCls).each(function(index, el) {
                 var username = $(this).text();
                 var name = userMap[username];
                 if (name) {
-                    $(this).text(name);
+                    $(this).text(name).removeClass(filterCls.replace('.', ''));
                 }
             });
         }
