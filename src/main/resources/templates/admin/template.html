@@ -115,15 +115,16 @@
                     {{html contentMd}}
                 </div>
                 <div class="actions">
-                    <a class="reply">回复</a> 
-                    {{if actions}}
+                    <a class="reply">回复</a> {{if actions}}
                     <a class="edit">编辑</a>
-                    <a class="delete">删除</a> 
-                    {{/if}}
+                    <a class="delete">删除</a> {{/if}}
                     <div class="ui dropdown dd-more-actions">
                         <div class="text" style="margin: 0;">更多</div>
                         <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                         <div class="menu">
+                            {{if actions}}
+                            <div class="item edit">编辑</div>
+                            <div class="item delete">删除</div> {{/if}}
                             <div class="item btn-read">阅读</div>
                             <div class="item btn-copy" data-clipboard-text="${content}">复制</div>
                             <div class="item btn-share" data-clipboard-text="${textShare}">分享</div>

@@ -100,6 +100,11 @@
         margin-top: 0;
     }
     
+    .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
+    .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
+        display: none;
+    }
+    
     .ui.vertical.icon.buttons.btns-scroll {
         position: fixed;
         right: 433px;
@@ -225,6 +230,14 @@
         .chat-search {
             display: none;
         }
+        .chat .comments .comment .content .actions > a.edit,
+        .chat .comments .comment .content .actions > a.delete {
+            display: none;
+        }
+        .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
+        .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
+            display: block;
+        }
     }
     </style>
 </head>
@@ -307,9 +320,11 @@
                                         <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</a>
                                         <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</a>
                                         <div class="ui dropdown dd-more-actions">
-                                            <div class="text" style="margin: 0;">更多</div>
+                                            <a class="text" style="margin: 0;">更多</a>
                                             <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                                             <div class="menu">
+                                                <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</div>
+                                                <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</div>
                                                 <div class="item btn-read">阅读</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
@@ -1425,7 +1440,7 @@
 
         });
 
-        $('body').on('click', '.comments .actions a.delete', function(event) {
+        $('body').on('click', '.comments .actions .delete', function(event) {
             $btn = $(this);
             $('.ad-delete-confirm').modal({
                 onApprove: function() {
@@ -1443,7 +1458,7 @@
             }).modal('show');
         });
 
-        $('body').on('click', '.comments .actions a.edit', function(event) {
+        $('body').on('click', '.comments .actions .edit', function(event) {
             $btn = $(this);
 
             $.get('/admin/chat/get', {
