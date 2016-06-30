@@ -107,14 +107,15 @@ jQuery(function($) {
         };
     }
 
+    var $loadingDimmer = $('<div style="z-index: 99999;" class="ui page active dimmer ad-loading-page-dimmer"> <div class="ui large text loader">处理中...</div> </div>');
+
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
-        // if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/poll'))) {
-
         if (settings.url.lastIndexOf('/unmask') == -1) {
-            $('.ad-page-dimmer').addClass('active');
+            if ($('.ad-loading-page-dimmer').size() == 0) {
+                $('body').append($loadingDimmer);
+            }
         }
-        // }
 
         var csrf = {};
         csrf[$('.ad-csrf input:hidden').attr('name')] = $('.ad-csrf input:hidden').attr('value');
@@ -126,16 +127,8 @@ jQuery(function($) {
         }
     });
 
-    // $(document).ajaxStart(function() {
-    //     $('.ad-page-dimmer').addClass('active');
-    // });
-
-    // $(document).ajaxComplete(function() {
-    //     $('.ad-page-dimmer').removeClass('active');
-    // });
-
     $(document).on('ajaxStop', function() {
-        $('.ad-page-dimmer').removeClass('active');
+        $('.ad-loading-page-dimmer').remove();
     });
 
 
