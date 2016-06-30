@@ -306,6 +306,15 @@
                                         <a class="reply">回复</a>
                                         <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</a>
                                         <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</a>
+                                        <div class="ui dropdown dd-more-actions">
+                                            <div class="text" style="margin: 0;">更多</div>
+                                            <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
+                                            <div class="menu">
+                                                <div class="item btn-read">阅读</div>
+                                                <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
+                                                <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -453,6 +462,7 @@
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/desktop-notify-min.js}" src="../../static/lib/desktop-notify-min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/clipboard.min.js}" src="../../static/lib/clipboard.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/poll.js}" src="../../static/admin/js/poll.js"></script>
     <script type="text/javascript">
@@ -461,6 +471,18 @@
         Dropzone.autoDiscover = false;
 
         jQuery(".timeago").timeago();
+
+        var clipboard = new Clipboard('.btn-share, .btn-copy');
+
+        clipboard.on('success', function(e) {
+            var $btn = $(e.trigger);
+            var msg = $btn.hasClass('btn-share') ? '分享链接复制到剪贴板成功!' : '沟通内容复制到剪贴板成功!';
+            toastr.success(msg);
+        });
+
+        clipboard.on('error', function(e) {
+            toastr.success('复制到剪贴板失败!');
+        });
 
         // --------------------------------------------------------------------------------- username mapping to name start
         Utils.showMappedTxt('.mapping-user');
@@ -744,6 +766,9 @@
 
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
+        $('.ui.dropdown.dd-more-actions').dropdown({
+            action: 'hide'
+        });
         $('.pp').popup();
         $('.pp-users.field,.pp-edit-users.field').popup({
             inline: true,
@@ -1255,22 +1280,6 @@
                     $('.ui.sticky').sticky('refresh');
                 }
             });
-            // if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
-            //     isS2bFirst = false;
-            //     Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
-            //         $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
-            //             offset: -50
-            //         });
-
-            //         // $('.ui.sticky').sticky('refresh');
-            //     });
-            // } else {
-            //     $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
-            //         offset: -50
-            //     });
-
-            //     // $('.ui.sticky').sticky('refresh');
-            // }
         }
 
         // 滚动到顶部
@@ -1317,6 +1326,7 @@
                 chat.marked = (chat.id == markId) ? 'marked' : '';
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
                 chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
+                chat.textShare = baseURL + 'admin/dynamic?id=' + chat.id;
                 if (chat.creator.name) {
                     chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                 }
@@ -1327,9 +1337,9 @@
                 chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
             });
             var $more = $("#chatMoreTpl").tmpl(chats);
-            // $more.find('pre code').each(function(i, block) {
-            //     hljs.highlightBlock(block);
-            // });
+            $more.find('.ui.dropdown.dd-more-actions').dropdown({
+                action: 'hide'
+            });
 
             return $more;
         }
@@ -1604,7 +1614,7 @@
                     $("#logMoreTpl").tmpl(data.data.content).appendTo('.fd-dynamic');
                     jQuery(".timeago").timeago();
                     Utils.showMappedTxt('.mapping-user');
-                    
+
                     data.data.last && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
@@ -1890,9 +1900,8 @@
             }).popup('show');
         });
 
-        $('body').on('dblclick', '.chat .comments .comment', function(event) {
-            event.preventDefault();
-            var $md = $(this).find('.content .markdown-body');
+        function commentRead($comment) {
+            var $md = $comment.find('.content .markdown-body');
             $('.ad-comment-page-dimmer')
                 .show()
                 .find('.container').css({
@@ -1912,12 +1921,24 @@
                     $('.ad-comment-page-dimmer').removeClass('dimmer').hide();
                 }
             }).dimmer('show');
+        }
+
+        $('body').on('dblclick', '.chat .comments .comment', function(event) {
+            event.preventDefault();
+            commentRead($(this));
         });
         $('body').on('click', '.ad-comment-page-dimmer .container', function(event) {
             if (event.target == event.currentTarget) {
                 $(this).closest('.page.dimmer').dimmer('hide');
             }
         });
+
+        //-----------------------------------------------------------chat comment more-actions start
+        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-read', function(event) {
+            event.preventDefault();
+            commentRead($(this).closest('.comment'));
+        });
+        //-----------------------------------------------------------chat comment more-actions end
 
     });
     </script>
