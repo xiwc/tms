@@ -180,7 +180,7 @@
         height: 36px;
         width: 1px;
     }
-
+    
     .list-chat-search-results {
         min-width: 390px;
     }
@@ -411,18 +411,12 @@
         </form>
     </div>
     <!-- popup container end -->
-    <div th:fragment="ad-page-dimmer" style="z-index: 99999;" class="ui page dimmer ad-comment-page-dimmer">
-        <div class="container" style="display: flex; display: -webkit-flex; justify-content: center; align-items: center; max-width: 650px; margin: auto; overflow-y: auto;">
-            <div class="content">
-                <div class="text" style="max-width: 633px; background-color: white; padding: 15px; text-align: left;"></div>
-            </div>
-        </div>
-    </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-chat-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
