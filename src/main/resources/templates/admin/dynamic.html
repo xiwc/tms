@@ -269,7 +269,7 @@
                                             <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;" th:unless="${#strings.isEmpty(l.oldValue)}">更新为</div>
                                             <div th:if="${#strings.toString(l.properties) == 'Labels'}" class="ui tag label" th:text="${l.newValue}"></div>
                                             <div th:if="${#strings.toString(l.properties) == 'Watchers'}" class="ui label">
-                                                <i class="user icon"></i> <span th:text="${l.newValue}"></span>
+                                                <i class="user icon"></i> <span class="mapping-user" th:text="${l.newValue}"></span>
                                             </div>
                                             <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${#strings.toString(l.properties) == 'Labels' or #strings.toString(l.properties) == 'Watchers'}" th:text="${l.newValue}"></div>
                                         </div>
@@ -431,6 +431,7 @@
     <input type="hidden" name="page.size.logs" th:value="${logs.size}" />
     <input type="hidden" name="user.username" th:value="${user.username}" />
     <input type="hidden" name="role.admin" th:value="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" />
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:name="${u.username}" th:value="${u.name}" />
     <!--     
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
@@ -460,6 +461,10 @@
         Dropzone.autoDiscover = false;
 
         jQuery(".timeago").timeago();
+
+        // --------------------------------------------------------------------------------- username mapping to name start
+        Utils.showMappedTxt('.mapping-user');
+        // --------------------------------------------------------------------------------- username mapping to name end
 
         // ------------------------------------------------------------------------------------- ck-auto-chat-refresh start
 
