@@ -1867,6 +1867,7 @@
             event.preventDefault();
             var $md = $(this).find('.content .markdown-body');
             $('.ad-comment-page-dimmer')
+                .show()
                 .find('.container').css({
                     'height': $(window).height(),
                     'align-items': $md.height() < $(window).height() ? 'center' : 'inherit'
@@ -1881,7 +1882,7 @@
                 },
                 onHide: function() {
                     $('body').removeClass('blurring');
-                    $('.ad-comment-page-dimmer').removeClass('dimmer');
+                    $('.ad-comment-page-dimmer').removeClass('dimmer').hide();
                 }
             }).dimmer('show');
         });
