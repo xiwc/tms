@@ -251,6 +251,7 @@
                                         <div class="menu">
                                             <div class="item ddmi-edit">编辑</div>
                                             <a class="item" th:href="@{/admin/dynamic(at=${t.creator + (#strings.isEmpty(t.updater) ?  '' :  (',' + t.updater))}, translateId=${t.id})}">沟通</a>
+                                            <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + t.id}">分享</div>
                                             <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (t.creator == user.username)}" class="item ddmi-delete">删除</div>
                                         </div>
                                     </div>
@@ -336,6 +337,7 @@
     <script type="text/javascript" th:src="@{/lib/fancybox/jquery.fancybox.pack.js}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script>
     <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/clipboard.min.js}" src="../../static/lib/clipboard.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
@@ -348,6 +350,18 @@
         // --------------------------------------------------------------------------------- username mapping to name start
         Utils.showMappedTxt('.mapping-user');
         // --------------------------------------------------------------------------------- username mapping to name end
+
+        var clipboard = new Clipboard('.btn-share');
+
+        clipboard.on('success', function(e) {
+            var $btn = $(e.trigger);
+            var msg = $btn.hasClass('btn-share') ? '分享链接复制到剪贴板成功!' : '内容复制到剪贴板成功!';
+            toastr.success(msg);
+        });
+
+        clipboard.on('error', function(e) {
+            toastr.success('复制到剪贴板失败!');
+        });
 
         // ---------------------------------------------------------------------------------clipboard paste image start
         function pasteImage(evt, data) {
