@@ -209,7 +209,7 @@ public class AdminController extends BaseController {
 				.getContent()), pageable, chats.getTotalElements());
 
 		Page<Log> logs = logRepository.findByTarget(Target.Translate,
-				new PageRequest(0, 10, Direction.DESC, "createDate"));
+				new PageRequest(0, 15, Direction.DESC, "createDate"));
 
 		List<User> users = userRepository.findAll();
 		Collections.sort(users);
