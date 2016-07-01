@@ -718,6 +718,11 @@
                     }
                 });
             }
+        }).click(function(event) {
+            var $input = $('.chat-search .ui.search input');
+            if (!$input.val()) {
+                $input.focus();
+            }
         });
 
         $('.chat-search .ui.search input').keyup(function(event) {
