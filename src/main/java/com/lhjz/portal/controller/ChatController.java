@@ -173,6 +173,11 @@ public class ChatController extends BaseController {
 		}
 
 		Chat chat = chatRepository.findOne(id);
+
+		if (content.equals(chat.getContent())) {
+			return RespBody.failed("修改内容没有任何变更的内容!");
+		}
+
 		chat.setContent(content);
 		chat.setUpdateDate(new Date());
 		chat.setUpdater(getLoginUser());
