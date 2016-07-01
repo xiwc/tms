@@ -244,6 +244,59 @@
             display: none;
         }
     }
+    
+    .cbutton {
+        position: relative;
+    }
+    
+    .cbutton::after {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -7px 0 0 -7px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        content: '';
+        opacity: 0;
+        pointer-events: none;
+    }
+    /* Novak */
+    
+    .cbutton--effect-novak::after {
+        background: rgba(111, 148, 182, 0.25);
+    }
+    
+    .cbutton--effect-novak.cbutton--click::after {
+        -webkit-animation: anim-effect-novak 0.5s forwards;
+        animation: anim-effect-novak 0.5s forwards;
+    }
+    
+    @-webkit-keyframes anim-effect-novak {
+        0% {
+            opacity: 1;
+            -webkit-transform: scale3d(0.1, 0.1, 1);
+            transform: scale3d(0.1, 0.1, 1);
+        }
+        100% {
+            opacity: 0;
+            -webkit-transform: scale3d(8, 8, 1);
+            transform: scale3d(30, 30, 1);
+        }
+    }
+    
+    @keyframes anim-effect-novak {
+        0% {
+            opacity: 1;
+            -webkit-transform: scale3d(0.1, 0.1, 1);
+            transform: scale3d(0.1, 0.1, 1);
+        }
+        100% {
+            opacity: 0;
+            -webkit-transform: scale3d(8, 8, 1);
+            transform: scale3d(30, 30, 1);
+        }
+    }
     </style>
 </head>
 
@@ -311,10 +364,10 @@
                                     <div class="metadata">
                                         <span class="date timeago" th:title="${c.createDate}" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                         <div class="rating">
-                                            <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
+                                            <i style="cursor: pointer;" title="赞一下" class="cbutton cbutton--effect-novak thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
                                         </div>
                                         <div class="rating">
-                                            <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
+                                            <i style="cursor: pointer;" title="踩一下" class="cbutton cbutton--effect-novak thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
                                         </div>
                                     </div>
                                     <div class="text markdown-body" th:text="${c.content}">
@@ -374,9 +427,9 @@
                                     </div>
                                 </div>
                                 <div class="ui buttons">
-                                    <button class="ui button btn-chat-clear">取消</button>
+                                    <button class="cbutton cbutton--effect-novak ui button btn-chat-clear">取消</button>
                                     <div class="or"></div>
-                                    <button class="ui positive button btn-chat-submit">提交</button>
+                                    <button class="cbutton cbutton--effect-novak ui positive button btn-chat-submit">提交</button>
                                 </div>
                                 <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
                                     <i class="refresh icon"></i>
@@ -1973,6 +2026,15 @@
         });
         //-----------------------------------------------------------chat comment more-actions end
 
+    });
+
+    $('body').on('click', '.cbutton', function(event) {
+        event.preventDefault();
+        $btn = $(this);
+        $btn.addClass('cbutton--click');
+        setTimeout(function() {
+            $btn.removeClass('cbutton--click');
+        }, 500);
     });
     </script>
 </body>
