@@ -110,7 +110,7 @@ jQuery(function($) {
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
         if (settings.url.lastIndexOf('/unmask') == -1) {
-            $('.ad-page-dimmer').addClass('active');
+            // $('.ad-page-dimmer').addClass('active');
         }
 
         var csrf = {};
@@ -123,8 +123,12 @@ jQuery(function($) {
         }
     });
 
+    $(document).on('ajaxStart', function() {
+        NProgress && NProgress.start();
+    });
     $(document).on('ajaxStop', function() {
-        $('.ad-page-dimmer').removeClass('active');
+        // $('.ad-page-dimmer').removeClass('active');
+        NProgress && NProgress.done();
     });
 
 
