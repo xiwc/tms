@@ -455,7 +455,7 @@
     <input type="hidden" name="page.size.logs" th:value="${logs.size}" />
     <input type="hidden" name="user.username" th:value="${user.username}" />
     <input type="hidden" name="role.admin" th:value="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" />
-    <input type="hidden" th:each="u : ${users}" data-group="users" th:name="${u.username}" th:value="${u.name}" />
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:attr="data-status=${u.enabled}" th:name="${u.username}" th:value="${u.name}" />
     <!--     
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
@@ -862,13 +862,7 @@
         function parseUsernames(plainText) {
             var users = parseUsers(plainText);
             if (users.indexOf('all') > -1) {
-                var users2 = [];
-                $.each(usernames, function(index, username) {
-                    if (username != 'all') {
-                        users2.push(username);
-                    }
-                });
-                return users2;
+                return usernameAll;
             }
             return users;
         }
@@ -1063,11 +1057,16 @@
         // ============================================================================ @user start
         // TODO 临时全局变量定义
         var mk = ' @';
-        var usernames = [];
+        var usernames = []; // 用户名&用户组
+        var usernameAll = []; // 用户名
         var userMap = {};
         $('.list-users-container .list-users > .item').each(function(index, el) {
-            usernames.push($(el).attr('data-value'));
-            userMap[$(el).attr('data-value')] = $(el).attr('data-label');
+            var value = $(el).attr('data-value');
+            usernames.push(value);
+            userMap[value] = $(el).attr('data-label');
+            if ($(el).attr('data-type') != 'group' && value != 'all') {
+                usernameAll.push(value);
+            }
         });
 
         function atUserHandler($pp, $usersContainer) {
