@@ -203,8 +203,21 @@
         z-index: 2;
     }
     /* 文件上传 end*/
+    /* Mobile */
     
     @media only screen and (max-width: 767px) {
+        .chat .comments .comment .content .actions > a.edit,
+        .chat .comments .comment .content .actions > a.delete {
+            display: none;
+        }
+        .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
+        .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
+            display: block;
+        }
+    }
+    /* Mobile & Tablet */
+    
+    @media only screen and (max-width: 991px) {
         .main.container {
             margin-right: 0 !important;
             margin-left: 0 !important;
@@ -229,14 +242,6 @@
         }
         .chat-search {
             display: none;
-        }
-        .chat .comments .comment .content .actions > a.edit,
-        .chat .comments .comment .content .actions > a.delete {
-            display: none;
-        }
-        .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
-        .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
-            display: block;
         }
     }
     </style>
