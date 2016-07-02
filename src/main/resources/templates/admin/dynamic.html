@@ -370,7 +370,7 @@
                                             <i style="cursor: pointer;" title="踩一下" class="cbutton cbutton--effect-novak thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
                                         </div>
                                     </div>
-                                    <div class="text markdown-body" th:text="${c.content}">
+                                    <div class="text markdown-body" th:attr="data-content=${c.content}" th:text="${c.content}">
                                         How artistic!
                                     </div>
                                     <div class="actions">
@@ -2019,7 +2019,21 @@
             $btn = $(this);
             $('.ad-msg-as-wiki').modal({
                 onShow: function() {
-                    $(this).find('.ui.form').form('clear');
+                    var $md = $(this);
+                    $md.find('.ui.form').form('clear');
+
+                    var content = $btn.closest('.comment').find('.content .text.markdown-body').attr('data-content');
+                    var lines = content.split('\n');
+                    $.each(lines, function(index, line) {
+                        line = $.trim(line);
+                        var arr = line.split(/\s+/);
+                        if (arr.length > 1) {
+                            if (/^#+$/.test(arr[0])) {
+                                $md.find('input[name="title"]').val(line.replace(/^#+\s+/, ''));
+                                return false;
+                            }
+                        }
+                    });
                 },
                 onApprove: function() {
                     $md = $(this);
