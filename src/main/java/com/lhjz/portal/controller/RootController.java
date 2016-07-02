@@ -86,6 +86,8 @@ public class RootController extends BaseController {
 			@RequestParam(value = "search", required = false) String search,
 			@PageableDefault(size = 2, sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
+		Page<Chat> chats = null;
+
 		if (StringUtil.isNotEmpty(id)) {
 			long cntGtId = chatRepository.countPublicGtId(id);
 			int size = pageable.getPageSize();
@@ -96,10 +98,16 @@ public class RootController extends BaseController {
 
 			pageable = new PageRequest(page > -1 ? (int) page : 0, size,
 					Direction.DESC, "createDate");
-		}
 
-		Page<Chat> chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki,
-				false, pageable);
+			chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki, false,
+					pageable);
+		} else if (StringUtil.isNotEmpty(search)) {
+			chats = chatRepository.findByTypeAndPrivatedAndContentLike(
+					ChatType.Wiki, false, "%" + search + "%", pageable);
+		} else {
+			chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki, false,
+					pageable);
+		}
 
 		List<User> users = userRepository.findAll();
 
@@ -130,10 +138,18 @@ public class RootController extends BaseController {
 	@RequestMapping(value = "free/wiki/more", method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody moreWiki(
+			@RequestParam(value = "search", required = false) String search,
 			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
-		Page<Chat> chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki,
-				false, pageable);
+		Page<Chat> chats = null;
+
+		if (StringUtil.isNotEmpty(search)) {
+			chats = chatRepository.findByTypeAndPrivatedAndContentLike(
+					ChatType.Wiki, false, "%" + search + "%", pageable);
+		} else {
+			chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki, false,
+					pageable);
+		}
 
 		return RespBody.succeed(chats);
 	}

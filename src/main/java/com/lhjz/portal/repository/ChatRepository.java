@@ -31,6 +31,9 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 	Page<Chat> findByTypeAndPrivated(ChatType type, Boolean privated,
 			Pageable pageable);
 
+	Page<Chat> findByTypeAndPrivatedAndContentLike(ChatType type,
+			Boolean privated, String search, Pageable pageable);
+
 	@Query(value = "SELECT * FROM chat WHERE id > ?1 ORDER BY id ASC", nativeQuery = true)
 	List<Chat> queryRecent(Long lastId);
 

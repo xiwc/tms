@@ -34,41 +34,10 @@
         position: relative;
     }
     
-    .main.container .right.rail {
-        margin-left: 3em;
-        padding-top: 2em;
-        width: 420px;
-        /*overflow: auto;*/
-    }
-    
-    .main.container .right.rail .sticky {
-        /*max-height: 400px;*/
-        overflow: auto;
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-    
-    .CodeMirror,
-    .CodeMirror-scroll {
-        min-height: 150px;
-        /*max-height: 150px;*/
-    }
-    
-    .fm-edit-reply .CodeMirror,
-    .fm-edit-reply .CodeMirror-scroll {
-        height: 200px;
-    }
-    
-    .CodeMirror-fullscreen,
-    .editor-preview-side.editor-preview-active-side {
-        z-index: 999;
-    }
-    
     .avatar.ui.mini.circular.image {
         cursor: pointer;
     }
     
-    .ui.feed>.event:hover,
     .ui.comments .comment:hover,
     .ui.comments .comment.marked {
         background-color: #F3F3F3;
@@ -112,20 +81,6 @@
         bottom: 325px;
         background-color: transparent;
         z-index: 1;
-    }
-    
-    .ui.button.btn-get-chat-news {
-        display: none;
-        position: fixed;
-        right: 430px;
-        /* bottom: 300px; */
-        bottom: 400px;
-        background-color: rgba(219, 40, 40, 0.54);
-        z-index: 1;
-    }
-    
-    .ui.button.btn-get-chat-news:hover {
-        background-color: rgba(219, 40, 40, 1);
     }
     
     .ui.vertical.icon.buttons.btns-scroll .button {
@@ -177,32 +132,19 @@
         margin-right: 0;
     }
     
-    .chat-search-loc {
-        position: fixed;
-        top: 50px;
-        right: 433px;
-        /* z-index: 1; */
-        height: 36px;
-        width: 1px;
-    }
-    
     .list-chat-search-results {
         min-width: 390px;
     }
     /* chat msg search end */
-    /* 文件上传 start*/
     
-    .dz-default.dz-message {
-        height: 120px;
-        line-height: 120px;
-        width: 200px;
-        text-align: center;
+    #nprogress .bar {
+        top: 1px;
     }
+    /* Remove these to get rid of the spinner */
     
-    .editor-toolbar {
-        z-index: 2;
+    #nprogress .spinner {
+        top: 5px;
     }
-    /* 文件上传 end*/
     /* Mobile */
     
     @media only screen and (max-width: 767px) {
@@ -360,7 +302,7 @@
                         <!-- 沟通消息检索 -->
                         <div class="chat-search">
                             <div class="ui search">
-                                <div class="ui circular icon button btn-search" title="沟通消息检索">
+                                <div class="ui circular icon button btn-search" title="博文检索">
                                     <input style="display: none;" class="prompt" th:value="${param.containsKey('search') ? param.search[0] : ''}" type="text" placeholder="查找...">
                                     <i class="search link icon"></i>
                                 </div>
@@ -374,7 +316,6 @@
     </div>
     <!-- popup container start -->
     <div class="ui flowing popup top left transition hidden pp-translate"></div>
-    <div class="chat-search-loc"></div>
     <div class="ui flowing popup top left transition hidden pp-chat-search-results">
         <div class="ui selection divided list list-chat-search-results">
         </div>
@@ -383,14 +324,14 @@
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
     <div th:replace="admin/template :: wikiMoreTpl"></div>
-    <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
-    <div th:replace="admin/template :: chatSearchTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
     <input type="hidden" name="page.size" th:value="${chats.size}" />
-    <input type="hidden" th:each="u : ${users}" data-group="users" th:attr="data-status=${u.enabled}" th:name="${u.username}" th:value="${u.name}" />
+    <input type="hidden" name="param.id" th:value="${param.containsKey('id') ? param.id[0] : ''}" />
+    <input type="hidden" name="param.search" th:value="${param.containsKey('search') ? param.search[0] : ''}" />
+    <!-- <input type="hidden" th:each="u : ${users}" data-group="users" th:attr="data-status=${u.enabled}" th:name="${u.username}" th:value="${u.name}" /> -->
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/deps-dynamic.js}" src="../static/admin/js/deps-dynamic.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../static/lib/jquery.timeago.min.js"></script>
@@ -399,8 +340,6 @@
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
-
-        Dropzone.autoDiscover = false;
 
         jQuery(".timeago").timeago();
 
@@ -418,19 +357,6 @@
 
 
         // ------------------------------------------------------------------------------------- fancybox image start
-
-
-        // $("body img").each(function(index, el) {
-        //     $(this).wrap($('<a class="fancybox-img" />').attr({
-        //         'href': $(this).attr('src'),
-        //         'title': $(this).attr('alt')
-        //     }));
-        // });
-
-        // $(".fancybox-img").fancybox({
-        //     openEffect: 'none',
-        //     closeEffect: 'none'
-        // });
 
         $('body').on('click', '.chat .comments .comment .content .text.markdown-body img', function(event) {
             event.preventDefault();
@@ -454,34 +380,34 @@
 
         // ------------------------------------------------------------------------------------- rating start
 
-        $('body').on('click', '.chat .comments .comment .content .rating i.icon', function(event) {
-            event.preventDefault();
-            $icon = $(this).removeClass('outline');
-            $span = $icon.parent().children('span');
+        // $('body').on('click', '.chat .comments .comment .content .rating i.icon', function(event) {
+        //     event.preventDefault();
+        //     $icon = $(this).removeClass('outline');
+        //     $span = $icon.parent().children('span');
 
-            var chatHtml = $icon.closest('.comment').find('.content .text.markdown-body').html();
-            var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + chatHtml).wrap('<div/>').parent().html();
+        //     var chatHtml = $icon.closest('.comment').find('.content .text.markdown-body').html();
+        //     var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + chatHtml).wrap('<div/>').parent().html();
 
-            $.post('/admin/chat/vote/unmask', {
-                baseURL: baseURL,
-                id: $icon.closest('.comment').attr('data-id'),
-                type: $icon.attr('data-type'),
-                contentHtml: html
-            }, function(data, textStatus, xhr) {
-                if (data.success) {
-                    if ($span.size() == 0) {
-                        $span = $('<span>1 ' + $icon.attr('data-label') + '</span>');
-                        $icon.parent().append($span);
-                    } else {
-                        var oArr = $span.text().split(' ');
-                        $span.text((parseInt(oArr[0]) + 1) + ' ' + oArr[1]);
-                    }
-                    $span.attr('title', $icon.attr('data-type') == 'zan' ? data.data.voteZan : data.data.voteCai)
-                } else {
-                    toastr.error(data.data, "投票失败!");
-                }
-            });
-        });
+        //     $.post('/admin/chat/vote/unmask', {
+        //         baseURL: baseURL,
+        //         id: $icon.closest('.comment').attr('data-id'),
+        //         type: $icon.attr('data-type'),
+        //         contentHtml: html
+        //     }, function(data, textStatus, xhr) {
+        //         if (data.success) {
+        //             if ($span.size() == 0) {
+        //                 $span = $('<span>1 ' + $icon.attr('data-label') + '</span>');
+        //                 $icon.parent().append($span);
+        //             } else {
+        //                 var oArr = $span.text().split(' ');
+        //                 $span.text((parseInt(oArr[0]) + 1) + ' ' + oArr[1]);
+        //             }
+        //             $span.attr('title', $icon.attr('data-type') == 'zan' ? data.data.voteZan : data.data.voteCai)
+        //         } else {
+        //             toastr.error(data.data, "投票失败!");
+        //         }
+        //     });
+        // });
 
         // ------------------------------------------------------------------------------------- rating end
 
@@ -496,7 +422,7 @@
         });
         var source = [];
         if (localStorage) {
-            var v = localStorage.getItem('admin/dynamic:search');
+            var v = localStorage.getItem('free/wiki:search');
             source = v ? $.parseJSON(v) : [];
         }
         $('.chat-search .ui.search').search({
@@ -536,71 +462,22 @@
                     source: source
                 });
             }
-            localStorage && localStorage.setItem('admin/dynamic:search', JSON.stringify(source));
+            localStorage && localStorage.setItem('free/wiki:search', JSON.stringify(source));
             return true;
         }
 
         function searchHandler() {
-            $ppSearch.popup('hide');
-            if ($ppSearch.popup('is visible')) {
-                $ppSearch.popup('hide');
-                setTimeout(function() {
-                    $ppSearch.popup('show');
-                }, 300);
-            } else {
-                $ppSearch.popup('show');
+            if (searchPreCheck()) {
+                window.location.href = '/?search=' + $('.chat-search .ui.search input').val();
             }
         }
 
-        var $ppSearch = $('.btn-search i.icon').popup({
-            popup: $('.pp-chat-search-results'),
-            hoverable: true,
-            on: 'click',
-            target: '.btn-search i.icon',
-            movePopup: false,
-            position: 'bottom right',
-            closable: false,
-            delay: {
-                show: 300,
-                hide: 300
-            },
-            onShow: function() {
-                if (!searchPreCheck()) {
-                    return false;
-                }
-                var $pp = $(this);
-                var search = $('.chat-search .ui.search input').val();
-                $pp.children('.ui.list').html('加载中...');
-                $.get('admin/chat/search/unmask', {
-                    search: search
-                }, function(data) {
-                    if (data.success) {
-                        var chats = data.data.content;
-                        if (data.data.content.length == 0) {
-                            $pp.children('.ui.list').html('检索结果不存在!');
-                            return;
-                        }
-
-                        $.each(chats, function(index, chat) {
-                            chat.contentBrief = chat.content.length > 50 ? chat.content.substr(0, 47) + '...' : chat.content;
-                            if (chat.creator.name) {
-                                chat.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
-                            }
-                            var d = new Date(chat.createDate);
-                            chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                        });
-                        $("#chatSearchTpl").tmpl(chats).appendTo($pp.children('.ui.list').empty());
-                        $('.pp-chat-search-results .timeago').timeago();
-
-                    } else {
-                        toastr.error(data.data, "加载失败!");
-                    }
-                });
-            }
-        }).click(function(event) {
+        $('.btn-search i.icon').click(function(event) {
             var $input = $('.chat-search .ui.search input');
             if (!$input.val()) {
                 $input.focus();
+            } else {
+                searchHandler();
             }
         });
 
@@ -608,57 +485,6 @@
             if (event.keyCode == 13) {
                 searchHandler();
             }
-        });
-
-        $('.list-chat-search-results').on('click', '.item', function(event) {
-            event.preventDefault();
-            $item = $(this);
-            $.get('/admin/chat/searchBy', {
-                id: $item.attr('data-id')
-            }, function(data) {
-                if (data.success) {
-
-                    var chats = data.data.content;
-                    if (chats.length == 0) {
-                        toastr.error("检索结果不存在!");
-                        return;
-                    }
-
-                    var $btnUp = $('.chat .btn-chat-pre-more');
-                    var $btnDown = $('.chat .btn-chat-next-more');
-
-                    if (data.data.last) {
-                        $btnUp.remove();
-                        $btnUp = $('.chat .btn-chat-pre-more');
-                    } else {
-                        if ($btnUp.size() == 0) {
-                            $btnUp = $('<button class="fluid ui button btn-chat-pre-more">加载更多</button>');
-                            $btnUp.insertAfter('.chat .comments > h3');
-                        }
-
-                        $('input:hidden[name="page.number.next"]').val(data.data.number + 1);
-                    }
-
-                    if (data.data.first) {
-                        $btnDown.remove();
-                        $btnDown = $('.chat .btn-chat-next-more');
-                    } else {
-                        if ($btnDown.size() == 0) {
-                            $btnDown = $('<button class="fluid ui button btn-chat-next-more">加载更多</button>');
-                            $btnDown.insertBefore('.chat .fm-reply')
-                        }
-                        $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
-                    }
-
-                    $('.chat .comments .comment').remove();
-
-                    $after = $btnUp.size() == 0 ? $('.chat .comments > h3') : $btnUp;
-
-                    var $more = convertChat(chats, $item.attr('data-id'));
-                    $more.insertAfter($after);
-                    s2m();
-                }
-            });
         });
 
         // ------------------------------------------------------------------------------------- chat search end
@@ -678,8 +504,6 @@
         var $textMds = $('.comments .content .text');
         var converter = new showdown.Converter();
         $textMds.each(function(index, el) {
-            // var html = simplemde.markdown(preParse($(el).text()));
-            // var html = converter.makeHtml($(el).text());
             var html = marked($(el).text());
             $(el).html(html);
         });
@@ -751,8 +575,6 @@
             var isAdminRole = $('input:hidden[name="role.admin"]').val();
             var loginUsername = $('input:hidden[name="user.username"]').val();
             $.each(chats, function(index, chat) {
-                // chat.contentMd = simplemde.markdown(preParse(chat.content));
-                // chat.contentMd = converter.makeHtml(chat.content);
                 chat.contentMd = marked(chat.content);
                 chat.marked = (chat.id == markId) ? 'marked' : '';
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
@@ -797,6 +619,7 @@
             $btn = $(this);
 
             $.get('/free/wiki/more', {
+                search: $('input:hidden[name="param.search"]').val(),
                 page: $('input:hidden[name="page.number.pre"]').val(),
                 size: $('input:hidden[name="page.size"]').val()
             }, function(data) {
@@ -828,6 +651,7 @@
             $btn = $(this);
 
             $.get('/free/wiki/more', {
+                search: $('input:hidden[name="param.search"]').val(),
                 page: $('input:hidden[name="page.number.next"]').val(),
                 size: $('input:hidden[name="page.size"]').val()
             }, function(data) {
