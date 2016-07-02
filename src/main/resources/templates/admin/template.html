@@ -137,6 +137,52 @@
             </div>
         </div>
     </script>
+    <script th:fragment="wikiMoreTpl" id="wikiMoreTpl" type="text/x-jquery-tmpl">
+        <div class="comment ${marked}" data-id="${id}">
+            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                {{if creator.iconName}}
+                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>
+                {{else}}
+                    <img src="/img/head.png">
+                {{/if}}
+            </a>
+            <div class="content">
+                <a class="author" data-value="${creator.username}">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZan}}
+                        <span title="${voteZan}">${zanCount} 赞</span> {{/if}}
+                    </div>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCai}}
+                        <span title="${voteCai}">${caiCount} 踩</span> {{/if}}
+                    </div>
+                </div>
+                <div class="text markdown-body" data-content="${content}">
+                    {{html contentMd}}
+                </div>
+                <div class="actions">
+                    <a class="reply">回复</a>
+                    <div class="ui top right pointing dropdown dd-more-actions">
+                        <div class="text" style="margin: 0;">更多</div>
+                        <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
+                        <div class="menu">
+                            <div class="item btn-read">阅读</div>
+                            <div class="item btn-copy" data-clipboard-text="${content}">复制</div>
+                            <div class="item btn-share" data-clipboard-text="${textShare}">分享</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
     <script th:fragment="logMoreTpl" id="logMoreTpl" type="text/x-jquery-tmpl">
         <div class="event" data-id="${id}">
             <div class="label">

@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.lhjz.portal.entity.Chat;
+import com.lhjz.portal.pojo.Enum.ChatType;
 
 /**
  * 
@@ -23,6 +24,12 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 
 	@Query(value = "SELECT COUNT(*) FROM chat WHERE id >= ?1", nativeQuery = true)
 	long countGtId(Long id);
+
+	@Query(value = "SELECT COUNT(*) FROM chat WHERE privated <> 1 AND type = 'Wiki' AND id >= ?1", nativeQuery = true)
+	long countPublicGtId(Long id);
+
+	Page<Chat> findByTypeAndPrivated(ChatType type, Boolean privated,
+			Pageable pageable);
 
 	@Query(value = "SELECT * FROM chat WHERE id > ?1 ORDER BY id ASC", nativeQuery = true)
 	List<Chat> queryRecent(Long lastId);
