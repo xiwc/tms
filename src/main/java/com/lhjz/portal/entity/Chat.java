@@ -8,20 +8,24 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.pojo.Enum.ChatType;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -61,6 +65,10 @@ public class Chat implements Serializable {
 	@Column(nullable = false)
 	private Status status = Status.Normal;
 
+	@Enumerated(EnumType.STRING)
+	@Column
+	private ChatType type = ChatType.Msg;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate = new Date();
 
@@ -72,6 +80,15 @@ public class Chat implements Serializable {
 
 	@ManyToMany(mappedBy = "voterChats")
 	Set<User> voters = new HashSet<User>();
+
+	@Column
+	private boolean privated;
+
+	@Column
+	private String title;
+
+	@OneToMany(mappedBy = "chat", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	Set<Label> labels = new HashSet<Label>();
 
 	public Long getId() {
 		return id;
@@ -161,13 +178,46 @@ public class Chat implements Serializable {
 		this.voteCai = voteCai;
 	}
 
+	public boolean isPrivated() {
+		return privated;
+	}
+
+	public void setPrivated(boolean privated) {
+		this.privated = privated;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public Set<Label> getLabels() {
+		return labels;
+	}
+
+	public void setLabels(Set<Label> labels) {
+		this.labels = labels;
+	}
+
+	public ChatType getType() {
+		return type;
+	}
+
+	public void setType(ChatType type) {
+		this.type = type;
+	}
+
 	@Override
 	public String toString() {
 		return "Chat [id=" + id + ", content=" + content + ", voteZan="
 				+ voteZan + ", voteCai=" + voteCai + ", creator=" + creator
-				+ ", updater=" + updater + ", status=" + status
-				+ ", createDate=" + createDate + ", updateDate=" + updateDate
-				+ ", version=" + version + "]";
+				+ ", updater=" + updater + ", status=" + status + ", type="
+				+ type + ", createDate=" + createDate + ", updateDate="
+				+ updateDate + ", version=" + version + ", privated="
+				+ privated + ", title=" + title + "]";
 	}
 
 }

@@ -21,8 +21,12 @@ public class Enum {
 		Image, Attachment;
 	}
 
+	public static enum ChatType {
+		Wiki, Msg;
+	}
+
 	public static enum Prop {
-		Key, Content, Name, Id, Watchers, Labels, TranslateItem;
+		Key, Content, Name, Id, Watchers, Labels, TranslateItem, Title;
 	}
 
 	public static enum Target {

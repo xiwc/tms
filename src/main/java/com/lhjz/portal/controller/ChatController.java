@@ -3,9 +3,11 @@
  */
 package com.lhjz.portal.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Chat;
+import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.security.Group;
 import com.lhjz.portal.entity.security.GroupMember;
@@ -32,12 +36,15 @@ import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
+import com.lhjz.portal.pojo.Enum.ChatType;
+import com.lhjz.portal.pojo.Enum.Prop;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.Enum.VoteType;
 import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.GroupMemberRepository;
 import com.lhjz.portal.repository.GroupRepository;
+import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.util.CollectionUtil;
 import com.lhjz.portal.util.DateUtil;
@@ -73,13 +80,17 @@ public class ChatController extends BaseController {
 	LogRepository logRepository;
 
 	@Autowired
+	LabelRepository labelRepository;
+
+	@Autowired
 	MailSender2 mailSender;
 
 	String dynamicAction = "admin/dynamic";
 
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody create(@RequestParam("baseURL") String baseURL,
+	public RespBody create(
+			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
 			@RequestParam(value = "groups", required = false) String groups,
 			@RequestParam("content") String content,
@@ -96,6 +107,7 @@ public class ChatController extends BaseController {
 		chat.setCreateDate(new Date());
 		chat.setCreator(getLoginUser());
 		chat.setStatus(Status.New);
+		chat.setType(ChatType.Msg);
 
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
@@ -116,17 +128,22 @@ public class ChatController extends BaseController {
 			}
 			if (StringUtil.isNotEmpty(groups)) {
 				String[] groupArr = groups.split(",");
-				Arrays.asList(groupArr).stream().forEach((group) -> {
-					List<Group> groupList = groupRepository
-							.findByGroupName(group);
-					if (groupList.size() > 0) {
-						List<GroupMember> groupMembers = groupMemberRepository
-								.findByGroup(groupList.get(0));
-						groupMembers.stream().forEach(gm -> {
-							mail.addUsers(getUser(gm.getUsername()));
-						});
-					}
-				});
+				Arrays.asList(groupArr)
+						.stream()
+						.forEach(
+								(group) -> {
+									List<Group> groupList = groupRepository
+											.findByGroupName(group);
+									if (groupList.size() > 0) {
+										List<GroupMember> groupMembers = groupMemberRepository
+												.findByGroup(groupList.get(0));
+										groupMembers.stream().forEach(
+												gm -> {
+													mail.addUsers(getUser(gm
+															.getUsername()));
+												});
+									}
+								});
 			}
 
 			ThreadUtil.exec(() -> {
@@ -139,8 +156,7 @@ public class ChatController extends BaseController {
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面的沟通消息中有@到你", "content",
-											html)),
-							mail.get());
+											html)), mail.get());
 					logger.info("沟通邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -160,7 +176,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody update(@RequestParam("id") Long id,
+	public RespBody update(
+			@RequestParam("id") Long id,
 			@RequestParam("content") String content,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
@@ -204,33 +221,35 @@ public class ChatController extends BaseController {
 			}
 			if (StringUtil.isNotEmpty(groups)) {
 				String[] groupArr = groups.split(",");
-				Arrays.asList(groupArr).stream().forEach((group) -> {
-					List<Group> groupList = groupRepository
-							.findByGroupName(group);
-					if (groupList.size() > 0) {
-						List<GroupMember> groupMembers = groupMemberRepository
-								.findByGroup(groupList.get(0));
-						groupMembers.stream().forEach(gm -> {
-							mail.addUsers(getUser(gm.getUsername()));
-						});
-					}
-				});
+				Arrays.asList(groupArr)
+						.stream()
+						.forEach(
+								(group) -> {
+									List<Group> groupList = groupRepository
+											.findByGroupName(group);
+									if (groupList.size() > 0) {
+										List<GroupMember> groupMembers = groupMemberRepository
+												.findByGroup(groupList.get(0));
+										groupMembers.stream().forEach(
+												gm -> {
+													mail.addUsers(getUser(gm
+															.getUsername()));
+												});
+									}
+								});
 			}
 
 			ThreadUtil.exec(() -> {
 
 				try {
 					Thread.sleep(3000);
-					mailSender.sendHtml(
-							String.format("TMS-沟通动态编辑@消息_%s",
-									DateUtil.format(new Date(),
-											DateUtil.FORMAT7)),
+					mailSender.sendHtml(String.format("TMS-沟通动态编辑@消息_%s",
+							DateUtil.format(new Date(), DateUtil.FORMAT7)),
 							TemplateUtil.process("templates/mail/mail-dynamic",
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", "下面编辑的沟通消息中有@到你",
-											"content", html)),
-							mail.get());
+											"content", html)), mail.get());
 					logger.info("沟通编辑邮件发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -272,8 +291,7 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chat);
 	}
 
-	@RequestMapping(value = { "poll",
-			"poll/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "poll", "poll/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody poll(@RequestParam("lastId") Long lastId,
 			@RequestParam("lastEvtId") Long lastEvtId) {
@@ -288,8 +306,7 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(data).addMsg(logs);
 	}
 
-	@RequestMapping(value = { "getNews",
-			"getNews/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "getNews", "getNews/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody getNews(@RequestParam("lastId") Long lastId) {
 
@@ -300,33 +317,30 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "more", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody more(@PageableDefault(sort = {
-			"createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody more(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
-		chats = new PageImpl<Chat>(
-				CollectionUtil.reverseList(chats.getContent()), pageable,
-				chats.getTotalElements());
+		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
+				.getContent()), pageable, chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
 
 	@RequestMapping(value = "moreLogs", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody moreLogs(@PageableDefault(sort = {
-			"createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody moreLogs(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Log> logs = logRepository.findByTarget(Target.Translate, pageable);
 
 		return RespBody.succeed(logs);
 	}
 
-	@RequestMapping(value = { "search",
-			"search/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "search", "search/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody search(
-			@PageableDefault(sort = {
-					"createDate" }, direction = Direction.DESC) Pageable pageable,
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "search", required = true) String search) {
 
 		Page<Chat> chats = chatRepository.findByContentLike("%" + search + "%",
@@ -337,12 +351,11 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chats);
 	}
 
-	@RequestMapping(value = { "searchBy",
-			"searchBy/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "searchBy", "searchBy/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody searchBy(@RequestParam(value = "id") Long id,
-			@PageableDefault(sort = {
-					"createDate" }, direction = Direction.DESC) Pageable pageable) {
+	public RespBody searchBy(
+			@RequestParam(value = "id") Long id,
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		long cntGtId = chatRepository.countGtId(id);
 		int size = pageable.getPageSize();
@@ -355,9 +368,8 @@ public class ChatController extends BaseController {
 				Direction.DESC, "createDate");
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
-		chats = new PageImpl<Chat>(
-				CollectionUtil.reverseList(chats.getContent()), pageable,
-				chats.getTotalElements());
+		chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
+				.getContent()), pageable, chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
@@ -379,8 +391,7 @@ public class ChatController extends BaseController {
 		return isExits;
 	}
 
-	@RequestMapping(value = { "vote",
-			"vote/unmask" }, method = RequestMethod.POST)
+	@RequestMapping(value = { "vote", "vote/unmask" }, method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody vote(@RequestParam("id") Long id,
 			@RequestParam("baseURL") String baseURL,
@@ -403,8 +414,8 @@ public class ChatController extends BaseController {
 			if (isVoterExists(voteZan)) {
 				return RespBody.failed("您已经投票[赞]过！");
 			} else {
-				chat.setVoteZan(voteZan == null ? loginUsername
-						: voteZan + ',' + loginUsername);
+				chat.setVoteZan(voteZan == null ? loginUsername : voteZan + ','
+						+ loginUsername);
 
 				chat2 = chatRepository.saveAndFlush(chat);
 				title = loginUser.getName() + "[" + loginUsername
@@ -416,8 +427,8 @@ public class ChatController extends BaseController {
 			if (isVoterExists(voteCai)) {
 				return RespBody.failed("您已经投票[踩]过！");
 			} else {
-				chat.setVoteCai(voteCai == null ? loginUsername
-						: voteCai + ',' + loginUsername);
+				chat.setVoteCai(voteCai == null ? loginUsername : voteCai + ','
+						+ loginUsername);
 				chat2 = chatRepository.saveAndFlush(chat);
 				title = loginUser.getName() + "[" + loginUsername
 						+ "]踩了你的沟通消息!";
@@ -433,14 +444,13 @@ public class ChatController extends BaseController {
 
 			try {
 				Thread.sleep(3000);
-				mailSender.sendHtml(
-						String.format("TMS-沟通动态投票@消息_%s",
-								DateUtil.format(new Date(), DateUtil.FORMAT7)),
+				mailSender.sendHtml(String.format("TMS-沟通动态投票@消息_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/mail-dynamic",
 								MapUtil.objArr2Map("user", loginUser, "date",
 										new Date(), "href", href, "title",
-										titleHtml, "content", html)),
-						mail.get());
+										titleHtml, "content", html)), mail
+								.get());
 				logger.info("沟通消息投票邮件发送成功！");
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -452,5 +462,149 @@ public class ChatController extends BaseController {
 		log(Action.Vote, Target.Chat, chat.getId(), chat2);
 
 		return RespBody.succeed(chat2);
+	}
+
+	@RequestMapping(value = { "asWiki", "asWiki/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody asWiki(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("title") String title,
+			@RequestParam(value = "labels", required = false) String labels) {
+
+		if (StringUtil.isEmpty(title)) {
+			return RespBody.failed("标题不能为空!");
+		}
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("聊天内容不存在!");
+		}
+
+		chat.setTitle(title);
+		chat.setType(ChatType.Wiki);
+
+		Chat chat2 = chatRepository.saveAndFlush(chat);
+
+		if (StringUtil.isNotEmpty(labels)) {
+
+			List<Label> labelList = new ArrayList<Label>();
+
+			String[] labelArr = labels.split(SysConstant.COMMA);
+			Stream.of(labelArr).forEach((lbl) -> {
+				Label label = new Label();
+				label.setCreateDate(new Date());
+				label.setCreator(WebUtil.getUsername());
+				label.setName(lbl);
+				label.setStatus(Status.New);
+				label.setChat(chat2);
+
+				labelList.add(label);
+			});
+
+			labelRepository.save(labelList);
+			labelRepository.flush();
+		}
+
+		logWithProperties(Action.Update, Target.Chat, chat2.getId(),
+				Prop.Title.name(), title);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = { "updateWiki", "updateWiki/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody updateWiki(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("title") String title,
+			@RequestParam(value = "labels", required = false) String labels) {
+
+		if (StringUtil.isEmpty(title)) {
+			return RespBody.failed("标题不能为空!");
+		}
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("聊天内容不存在!");
+		}
+
+		String oldTitle = chat.getTitle();
+		chat.setTitle(title);
+
+		Chat chat2 = chatRepository.saveAndFlush(chat);
+
+		if (StringUtil.isNotEmpty(labels)) {
+
+			List<Label> labelList2 = labelRepository.findByChat(chat2);
+			labelRepository.delete(labelList2);
+			labelRepository.flush();
+
+			List<Label> labelList = new ArrayList<Label>();
+
+			String[] labelArr = labels.split(SysConstant.COMMA);
+			Stream.of(labelArr).forEach((lbl) -> {
+				Label label = new Label();
+				label.setCreateDate(new Date());
+				label.setCreator(WebUtil.getUsername());
+				label.setName(lbl);
+				label.setStatus(Status.New);
+				label.setChat(chat2);
+
+				labelList.add(label);
+			});
+
+			labelRepository.save(labelList);
+			labelRepository.flush();
+		}
+
+		logWithProperties(Action.Update, Target.Chat, chat2.getId(),
+				Prop.Title.name(), title, oldTitle);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = { "addLabel", "addLabel/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody addLabel(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("label") String label) {
+
+		if (StringUtil.isEmpty(label)) {
+			return RespBody.failed("标签不能为空!");
+		}
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("聊天内容不存在!");
+		}
+
+		Label label2 = new Label();
+		label2.setCreateDate(new Date());
+		label2.setCreator(WebUtil.getUsername());
+		label2.setName(label);
+		label2.setStatus(Status.New);
+		label2.setChat(chat);
+
+		labelRepository.save(label2);
+		labelRepository.flush();
+
+		logWithProperties(Action.Update, Target.Chat, chat.getId(),
+				Prop.Labels.name(), label);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = { "deleteLabel", "deleteLabel/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody deleteLabel(@RequestParam("baseURL") String baseURL,
+			@RequestParam("labelId") Long labelId) {
+
+		labelRepository.delete(labelId);
+
+		log(Action.Delete, Target.Label, labelId);
+
+		return RespBody.succeed(labelId);
 	}
 }
