@@ -286,7 +286,7 @@
                             </div>
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-next-more">加载更多</button>
                             <form class="ui reply form fm-reply">
-                                <a th:href="@{/(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
+                                <a th:href="@{/(scroll=${'t'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
                                     <i class="refresh icon"></i>
                                 </a>
                             </form>
@@ -514,7 +514,10 @@
 
         // ============================================================================ url? start
 
-        if (url('?scroll') || url('?scroll') == '') {
+        if (url('?scroll') == 't') {
+            s2t();
+        }
+        if (url('?scroll') == 'b') {
             s2b();
         }
 
