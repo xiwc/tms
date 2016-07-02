@@ -384,6 +384,7 @@
                                                 <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</div>
                                                 <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</div>
                                                 <div class="item btn-read">阅读</div>
+                                                <div class="item btn-wiki" th:if="${#strings.toString(c.type) != 'Wiki'}">转博</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
                                             </div>
@@ -504,6 +505,7 @@
     <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
+    <div th:replace="admin/template :: ad-msg-as-wiki"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
@@ -830,6 +832,9 @@
         $('.ui.dropdown').dropdown();
         $('.ui.dropdown.dd-more-actions').dropdown({
             action: 'hide'
+        });
+        $('.ui.dropdown.dd-labels').dropdown({
+            allowAdditions: true
         });
         $('.pp').popup();
         $('.pp-users.field,.pp-edit-users.field').popup({
@@ -1389,6 +1394,7 @@
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
                 chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                 chat.textShare = baseURL + 'admin/dynamic?id=' + chat.id;
+                chat.isNotWiki = (chat.type != "wiki");
                 if (chat.creator.name) {
                     chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                 }
@@ -2008,17 +2014,41 @@
             event.preventDefault();
             commentRead($(this).closest('.comment'));
         });
+        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-wiki', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+            $('.ad-msg-as-wiki').modal({
+                onShow: function() {
+                    $(this).find('.ui.form').form('clear');
+                },
+                onApprove: function() {
+                    $md = $(this);
+                    $.post('/admin/chat/asWiki', {
+                        id: $btn.closest('.comment').attr('data-id'),
+                        baseURL: baseURL,
+                        title: $md.find('input[name="title"]').val(),
+                        labels: $md.find('.dd-labels').dropdown('get value')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.remove();
+                            toastr.success('消息转博文成功!');
+                        } else {
+                            toastr.error(data.data, '消息转博文失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
         //-----------------------------------------------------------chat comment more-actions end
 
-    });
-
-    $('body').on('click', '.cbutton', function(event) {
-        event.preventDefault();
-        $btn = $(this);
-        $btn.addClass('cbutton--click');
-        setTimeout(function() {
-            $btn.removeClass('cbutton--click');
-        }, 500);
+        $('body').on('click', '.cbutton', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+            $btn.addClass('cbutton--click');
+            setTimeout(function() {
+                $btn.removeClass('cbutton--click');
+            }, 500);
+        });
     });
     </script>
 </body>

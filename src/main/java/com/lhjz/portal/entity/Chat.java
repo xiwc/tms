@@ -82,7 +82,7 @@ public class Chat implements Serializable {
 	Set<User> voters = new HashSet<User>();
 
 	@Column
-	private boolean privated;
+	private Boolean privated = Boolean.FALSE;
 
 	@Column
 	private String title;
@@ -178,11 +178,11 @@ public class Chat implements Serializable {
 		this.voteCai = voteCai;
 	}
 
-	public boolean isPrivated() {
+	public Boolean isPrivated() {
 		return privated;
 	}
 
-	public void setPrivated(boolean privated) {
+	public void setPrivated(Boolean privated) {
 		this.privated = privated;
 	}
 

@@ -81,7 +81,7 @@ public class AdminController extends BaseController {
 
 	@Autowired
 	LabelRepository labelRepository;
-	
+
 	@Autowired
 	ChatRepository chatRepository;
 
@@ -183,7 +183,7 @@ public class AdminController extends BaseController {
 	public String feedback(Model model) {
 		return "admin/feedback";
 	}
-	
+
 	@RequestMapping("dynamic")
 	public String dynamic(
 			Model model,
@@ -200,8 +200,7 @@ public class AdminController extends BaseController {
 			}
 
 			pageable = new PageRequest(page > -1 ? (int) page : 0, size,
-					Direction.DESC,
-					"createDate");
+					Direction.DESC, "createDate");
 		}
 
 		Page<Chat> chats = chatRepository.findAll(pageable);
@@ -217,19 +216,32 @@ public class AdminController extends BaseController {
 		List<Group> groups = groupRepository.findAll();
 		Collections.sort(groups);
 
+		// login user labels
+		List<Label> labels = labelRepository.findByCreatorGroupByName(WebUtil
+				.getUsername());
+		Set<String> lbls = null;
+		if (labels != null) {
+			lbls = labels.stream().map((label) -> {
+				return label.getName();
+			}).collect(Collectors.toSet());
+		} else {
+			lbls = new HashSet<String>();
+		}
+
 		model.addAttribute("chats", chats);
 		model.addAttribute("logs", logs);
 		model.addAttribute("users", users);
 		model.addAttribute("groups", groups);
+		model.addAttribute("labels", new TreeSet<>(lbls));
 		model.addAttribute("user", getLoginUser());
-		
+
 		return "admin/dynamic";
 	}
 
 	@RequestMapping("translate")
-	public String translate(Model model,
-			@PageableDefault(sort = {
-					"createDate" }, direction = Direction.DESC) Pageable pageable,
+	public String translate(
+			Model model,
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "projectId", required = false) Long projectId,
 			@RequestParam(value = "creator", required = false) String creator,
 			@RequestParam(value = "status", required = false) String status,
@@ -271,8 +283,8 @@ public class AdminController extends BaseController {
 				page = translateRepository.findByProjectAndStatus(project,
 						Status.valueOf(status), pageable);
 			} else if (StringUtil.isNotEmpty(languageId)) {
-				long total = translateRepository
-						.countUnTranslatedByProject(languageId, projectId);
+				long total = translateRepository.countUnTranslatedByProject(
+						languageId, projectId);
 				List<Translate> unTranslates = translateRepository
 						.queryUnTranslatedByProject(languageId, projectId,
 								pageable.getOffset(), pageable.getPageSize());
@@ -299,13 +311,14 @@ public class AdminController extends BaseController {
 								pageable.getPageSize(), Direction.DESC,
 								"updateDate");
 					}
-					page = translateRepository
-							.findByStatus(Status.valueOf(status), pageable);
+					page = translateRepository.findByStatus(
+							Status.valueOf(status), pageable);
 				} else if (StringUtil.isNotEmpty(languageId)) {
 					long total = translateRepository
 							.countUnTranslated(languageId);
 					List<Translate> unTranslates = translateRepository
-							.queryUnTranslated(languageId, pageable.getOffset(),
+							.queryUnTranslated(languageId,
+									pageable.getOffset(),
 									pageable.getPageSize());
 					page = new PageImpl<Translate>(unTranslates, pageable,
 							total);
@@ -319,16 +332,18 @@ public class AdminController extends BaseController {
 		}
 
 		if (page == null) {
-			page = new PageImpl<Translate>(new ArrayList<Translate>(), pageable,
-					0);
+			page = new PageImpl<Translate>(new ArrayList<Translate>(),
+					pageable, 0);
 		}
 
-		page.getContent().forEach((t) -> {
-			t.getTranslateItems().forEach((ti) -> {
-				ti.setTranslateItemHistories(
-						new TreeSet<>(ti.getTranslateItemHistories()));
-			});
-		});
+		page.getContent().forEach(
+				(t) -> {
+					t.getTranslateItems().forEach(
+							(ti) -> {
+								ti.setTranslateItemHistories(new TreeSet<>(ti
+										.getTranslateItemHistories()));
+							});
+				});
 
 		List<Language> languages2 = new ArrayList<Language>();
 
@@ -346,8 +361,8 @@ public class AdminController extends BaseController {
 		}
 
 		// login user labels
-		List<Label> labels = labelRepository
-				.findByCreatorGroupByName(WebUtil.getUsername());
+		List<Label> labels = labelRepository.findByCreatorGroupByName(WebUtil
+				.getUsername());
 		Set<String> lbls = null;
 		if (labels != null) {
 			lbls = labels.stream().map((label) -> {
@@ -405,8 +420,8 @@ public class AdminController extends BaseController {
 		}
 
 		// login user labels
-		List<Label> labels = labelRepository
-				.findByCreatorGroupByName(WebUtil.getUsername());
+		List<Label> labels = labelRepository.findByCreatorGroupByName(WebUtil
+				.getUsername());
 		Set<String> lbls = null;
 		if (labels != null) {
 			lbls = labels.stream().map((label) -> {
