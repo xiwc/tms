@@ -469,6 +469,7 @@ public class ChatController extends BaseController {
 	public RespBody asWiki(@RequestParam("id") Long id,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam("title") String title,
+			@RequestParam(value = "privated", required = false) Boolean privated,
 			@RequestParam(value = "labels", required = false) String labels) {
 
 		if (StringUtil.isEmpty(title)) {
@@ -483,6 +484,7 @@ public class ChatController extends BaseController {
 
 		chat.setTitle(title);
 		chat.setType(ChatType.Wiki);
+		chat.setPrivated(privated == null ? false : privated);
 
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
@@ -517,6 +519,7 @@ public class ChatController extends BaseController {
 	public RespBody updateWiki(@RequestParam("id") Long id,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam("title") String title,
+			@RequestParam(value = "privated", required = false) Boolean privated,
 			@RequestParam(value = "labels", required = false) String labels) {
 
 		if (StringUtil.isEmpty(title)) {
@@ -531,6 +534,10 @@ public class ChatController extends BaseController {
 
 		String oldTitle = chat.getTitle();
 		chat.setTitle(title);
+
+		if (privated != null) {
+			chat.setPrivated(privated);
+		}
 
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 

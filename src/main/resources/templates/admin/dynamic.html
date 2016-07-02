@@ -2041,6 +2041,7 @@
                         id: $btn.closest('.comment').attr('data-id'),
                         baseURL: baseURL,
                         title: $md.find('input[name="title"]').val(),
+                        privated: $md.find('.ui.checkbox').checkbox('is checked'),
                         labels: $md.find('.dd-labels').dropdown('get value')
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
