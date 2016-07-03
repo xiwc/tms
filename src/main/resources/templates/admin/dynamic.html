@@ -354,7 +354,7 @@
                         <div class="ui minimal comments" style="display:none;">
                             <h3 class="ui dividing header">沟通</h3>
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-more">加载更多</button>
-                            <div class="comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
+                            <div class="animated bounceInLeft comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
                                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
@@ -580,32 +580,17 @@
 
         // ------------------------------------------------------------------------------------- fancybox image start
 
-
-        $("body img").each(function(index, el) {
-            $(this).wrap($('<a class="fancybox-img" />').attr({
-                'href': $(this).attr('src'),
-                'title': $(this).attr('alt')
-            }));
-        });
-
-        $(".fancybox-img").fancybox({
-            openEffect: 'none',
-            closeEffect: 'none'
-        });
-
         $('body').on('click', '.chat .comments .comment .content .text.markdown-body img', function(event) {
             event.preventDefault();
             $img = $(this);
             var imgArr = [];
             var $imgs = $img.closest('.text.markdown-body').find('img').each(function(index, img) {
-                // $(this).attr('title', $(img).attr('alt'));
                 imgArr.push({
                     href: $(img).attr('src'),
                     title: $(img).attr('alt')
                 });
             });
             var index = $imgs.index($img);
-            // $.fancybox.open($imgs.clone().toArray(), {
             $.fancybox.open(imgArr, {
                 loop: false,
                 index: index
@@ -1349,6 +1334,16 @@
             $('html, body, .ad-index-content').scrollTo(0, 300);
         }
 
+        // 滚动到标记处
+        function s2mk() {
+
+            Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
+                $('html, body, .ad-index-content').scrollTo($(".marker").first().removeClass('marker'), 300, {
+                    offset: -50
+                });
+            });
+        }
+
         // 滚动到底部
         function s2b() {
 
@@ -1380,12 +1375,13 @@
          * @param  {[type]} chats 沟通消息数组
          * @return {[type]}       返回模板编译后的jquery dom
          */
-        function convertChat(chats, markId) {
+        function convertChat(chats, markId, first) {
             var isAdminRole = $('input:hidden[name="role.admin"]').val();
             var loginUsername = $('input:hidden[name="user.username"]').val();
             $.each(chats, function(index, chat) {
                 chat.contentMd = simplemde.markdown(preParse(chat.content));
                 chat.marked = (chat.id == markId) ? 'marked' : '';
+                chat.marker = (first === true && (index == 0)) ? 'marker' : ((first === false && (index == chats.length - 1)) ? 'marker' : '');
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
                 chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                 chat.textShare = baseURL + 'admin/dynamic?id=' + chat.id;
@@ -1450,7 +1446,7 @@
                             return;
                         }
 
-                        var $more = convertChat(data.data);
+                        var $more = convertChat(data.data, null, null);
                         $more.insertBefore($domBefore);
                         jQuery(".timeago").timeago();
                         s2b();
@@ -1594,9 +1590,12 @@
                     $('input:hidden[name="page.number.next"]').val(data.data.number + 1);
                     $('input:hidden[name="page.size"]').val(data.data.size);
 
-                    var $more = convertChat(data.data.content);
+                    var $more = convertChat(data.data.content, null, false);
 
                     $more.insertAfter($('.btn-chat-more'));
+
+                    s2mk();
+
                     jQuery(".timeago").timeago();
                     data.data.last && $btn.remove();
                     toastr.success('加载成功!');
@@ -1625,8 +1624,11 @@
                     $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
                     $('input:hidden[name="page.size"]').val(data.data.size);
 
-                    var $more = convertChat(data.data.content);
+                    var $more = convertChat(data.data.content, null, true);
                     $more.insertBefore($('.btn-chat-pre-more'));
+
+                    s2mk();
+
                     jQuery(".timeago").timeago();
 
                     data.data.first && $btn.remove();
