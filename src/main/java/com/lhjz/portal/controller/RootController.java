@@ -36,10 +36,14 @@ import com.lhjz.portal.entity.Comment;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.security.Group;
 import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
+import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.ChatType;
 import com.lhjz.portal.pojo.Enum.CommentType;
 import com.lhjz.portal.pojo.Enum.Status;
+import com.lhjz.portal.pojo.Enum.Target;
+import com.lhjz.portal.pojo.Enum.VoteType;
 import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.CommentRepository;
 import com.lhjz.portal.repository.GroupMemberRepository;
@@ -51,6 +55,7 @@ import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.TemplateUtil;
 import com.lhjz.portal.util.ThreadUtil;
+import com.lhjz.portal.util.WebUtil;
 
 /**
  * 
@@ -226,5 +231,91 @@ public class RootController extends BaseController {
 	@RequestMapping(value = "register", method = RequestMethod.GET)
 	public String register() {
 		return "register";
+	}
+
+	@RequestMapping(value = { "free/wiki/vote", "free/wiki/vote/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody voteWiki(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("contentHtml") String contentHtml,
+			@RequestParam(value = "type", required = false) String type) {
+
+		Chat chat = chatRepository.findOne(id);
+		if (chat == null) {
+			return RespBody.failed("投票博文不存在!");
+		}
+		String loginUsername = WebUtil.getUsername();
+
+		Chat chat2 = null;
+
+		String title = "";
+		User user = getLoginUser();
+		final User loginUser;
+		if (user == null) {
+			loginUser = new User();
+			loginUser.setUsername(SysConstant.USER_VISITOR);
+			loginUser.setName(SysConstant.USER_NAME_VISITOR);
+		} else {
+			loginUser = user;
+		}
+
+		if (VoteType.Zan.name().equalsIgnoreCase(type)) {
+			if (StringUtil.isNotEmpty(loginUsername)) {
+				String voteZan = chat.getVoteZan();
+				chat.setVoteZan(voteZan == null ? loginUsername : voteZan + ','
+						+ loginUsername);
+			}
+			Integer voteZanCnt = chat.getVoteZanCnt();
+			if (voteZanCnt == null) {
+				voteZanCnt = 0;
+			}
+			chat.setVoteZanCnt(++voteZanCnt);
+
+			chat2 = chatRepository.saveAndFlush(chat);
+			title = loginUser.getName() + "[" + loginUsername + "]赞了你的博文!";
+
+		} else {
+			if (StringUtil.isNotEmpty(loginUsername)) {
+				String voteCai = chat.getVoteCai();
+				chat.setVoteCai(voteCai == null ? loginUsername : voteCai + ','
+						+ loginUsername);
+			}
+			Integer voteCaiCnt = chat.getVoteCaiCnt();
+			if (voteCaiCnt == null) {
+				voteCaiCnt = 0;
+			}
+			chat.setVoteCaiCnt(++voteCaiCnt);
+
+			chat2 = chatRepository.saveAndFlush(chat);
+			title = loginUser.getName() + "[" + loginUsername + "]踩了你的博文!";
+		}
+
+		final String href = baseURL + "?id=" + id;
+		final String titleHtml = title;
+		final Mail mail = Mail.instance().addUsers(chat.getCreator());
+		final String html = "<h3>投票博文内容:</h3><hr/>" + contentHtml;
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				Thread.sleep(3000);
+				mailSender.sendHtml(String.format("TMS-博文投票@消息_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil.process("templates/mail/mail-dynamic",
+								MapUtil.objArr2Map("user", loginUser, "date",
+										new Date(), "href", href, "title",
+										titleHtml, "content", html)), mail
+								.get());
+				logger.info("博文投票邮件发送成功！");
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("博文投票邮件发送失败！");
+			}
+
+		});
+
+		log(Action.Vote, Target.Chat, chat.getId(), chat2);
+
+		return RespBody.succeed(chat2);
 	}
 }
