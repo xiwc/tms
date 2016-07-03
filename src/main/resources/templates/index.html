@@ -449,7 +449,6 @@
                         var oArr = $span.text().split(' ');
                         $span.text((parseInt(oArr[0]) + 1) + ' ' + oArr[1]);
                     }
-                    $span.attr('title', $icon.attr('data-type') == 'zan' ? data.data.voteZan : data.data.voteCai)
                 } else {
                     toastr.error(data.data, "投票失败!");
                 }
