@@ -215,6 +215,17 @@
             transform: scale3d(30, 30, 1);
         }
     }
+    
+    .topbar {
+        position: absolute;
+        width: 100%;
+        padding-right: 40px;
+    }
+    
+    .topbar a {
+        float: right;
+        margin-left: 10px;
+    }
     </style>
 </head>
 
@@ -223,6 +234,19 @@
         <div class="ad-index-container">
             <div id="context">
                 <div class="main ui container">
+                    <div class="topbar">
+                        <a th:if="${user == null}" th:href="@{/login}">登录</a>
+                        <a th:if="${user != null}" class="ad-index-logout" style="cursor: pointer;">
+                            <i class="sign out icon" style="margin-right: 0px;"></i>
+                            <span>退出 </span>
+                            <form class="hidden" th:action="@{/admin/logout}" action="" method="post"></form>
+                        </a>
+                        <a th:if="${user != null}" th:href="@{/admin}">
+                            <i class="user icon" style="margin-right: 0px;"></i>
+                            <span th:text="${#strings.isEmpty(user.name) ? user.username : user.name}">Admin</span>
+                        </a>
+                        <!-- <a th:if="${user == null}" th:href="@{/register}">注册</a> -->
+                    </div>
                     <div class="chat">
                         <div class="ui minimal comments" style="display:none;">
                             <h3 class="ui dividing header">博文</h3>

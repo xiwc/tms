@@ -50,8 +50,8 @@ public class SecurityConfig {
 	@Configuration
 	@Order(1)
 	@Profile({ "dev", "prod" })
-	public static class SecurityConfiguration
-			extends WebSecurityConfigurerAdapter {
+	public static class SecurityConfiguration extends
+			WebSecurityConfigurerAdapter {
 
 		@Autowired
 		DataSource dataSource;
@@ -66,10 +66,11 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/admin/**").authorizeRequests()
+			http.antMatcher("/admin/**")
+					.authorizeRequests()
 					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**", "/admin/login")
-					.permitAll().anyRequest().authenticated().and().formLogin()
+							"/admin/js/**", "/admin/login").permitAll()
+					.anyRequest().authenticated().and().formLogin()
 					.loginPage("/admin/login").permitAll()
 					.loginProcessingUrl("/admin/signin")
 					.defaultSuccessUrl("/admin").and().logout()
@@ -83,23 +84,39 @@ public class SecurityConfig {
 	}
 
 	@Configuration
-	@Order(1)
-	@Profile("test")
-	public static class SecurityConfigurationTest
-			extends WebSecurityConfigurerAdapter {
+	@Order(2)
+	@Profile({ "dev", "prod" })
+	public static class SecurityConfiguration2 extends
+			WebSecurityConfigurerAdapter {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/admin/**").authorizeRequests()
+			http.antMatcher("/").authorizeRequests().anyRequest().permitAll();
+
+		}
+
+	}
+
+	@Configuration
+	@Order(1)
+	@Profile("test")
+	public static class SecurityConfigurationTest extends
+			WebSecurityConfigurerAdapter {
+
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+
+			http.antMatcher("/admin/**")
+					.authorizeRequests()
 					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**")
-					.permitAll().anyRequest().authenticated().and().formLogin()
+							"/admin/js/**").permitAll().anyRequest()
+					.authenticated().and().formLogin()
 					.loginPage("/admin/login").permitAll()
 					.loginProcessingUrl("/admin/signin")
 					.defaultSuccessUrl("/admin").and().logout()
-					.logoutUrl("/admin/logout").logoutSuccessUrl("/admin/login")
-					.and().csrf().disable();
+					.logoutUrl("/admin/logout")
+					.logoutSuccessUrl("/admin/login").and().csrf().disable();
 
 		}
 

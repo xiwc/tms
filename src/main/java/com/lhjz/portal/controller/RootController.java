@@ -130,6 +130,7 @@ public class RootController extends BaseController {
 		model.addAttribute("chats", chats);
 		model.addAttribute("users", users);
 		model.addAttribute("groups", groups);
+		model.addAttribute("user", getLoginUser());
 		model.addAttribute("labels", new TreeSet<>(lbls));
 
 		return "index";
@@ -154,4 +155,13 @@ public class RootController extends BaseController {
 		return RespBody.succeed(chats);
 	}
 
+	@RequestMapping(value = "login", method = RequestMethod.GET)
+	public String login() {
+		return "redirect:admin/login";
+	}
+
+	@RequestMapping(value = "register", method = RequestMethod.GET)
+	public String register() {
+		return "register";
+	}
 }
