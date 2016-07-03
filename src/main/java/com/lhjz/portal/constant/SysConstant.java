@@ -159,6 +159,9 @@ public final class SysConstant {
 	public static final String ORDER_PRICE_DESC = "2";
 	public static final String ORDER_LIKE = "3";
 
+	public static final String USER_VISITOR = "visitor";
+	public static final String USER_NAME_VISITOR = "游客";
+
 	public static final Short SERVICE_STATUS_ONGOING = 1;
 	public static final Short SERVICE_STATUS_ACCEPT = 0;
 

@@ -22,6 +22,8 @@ https://github.com/NextStepWebs/simplemde-markdown-editor
 https://github.com/flesler/jquery.scrollTo  
 http://fancyapps.com/fancybox/  
 http://www.dropzonejs.com/  
+https://github.com/daneden/animate.css  
+https://github.com/IanLunn/Hover  
 
 # 开发工具
 sts: http://spring.io/tools/sts/  

@@ -5,27 +5,21 @@ package com.lhjz.portal.entity;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import com.lhjz.portal.entity.security.User;
-import com.lhjz.portal.pojo.Enum.ChatType;
+import com.lhjz.portal.pojo.Enum.CommentType;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -36,13 +30,15 @@ import com.lhjz.portal.pojo.Enum.Status;
  * 
  */
 @Entity
-public class Chat implements Serializable {
+public class Comment implements Serializable {
 
 	private static final long serialVersionUID = -1213448577430547620L;
 
 	@Id
 	@GeneratedValue
 	private Long id;
+
+	private String targetId;
 
 	@Column(length = 16777216)
 	private String content;
@@ -71,7 +67,7 @@ public class Chat implements Serializable {
 
 	@Enumerated(EnumType.STRING)
 	@Column
-	private ChatType type = ChatType.Msg;
+	private CommentType type = CommentType.Reply;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate = new Date();
@@ -81,18 +77,6 @@ public class Chat implements Serializable {
 
 	@Version
 	private long version;
-
-	@ManyToMany(mappedBy = "voterChats")
-	Set<User> voters = new HashSet<User>();
-
-	@Column
-	private Boolean privated = Boolean.FALSE;
-
-	@Column
-	private String title;
-
-	@OneToMany(mappedBy = "chat", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
-	Set<Label> labels = new HashSet<Label>();
 
 	public Long getId() {
 		return id;
@@ -158,14 +142,6 @@ public class Chat implements Serializable {
 		this.version = version;
 	}
 
-	public Set<User> getVoters() {
-		return voters;
-	}
-
-	public void setVoters(Set<User> voters) {
-		this.voters = voters;
-	}
-
 	public String getVoteZan() {
 		return voteZan;
 	}
@@ -182,35 +158,11 @@ public class Chat implements Serializable {
 		this.voteCai = voteCai;
 	}
 
-	public Boolean isPrivated() {
-		return privated;
-	}
-
-	public void setPrivated(Boolean privated) {
-		this.privated = privated;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public Set<Label> getLabels() {
-		return labels;
-	}
-
-	public void setLabels(Set<Label> labels) {
-		this.labels = labels;
-	}
-
-	public ChatType getType() {
+	public CommentType getType() {
 		return type;
 	}
 
-	public void setType(ChatType type) {
+	public void setType(CommentType type) {
 		this.type = type;
 	}
 
@@ -230,15 +182,22 @@ public class Chat implements Serializable {
 		this.voteCaiCnt = voteCaiCnt;
 	}
 
+	public String getTargetId() {
+		return targetId;
+	}
+
+	public void setTargetId(String targetId) {
+		this.targetId = targetId;
+	}
+
 	@Override
 	public String toString() {
-		return "Chat [id=" + id + ", content=" + content + ", voteZan="
-				+ voteZan + ", voteCai=" + voteCai + ", voteZanCnt="
-				+ voteZanCnt + ", voteCaiCnt=" + voteCaiCnt + ", creator="
-				+ creator + ", updater=" + updater + ", status=" + status
-				+ ", type=" + type + ", createDate=" + createDate
-				+ ", updateDate=" + updateDate + ", version=" + version
-				+ ", privated=" + privated + ", title=" + title + "]";
+		return "Comment [id=" + id + ", targetId=" + targetId + ", content="
+				+ content + ", voteZan=" + voteZan + ", voteCai=" + voteCai
+				+ ", voteZanCnt=" + voteZanCnt + ", voteCaiCnt=" + voteCaiCnt
+				+ ", creator=" + creator + ", updater=" + updater + ", status="
+				+ status + ", type=" + type + ", createDate=" + createDate
+				+ ", updateDate=" + updateDate + ", version=" + version + "]";
 	}
 
 }

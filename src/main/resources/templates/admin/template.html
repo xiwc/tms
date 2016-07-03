@@ -138,7 +138,7 @@
         </div>
     </script>
     <script th:fragment="wikiMoreTpl" id="wikiMoreTpl" type="text/x-jquery-tmpl">
-        <div class="comment ${marked}" data-id="${id}">
+        <div class="animated bounceInLeft comment ${marked} ${marker}" data-id="${id}">
             <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>

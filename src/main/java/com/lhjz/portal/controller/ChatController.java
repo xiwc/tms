@@ -416,6 +416,11 @@ public class ChatController extends BaseController {
 			} else {
 				chat.setVoteZan(voteZan == null ? loginUsername : voteZan + ','
 						+ loginUsername);
+				Integer voteZanCnt = chat.getVoteZanCnt();
+				if (voteZanCnt == null) {
+					voteZanCnt = 0;
+				}
+				chat.setVoteZanCnt(++voteZanCnt);
 
 				chat2 = chatRepository.saveAndFlush(chat);
 				title = loginUser.getName() + "[" + loginUsername
@@ -429,6 +434,12 @@ public class ChatController extends BaseController {
 			} else {
 				chat.setVoteCai(voteCai == null ? loginUsername : voteCai + ','
 						+ loginUsername);
+				Integer voteCaiCnt = chat.getVoteCaiCnt();
+				if (voteCaiCnt == null) {
+					voteCaiCnt = 0;
+				}
+				chat.setVoteCaiCnt(++voteCaiCnt);
+
 				chat2 = chatRepository.saveAndFlush(chat);
 				title = loginUser.getName() + "[" + loginUsername
 						+ "]踩了你的沟通消息!";
@@ -466,7 +477,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = { "asWiki", "asWiki/unmask" }, method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody asWiki(@RequestParam("id") Long id,
+	public RespBody asWiki(
+			@RequestParam("id") Long id,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam("title") String title,
 			@RequestParam(value = "privated", required = false) Boolean privated,
@@ -516,7 +528,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = { "updateWiki", "updateWiki/unmask" }, method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody updateWiki(@RequestParam("id") Long id,
+	public RespBody updateWiki(
+			@RequestParam("id") Long id,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam("title") String title,
 			@RequestParam(value = "privated", required = false) Boolean privated,

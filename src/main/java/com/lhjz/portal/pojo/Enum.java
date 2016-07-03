@@ -25,6 +25,10 @@ public class Enum {
 		Wiki, Msg;
 	}
 
+	public static enum CommentType {
+		Reply;
+	}
+
 	public static enum Prop {
 		Key, Content, Name, Id, Watchers, Labels, TranslateItem, Title;
 	}

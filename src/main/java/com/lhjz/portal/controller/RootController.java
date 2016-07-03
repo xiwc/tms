@@ -4,6 +4,7 @@
 package com.lhjz.portal.controller;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -29,18 +30,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Chat;
+import com.lhjz.portal.entity.Comment;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.security.Group;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.ChatType;
+import com.lhjz.portal.pojo.Enum.CommentType;
+import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.repository.ChatRepository;
+import com.lhjz.portal.repository.CommentRepository;
 import com.lhjz.portal.repository.GroupMemberRepository;
 import com.lhjz.portal.repository.GroupRepository;
 import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.UserRepository;
+import com.lhjz.portal.util.DateUtil;
+import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
+import com.lhjz.portal.util.TemplateUtil;
+import com.lhjz.portal.util.ThreadUtil;
 
 /**
  * 
@@ -69,6 +79,9 @@ public class RootController extends BaseController {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	CommentRepository commentRepository;
 
 	@Autowired
 	MailSender2 mailSender;
@@ -153,6 +166,56 @@ public class RootController extends BaseController {
 		}
 
 		return RespBody.succeed(chats);
+	}
+
+	@RequestMapping(value = "free/wiki/reply", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody replyWiki(@RequestParam("baseURL") String baseURL,
+			@RequestParam("id") Long id, @RequestParam("content") String content) {
+
+		User user = getLoginUser();
+
+		Comment comment = new Comment();
+		comment.setContent(content);
+		comment.setTargetId(String.valueOf(id));
+		comment.setCreateDate(new Date());
+		comment.setCreator(user);
+		comment.setStatus(Status.New);
+		comment.setType(CommentType.Reply);
+
+		Comment comment2 = commentRepository.saveAndFlush(comment);
+
+		final String href = baseURL + "?id=" + id;
+		final String content2 = content;
+		final User loginUser;
+		if (user == null) {
+			loginUser = new User();
+			loginUser.setUsername(SysConstant.USER_VISITOR);
+			loginUser.setName(SysConstant.USER_NAME_VISITOR);
+		} else {
+			loginUser = user;
+		}
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				Thread.sleep(3000);
+				mailSender.sendHtml(String.format("TMS-博文回复_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil.process("templates/mail/mail-dynamic",
+								MapUtil.objArr2Map("user", loginUser, "date",
+										new Date(), "href", href, "title",
+										"博文回复消息", "content", content2)),
+						StringUtil.split(toAddrArr, ","));
+				logger.info("博文回复邮件发送成功！");
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("博文回复邮件发送失败！");
+			}
+
+		});
+
+		return RespBody.succeed(comment2);
 	}
 
 	@RequestMapping(value = "login", method = RequestMethod.GET)
