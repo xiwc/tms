@@ -26,6 +26,8 @@ import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.Log;
+import com.lhjz.portal.entity.security.Group;
+import com.lhjz.portal.entity.security.GroupMember;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
@@ -34,6 +36,8 @@ import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.Enum.VoteType;
 import com.lhjz.portal.repository.ChatRepository;
+import com.lhjz.portal.repository.GroupMemberRepository;
+import com.lhjz.portal.repository.GroupRepository;
 import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.util.CollectionUtil;
 import com.lhjz.portal.util.DateUtil;
@@ -60,6 +64,12 @@ public class ChatController extends BaseController {
 	ChatRepository chatRepository;
 
 	@Autowired
+	GroupRepository groupRepository;
+
+	@Autowired
+	GroupMemberRepository groupMemberRepository;
+
+	@Autowired
 	LogRepository logRepository;
 
 	@Autowired
@@ -71,6 +81,7 @@ public class ChatController extends BaseController {
 	@ResponseBody
 	public RespBody create(@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
+			@RequestParam(value = "groups", required = false) String groups,
 			@RequestParam("content") String content,
 			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
 			@RequestParam("lastId") Long lastId,
@@ -95,11 +106,28 @@ public class ChatController extends BaseController {
 		final String html = contentHtml;
 
 		final Mail mail = Mail.instance();
-		if (StringUtil.isNotEmpty(usernames)) {
-			String[] usernameArr = usernames.split(",");
-			Arrays.asList(usernameArr).stream().forEach((username) -> {
-				mail.addUsers(getUser(username));
-			});
+		if (StringUtil.isNotEmpty(usernames) || StringUtil.isNotEmpty(groups)) {
+
+			if (StringUtil.isNotEmpty(usernames)) {
+				String[] usernameArr = usernames.split(",");
+				Arrays.asList(usernameArr).stream().forEach((username) -> {
+					mail.addUsers(getUser(username));
+				});
+			}
+			if (StringUtil.isNotEmpty(groups)) {
+				String[] groupArr = groups.split(",");
+				Arrays.asList(groupArr).stream().forEach((group) -> {
+					List<Group> groupList = groupRepository
+							.findByGroupName(group);
+					if (groupList.size() > 0) {
+						List<GroupMember> groupMembers = groupMemberRepository
+								.findByGroup(groupList.get(0));
+						groupMembers.stream().forEach(gm -> {
+							mail.addUsers(getUser(gm.getUsername()));
+						});
+					}
+				});
+			}
 
 			ThreadUtil.exec(() -> {
 
@@ -136,6 +164,7 @@ public class ChatController extends BaseController {
 			@RequestParam("content") String content,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
+			@RequestParam(value = "groups", required = false) String groups,
 			@RequestParam("contentHtmlOld") String contentHtmlOld,
 			@RequestParam("contentHtml") String contentHtml) {
 
@@ -144,6 +173,11 @@ public class ChatController extends BaseController {
 		}
 
 		Chat chat = chatRepository.findOne(id);
+
+		if (content.equals(chat.getContent())) {
+			return RespBody.failed("修改内容没有任何变更的内容!");
+		}
+
 		chat.setContent(content);
 		chat.setUpdateDate(new Date());
 		chat.setUpdater(getLoginUser());
@@ -159,11 +193,29 @@ public class ChatController extends BaseController {
 				+ "<hr/><h3>编辑前内容:</h3>" + contentHtmlOld;
 
 		final Mail mail = Mail.instance();
-		if (StringUtil.isNotEmpty(usernames)) {
-			String[] usernameArr = usernames.split(",");
-			Arrays.asList(usernameArr).stream().forEach((username) -> {
-				mail.addUsers(getUser(username));
-			});
+
+		if (StringUtil.isNotEmpty(usernames) || StringUtil.isNotEmpty(groups)) {
+
+			if (StringUtil.isNotEmpty(usernames)) {
+				String[] usernameArr = usernames.split(",");
+				Arrays.asList(usernameArr).stream().forEach((username) -> {
+					mail.addUsers(getUser(username));
+				});
+			}
+			if (StringUtil.isNotEmpty(groups)) {
+				String[] groupArr = groups.split(",");
+				Arrays.asList(groupArr).stream().forEach((group) -> {
+					List<Group> groupList = groupRepository
+							.findByGroupName(group);
+					if (groupList.size() > 0) {
+						List<GroupMember> groupMembers = groupMemberRepository
+								.findByGroup(groupList.get(0));
+						groupMembers.stream().forEach(gm -> {
+							mail.addUsers(getUser(gm.getUsername()));
+						});
+					}
+				});
+			}
 
 			ThreadUtil.exec(() -> {
 
@@ -236,7 +288,8 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(data).addMsg(logs);
 	}
 
-	@RequestMapping(value = { "getNews", "getNews/unmask" }, method = RequestMethod.GET)
+	@RequestMapping(value = { "getNews",
+			"getNews/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody getNews(@RequestParam("lastId") Long lastId) {
 
@@ -380,13 +433,14 @@ public class ChatController extends BaseController {
 
 			try {
 				Thread.sleep(3000);
-				mailSender.sendHtml(String.format("TMS-沟通动态投票@消息_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+				mailSender.sendHtml(
+						String.format("TMS-沟通动态投票@消息_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
 						TemplateUtil.process("templates/mail/mail-dynamic",
 								MapUtil.objArr2Map("user", loginUser, "date",
 										new Date(), "href", href, "title",
-										titleHtml, "content", html)), mail
-								.get());
+										titleHtml, "content", html)),
+						mail.get());
 				logger.info("沟通消息投票邮件发送成功！");
 			} catch (Exception e) {
 				e.printStackTrace();

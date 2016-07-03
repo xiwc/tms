@@ -100,6 +100,11 @@
         margin-top: 0;
     }
     
+    .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
+    .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
+        display: none;
+    }
+    
     .ui.vertical.icon.buttons.btns-scroll {
         position: fixed;
         right: 433px;
@@ -180,6 +185,10 @@
         height: 36px;
         width: 1px;
     }
+    
+    .list-chat-search-results {
+        min-width: 390px;
+    }
     /* chat msg search end */
     /* 文件上传 start*/
     
@@ -194,8 +203,21 @@
         z-index: 2;
     }
     /* 文件上传 end*/
+    /* Mobile */
     
     @media only screen and (max-width: 767px) {
+        .chat .comments .comment .content .actions > a.edit,
+        .chat .comments .comment .content .actions > a.delete {
+            display: none;
+        }
+        .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
+        .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
+            display: block;
+        }
+    }
+    /* Mobile & Tablet */
+    
+    @media only screen and (max-width: 991px) {
         .main.container {
             margin-right: 0 !important;
             margin-left: 0 !important;
@@ -220,6 +242,59 @@
         }
         .chat-search {
             display: none;
+        }
+    }
+    
+    .cbutton {
+        position: relative;
+    }
+    
+    .cbutton::after {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin: -7px 0 0 -7px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        content: '';
+        opacity: 0;
+        pointer-events: none;
+    }
+    /* Novak */
+    
+    .cbutton--effect-novak::after {
+        background: rgba(111, 148, 182, 0.25);
+    }
+    
+    .cbutton--effect-novak.cbutton--click::after {
+        -webkit-animation: anim-effect-novak 0.5s forwards;
+        animation: anim-effect-novak 0.5s forwards;
+    }
+    
+    @-webkit-keyframes anim-effect-novak {
+        0% {
+            opacity: 1;
+            -webkit-transform: scale3d(0.1, 0.1, 1);
+            transform: scale3d(0.1, 0.1, 1);
+        }
+        100% {
+            opacity: 0;
+            -webkit-transform: scale3d(8, 8, 1);
+            transform: scale3d(30, 30, 1);
+        }
+    }
+    
+    @keyframes anim-effect-novak {
+        0% {
+            opacity: 1;
+            -webkit-transform: scale3d(0.1, 0.1, 1);
+            transform: scale3d(0.1, 0.1, 1);
+        }
+        100% {
+            opacity: 0;
+            -webkit-transform: scale3d(8, 8, 1);
+            transform: scale3d(30, 30, 1);
         }
     }
     </style>
@@ -261,11 +336,11 @@
                                             </div>
                                         </div>
                                         <div th:unless="${#strings.isEmpty(l.properties)}" class="extra text">
-                                            <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${#strings.isEmpty(l.oldValue)}" th:text="${l.oldValue}"></div>
-                                            <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;" th:unless="${#strings.isEmpty(l.oldValue)}">更新为</div>
+                                            <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${l.oldValue == null}" th:text="${l.oldValue}"></div>
+                                            <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;" th:unless="${l.oldValue == null}">更新为</div>
                                             <div th:if="${#strings.toString(l.properties) == 'Labels'}" class="ui tag label" th:text="${l.newValue}"></div>
                                             <div th:if="${#strings.toString(l.properties) == 'Watchers'}" class="ui label">
-                                                <i class="user icon"></i> <span th:text="${l.newValue}"></span>
+                                                <i class="user icon"></i> <span class="mapping-user" th:text="${l.newValue}"></span>
                                             </div>
                                             <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);" th:unless="${#strings.toString(l.properties) == 'Labels' or #strings.toString(l.properties) == 'Watchers'}" th:text="${l.newValue}"></div>
                                         </div>
@@ -289,10 +364,10 @@
                                     <div class="metadata">
                                         <span class="date timeago" th:title="${c.createDate}" th:text="${#calendars.format(c.createDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                         <div class="rating">
-                                            <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
+                                            <i style="cursor: pointer;" title="赞一下" class="cbutton cbutton--effect-novak thumbs outline up icon" data-type="zan" data-label="赞"></i> <span th:unless="${#strings.isEmpty(c.voteZan)}" th:title="${c.voteZan}" th:text="${#arrays.length(#strings.arraySplit(c.voteZan,',')) + ' 赞'}">5 赞</span>
                                         </div>
                                         <div class="rating">
-                                            <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
+                                            <i style="cursor: pointer;" title="踩一下" class="cbutton cbutton--effect-novak thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
                                         </div>
                                     </div>
                                     <div class="text markdown-body" th:text="${c.content}">
@@ -302,6 +377,17 @@
                                         <a class="reply">回复</a>
                                         <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</a>
                                         <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</a>
+                                        <div class="ui top right pointing dropdown dd-more-actions">
+                                            <a class="text" style="margin: 0;">更多</a>
+                                            <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
+                                            <div class="menu">
+                                                <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</div>
+                                                <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</div>
+                                                <div class="item btn-read">阅读</div>
+                                                <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
+                                                <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -330,12 +416,20 @@
                                                 <div class="header" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name) + ' - ' + u.mails + ' (' + u.username + ')'}">张三 - weicheng.xi@newtouch.cn (xiweicheng)</div>
                                             </div>
                                         </div>
+                                        <div class="item" th:each="g : ${groups}" th:attr="data-type=${'group'}, data-value=${g.groupName}, data-label=${g.groupName}">
+                                            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                                <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${#strings.toUpperCase(#strings.substring(g.groupName,#strings.length(g.groupName) - 1,#strings.length(g.groupName)))}">管理员</span>
+                                            </a>
+                                            <div class="content">
+                                                <div class="header" th:text="${(g.groupName) + ' - (用户组)'}">张三 - (用户组)</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="ui buttons">
-                                    <button class="ui button btn-chat-clear">取消</button>
+                                    <button class="cbutton cbutton--effect-novak ui button btn-chat-clear">取消</button>
                                     <div class="or"></div>
-                                    <button class="ui positive button btn-chat-submit">提交</button>
+                                    <button class="cbutton cbutton--effect-novak ui positive button btn-chat-submit">提交</button>
                                 </div>
                                 <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
                                     <i class="refresh icon"></i>
@@ -399,18 +493,12 @@
         </form>
     </div>
     <!-- popup container end -->
-    <div th:fragment="ad-page-dimmer" style="z-index: 99999;" class="ui page dimmer ad-comment-page-dimmer">
-        <div class="container" style="display: flex; display: -webkit-flex; justify-content: center; align-items: center; max-width: 650px; margin: auto; overflow-y: auto;">
-            <div class="content">
-                <div class="text" style="max-width: 633px; background-color: white; padding: 15px; text-align: left;"></div>
-            </div>
-        </div>
-    </div>
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-chat-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
@@ -425,27 +513,13 @@
     <input type="hidden" name="page.size.logs" th:value="${logs.size}" />
     <input type="hidden" name="user.username" th:value="${user.username}" />
     <input type="hidden" name="role.admin" th:value="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" />
-    <!--     
-    <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
-    <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
-     -->
-    <!--     
-    <script type="text/javascript" th:src="@{/lib/highlight/highlight.pack.js}" src="../../static/lib/highlight/highlight.pack.js"></script>
-    <script type="text/javascript" th:src="@{/lib/jquery.tmpl.min.js}" src="../../static/lib/jquery.tmpl.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/dropzone/dropzone.min.js}" src="../../static/lib/dropzone/dropzone.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/fancybox/jquery.fancybox.pack.js}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script>
-     -->
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:attr="data-status=${u.enabled}" th:name="${u.username}" th:value="${u.name}" />
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/deps-dynamic.js}" src="../../static/admin/js/deps-dynamic.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/desktop-notify-min.js}" src="../../static/lib/desktop-notify-min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/clipboard.min.js}" src="../../static/lib/clipboard.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/poll.js}" src="../../static/admin/js/poll.js"></script>
     <script type="text/javascript">
@@ -454,6 +528,22 @@
         Dropzone.autoDiscover = false;
 
         jQuery(".timeago").timeago();
+
+        var clipboard = new Clipboard('.btn-share, .btn-copy');
+
+        clipboard.on('success', function(e) {
+            var $btn = $(e.trigger);
+            var msg = $btn.hasClass('btn-share') ? '分享链接复制到剪贴板成功!' : '沟通内容复制到剪贴板成功!';
+            toastr.success(msg);
+        });
+
+        clipboard.on('error', function(e) {
+            toastr.success('复制到剪贴板失败!');
+        });
+
+        // --------------------------------------------------------------------------------- username mapping to name start
+        Utils.showMappedTxt('.mapping-user');
+        // --------------------------------------------------------------------------------- username mapping to name end
 
         // ------------------------------------------------------------------------------------- ck-auto-chat-refresh start
 
@@ -670,6 +760,11 @@
                     }
                 });
             }
+        }).click(function(event) {
+            var $input = $('.chat-search .ui.search input');
+            if (!$input.val()) {
+                $input.focus();
+            }
         });
 
         $('.chat-search .ui.search input').keyup(function(event) {
@@ -677,10 +772,6 @@
                 searchHandler();
             }
         });
-
-        // $('.chat-search .ui.search i').click(function(event) {
-        //     searchHandler();
-        // });
 
         $('.list-chat-search-results').on('click', '.item', function(event) {
             event.preventDefault();
@@ -737,6 +828,9 @@
 
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
+        $('.ui.dropdown.dd-more-actions').dropdown({
+            action: 'hide'
+        });
         $('.pp').popup();
         $('.pp-users.field,.pp-edit-users.field').popup({
             inline: true,
@@ -784,6 +878,25 @@
         }
 
         /**
+         * 解析@groups
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function parseGroups(plainText) {
+            var groups = [];
+            var atR = /\{!~([^\}]*)\}/g;
+            var rs = atR.exec(plainText);
+            while (rs) {
+                if (userMap[rs[1]] && groups.indexOf(rs[1]) == -1) {
+                    groups.push(rs[1]);
+                }
+                rs = atR.exec(plainText);
+            }
+
+            return groups;
+        }
+
+        /**
          * 解析要发送邮件的用户们
          * @param  {[type]} plainText [description]
          * @return {[type]}           [description]
@@ -791,17 +904,26 @@
         function parseUsernames(plainText) {
             var users = parseUsers(plainText);
             if (users.indexOf('all') > -1) {
-                var users2 = [];
-                $.each(usernames, function(index, username) {
-                    if (username != 'all') {
-                        users2.push(username);
-                    }
-                });
-                return users2;
+                return usernameAll;
             }
             return users;
         }
 
+        /**
+         * 解析要发送邮件的用户组们
+         * @param  {[type]} plainText [description]
+         * @return {[type]}           [description]
+         */
+        function parseGroupNames(plainText) {
+            var groupNameArr = [];
+            var groups = parseGroups(plainText);
+            $.each(groups, function(index, group) {
+                if (groupNameArr.indexOf(group) == -1) {
+                    groupNameArr.push(group);
+                }
+            });
+            return groupNameArr;
+        }
         /**
          * 替换@user解析
          * @param  {[type]} plainText [description]
@@ -812,6 +934,9 @@
             var txt = plainText;
             $.each(parseUsers(plainText), function(index, username) {
                 txt = txt.replace(new RegExp('{~' + username + '}', 'g'), '<span data-value="' + username + '" class="at-user">' + '**`@' + userMap[username] + '`**' + '</span>');
+            });
+            $.each(parseGroups(plainText), function(index, groupName) {
+                txt = txt.replace(new RegExp('{!~' + groupName + '}', 'g'), '<span data-value="' + groupName + '" class="at-group">' + '**`@' + userMap[groupName] + '(组)`**' + '</span>');
             });
 
             return txt;
@@ -832,6 +957,7 @@
                 element: $elem,
                 autoDownloadFontAwesome: false,
                 autofocus: true,
+                spellChecker: false,
                 toolbar: [
                     "bold",
                     "italic",
@@ -974,11 +1100,16 @@
         // ============================================================================ @user start
         // TODO 临时全局变量定义
         var mk = ' @';
-        var usernames = [];
+        var usernames = []; // 用户名&用户组
+        var usernameAll = []; // 用户名
         var userMap = {};
         $('.list-users-container .list-users > .item').each(function(index, el) {
-            usernames.push($(el).attr('data-value'));
-            userMap[$(el).attr('data-value')] = $(el).attr('data-label');
+            var value = $(el).attr('data-value');
+            usernames.push(value);
+            userMap[value] = $(el).attr('data-label');
+            if ($(el).attr('data-type') != 'group' && value != 'all') {
+                usernameAll.push(value);
+            }
         });
 
         function atUserHandler($pp, $usersContainer) {
@@ -1078,7 +1209,11 @@
             var mkIndex = line.lastIndexOf(mk);
             var atFrom = mkIndex + mk.length;
             if (mkIndex > -1 && cursor.ch >= atFrom) {
-                cm.replaceRange('{~' + $user.attr('data-value') + '}', {
+
+                var type = $user.attr('data-type');
+                var showTxt = (type == 'group') ? '{!~' + $user.attr('data-value') + '}' : '{~' + $user.attr('data-value') + '}';
+
+                cm.replaceRange(showTxt, {
                     line: cursor.line,
                     ch: atFrom - 1
                 }, {
@@ -1092,10 +1227,15 @@
             cm.focus();
         }
 
-        function insertAtUser(cm, username) {
+        function insertAtUserOrGroup(cm, username, isGroup) {
             var cursor = cm.getCursor();
             if (cursor) {
-                cm.replaceRange('{~' + username + '}', cursor, cursor);
+                if (!isGroup) {
+                    cm.replaceRange('{~' + username + '}', cursor, cursor);
+                } else {
+                    cm.replaceRange('{!~' + username + '}', cursor, cursor);
+                }
+
             }
         }
 
@@ -1202,22 +1342,6 @@
                     $('.ui.sticky').sticky('refresh');
                 }
             });
-            // if (isS2bFirst) { // 解决页面首次加载, 有图片加载比较慢导致没有滚动到顶部问题.
-            //     isS2bFirst = false;
-            //     Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
-            //         $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
-            //             offset: -50
-            //         });
-
-            //         // $('.ui.sticky').sticky('refresh');
-            //     });
-            // } else {
-            //     $('html, body, .ad-index-content').scrollTo($(".comments .comment.marked"), 300, {
-            //         offset: -50
-            //     });
-
-            //     // $('.ui.sticky').sticky('refresh');
-            // }
         }
 
         // 滚动到顶部
@@ -1264,6 +1388,7 @@
                 chat.marked = (chat.id == markId) ? 'marked' : '';
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
                 chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
+                chat.textShare = baseURL + 'admin/dynamic?id=' + chat.id;
                 if (chat.creator.name) {
                     chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                 }
@@ -1274,9 +1399,9 @@
                 chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
             });
             var $more = $("#chatMoreTpl").tmpl(chats);
-            // $more.find('pre code').each(function(i, block) {
-            //     hljs.highlightBlock(block);
-            // });
+            $more.find('.ui.dropdown.dd-more-actions').dropdown({
+                action: 'hide'
+            });
 
             return $more;
         }
@@ -1308,6 +1433,7 @@
                 lastId: $last.size() == 0 ? -1 : $('.chat .comments .comment').last().attr('data-id'),
                 baseURL: baseURL,
                 usernames: parseUsernames(content).join(','),
+                groups: parseGroupNames(content).join(','),
                 content: content,
                 contentHtml: html,
             }, function(data, textStatus, xhr) {
@@ -1361,7 +1487,7 @@
 
         });
 
-        $('body').on('click', '.comments .actions a.delete', function(event) {
+        $('body').on('click', '.comments .actions .delete', function(event) {
             $btn = $(this);
             $('.ad-delete-confirm').modal({
                 onApprove: function() {
@@ -1379,7 +1505,7 @@
             }).modal('show');
         });
 
-        $('body').on('click', '.comments .actions a.edit', function(event) {
+        $('body').on('click', '.comments .actions .edit', function(event) {
             $btn = $(this);
 
             $.get('/admin/chat/get', {
@@ -1390,9 +1516,6 @@
                     var contentOld = data.data.content;
 
                     $('.ad-chat-edit').modal({
-                        onShow: function() {
-                            // simplemdeEdit.value(data.data.content);
-                        },
                         onVisible: function() {
                             simplemdeEdit.codemirror.focus();
                             simplemdeEdit.value(data.data.content);
@@ -1404,6 +1527,11 @@
                             }
 
                             var content = simplemdeEdit.value();
+                            if (contentOld == content) {
+                                toastr.error('修改内容没有任何变更的内容!');
+                                return false;
+                            }
+
                             var htmlOld = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemdeEdit.markdown(preParse(contentOld))).wrap('<div/>').parent().html();
                             var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + simplemdeEdit.markdown(preParse(content))).wrap('<div/>').parent().html();
 
@@ -1411,6 +1539,7 @@
                                 id: $btn.closest('.comment').attr('data-id'),
                                 baseURL: baseURL,
                                 usernames: parseUsernames(content).join(','),
+                                groups: parseGroupNames(content).join(','),
                                 content: content,
                                 contentHtmlOld: htmlOld,
                                 contentHtml: html,
@@ -1434,7 +1563,14 @@
 
         $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
             event.preventDefault();
-            insertAtUser(cm, $(this).attr('data-value'));
+            insertAtUserOrGroup(cm, $(this).attr('data-value'));
+            s2b();
+            cm.focus();
+        });
+
+        $('body').on('click', '.ui.comments .comment .text span.at-group', function(event) {
+            event.preventDefault();
+            insertAtUserOrGroup(cm, $(this).attr('data-value'), true);
             s2b();
             cm.focus();
         });
@@ -1534,8 +1670,10 @@
                         if (log.creator.name) {
                             log.creator.iconName = log.creator.name.substr(log.creator.name.length - 1).toUpperCase();
                         }
+
                         if (log.properties == 'Labels') log.isLabels = true;
                         if (log.properties == 'Watchers') log.isWatchers = true;
+                        if (log.oldValue != null) log.isOldValue = true;
 
                         log.actionMapping = actionMapping[log.action];
                         log.propertiesMapping = propMapping[log.properties];
@@ -1544,6 +1682,8 @@
                     });
                     $("#logMoreTpl").tmpl(data.data.content).appendTo('.fd-dynamic');
                     jQuery(".timeago").timeago();
+                    Utils.showMappedTxt('.mapping-user');
+
                     data.data.last && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
@@ -1675,6 +1815,7 @@
                                 }
                                 if (log.properties == 'Labels') log.isLabels = true;
                                 if (log.properties == 'Watchers') log.isWatchers = true;
+                                if (log.oldValue != null) log.isOldValue = true;
 
                                 log.actionMapping = actionMapping[log.action];
                                 log.propertiesMapping = propMapping[log.properties];
@@ -1683,6 +1824,7 @@
                             });
                             $("#logMoreTpl").tmpl(data.msgs[0]).prependTo('.fd-dynamic');
                             jQuery(".timeago").timeago();
+                            Utils.showMappedTxt('.mapping-user');
 
                             var $toast = toastr.info('刚刚有' + data.msgs.length + '条动态更新');
                             $toast.click(function(event) {
@@ -1714,7 +1856,6 @@
                 type: data.blob.type
             }, function(data, textStatus, xhr) {
                 if (data.success) {
-                    console.log(data);
                     insertComment(cm, '![{name}]({baseURL}{path}{uuidName})'
                         .replace(/\{name\}/g, data.data.name)
                         .replace(/\{baseURL\}/g, baseURL)
@@ -1725,6 +1866,26 @@
         }).on('pasteImageError', function(ev, data) {
             toastr.error(data.message, '剪贴板粘贴图片错误!');
         });
+
+        // clipboard paste image
+        $('.fm-edit-reply .CodeMirror textarea').pastableTextarea().on('pasteImage', function(ev, data) {
+
+            $.post('/admin/file/base64', {
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    insertComment(cme, '![{name}]({baseURL}{path}{uuidName})'
+                        .replace(/\{name\}/g, data.data.name)
+                        .replace(/\{baseURL\}/g, baseURL)
+                        .replace(/\{path\}/g, data.data.path)
+                        .replace(/\{uuidName\}/g, data.data.uuidName));
+                }
+            });
+        }).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        });
+
 
         // 翻译popup
         $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
@@ -1809,18 +1970,10 @@
             }).popup('show');
         });
 
-        $('.ad-comment-page-dimmer').dimmer({
-            onShow: function() {
-                $('body').addClass('blurring');
-            },
-            onHide: function() {
-                $('body').removeClass('blurring');
-            }
-        });
-        $('body').on('dblclick', '.chat .comments .comment', function(event) {
-            event.preventDefault();
-            var $md = $(this).find('.content .markdown-body');
+        function commentRead($comment) {
+            var $md = $comment.find('.content .markdown-body');
             $('.ad-comment-page-dimmer')
+                .show()
                 .find('.container').css({
                     'height': $(window).height(),
                     'align-items': $md.height() < $(window).height() ? 'center' : 'inherit'
@@ -1828,7 +1981,21 @@
                 .find('.text')
                 .empty()
                 .append($md.clone());
-            $('.ad-comment-page-dimmer').dimmer('show');
+
+            $('.ad-comment-page-dimmer').addClass('dimmer').dimmer({
+                onShow: function() {
+                    $('body').addClass('blurring');
+                },
+                onHide: function() {
+                    $('body').removeClass('blurring');
+                    $('.ad-comment-page-dimmer').removeClass('dimmer').hide();
+                }
+            }).dimmer('show');
+        }
+
+        $('body').on('dblclick', '.chat .comments .comment', function(event) {
+            event.preventDefault();
+            commentRead($(this));
         });
         $('body').on('click', '.ad-comment-page-dimmer .container', function(event) {
             if (event.target == event.currentTarget) {
@@ -1836,6 +2003,22 @@
             }
         });
 
+        //-----------------------------------------------------------chat comment more-actions start
+        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-read', function(event) {
+            event.preventDefault();
+            commentRead($(this).closest('.comment'));
+        });
+        //-----------------------------------------------------------chat comment more-actions end
+
+    });
+
+    $('body').on('click', '.cbutton', function(event) {
+        event.preventDefault();
+        $btn = $(this);
+        $btn.addClass('cbutton--click');
+        setTimeout(function() {
+            $btn.removeClass('cbutton--click');
+        }, 500);
     });
     </script>
 </body>

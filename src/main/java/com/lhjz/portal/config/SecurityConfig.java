@@ -68,7 +68,7 @@ public class SecurityConfig {
 
 			http.antMatcher("/admin/**").authorizeRequests()
 					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**")
+							"/admin/js/**", "/admin/login")
 					.permitAll().anyRequest().authenticated().and().formLogin()
 					.loginPage("/admin/login").permitAll()
 					.loginProcessingUrl("/admin/signin")

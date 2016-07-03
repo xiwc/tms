@@ -3,10 +3,12 @@
  */
 package com.lhjz.portal.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -28,6 +30,8 @@ import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.entity.security.Authority;
 import com.lhjz.portal.entity.security.AuthorityId;
+import com.lhjz.portal.entity.security.Group;
+import com.lhjz.portal.entity.security.GroupMember;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
@@ -35,8 +39,11 @@ import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Role;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
+import com.lhjz.portal.pojo.GroupForm;
 import com.lhjz.portal.pojo.UserForm;
 import com.lhjz.portal.repository.AuthorityRepository;
+import com.lhjz.portal.repository.GroupMemberRepository;
+import com.lhjz.portal.repository.GroupRepository;
 import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.DateUtil;
 import com.lhjz.portal.util.MapUtil;
@@ -69,6 +76,12 @@ public class UserController extends BaseController {
 
 	@Autowired
 	MailSender2 mailSender;
+
+	@Autowired
+	GroupRepository groupRepository;
+
+	@Autowired
+	GroupMemberRepository groupMemberRepository;
 
 	String loginAction = "admin/login";
 
@@ -244,7 +257,8 @@ public class UserController extends BaseController {
 									MapUtil.objArr2Map("user", loginUser,
 											"date", new Date(), "href", href,
 											"title", title1, "content",
-											content1)), mail.get());
+											content1)),
+							mail.get());
 					logger.info("邮件通知发送成功！");
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -467,5 +481,217 @@ public class UserController extends BaseController {
 		}
 
 		return RespBody.succeed(user);
+	}
+
+	@RequestMapping(value = "groups", method = RequestMethod.GET)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody getGroups() {
+
+		List<Group> groups = groupRepository.findAll();
+
+		return RespBody.succeed(groups);
+	}
+
+	@RequestMapping(value = "groupMemembers", method = RequestMethod.GET)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody groupMemembers(@RequestParam("groupId") Long groupId) {
+
+		Group group = groupRepository.findOne(groupId);
+
+		if (group == null) {
+			logger.error("用户组不存在! ID: {}", groupId);
+			return RespBody.failed("用户组不存在!");
+		}
+
+		List<GroupMember> groupMembers = groupMemberRepository
+				.findByGroup(group);
+
+		return RespBody.succeed(groupMembers);
+	}
+
+	@RequestMapping(value = "createGroup", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody createGroup(@Valid GroupForm groupForm,
+			BindingResult bindingResult) {
+
+		if (bindingResult.hasErrors()) {
+			return RespBody.failed(bindingResult.getAllErrors().stream()
+					.map(err -> err.getDefaultMessage())
+					.collect(Collectors.joining("<br/>")));
+		}
+
+		List<Group> groups = groupRepository
+				.findByGroupName(groupForm.getGroupName());
+		if (groups.size() > 0) {
+			return RespBody.failed("该用户组已经存在!");
+		}
+
+		Group group = new Group(groupForm.getGroupName());
+		group.setCreateDate(new Date());
+		group.setCreator(WebUtil.getUsername());
+		group.setStatus(Status.New);
+
+		Group group2 = groupRepository.saveAndFlush(group);
+
+		return RespBody.succeed(group2);
+	}
+
+	@RequestMapping(value = "updateGroup", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody updateGroup(@RequestParam("groupId") Long groupId,
+			@RequestParam("groupName") String groupName) {
+
+		Group group = groupRepository.findOne(groupId);
+
+		if (group == null) {
+			logger.error("用户组不存在! ID: {}", groupId);
+			return RespBody.failed("用户组不存在!");
+		}
+
+		group.setUpdateDate(new Date());
+		group.setUpdater(WebUtil.getUsername());
+		group.setStatus(Status.Updated);
+
+		group.setGroupName(groupName);
+
+		Group group2 = groupRepository.saveAndFlush(group);
+
+		return RespBody.succeed(group2);
+	}
+
+	@RequestMapping(value = "deleteGroup", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody deleteGroup(@RequestParam("groupId") Long groupId) {
+
+		Group group = groupRepository.findOne(groupId);
+
+		if (group == null) {
+			logger.error("用户组不存在! ID: {}", groupId);
+			return RespBody.failed("用户组不存在!");
+		}
+
+		List<GroupMember> groupMembers = groupMemberRepository
+				.findByGroup(group);
+
+		groupMemberRepository.deleteInBatch(groupMembers);
+		groupMemberRepository.flush();
+
+		groupRepository.delete(group);
+		groupRepository.flush();
+
+		return RespBody.succeed(groupId);
+	}
+
+	@RequestMapping(value = "addGroupMembers", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody addGroupMembers(@RequestParam("groupId") Long groupId,
+			@RequestParam("usernames") String usernames) {
+
+		Group group = groupRepository.findOne(groupId);
+
+		if (group == null) {
+			logger.error("用户组不存在! ID: {}", groupId);
+			return RespBody.failed("用户组不存在!");
+		}
+
+		String[] usernameArr = usernames.split(",");
+
+		List<GroupMember> groupMembers = new ArrayList<>();
+		Stream.of(usernameArr).forEach((un) -> {
+
+			List<GroupMember> gms = groupMemberRepository
+					.findByGroupAndUsername(group, un);
+			if (gms.size() == 0) {
+				GroupMember gm = new GroupMember(group, un);
+				gm.setCreateDate(new Date());
+				gm.setCreator(WebUtil.getUsername());
+				gm.setStatus(Status.New);
+
+				groupMembers.add(gm);
+			}
+		});
+
+		List<GroupMember> groupMembers2 = groupMemberRepository
+				.save(groupMembers);
+		groupMemberRepository.flush();
+
+		return RespBody.succeed(groupMembers2);
+	}
+
+	@RequestMapping(value = "deleteGroupMembers", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody deleteGroupMembers(@RequestParam("groupId") Long groupId,
+			@RequestParam("usernames") String usernames) {
+
+		Group group = groupRepository.findOne(groupId);
+
+		if (group == null) {
+			logger.error("用户组不存在! ID: {}", groupId);
+			return RespBody.failed("用户组不存在!");
+		}
+
+		String[] usernameArr = usernames.split(",");
+
+		List<GroupMember> groupMembers = new ArrayList<>();
+		Stream.of(usernameArr).forEach((un) -> {
+			List<GroupMember> gms = groupMemberRepository
+					.findByGroupAndUsername(group, un);
+			groupMembers.addAll(gms);
+		});
+
+		groupMemberRepository.deleteInBatch(groupMembers);
+		groupMemberRepository.flush();
+
+		return RespBody.succeed();
+	}
+
+	@RequestMapping(value = "updateGroupMembers", method = RequestMethod.POST)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody updateGroupMembers(@RequestParam("groupId") Long groupId,
+			@RequestParam("usernames") String usernames) {
+
+		Group group = groupRepository.findOne(groupId);
+
+		if (group == null) {
+			logger.error("用户组不存在! ID: {}", groupId);
+			return RespBody.failed("用户组不存在!");
+		}
+
+		List<GroupMember> groupMembers2 = groupMemberRepository
+				.findByGroup(group);
+
+		groupMemberRepository.deleteInBatch(groupMembers2);
+		groupMemberRepository.flush();
+
+		String[] usernameArr = usernames.split(",");
+
+		List<GroupMember> groupMembers = new ArrayList<>();
+		Stream.of(usernameArr).forEach((un) -> {
+
+			List<GroupMember> gms = groupMemberRepository
+					.findByGroupAndUsername(group, un);
+			if (gms.size() == 0) {
+				GroupMember gm = new GroupMember(group, un);
+				gm.setCreateDate(new Date());
+				gm.setCreator(WebUtil.getUsername());
+				gm.setStatus(Status.New);
+
+				groupMembers.add(gm);
+			}
+		});
+
+		List<GroupMember> groupMembers3 = groupMemberRepository
+				.save(groupMembers);
+		groupMemberRepository.flush();
+
+		return RespBody.succeed(groupMembers3);
 	}
 }

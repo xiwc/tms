@@ -1,68 +1,3 @@
-body {
-    /* overflow: hidden; */
-}
-
-div.admin.login {
-    min-width: 300px;
-    max-width: 300px;
-    top: 50px;
-    margin-left: auto;
-    margin-right: auto;
-    position: relative;
-}
-
-#context {
-    min-height: 450px;
-    padding-bottom: 20px;
-}
-
-.ad-index-content {
-    padding-top: 70px;
-    padding-bottom: 20px;
-    padding-right: 12px;
-    min-height: 100%;
-}
-
-.ad-index-container {
-    /* margin-left: 185px; */
-    margin-left: 160px;
-    position: relative;
-    min-height: 432px;
-}
-
-.ad-index-rail {}
-
-.ad-index-sticky {
-    width: 120px;
-}
-
-@media only screen and (max-width: 767px) {
-    .ad-index-rail {
-        display: none;
-    }
-    .ad-index-container {
-        margin-left: 12px;
-    }
-}
-
-
-#dropzone {
-    max-width: 500px;
-    margin: auto;
-}
-
-.dropzone {
-    border: 2px dashed #0087F7;
-    border-radius: 5px;
-    background: white;
-}
-
-.dropzone .dz-message {
-    font-weight: 400;
-    font-size: x-large;
-}
-
-
 /* Make clicks pass-through */
 #nprogress {
   pointer-events: none;
@@ -73,7 +8,7 @@ div.admin.login {
 
   position: fixed;
   z-index: 1031;
-  top: 41px;
+  top: 0;
   left: 0;
 
   width: 100%;
@@ -100,8 +35,8 @@ div.admin.login {
   display: block;
   position: fixed;
   z-index: 1031;
-  top: 45px;
-  right: 5px;
+  top: 15px;
+  right: 15px;
 }
 
 #nprogress .spinner-icon {

@@ -109,12 +109,9 @@ jQuery(function($) {
 
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
-        // if (!((typeof url == 'function') && (url('path', settings.url) == '/admin/chat/poll'))) {
-
         if (settings.url.lastIndexOf('/unmask') == -1) {
-            $('.ad-page-dimmer').addClass('active');
+            // $('.ad-page-dimmer').addClass('active');
         }
-        // }
 
         var csrf = {};
         csrf[$('.ad-csrf input:hidden').attr('name')] = $('.ad-csrf input:hidden').attr('value');
@@ -126,16 +123,12 @@ jQuery(function($) {
         }
     });
 
-    // $(document).ajaxStart(function() {
-    //     $('.ad-page-dimmer').addClass('active');
-    // });
-
-    // $(document).ajaxComplete(function() {
-    //     $('.ad-page-dimmer').removeClass('active');
-    // });
-
+    $(document).on('ajaxStart', function() {
+        NProgress && NProgress.start();
+    });
     $(document).on('ajaxStop', function() {
-        $('.ad-page-dimmer').removeClass('active');
+        // $('.ad-page-dimmer').removeClass('active');
+        NProgress && NProgress.done();
     });
 
 
@@ -193,14 +186,14 @@ jQuery(function($) {
             }
             return '';
         },
-        md2html(markdown) {
+        md2html: function(markdown) {
             if (showdown) {
                 var converter = new showdown.Converter();
                 return converter.makeHtml(markdown);
             }
             return markdown;
         },
-        imgLoaded($imgs, callback) {
+        imgLoaded: function($imgs, callback) {
             var imgdefereds = [];
             $imgs.each(function() {
                 var dfd = $.Deferred();
@@ -221,6 +214,20 @@ jQuery(function($) {
             })
             $.when.apply(null, imgdefereds).done(function() {
                 callback && callback.call(null);
+            });
+        },
+        showMappedTxt: function(filterCls) {
+            var userMap = {};
+            $('input:hidden[data-group="users"]').each(function(index, el) {
+                userMap[$(this).attr('name')] = $(this).attr('value');
+            });
+
+            $(filterCls).each(function(index, el) {
+                var username = $(this).text();
+                var name = userMap[username];
+                if (name) {
+                    $(this).text(name).removeClass(filterCls.replace('.', ''));
+                }
             });
         }
     });

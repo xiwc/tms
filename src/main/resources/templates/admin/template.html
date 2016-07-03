@@ -118,6 +118,18 @@
                     <a class="reply">回复</a> {{if actions}}
                     <a class="edit">编辑</a>
                     <a class="delete">删除</a> {{/if}}
+                    <div class="ui top right pointing dropdown dd-more-actions">
+                        <div class="text" style="margin: 0;">更多</div>
+                        <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
+                        <div class="menu">
+                            {{if actions}}
+                            <div class="item edit">编辑</div>
+                            <div class="item delete">删除</div> {{/if}}
+                            <div class="item btn-read">阅读</div>
+                            <div class="item btn-copy" data-clipboard-text="${content}">复制</div>
+                            <div class="item btn-share" data-clipboard-text="${textShare}">分享</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -143,7 +155,7 @@
                         {{/if}}
                     </a>
                     <span>${actionMapping}</span>
-                    <a target="_blank" href="/admin/translate?id=${targetId}">翻译</a>
+                    <a target="_blank" href="/admin/translate?id=${targetId}">翻译#${targetId}</a>
                     <span>${propertiesMapping}</span>
                     <div class="date timeago" title="${createDate}">
                         ${createDate}
@@ -151,14 +163,14 @@
                 </div>
                 {{if properties}}
                 <div class="extra text">
-                    {{if oldValue}}
+                    {{if isOldValue}}
                     <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${oldValue}</div>
                     <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;">更新为</div>
                     {{/if}} {{if isLabels}}
                     <div class="ui tag label">${newValue}</div>
                     {{else isWatchers}}
                     <div class="ui label">
-                        <i class="user icon"></i> <span>${newValue}</span>
+                        <i class="user icon"></i> <span class="mapping-user">${newValue}</span>
                     </div>
                     {{else}}
                     <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${newValue}</div>
@@ -324,6 +336,13 @@
     <div th:fragment="ad-page-dimmer" style="z-index: 99999;" class="ui page dimmer ad-page-dimmer">
         <div class="ui large text loader">处理中...</div>
     </div>
+    <div th:fragment="ad-comment-page-dimmer" style="z-index: 99999; display: none;" class="ui page ad-comment-page-dimmer">
+        <div class="container" style="display: flex; display: -webkit-flex; justify-content: center; align-items: center; max-width: 650px; margin: auto; overflow-y: auto;">
+            <div class="content">
+                <div class="text" style="max-width: 633px; background-color: white; padding: 15px; text-align: left;"></div>
+            </div>
+        </div>
+    </div>
     <!-- user add modal -->
     <div th:fragment="ad-user-add" class="ui small modal ad-user-add">
         <div class="header">
@@ -356,6 +375,56 @@
                         <div class="ui radio checkbox chk-admin" sec:authorize="hasRole('ROLE_SUPER')">
                             <input type="radio" name="role" value="admin">
                             <label>管理员</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- user group add modal -->
+    <div th:fragment="ad-user-group-add" class="ui small modal ad-user-group-add">
+        <div class="header">
+            添加用户组
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="required field">
+                        <label>组名:</label>
+                        <input name="groupName" type="text" placeholder="组名">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- user group edit modal -->
+    <div th:fragment="ad-user-group-edit" class="ui small modal ad-user-group-edit">
+        <div class="header">
+            用户组成员编辑
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="ui message">
+                        当前编辑用户组: <span></span>
+                    </div>
+                    <div class="required field">
+                        <label>组成员:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-group-member">
+                            <input type="hidden" name="usernames" value="">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">组成员</div>
+                            <div class="menu">
+                                <div th:each="u : ${users}" class="item" th:title="${u.name}" th:attr="data-value=${u.username}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
