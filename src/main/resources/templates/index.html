@@ -26,12 +26,22 @@
     }
     
     .main.container {
-        margin-right: 460px !important;
-        margin-left: 3em !important;
-        width: auto !important;
-        max-width: 960px !important;
+        margin: auto;
+        width: 690px;
         padding: 2em 0em 7em;
         position: relative;
+    }
+    
+    .ad-index-content {
+        padding-right: 0;
+    }
+    
+    .chat {
+        margin-right: 40px;
+    }
+    
+    .ui.minimal.comments {
+        margin: auto;
     }
     
     .avatar.ui.mini.circular.image {
@@ -76,9 +86,8 @@
     
     .ui.vertical.icon.buttons.btns-scroll {
         position: fixed;
-        right: 433px;
-        /* bottom: 225px; */
-        bottom: 325px;
+        right: 0;
+        top: 300px;
         background-color: transparent;
         z-index: 1;
     }
@@ -113,11 +122,9 @@
     
     .chat-search {
         position: fixed;
-        top: 50px;
-        right: 433px;
+        top: 15px;
+        right: 0;
         z-index: 1;
-        /* display: none; */
-        /* width: 30px; */
     }
     
     .ui.search.sh-search {
@@ -145,47 +152,16 @@
     #nprogress .spinner {
         top: 5px;
     }
+    
+    .ad-index-container {
+        margin-left: 0;
+    }
     /* Mobile */
     
-    @media only screen and (max-width: 767px) {
-        .chat .comments .comment .content .actions > a.edit,
-        .chat .comments .comment .content .actions > a.delete {
-            display: none;
-        }
-        .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
-        .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
-            display: block;
-        }
-    }
+    @media only screen and (max-width: 767px) {}
     /* Mobile & Tablet */
     
-    @media only screen and (max-width: 991px) {
-        .main.container {
-            margin-right: 0 !important;
-            margin-left: 0 !important;
-            width: auto !important;
-            max-width: 960px !important;
-            padding: 2em 0em 2em;
-            position: relative;
-        }
-        .main.container .right.rail {
-            margin-left: 3em;
-            padding-top: 2em;
-            width: 420px;
-            display: none;
-        }
-        .ui.vertical.icon.buttons.btns-scroll {
-            right: 13px;
-            bottom: 190px;
-        }
-        .ui.button.btn-get-chat-news {
-            right: 10px;
-            bottom: 265px;
-        }
-        .chat-search {
-            display: none;
-        }
-    }
+    @media only screen and (max-width: 991px) {}
     
     .cbutton {
         position: relative;
@@ -243,7 +219,7 @@
 </head>
 
 <body>
-    <div class="pusher ad-index-content" style="padding-top: 40px; padding-bottom: 0;">
+    <div class="pusher ad-index-content" style="padding-top: 0; padding-bottom: 0;">
         <div class="ad-index-container">
             <div id="context">
                 <div class="main ui container">
@@ -272,11 +248,11 @@
                                     </div>
                                     <div class="actions">
                                         <a class="reply">回复</a>
+                                        <a class="btn-read">阅读</a>
                                         <div class="ui top right pointing dropdown dd-more-actions">
                                             <a class="text" style="margin: 0;">更多</a>
                                             <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                                             <div class="menu">
-                                                <div class="item btn-read">阅读</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
                                             </div>
@@ -291,7 +267,7 @@
                                 </a>
                             </form>
                         </div>
-                        <div class="ui vertical circular icon buttons btns-scroll">
+                        <div class="ui vertical circular icon buttons btns-scroll btn-ctrl">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
                                 <i class="arrow up icon"></i>
                             </div>
@@ -300,7 +276,7 @@
                             </div>
                         </div>
                         <!-- 沟通消息检索 -->
-                        <div class="chat-search">
+                        <div class="chat-search btn-ctrl">
                             <div class="ui search">
                                 <div class="ui circular icon button btn-search" title="博文检索">
                                     <input style="display: none;" class="prompt" th:value="${param.containsKey('search') ? param.search[0] : ''}" type="text" placeholder="查找...">
@@ -315,11 +291,7 @@
         </div>
     </div>
     <!-- popup container start -->
-    <div class="ui flowing popup top left transition hidden pp-translate"></div>
-    <div class="ui flowing popup top left transition hidden pp-chat-search-results">
-        <div class="ui selection divided list list-chat-search-results">
-        </div>
-    </div>
+    <div class="ui flowing popup top left transition hidden pp-wiki"></div>
     <!-- popup container end -->
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
@@ -355,6 +327,22 @@
             toastr.success('复制到剪贴板失败!');
         });
 
+        $('.btn-ctrl').css({
+            right: ($(window).width() - $('.ui.container').width()) / 2 + 2 - 10
+        });
+
+        $('.btns-scroll').css({
+            top: ($(window).height() - $('.btns-scroll').height()) / 2
+        });
+
+        $(window).resize(function(event) {
+            $('.btn-ctrl').css({
+                right: ($(window).width() - $('.ui.container').width()) / 2 + 2 - 10
+            });
+            $('.btns-scroll').css({
+                top: ($(window).height() - $('.btns-scroll').height()) / 2
+            });
+        });
 
         // ------------------------------------------------------------------------------------- fancybox image start
 
@@ -714,49 +702,9 @@
         });
 
         //-----------------------------------------------------------chat comment more-actions start
-        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-read', function(event) {
+        $('body').on('click', '.chat .comments .comment .btn-read', function(event) {
             event.preventDefault();
             commentRead($(this).closest('.comment'));
-        });
-        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-wiki', function(event) {
-            event.preventDefault();
-            $btn = $(this);
-            $('.ad-msg-as-wiki').modal({
-                onShow: function() {
-                    var $md = $(this);
-                    $md.find('.ui.form').form('clear');
-
-                    var content = $btn.closest('.comment').find('.content .text.markdown-body').attr('data-content');
-                    var lines = content.split('\n');
-                    $.each(lines, function(index, line) {
-                        line = $.trim(line);
-                        var arr = line.split(/\s+/);
-                        if (arr.length > 1) {
-                            if (/^#+$/.test(arr[0])) {
-                                $md.find('input[name="title"]').val(line.replace(/^#+\s+/, ''));
-                                return false;
-                            }
-                        }
-                    });
-                },
-                onApprove: function() {
-                    $md = $(this);
-                    $.post('/admin/chat/asWiki', {
-                        id: $btn.closest('.comment').attr('data-id'),
-                        baseURL: baseURL,
-                        title: $md.find('input[name="title"]').val(),
-                        privated: $md.find('.ui.checkbox').checkbox('is checked'),
-                        labels: $md.find('.dd-labels').dropdown('get value')
-                    }, function(data, textStatus, xhr) {
-                        if (data.success) {
-                            $btn.remove();
-                            toastr.success('消息转博文成功!');
-                        } else {
-                            toastr.error(data.data, '消息转博文失败!');
-                        }
-                    });
-                }
-            }).modal('show');
         });
         //-----------------------------------------------------------chat comment more-actions end
 
