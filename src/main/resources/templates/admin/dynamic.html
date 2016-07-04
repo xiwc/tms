@@ -327,7 +327,7 @@
                                     <div class="content">
                                         <div class="summary">
                                             <a class="user" th:attr="data-value=${l.creator.username}" th:text="${#strings.isEmpty(l.creator.name) ? l.creator.username : l.creator.name}">张三</a>
-                                            <span th:if="${#strings.toString(l.action) == 'Create'}">创建</span>
+                                            <span th:if="${#strings.toString(l.action) == 'Create'}">添加</span>
                                             <span th:if="${#strings.toString(l.action) == 'Update'}">更新</span>
                                             <span th:if="${#strings.toString(l.action) == 'Delete'}">删除</span>
                                             <a th:if="${#strings.toString(l.target) == 'Translate'}" target="_blank" th:href="@{/admin/translate(id=${l.targetId})}" th:text="${'翻译#' + l.targetId}">翻译</a>
@@ -1669,7 +1669,7 @@
         });
 
         var actionMapping = {
-            'Create': '创建',
+            'Create': '添加',
             'Update': '更新',
             "Delete": '删除'
         };
