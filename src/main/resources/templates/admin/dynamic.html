@@ -2218,8 +2218,9 @@
                     var $img = $(emojione.shortnameToImage(e)).attr('data-name', e).attr('title', e).click(function(event) {
                         var cursor = cm.getCursor();
                         if (cursor) {
-                            cm.replaceRange('![{name}]({src})'
+                            cm.replaceRange('![{name}]({protocol}:{src})'
                                 .replace(/\{name\}/g, $(this).attr('data-name'))
+                                .replace(/\{protocol\}/g, url('protocol'))
                                 .replace(/\{src\}/g, $(this).attr('src')), cursor, cursor);
                             cm.focus();
                         }
