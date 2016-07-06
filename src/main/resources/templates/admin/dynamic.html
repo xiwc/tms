@@ -216,6 +216,16 @@
         .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
             display: block;
         }
+        .ui.button.btn-chat-s2h {
+            left: 15px;
+        }
+    }
+    /* Tablet */
+    
+    @media only screen and (min-width: 768px) and (max-width: 991px) {
+        .ui.button.btn-chat-s2h {
+            left: 165px;
+        }
     }
     /* Mobile & Tablet */
     
@@ -308,6 +318,19 @@
     .pp-chat-emoji img.emojione:hover,
     .pp-chat-edit-emoji img.emojione:hover {
         background-color: lightgray;
+    }
+    
+    .ui.button.btn-chat-s2h {
+        display: none;
+        position: fixed;
+        left: 205px;
+        top: 200px;
+        background-color: rgba(224, 225, 226, 0.54);
+        z-index: 1;
+    }
+    
+    .ui.button.btn-chat-s2h:hover {
+        background-color: rgba(224, 225, 226, 1);
     }
     </style>
 </head>
@@ -459,6 +482,7 @@
                             <i class="refresh icon"></i>
                             <div class="floating ui red circular label lbl-chat-news-count">0</div>
                         </div>
+                        <div class="ui circular icon button btn-chat-s2h" title="滚动至消息头"> <i class="chevron up icon"></i> </div>
                         <div class="ui vertical circular icon buttons btns-scroll">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
                                 <i class="arrow up icon"></i>
@@ -1348,6 +1372,13 @@
                 .replace(/\{baseURL\}/g, baseURL)
                 .replace(/\{ats\}/g, ats.join(' & '));
             insertComment(cm, comment);
+
+            if ('pushState' in history) {
+                history.replaceState(null, '', url('path'));
+                Utils.remember();
+                var dynamicUrl = Utils.getRemember('/admin/dynamic');
+                dynamicUrl && $('a.item.mi-dynamic').attr('href', dynamicUrl);
+            }
         }
 
         // ============================================================================ url? end
@@ -2228,8 +2259,9 @@
                         var $img = $(emojione.shortnameToImage(e)).attr('data-name', e).attr('title', e).click(function(event) {
                             var cursor = cm.getCursor();
                             if (cursor) {
-                                cm.replaceRange('![{name}]({src})'
+                                cm.replaceRange('![{name}]({protocol}:{src})'
                                     .replace(/\{name\}/g, $(this).attr('data-name'))
+                                    .replace(/\{protocol\}/g, url('protocol'))
                                     .replace(/\{src\}/g, $(this).attr('src')), cursor, cursor);
                                 cm.focus();
                             }
@@ -2242,6 +2274,41 @@
             };
 
         })();
+
+        // -------------------------------------------------------------------------------- 滚动至消息头 start
+
+        $('.btn-chat-s2h').click(function() {
+            var $btn = $(this);
+            s2mk($btn.data('target'));
+        });
+
+        $('body').on('mouseenter', '.chat .comment', function(event) {
+            event.preventDefault();
+            var $header = $(event.target).closest('.comment').find('a.avatar.image');
+            if ($header.size() > 0) {
+                $('.btn-chat-s2h').data('target', $header.closest('.comment'));
+                if (!Utils.isElementInViewport($header)) {
+                    $('.btn-chat-s2h').show();
+                }
+            }
+        });
+
+        $('.chat').mouseleave(function(event) {
+            $('.btn-chat-s2h').removeData('target').hide();
+        });
+
+        $(window).scroll(function(event) {
+            var $t = $('.btn-chat-s2h').data('target');
+            var $header = $t && $t.find('a.avatar.image');
+            if ($header && $header.size() > 0 && !Utils.isElementInViewport($header)) {
+                $('.btn-chat-s2h').show();
+            } else {
+                $('.btn-chat-s2h').hide();
+            }
+        });
+
+        // -------------------------------------------------------------------------------- 滚动至消息头 end
+
     });
     </script>
 </body>
