@@ -268,7 +268,7 @@
                             <span>退出 </span>
                             <form class="hidden" th:action="@{/admin/logout}" action="" method="post"></form>
                         </a>
-                        <a th:if="${user != null}" th:href="@{/admin}">
+                        <a th:if="${user != null}" th:href="@{/admin/dynamic(scroll=${'1'})}">
                             <i class="user icon" style="margin-right: 0px;"></i>
                             <span th:text="${#strings.isEmpty(user.name) ? user.username : user.name}">Admin</span>
                         </a>
