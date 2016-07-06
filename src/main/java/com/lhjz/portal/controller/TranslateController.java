@@ -717,8 +717,8 @@ public class TranslateController extends BaseController {
 		final Translate translate = label.getTranslate();
 
 		translate.getLabels().remove(label);
-		translate.setUpdateDate(new Date());
-		translate.setUpdater(WebUtil.getUsername());
+		// translate.setUpdateDate(new Date());
+		// translate.setUpdater(WebUtil.getUsername());
 		translate.setStatus(Status.Updated);
 		translate.setSearch(translate.toString());
 
@@ -754,8 +754,8 @@ public class TranslateController extends BaseController {
 		userRepository.save(user);
 
 		translate.getWatchers().remove(user);
-		translate.setUpdateDate(new Date());
-		translate.setUpdater(WebUtil.getUsername());
+		// translate.setUpdateDate(new Date());
+		// translate.setUpdater(WebUtil.getUsername());
 
 		translateRepository.saveAndFlush(translate);
 
@@ -828,8 +828,8 @@ public class TranslateController extends BaseController {
 
 		Label label3 = labelRepository.saveAndFlush(label);
 		translate.getLabels().add(label3);
-		translate.setUpdateDate(new Date());
-		translate.setUpdater(WebUtil.getUsername());
+		// translate.setUpdateDate(new Date());
+		// translate.setUpdater(WebUtil.getUsername());
 		translate.setSearch(translate.toString());
 
 		translateRepository.saveAndFlush(translate);
@@ -874,8 +874,8 @@ public class TranslateController extends BaseController {
 
 		userRepository.saveAndFlush(user);
 
-		translate.setUpdateDate(new Date());
-		translate.setUpdater(WebUtil.getUsername());
+		// translate.setUpdateDate(new Date());
+		// translate.setUpdater(WebUtil.getUsername());
 
 		translateRepository.saveAndFlush(translate);
 
