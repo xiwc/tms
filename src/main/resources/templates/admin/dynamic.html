@@ -123,10 +123,22 @@
         display: none;
         position: fixed;
         right: 430px;
-        /* bottom: 300px; */
         bottom: 400px;
         background-color: rgba(219, 40, 40, 0.54);
         z-index: 1;
+    }
+    
+    .ui.button.btn-chat-s2h {
+        display: none;
+        position: fixed;
+        left: 205px;
+        top: 200px;
+        background-color: rgba(224, 225, 226, 0.54);
+        z-index: 1;
+    }
+    
+    .ui.button.btn-chat-s2h:hover {
+        background-color: rgba(224, 225, 226, 1);
     }
     
     .ui.button.btn-get-chat-news:hover {
@@ -218,6 +230,16 @@
         .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
         .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
             display: block;
+        }
+        .ui.button.btn-chat-s2h {
+            left: 15px;
+        }
+    }
+    /* Tablet */
+    
+    @media only screen and (min-width: 768px) and (max-width: 991px) {
+        .ui.button.btn-chat-s2h {
+            left: 165px;
         }
     }
     /* Mobile & Tablet */
@@ -461,6 +483,7 @@
                             <i class="refresh icon"></i>
                             <div class="floating ui red circular label lbl-chat-news-count">0</div>
                         </div>
+                        <div class="ui circular icon button btn-chat-s2h" title="滚动至消息头"> <i class="chevron up icon"></i> </div>
                         <div class="ui vertical circular icon buttons btns-scroll">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
                                 <i class="arrow up icon"></i>
@@ -2086,153 +2109,185 @@
         });
         //-----------------------------------------------------------chat comment more-actions end
 
-    });
+        $('body').on('click', '.cbutton', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+            $btn.addClass('cbutton--click');
+            setTimeout(function() {
+                $btn.removeClass('cbutton--click');
+            }, 500);
+        });
 
-    $('body').on('click', '.cbutton', function(event) {
-        event.preventDefault();
-        $btn = $(this);
-        $btn.addClass('cbutton--click');
-        setTimeout(function() {
-            $btn.removeClass('cbutton--click');
-        }, 500);
-    });
+        // emoji
+        var emoji = (function() {
 
-    // emoji
-    var emoji = (function() {
+            // 表情
+            var emojis = [
+                ':smile:',
+                ':laughing:',
+                ':blush:',
+                ':smiley:',
+                ':relaxed:',
+                ':smirk:',
+                ':heart_eyes:',
+                ':kissing_heart:',
+                ':kissing_closed_eyes:',
+                ':flushed:',
+                ':relieved:',
+                ':satisfied:',
+                ':grin:',
+                ':wink:',
+                ':stuck_out_tongue_winking_eye:',
+                ':stuck_out_tongue_closed_eyes:',
+                ':unamused:',
+                ':sweat_smile:',
+                ':sweat:',
+                ':disappointed_relieved:',
+                ':weary:',
+                ':pensive:',
+                ':disappointed:',
+                ':confounded:',
+                ':fearful:',
+                ':cold_sweat:',
+                ':persevere:',
+                ':cry:',
+                ':sob:',
+                ':joy:',
+                ':astonished:',
+                ':scream:',
+                ':tired_face:',
+                ':angry:',
+                ':rage:',
+                ':triumph:',
+                ':sleepy:',
+                ':yum:',
+                ':mask:',
+                ':sunglasses:',
+                ':dizzy_face:',
+                ':imp:',
+                ':smiling_imp:',
+                ':neutral_face:',
+                ':no_mouth:',
+                ':innocent:',
+                ':alien:',
+                ':yellow_heart:',
+                ':blue_heart:',
+                ':heart:',
+                ':broken_heart:',
+                ':heartbeat:',
+                ':heartpulse:',
+                ':two_hearts:',
+                ':revolving_hearts:',
+                ':cupid:',
+                ':sparkling_heart:',
+                ':sparkles:',
+                ':star:',
+                ':dizzy:',
+                ':boom:',
+                ':anger:',
+                ':exclamation:',
+                ':question:',
+                ':grey_exclamation:',
+                ':grey_question:',
+                ':zzz:',
+                ':dash:',
+                ':sweat_drops:',
+                ':notes:',
+                ':musical_note:',
+                ':fire:',
+                ':hankey:',
+                ':thumbsup:',
+                ':thumbsdown:',
+                ':ok_hand:',
+                ':punch:',
+                ':fist:',
+                ':v:',
+                ':wave:',
+                ':raised_hand:',
+                ':open_hands:',
+                ':point_up:',
+                ':point_down:',
+                ':point_left:',
+                ':point_right:',
+                ':raised_hands:',
+                ':pray:',
+                ':point_up_2:',
+                ':clap:',
+                ':muscle:',
+                ':feet:',
+                ':lips:',
+                ':kiss:',
+                ':droplet:',
+                ':ear:',
+                ':eyes:',
+                ':nose:',
+                ':tongue:',
+                ':love_letter:',
+            ];
 
-        // 表情
-        var emojis = [
-            ':smile:',
-            ':laughing:',
-            ':blush:',
-            ':smiley:',
-            ':relaxed:',
-            ':smirk:',
-            ':heart_eyes:',
-            ':kissing_heart:',
-            ':kissing_closed_eyes:',
-            ':flushed:',
-            ':relieved:',
-            ':satisfied:',
-            ':grin:',
-            ':wink:',
-            ':stuck_out_tongue_winking_eye:',
-            ':stuck_out_tongue_closed_eyes:',
-            ':unamused:',
-            ':sweat_smile:',
-            ':sweat:',
-            ':disappointed_relieved:',
-            ':weary:',
-            ':pensive:',
-            ':disappointed:',
-            ':confounded:',
-            ':fearful:',
-            ':cold_sweat:',
-            ':persevere:',
-            ':cry:',
-            ':sob:',
-            ':joy:',
-            ':astonished:',
-            ':scream:',
-            ':tired_face:',
-            ':angry:',
-            ':rage:',
-            ':triumph:',
-            ':sleepy:',
-            ':yum:',
-            ':mask:',
-            ':sunglasses:',
-            ':dizzy_face:',
-            ':imp:',
-            ':smiling_imp:',
-            ':neutral_face:',
-            ':no_mouth:',
-            ':innocent:',
-            ':alien:',
-            ':yellow_heart:',
-            ':blue_heart:',
-            ':heart:',
-            ':broken_heart:',
-            ':heartbeat:',
-            ':heartpulse:',
-            ':two_hearts:',
-            ':revolving_hearts:',
-            ':cupid:',
-            ':sparkling_heart:',
-            ':sparkles:',
-            ':star:',
-            ':dizzy:',
-            ':boom:',
-            ':anger:',
-            ':exclamation:',
-            ':question:',
-            ':grey_exclamation:',
-            ':grey_question:',
-            ':zzz:',
-            ':dash:',
-            ':sweat_drops:',
-            ':notes:',
-            ':musical_note:',
-            ':fire:',
-            ':hankey:',
-            ':thumbsup:',
-            ':thumbsdown:',
-            ':ok_hand:',
-            ':punch:',
-            ':fist:',
-            ':v:',
-            ':wave:',
-            ':raised_hand:',
-            ':open_hands:',
-            ':point_up:',
-            ':point_down:',
-            ':point_left:',
-            ':point_right:',
-            ':raised_hands:',
-            ':pray:',
-            ':point_up_2:',
-            ':clap:',
-            ':muscle:',
-            ':feet:',
-            ':lips:',
-            ':kiss:',
-            ':droplet:',
-            ':ear:',
-            ':eyes:',
-            ':nose:',
-            ':tongue:',
-            ':love_letter:',
-        ];
+            return {
+                init: function($pp, cm) {
 
-        return {
-            init: function($pp, cm) {
+                    if ($pp.children().size() != 0) {
+                        return;
+                    }
 
-                if ($pp.children().size() != 0) {
-                    return;
-                }
+                    isInited = true;
 
-                isInited = true;
-
-                var $wrap = $('<div></div>');
-                $.each(emojis, function(index, e) {
-                    var $img = $(emojione.shortnameToImage(e)).attr('data-name', e).attr('title', e).click(function(event) {
-                        var cursor = cm.getCursor();
-                        if (cursor) {
-                            cm.replaceRange('![{name}]({protocol}:{src})'
-                                .replace(/\{name\}/g, $(this).attr('data-name'))
-                                .replace(/\{protocol\}/g, url('protocol'))
-                                .replace(/\{src\}/g, $(this).attr('src')), cursor, cursor);
-                            cm.focus();
-                        }
+                    var $wrap = $('<div></div>');
+                    $.each(emojis, function(index, e) {
+                        var $img = $(emojione.shortnameToImage(e)).attr('data-name', e).attr('title', e).click(function(event) {
+                            var cursor = cm.getCursor();
+                            if (cursor) {
+                                cm.replaceRange('![{name}]({protocol}:{src})'
+                                    .replace(/\{name\}/g, $(this).attr('data-name'))
+                                    .replace(/\{protocol\}/g, url('protocol'))
+                                    .replace(/\{src\}/g, $(this).attr('src')), cursor, cursor);
+                                cm.focus();
+                            }
+                        });
+                        $wrap.append($img);
                     });
-                    $wrap.append($img);
-                });
 
-                $pp.append($wrap);
+                    $pp.append($wrap);
+                }
+            };
+
+        })();
+
+        // -------------------------------------------------------------------------------- 滚动至消息头 start
+
+
+        $('.btn-chat-s2h').click(function() {
+            var $btn = $(this);
+            s2mk($btn.data('target'));
+        });
+        $('.chat .comment').hover(function(event) {
+            var $header = $(event.target).closest('.comment').find('a.avatar.image');
+            if ($header.size() > 0) {
+                $('.btn-chat-s2h').data('target', $header.closest('.comment'));
+                if (!Utils.isElementInViewport($header)) {
+                    $('.btn-chat-s2h').show();
+                }
             }
-        };
+        }, null);
 
-    })();
+        $('.chat').mouseleave(function(event) {
+            $('.btn-chat-s2h').removeData('target');
+        });
+
+        $(window).scroll(function(event) {
+            var $t = $('.btn-chat-s2h').data('target');
+            var $header = $t && $t.find('a.avatar.image');
+            if ($header && $header.size() > 0 && !Utils.isElementInViewport($header)) {
+                $('.btn-chat-s2h').show();
+            } else {
+                $('.btn-chat-s2h').hide();
+            }
+        });
+
+        // -------------------------------------------------------------------------------- 滚动至消息头 end
+    });
     </script>
 </body>
 
