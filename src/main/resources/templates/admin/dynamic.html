@@ -2269,7 +2269,9 @@
             var $btn = $(this);
             s2mk($btn.data('target'));
         });
-        $('.chat .comment').hover(function(event) {
+
+        $('body').on('mouseenter', '.chat .comment', function(event) {
+            event.preventDefault();
             var $header = $(event.target).closest('.comment').find('a.avatar.image');
             if ($header.size() > 0) {
                 $('.btn-chat-s2h').data('target', $header.closest('.comment'));
@@ -2277,10 +2279,10 @@
                     $('.btn-chat-s2h').show();
                 }
             }
-        }, null);
+        });
 
         $('.chat').mouseleave(function(event) {
-            $('.btn-chat-s2h').removeData('target');
+            $('.btn-chat-s2h').removeData('target').hide();
         });
 
         $(window).scroll(function(event) {
