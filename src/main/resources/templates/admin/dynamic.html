@@ -1392,10 +1392,10 @@
         });
 
         // 滚动到标记处
-        function s2mk() {
+        function s2mk($p) {
 
             Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
-                $('html, body, .ad-index-content').scrollTo($(".marker").first().removeClass('marker'), 300, {
+                $('html, body, .ad-index-content').scrollTo($p ? $p : $(".marker").first().removeClass('marker'), 300, {
                     offset: -50
                 });
             });
@@ -1543,13 +1543,38 @@
             event.preventDefault();
             simplemde.clearAutosavedValue();
             simplemde.value('');
+            record.back();
         });
+
+        // 用户停留视图位置记录
+        var record = (function() {
+
+            var _$p = null; // 位置记录点
+
+            return {
+                mark: function($p) {
+                    _$p = $p;
+                },
+                back: function() {
+                    this.exist() && s2mk(_$p);
+                    this.reset();
+                },
+                reset: function() {
+                    _$p = null;
+                },
+                exist: function() {
+                    return (_$p != null);
+                }
+            };
+        })();
 
         $('body').on('click', '.comments .actions a.reply', function(event) {
             event.preventDefault();
             $btn = $(this);
             var id = $btn.closest('.comment').attr('data-id');
             var username = $btn.closest('.comment').find('.content .author').attr('data-value');
+
+            record.mark($btn.closest('.comment'));
 
             // [[回复#10](admin/dynamic?id=1){~xiweicheng}]
             var comment = '[[回复#{id}]({baseURL}admin/dynamic?id={id}){~{username}}]\n\n';
