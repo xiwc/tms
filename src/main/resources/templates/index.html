@@ -558,7 +558,7 @@
         var $textMds = $('.comments .content .text');
         var converter = new showdown.Converter();
         $textMds.each(function(index, el) {
-            var html = marked($(el).text());
+            var html = marked($(el).attr('data-content'));
             $(el).html(html);
         });
 

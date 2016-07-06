@@ -1315,11 +1315,8 @@
 
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
-            var html = simplemde.markdown(preParse($(el).text()));
+            var html = simplemde.markdown(preParse($(el).attr('data-content')));
             $(el).html(html);
-            // $(el).html(html).find('pre code').each(function(i, block) {
-            //     hljs.highlightBlock(block);
-            // });
         });
 
         $('.ui.comments').show();
