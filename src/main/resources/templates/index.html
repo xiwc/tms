@@ -403,6 +403,14 @@
             });
         });
 
+        // Set options
+        marked && marked.setOptions({
+            breaks: true,
+            highlight: function(code) {
+                return window.hljs.highlightAuto(code).value;
+            }
+        });
+
         // ------------------------------------------------------------------------------------- fancybox image start
 
         $('body').on('click', '.chat .comments .comment .content .text.markdown-body img', function(event) {
