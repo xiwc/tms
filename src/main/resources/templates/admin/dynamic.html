@@ -1379,6 +1379,8 @@
             if ('pushState' in history) {
                 history.replaceState(null, '', url('path'));
                 Utils.remember();
+                var dynamicUrl = Utils.getRemember('/admin/dynamic');
+                dynamicUrl && $('a.item.mi-dynamic').attr('href', dynamicUrl);
             }
         }
 
