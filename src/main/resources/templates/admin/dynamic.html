@@ -405,6 +405,7 @@
                                             <i style="cursor: pointer;" title="踩一下" class="cbutton cbutton--effect-novak thumbs outline down icon" data-type="cai" data-label="踩"></i> <span th:unless="${#strings.isEmpty(c.voteCai)}" th:title="${c.voteCai}" th:text="${#arrays.length(#strings.arraySplit(c.voteCai,',')) + ' 踩'}">5 踩</span>
                                         </div>
                                     </div>
+                                    <input type="hidden" name="content" th:value="${c.content}" />
                                     <div class="text markdown-body" th:attr="data-content=${c.content}" th:text="${c.content}">
                                         How artistic!
                                     </div>
@@ -1315,7 +1316,8 @@
 
         var $textMds = $('.comments .content .text');
         $textMds.each(function(index, el) {
-            var html = simplemde.markdown(preParse($(el).text()));
+            // var html = simplemde.markdown(preParse($(el).text()));
+            var html = simplemde.markdown(preParse($(el).siblings('input:hidden[name="content"]').val()));
             $(el).html(html);
         });
 
