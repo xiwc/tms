@@ -132,11 +132,21 @@
         display: none;
         position: fixed;
         left: 205px;
+        top: 162px;
+        background-color: rgba(224, 225, 226, 0.54);
+        z-index: 1;
+    }
+    
+    .ui.button.btn-chat-s2b {
+        display: none;
+        position: fixed;
+        left: 205px;
         top: 200px;
         background-color: rgba(224, 225, 226, 0.54);
         z-index: 1;
     }
     
+    .ui.button.btn-chat-s2b:hover,
     .ui.button.btn-chat-s2h:hover {
         background-color: rgba(224, 225, 226, 1);
     }
@@ -231,6 +241,7 @@
         .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
             display: block;
         }
+        .ui.button.btn-chat-s2b,
         .ui.button.btn-chat-s2h {
             left: 15px;
         }
@@ -238,6 +249,7 @@
     /* Tablet */
     
     @media only screen and (min-width: 768px) and (max-width: 991px) {
+        .ui.button.btn-chat-s2b,
         .ui.button.btn-chat-s2h {
             left: 165px;
         }
@@ -484,6 +496,7 @@
                             <div class="floating ui red circular label lbl-chat-news-count">0</div>
                         </div>
                         <div class="ui circular icon button btn-chat-s2h" title="滚动至消息头"> <i class="chevron up icon"></i> </div>
+                        <div class="ui circular icon button btn-chat-s2b" title="滚动至下个消息头"> <i class="chevron down icon"></i> </div>
                         <div class="ui vertical circular icon buttons btns-scroll">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
                                 <i class="arrow up icon"></i>
@@ -1411,11 +1424,11 @@
         }
 
         // 滚动到标记处
-        function s2mk($p) {
+        function s2mk($p, offset) {
 
             Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
                 $('html, body, .ad-index-content').scrollTo($p ? $p : $(".marker").first().removeClass('marker'), 300, {
-                    offset: -50
+                    offset: offset ? offset : -50
                 });
             });
         }
@@ -1513,6 +1526,14 @@
 
                     simplemde.value('');
                     simplemde.autosave();
+
+                    if (simplemde.isPreviewActive()) {
+                        $('.fm-reply .editor-toolbar a.fa.fa-eye').click();
+                    }
+                    if (simplemde.isFullscreenActive()) {
+                        $('.fm-reply .editor-toolbar a.fa.fa-arrows-alt').click();
+                    }
+
                     toastr.success('提交成功!');
 
                     $('.btn-get-chat-news').hide(); // 已经顺便拉取了更新,所以隐藏获取更新按钮
@@ -2267,6 +2288,14 @@
             s2mk($btn.data('target'));
         });
 
+        $('.btn-chat-s2b').click(function() {
+            var $t = $('.btn-chat-s2h').data('target');
+            $('.btn-chat-s2h').data('target', $t.next());
+            s2mk($('.btn-chat-s2h').data('target'));
+            // $('.btn-chat-s2h').hide();
+            // $('.btn-chat-s2b').hide();
+        });
+
         $('body').on('mouseenter', '.chat .comment', function(event) {
             event.preventDefault();
             var $header = $(event.target).closest('.comment').find('.content a.author');
@@ -2274,12 +2303,14 @@
                 $('.btn-chat-s2h').data('target', $header.closest('.comment'));
                 if (!Utils.isElementInViewport($header)) {
                     $('.btn-chat-s2h').show();
+                    $('.btn-chat-s2b').show();
                 }
             }
         });
 
         $('.chat').mouseleave(function(event) {
             $('.btn-chat-s2h').removeData('target').hide();
+            $('.btn-chat-s2b').hide();
         });
 
         $(window).scroll(function(event) {
@@ -2287,8 +2318,10 @@
             var $header = $t && $t.find('.content a.author');
             if ($header && $header.size() > 0 && !Utils.isElementInViewport($header)) {
                 $('.btn-chat-s2h').show();
+                $('.btn-chat-s2b').show();
             } else {
                 $('.btn-chat-s2h').hide();
+                $('.btn-chat-s2b').hide();
             }
         });
 
