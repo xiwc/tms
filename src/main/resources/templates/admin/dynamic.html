@@ -2348,7 +2348,7 @@
             $('.btn-chat-s2b').hide();
         });
 
-        $(window).scroll(function(event) {
+        $(window).scroll(jQuery.debounce(200, function() {
             var $t = $('.btn-chat-s2h').data('target');
             var $header = $t && $t.find('.content a.author');
             if ($header && $header.size() > 0 && !Utils.isElementInViewport($header)) {
@@ -2358,7 +2358,7 @@
                 $('.btn-chat-s2h').hide();
                 $('.btn-chat-s2b').hide();
             }
-        });
+        }));
 
         // -------------------------------------------------------------------------------- 滚动至消息头 end
 
