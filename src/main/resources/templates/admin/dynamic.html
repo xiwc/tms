@@ -1316,13 +1316,10 @@
 
         // ============================================================================ @chat markdown to html start
 
-        var $textMds = $('.comments .content .text');
+        var $textMds = $('.comments .content .text.markdown-body');
         $textMds.each(function(index, el) {
-            var html = simplemde.markdown(preParse($(el).text()));
+            var html = simplemde.markdown(preParse($(el).attr('data-content')));
             $(el).html(html);
-            // $(el).html(html).find('pre code').each(function(i, block) {
-            //     hljs.highlightBlock(block);
-            // });
         });
 
         $('.ui.comments').show();
@@ -2272,7 +2269,7 @@
 
         $('body').on('mouseenter', '.chat .comment', function(event) {
             event.preventDefault();
-            var $header = $(event.target).closest('.comment').find('a.avatar.image');
+            var $header = $(event.target).closest('.comment').find('.content a.author');
             if ($header.size() > 0) {
                 $('.btn-chat-s2h').data('target', $header.closest('.comment'));
                 if (!Utils.isElementInViewport($header)) {
@@ -2287,7 +2284,7 @@
 
         $(window).scroll(function(event) {
             var $t = $('.btn-chat-s2h').data('target');
-            var $header = $t && $t.find('a.avatar.image');
+            var $header = $t && $t.find('.content a.author');
             if ($header && $header.size() > 0 && !Utils.isElementInViewport($header)) {
                 $('.btn-chat-s2h').show();
             } else {
