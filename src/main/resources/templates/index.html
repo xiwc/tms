@@ -170,6 +170,19 @@
         display: none;
         margin-bottom: 35px;
     }
+    
+    .ui.button.btn-chat-s2h {
+        display: none;
+        position: fixed;
+        left: 0;
+        top: 200px;
+        background-color: rgba(224, 225, 226, 0.54);
+        z-index: 1;
+    }
+    
+    .ui.button.btn-chat-s2h:hover {
+        background-color: rgba(224, 225, 226, 1);
+    }
     /* Mobile */
     
     @media only screen and (max-width: 767px) {
@@ -186,6 +199,9 @@
             padding-left: 7px;
         }
     }
+    /* Tablet */
+    
+    @media only screen and (min-width: 768px) and (max-width: 991px) {}
     /* Mobile & Tablet */
     
     @media only screen and (max-width: 991px) {}
@@ -323,6 +339,7 @@
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-next-more">加载更多</button>
                             <form class="ui reply form fm-reply"></form>
                         </div>
+                        <div class="ui circular icon button btn-chat-s2h" title="滚动至消息头"> <i class="chevron up icon"></i> </div>
                         <div class="ui vertical circular icon buttons btns-scroll btn-ctrl">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
                                 <i class="arrow up icon"></i>
@@ -401,6 +418,7 @@
             $('.btns-scroll').css({
                 top: ($(window).height() - $('.btns-scroll').height()) / 2
             });
+            $('.btn-chat-s2h').css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
         });
 
         // Set options
@@ -599,10 +617,10 @@
         }
 
         // 滚动到标记处
-        function s2mk() {
+        function s2mk($p) {
 
             Utils.imgLoaded($('.chat .ui.comments .comment .text img'), function() {
-                $('html, body, .ad-index-content').scrollTo($(".marker").first().removeClass('marker'), 300, {
+                $('html, body, .ad-index-content').scrollTo($p ? $p : $(".marker").first().removeClass('marker'), 300, {
                     offset: -50
                 });
             });
@@ -829,6 +847,40 @@
                 $btn.removeClass('cbutton--click');
             }, 500);
         });
+
+        // -------------------------------------------------------------------------------- 滚动至消息头 start
+
+        $('.btn-chat-s2h').click(function() {
+            var $btn = $(this);
+            s2mk($btn.data('target'));
+        }).css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
+
+        $('body').on('mouseenter', '.chat .comment', function(event) {
+            event.preventDefault();
+            var $header = $(event.target).closest('.comment').find('.content a.author');
+            if ($header.size() > 0) {
+                $('.btn-chat-s2h').data('target', $header.closest('.comment'));
+                if (!Utils.isElementInViewport($header)) {
+                    $('.btn-chat-s2h').show();
+                }
+            }
+        });
+
+        $('.chat').mouseleave(function(event) {
+            $('.btn-chat-s2h').removeData('target').hide();
+        });
+
+        $(window).scroll(function(event) {
+            var $t = $('.btn-chat-s2h').data('target');
+            var $header = $t && $t.find('.content a.author');
+            if ($header && $header.size() > 0 && !Utils.isElementInViewport($header)) {
+                $('.btn-chat-s2h').show();
+            } else {
+                $('.btn-chat-s2h').hide();
+            }
+        });
+
+        // -------------------------------------------------------------------------------- 滚动至消息头 end
     });
     </script>
 </body>
