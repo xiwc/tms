@@ -1314,10 +1314,11 @@
 
         // ============================================================================ @chat markdown to html start
 
-        var $textMds = $('.comments .content .text');
+        var $textMds = $('.comments .content .text.markdown-body');
         $textMds.each(function(index, el) {
             // var html = simplemde.markdown(preParse($(el).text()));
-            var html = simplemde.markdown(preParse($(el).siblings('input:hidden[name="content"]').val()));
+            var html = simplemde.markdown(preParse($(el).attr('data-content')));
+            // var html = simplemde.markdown(preParse($(el).siblings('input:hidden[name="content"]').val()));
             $(el).html(html);
         });
 

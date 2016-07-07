@@ -555,10 +555,9 @@
 
         // ============================================================================ @chat markdown to html start
 
-        var $textMds = $('.comments .content .text');
-        var converter = new showdown.Converter();
+        var $textMds = $('.comments .content .text.markdown-body');
         $textMds.each(function(index, el) {
-            var html = marked($(el).text());
+            var html = marked($(el).attr('data-content'));
             $(el).html(html);
         });
 
