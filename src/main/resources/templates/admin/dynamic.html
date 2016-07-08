@@ -1675,6 +1675,7 @@
                     var contentOld = data.data.content;
 
                     $('.ad-chat-edit').modal({
+                        observeChanges: true,
                         onVisible: function() {
                             simplemdeEdit.codemirror.focus();
                             simplemdeEdit.value(data.data.content);
