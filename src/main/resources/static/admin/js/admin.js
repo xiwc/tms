@@ -143,6 +143,8 @@ jQuery(function($) {
     // custom helper utils
     window.Utils = window.Utils || {};
 
+    var _startId = 0;
+
     $.extend(window.Utils, {
         removeFileType: function(name) {
             var i = name.lastIndexOf('.');
@@ -245,8 +247,68 @@ jQuery(function($) {
                 rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
                 rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
             );
+        },
+        catalog: function($e) {
+            var $headers = $(":header", $e);
+            var pre = null;
+
+            var link = {
+                pre: null,
+                arr: []
+            };
+            var current = link;
+            $headers.each(function(index, h) {
+                var name = h.nodeName;
+                if (!pre) {
+                    current.arr.push(h);
+                    pre = name;
+                } else {
+                    if (pre < name) {
+                        var last = current;
+                        current = {
+                            pre: last,
+                            arr: [h]
+                        };
+                        last.arr.push(current);
+                        pre = name;
+                    } else if (pre == name) {
+                        current.arr.push(h);
+                    } else {
+                        current = current.pre ? current.pre : current;
+                        current.arr.push(h);
+                        pre = name;
+                    }
+                }
+            });
+
+            return link;
+        },
+        generateDir: function(link) {
+            var $list = $('<div class="ui list"></div>');
+            prodDir($list, link);
+            return $list;
+        },
+        id: function(prefix) {
+            return (prefix ? prefix : "tms") + '-' + (++_startId);
+        },
+        dir: function($e) {
+            return this.generateDir(this.catalog($e));
         }
     });
+
+    function prodDir($list, link) {
+        $.each(link.arr, function(index, item) {
+            if (item.hasOwnProperty('arr')) {
+                var $l = $('<div class="list"></div>');
+                $list.append($l)
+                prodDir($l, item);
+            } else {
+                var id = Utils.id();
+                var $item = $('<a class="item wiki-dir-item"></a>').text($(item).attr('id', id).text()).attr('data-id', id);
+                $list.append($item);
+            }
+        });
+    }
 
     // remember the url
     Utils.remember();

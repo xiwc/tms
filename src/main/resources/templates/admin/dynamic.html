@@ -179,6 +179,15 @@
         margin-right: 0;
     }
     
+    .btn-chat-dir {
+        display: none;
+        position: fixed;
+        top: 100px;
+        right: 433px;
+        margin-right: 0!important;
+        z-index: 2;
+    }
+    
     .chat-search-loc {
         position: fixed;
         top: 50px;
@@ -243,6 +252,14 @@
         .ui.button.btn-chat-s2h {
             left: 15px;
         }
+        .btn-chat-dir {
+            left: 15px;
+            right: auto;
+        }
+        .wiki-dir {
+            left: 15px;
+            right: auto;
+        }
     }
     /* Tablet */
     
@@ -250,6 +267,14 @@
         .ui.button.btn-chat-s2b,
         .ui.button.btn-chat-s2h {
             left: 165px;
+        }
+        .btn-chat-dir {
+            left: 165px;
+            right: auto;
+        }
+        .wiki-dir {
+            left: 165px;
+            right: auto;
         }
     }
     /* Mobile & Tablet */
@@ -343,6 +368,21 @@
     .pp-chat-emoji img.emojione:hover,
     .pp-chat-edit-emoji img.emojione:hover {
         background-color: lightgray;
+    }
+    
+    .ui.segment.wiki-dir {
+        display: none;
+        position: fixed;
+        top: 86px;
+        right: 0;
+        overflow: auto;
+        width: 469px;
+        height: 430px;
+        text-align: left;
+    }
+    
+    a.item.wiki-dir-item {
+        font-weight: normal;
     }
     </style>
 </head>
@@ -513,6 +553,10 @@
                                 </div>
                                 <div class="results"></div>
                             </div>
+                        </div>
+                        <div class="ui circular icon button btn-chat-dir" title="文章目录">
+                            <i class="content icon"></i>
+                            <div class="wiki-dir ui segment"></div>
                         </div>
                     </div>
                 </div>
@@ -2341,6 +2385,12 @@
                     $('.btn-chat-s2b').show();
                 }
             }
+            $('.wiki-dir').empty().append(Utils.dir($(this)));
+            if ($('.wiki-dir a.wiki-dir-item').size() == 0) {
+                $('.btn-chat-dir').hide();
+            } else {
+                $('.btn-chat-dir').show();
+            }
         });
 
         $('.chat').mouseleave(function(event) {
@@ -2361,6 +2411,19 @@
         }));
 
         // -------------------------------------------------------------------------------- 滚动至消息头 end
+
+        // -------------------------------------------------------------------------------- wiki dir start
+
+        $('body').on('click', '.wiki-dir-item', function(event) {
+            event.preventDefault();
+            s2mk($('#' + $(this).attr('data-id')));
+        });
+        $('.btn-chat-dir').hover(function() {
+            $('.wiki-dir').show();
+        }, function() {
+            $('.wiki-dir').hide();
+        });
+        // -------------------------------------------------------------------------------- wiki dir end
 
     });
     </script>
