@@ -383,6 +383,12 @@
     a.item.wiki-dir-item {
         font-weight: normal;
     }
+    
+    .btn-wiki-dir-lock {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
     </style>
 </head>
 
@@ -555,7 +561,10 @@
                         </div>
                         <div class="ui circular icon button btn-chat-dir">
                             <i class="content icon"></i>
-                            <div class="wiki-dir ui segment"></div>
+                            <div class="wiki-dir ui segment">
+                                <i class="circular unlock alternate tiny icon btn-wiki-dir-lock"></i>
+                                <div class="wiki-dir-tree" style="margin-top: 10px;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2385,7 +2394,7 @@
                     $('.btn-chat-s2b').show();
                 }
             }
-            $('.wiki-dir').empty().append(Utils.dir($(this)));
+            $('.wiki-dir .wiki-dir-tree').empty().append(Utils.dir($(this)));
             if ($('.wiki-dir a.wiki-dir-item').size() == 0) {
                 $('.btn-chat-dir').hide();
             } else {
@@ -2421,7 +2430,12 @@
         $('.btn-chat-dir').hover(function() {
             $('.wiki-dir').show();
         }, function() {
-            $('.wiki-dir').hide();
+            if (!$('.btn-wiki-dir-lock').hasClass('lock')) {
+                $('.wiki-dir').hide();
+            }
+        });
+        $('.btn-wiki-dir-lock').click(function(event) {
+            $(this).toggleClass('lock unlock alternate');
         });
         // -------------------------------------------------------------------------------- wiki dir end
 
