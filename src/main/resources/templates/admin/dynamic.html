@@ -52,12 +52,11 @@
     .CodeMirror,
     .CodeMirror-scroll {
         min-height: 150px;
-        /*max-height: 150px;*/
     }
     
     .fm-edit-reply .CodeMirror,
     .fm-edit-reply .CodeMirror-scroll {
-        height: 200px;
+        min-height: 300px;
     }
     
     .CodeMirror-fullscreen,
@@ -1687,6 +1686,7 @@
                     var contentOld = data.data.content;
 
                     $('.ad-chat-edit').modal({
+                        observeChanges: true,
                         onVisible: function() {
                             simplemdeEdit.codemirror.focus();
                             simplemdeEdit.value(data.data.content);
