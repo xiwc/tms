@@ -59,11 +59,14 @@
     <div th:replace="admin/template :: ad-handle-confirm"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <input type="hidden" name="id" th:value="${chat.id}" />
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
+
+        var id = $('input:hidden[name="id"]').val();
 
         var simplemdeEdit = new SimpleMDE({
             element: $('textarea')[0],
@@ -104,7 +107,7 @@
             autosave: {
                 enabled: true,
                 delay: 5000,
-                uniqueId: "chat-edit-safe"
+                uniqueId: "chat-edit-safe-" + id
             }
         });
         simplemdeEdit.codemirror.on('keyup', function(cm, e) {
