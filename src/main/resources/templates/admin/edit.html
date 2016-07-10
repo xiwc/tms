@@ -163,6 +163,7 @@
             }, function(data, textStatus, xhr) {
                 if (data.success) {
                     $('input:hidden[name="content"]').val(content);
+                    simplemdeEdit.autosave();
                     toastr.success('更新成功!');
                 } else {
                     toastr.error(data.data, '更新失败!');
