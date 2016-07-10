@@ -1238,10 +1238,13 @@
                 var cursor = cm.getCursor();
                 var line = cm.getLine(cursor.line);
 
-                if (line.lastIndexOf('@') == 0) {
+                var indexAt = line.lastIndexOf('@');
+                if (indexAt == 0) {
                     mk = '@';
-                } else {
+                } else if (indexAt > 0) {
                     mk = ' @';
+                } else {
+                    return;
                 }
 
                 var mkIndex = line.lastIndexOf(mk);
@@ -1250,7 +1253,7 @@
 
                     $pp.popup('is hidden') && $pp.popup('show');
 
-                    var at = $.trim(line.substr(atFrom).split(' ')[0]);
+                    var at = $.trim(line.substring(atFrom, cursor.ch).split(' ')[0]);
 
                     if (at) {
                         $.each(usernames, function(index, username) {
@@ -1284,7 +1287,8 @@
         function atUserKDHandler($pp, $usersContainer) {
 
             return function(cm, e) {
-                if ($pp.popup('is visible')) {
+
+                if ((e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 13) && $pp.popup('is visible')) {
 
                     var cnt = $usersContainer.find('.list-users > .item:visible').size();
                     if (cnt == 0) {
@@ -1685,6 +1689,7 @@
 
                     $('.ad-chat-edit').modal({
                         observeChanges: true,
+                        closable: false, // 防止修改内容没保存窗口关闭导致数据丢失
                         onVisible: function() {
                             simplemdeEdit.codemirror.focus();
                             simplemdeEdit.value(data.data.content);
