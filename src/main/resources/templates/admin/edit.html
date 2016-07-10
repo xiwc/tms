@@ -43,6 +43,10 @@
         margin-right: 10px!important;
     }
     
+    .btn-reset {
+        margin-left: 10px!important;
+    }
+    
     .clearfix {
         clear: both;
     }
@@ -53,6 +57,7 @@
     <div class="ui container chat-edit">
         <textarea name="content" th:text="${chat.content}"></textarea>
         <button class="ui right floated primary button btn-save" th:attr="data-id=${chat.id}">保存</button>
+        <button class="ui left floated button btn-reset" th:attr="data-id=${chat.id}">重置</button>
         <div class="clearfix"></div>
     </div>
     <!-- popup container end -->
@@ -60,6 +65,7 @@
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <input type="hidden" name="id" th:value="${chat.id}" />
+    <input type="hidden" name="content" th:value="${chat.content}" />
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
@@ -117,7 +123,16 @@
         });
 
         var baseURL = Utils.getBaseURL();
-        var contentOld = simplemdeEdit.value();
+
+        $('.btn-reset').click(function(event) {
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    simplemdeEdit.value($('input:hidden[name="content"]').val());
+                    toastr.success('重置成功!');
+                }
+            }).modal('show');
+        });
+
         $('.btn-save').click(function(event) {
 
             var $btn = $(this);
@@ -127,6 +142,8 @@
             }
 
             var content = simplemdeEdit.value();
+            var contentOld = $('input:hidden[name="content"]').val();
+
             if (contentOld == content) {
                 toastr.error('修改内容没有任何变更的内容!');
                 return false;
@@ -145,6 +162,7 @@
                 contentHtml: html,
             }, function(data, textStatus, xhr) {
                 if (data.success) {
+                    $('input:hidden[name="content"]').val(content);
                     toastr.success('更新成功!');
                 } else {
                     toastr.error(data.data, '更新失败!');
