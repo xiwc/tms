@@ -54,7 +54,7 @@
 </head>
 
 <body>
-    <div class="ui container chat-edit">
+    <div class="ui container chat-edit markdown-body">
         <textarea name="content" th:text="${chat.content}"></textarea>
         <button class="ui right floated primary button btn-save" th:attr="data-id=${chat.id}">保存</button>
         <button class="ui left floated button btn-reset" th:attr="data-id=${chat.id}">重置</button>
