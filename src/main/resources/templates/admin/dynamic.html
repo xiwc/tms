@@ -476,6 +476,7 @@
                                                 <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</div>
                                                 <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</div>
                                                 <div class="item btn-read">阅读</div>
+                                                <a class="item" style="color: black;" target="_blank" th:href="@{/admin/wiki/edit(id=${c.id})}">安全编辑</a>
                                                 <div class="item btn-wiki" th:if="${#strings.toString(c.type) != 'Wiki'}">转博</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>

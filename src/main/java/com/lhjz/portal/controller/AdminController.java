@@ -23,6 +23,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.lhjz.portal.base.BaseController;
@@ -449,4 +450,11 @@ public class AdminController extends BaseController {
 		return "admin/import";
 	}
 
+	@RequestMapping(value = "wiki/edit", method = RequestMethod.GET)
+	public String editWiki(@RequestParam("id") Long id, Model model) {
+
+		model.addAttribute("chat", chatRepository.findOne(id));
+
+		return "admin/edit";
+	}
 }

@@ -318,4 +318,5 @@ public class RootController extends BaseController {
 
 		return RespBody.succeed(chat2);
 	}
+
 }
