@@ -306,6 +306,10 @@ public class ChatController extends BaseController {
 			return RespBody.failed("删除聊天内容不存在!");
 		}
 
+		List<ChatAt> chatAts = chatAtRepository.findByChat(chat);
+		chatAtRepository.delete(chatAts);
+		chatAtRepository.flush();
+
 		chatRepository.delete(chat);
 		chatRepository.flush();
 
