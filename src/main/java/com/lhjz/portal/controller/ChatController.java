@@ -512,6 +512,9 @@ public class ChatController extends BaseController {
 	public RespBody markAsReaded(@RequestParam("chatAtId") Long chatAtId) {
 
 		ChatAt chatAt = chatAtRepository.findOne(chatAtId);
+		if (chatAt == null) {
+			return RespBody.failed("@消息不存在,可能已经被删除!");
+		}
 		chatAt.setStatus(Status.Readed);
 		chatAtRepository.saveAndFlush(chatAt);
 
