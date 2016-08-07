@@ -29,6 +29,8 @@ public interface ChatAtRepository extends JpaRepository<ChatAt, Long> {
 
 	List<ChatAt> findByChat(Chat chat);
 
+	ChatAt findOneByChatAndAtUser(Chat chat, User atUser);
+
 	@Query(value = "SELECT COUNT(*) FROM `chat_at` WHERE at_user = ?1 AND `status` = 'New';", nativeQuery = true)
 	long countAtUserNew(String atUser);
 }

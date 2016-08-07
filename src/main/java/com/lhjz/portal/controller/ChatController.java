@@ -220,16 +220,17 @@ public class ChatController extends BaseController {
 			return RespBody.failed("修改内容没有任何变更的内容!");
 		}
 
+		final User loginUser = getLoginUser();
+
 		chat.setContent(content);
 		chat.setUpdateDate(new Date());
-		chat.setUpdater(getLoginUser());
+		chat.setUpdater(loginUser);
 		chat.setStatus(Status.Updated);
 
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
 		log(Action.Update, Target.Chat, chat2.getId());
 
-		final User loginUser = getLoginUser();
 		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
 		final String html = "<h3>编辑后内容:</h3>" + contentHtml
 				+ "<hr/><h3>编辑前内容:</h3>" + contentHtmlOld;
@@ -238,10 +239,16 @@ public class ChatController extends BaseController {
 
 		if (StringUtil.isNotEmpty(usernames) || StringUtil.isNotEmpty(groups)) {
 
+			Map<String, User> atUserMap = new HashMap<String, User>();
+
 			if (StringUtil.isNotEmpty(usernames)) {
 				String[] usernameArr = usernames.split(",");
 				Arrays.asList(usernameArr).stream().forEach((username) -> {
-					mail.addUsers(getUser(username));
+					User user = getUser(username);
+					if (user != null) {
+						mail.addUsers(user);
+						atUserMap.put(user.getUsername(), user);
+					}
 				});
 			}
 			if (StringUtil.isNotEmpty(groups)) {
@@ -257,12 +264,44 @@ public class ChatController extends BaseController {
 												.findByGroup(groupList.get(0));
 										groupMembers.stream().forEach(
 												gm -> {
-													mail.addUsers(getUser(gm
-															.getUsername()));
+													User user = getUser(gm
+															.getUsername());
+													if (user != null) {
+														mail.addUsers(user);
+														atUserMap.put(user
+																.getUsername(),
+																user);
+													}
 												});
 									}
 								});
 			}
+
+			List<ChatAt> chatAtList = new ArrayList<ChatAt>();
+			// 保存chatAt关系
+			atUserMap.values().forEach(
+					(user) -> {
+
+						ChatAt chatAt2 = chatAtRepository
+								.findOneByChatAndAtUser(chat2, user);
+						if (chatAt2 == null) {
+							ChatAt chatAt = new ChatAt();
+							chatAt.setChat(chat2);
+							chatAt.setAtUser(user);
+							chatAt.setCreateDate(new Date());
+							chatAt.setCreator(loginUser);
+
+							chatAtList.add(chatAt);
+						} else {
+							chatAt2.setStatus(Status.New);
+							chatAt2.setUpdateDate(new Date());
+							chatAt2.setUpdater(loginUser);
+
+							chatAtList.add(chatAt2);
+						}
+					});
+			chatAtRepository.save(chatAtList);
+			chatAtRepository.flush();
 
 			ThreadUtil.exec(() -> {
 
