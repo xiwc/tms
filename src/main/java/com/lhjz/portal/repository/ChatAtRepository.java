@@ -3,11 +3,14 @@
  */
 package com.lhjz.portal.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.ChatAt;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.pojo.Enum.Status;
@@ -23,6 +26,8 @@ public interface ChatAtRepository extends JpaRepository<ChatAt, Long> {
 
 	Page<ChatAt> findByAtUserAndStatus(User user, Status status,
 			Pageable pageable);
+
+	List<ChatAt> findByChat(Chat chat);
 
 	@Query(value = "SELECT COUNT(*) FROM `chat_at` WHERE at_user = ?1 AND `status` = 'New';", nativeQuery = true)
 	long countAtUserNew(String atUser);
