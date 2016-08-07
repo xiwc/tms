@@ -236,7 +236,34 @@
     </script>
     <!-- 沟通消息popup内容模板 -->
     <script th:fragment="chatSearchTpl" id="chatSearchTpl" type="text/x-jquery-tmpl">
-        <div class="item" data-id="${id}">
+        <div class="item" data-type="search" data-id="${id}">
+            <div style="float: left;">
+                <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                    {{if iconName}}
+                        <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${iconName}</span>
+                    {{else}}
+                        <img src="/img/head.png">
+                    {{/if}}
+                </a>
+            </div>
+            <div class="content" style="width: 100%;">
+                <a class="header" data-value="${creator.username}" style="display: inline;">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata" style="float: right;">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                </div>
+                <div class="description">${contentBrief}</div>
+            </div>
+        </div>
+    </script>
+    <!-- 沟通at消息popup内容模板 -->
+    <script th:fragment="chatAtsTpl" id="chatAtsTpl" type="text/x-jquery-tmpl">
+        <div class="item" data-type="at" data-id="${id}" data-chat-at-id="${chatAtId}">
             <div style="float: left;">
                 <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                     {{if iconName}}
