@@ -6,7 +6,9 @@ package com.lhjz.portal.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -28,6 +30,7 @@ import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Chat;
+import com.lhjz.portal.entity.ChatAt;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.security.Group;
@@ -41,6 +44,7 @@ import com.lhjz.portal.pojo.Enum.Prop;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.Enum.VoteType;
+import com.lhjz.portal.repository.ChatAtRepository;
 import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.GroupMemberRepository;
 import com.lhjz.portal.repository.GroupRepository;
@@ -83,6 +87,9 @@ public class ChatController extends BaseController {
 	LabelRepository labelRepository;
 
 	@Autowired
+	ChatAtRepository chatAtRepository;
+
+	@Autowired
 	MailSender2 mailSender;
 
 	String dynamicAction = "admin/dynamic";
@@ -102,10 +109,12 @@ public class ChatController extends BaseController {
 			return RespBody.failed("提交内容不能为空!");
 		}
 
+		final User loginUser = getLoginUser();
+
 		Chat chat = new Chat();
 		chat.setContent(content);
 		chat.setCreateDate(new Date());
-		chat.setCreator(getLoginUser());
+		chat.setCreator(loginUser);
 		chat.setStatus(Status.New);
 		chat.setType(ChatType.Msg);
 
@@ -113,17 +122,22 @@ public class ChatController extends BaseController {
 
 		log(Action.Create, Target.Chat, chat2.getId());
 
-		final User loginUser = getLoginUser();
 		final String href = baseURL + dynamicAction + "?id=" + chat2.getId();
 		final String html = contentHtml;
 
 		final Mail mail = Mail.instance();
 		if (StringUtil.isNotEmpty(usernames) || StringUtil.isNotEmpty(groups)) {
 
+			Map<String, User> atUserMap = new HashMap<String, User>();
+
 			if (StringUtil.isNotEmpty(usernames)) {
 				String[] usernameArr = usernames.split(",");
 				Arrays.asList(usernameArr).stream().forEach((username) -> {
-					mail.addUsers(getUser(username));
+					User user = getUser(username);
+					if (user != null) {
+						mail.addUsers(user);
+						atUserMap.put(user.getUsername(), user);
+					}
 				});
 			}
 			if (StringUtil.isNotEmpty(groups)) {
@@ -139,12 +153,33 @@ public class ChatController extends BaseController {
 												.findByGroup(groupList.get(0));
 										groupMembers.stream().forEach(
 												gm -> {
-													mail.addUsers(getUser(gm
-															.getUsername()));
+													User user = getUser(gm
+															.getUsername());
+													if (user != null) {
+														mail.addUsers(user);
+														atUserMap.put(user
+																.getUsername(),
+																user);
+													}
 												});
 									}
 								});
 			}
+
+			List<ChatAt> chatAtList = new ArrayList<ChatAt>();
+			// 保存chatAt关系
+			atUserMap.values().forEach((user) -> {
+				ChatAt chatAt = new ChatAt();
+				chatAt.setChat(chat2);
+				chatAt.setAtUser(user);
+				chatAt.setCreateDate(new Date());
+				chatAt.setCreator(loginUser);
+
+				chatAtList.add(chatAt);
+			});
+
+			chatAtRepository.save(chatAtList);
+			chatAtRepository.flush();
 
 			ThreadUtil.exec(() -> {
 
@@ -298,8 +333,11 @@ public class ChatController extends BaseController {
 
 		long cnt = chatRepository.countQueryRecent(lastId);
 		long cntLogs = logRepository.countQueryRecent(lastEvtId);
+		long cntAtUserNew = chatAtRepository.countAtUserNew(WebUtil
+				.getUsername());
 
-		Long[] data = new Long[] { lastId, cnt, lastEvtId, cntLogs };
+		Long[] data = new Long[] { lastId, cnt, lastEvtId, cntLogs,
+				cntAtUserNew };
 
 		List<Log> logs = logRepository.queryRecent(lastEvtId);
 
@@ -313,6 +351,17 @@ public class ChatController extends BaseController {
 		List<Chat> chats = chatRepository.queryRecent(lastId);
 
 		return RespBody.succeed(chats);
+	}
+
+	@RequestMapping(value = { "getAtChats", "getAtChats/unmask" }, method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody getAtChats(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		Page<ChatAt> chatAts = chatAtRepository.findByAtUserAndStatus(
+				getLoginUser(), Status.New, pageable);
+
+		return RespBody.succeed(chatAts);
 	}
 
 	@RequestMapping(value = "more", method = RequestMethod.GET)
@@ -626,5 +675,16 @@ public class ChatController extends BaseController {
 		log(Action.Delete, Target.Label, labelId);
 
 		return RespBody.succeed(labelId);
+	}
+
+	@RequestMapping(value = { "markAsReaded", "markAsReaded/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody markAsReaded(@RequestParam("chatAtId") Long chatAtId) {
+
+		ChatAt chatAt = chatAtRepository.findOne(chatAtId);
+		chatAt.setStatus(Status.Readed);
+		chatAtRepository.saveAndFlush(chatAt);
+
+		return RespBody.succeed(chatAt);
 	}
 }
