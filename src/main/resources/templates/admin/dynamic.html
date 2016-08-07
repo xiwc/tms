@@ -125,6 +125,15 @@
         z-index: 1;
     }
     
+    .ui.button.btn-get-chat-ats {
+        display: none;
+        position: fixed;
+        right: 430px;
+        top: 150px;
+        background-color: rgba(219, 40, 40, 0.54);
+        z-index: 1;
+    }
+    
     .ui.button.btn-get-chat-news:hover {
         background-color: rgba(219, 40, 40, 1);
     }
@@ -304,6 +313,9 @@
         .chat-search {
             display: none;
         }
+        .ui.button.btn-get-chat-ats {
+            display: none!important;
+        }
     }
     
     .cbutton {
@@ -388,6 +400,35 @@
         position: absolute;
         top: 0;
         left: 0;
+    }
+    
+    .ui.segment.pp-ats {
+        display: none;
+        position: fixed;
+        top: 150px;
+        right: 0;
+        overflow: auto;
+        width: 469px;
+        height: 430px;
+        text-align: left;
+    }
+    
+    .pp-ats-lock {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: rgba(0, 0, 0, .87);
+    }
+    
+    .pp-ats-refresh {
+        position: absolute;
+        top: 0;
+        left: 30px;
+        color: rgba(0, 0, 0, .87);
+    }
+    
+    .pp-ats .pp-ats-content .ui.list .item {
+        font-weight: normal;
     }
     </style>
 </head>
@@ -567,6 +608,17 @@
                                 <div class="wiki-dir-tree" style="margin-top: 10px;"></div>
                             </div>
                         </div>
+                        <div class="ui circular red icon button btn-get-chat-ats" title="查看@消息">
+                            <i class="at icon"></i>
+                            <div class="floating ui red circular label lbl-chat-ats-count">0</div>
+                            <div class="pp-ats ui segment">
+                                <i class="circular unlock alternate tiny icon pp-ats-lock"></i>
+                                <i class="circular refresh tiny icon pp-ats-refresh"></i>
+                                <div class="pp-ats-content" style="margin-top: 10px;">
+                                    <div class="ui selection divided list"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -609,6 +661,7 @@
     <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
+    <div th:replace="admin/template :: chatAtsTpl"></div>
     <div th:replace="admin/template :: ad-msg-as-wiki"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
@@ -865,13 +918,26 @@
             }
         });
 
-        $('.list-chat-search-results').on('click', '.item', function(event) {
+        $('.list-chat-search-results, .pp-ats-content').on('click', '.item', function(event) {
             event.preventDefault();
+            event.stopImmediatePropagation();
             $item = $(this);
             $.get('/admin/chat/searchBy', {
                 id: $item.attr('data-id')
             }, function(data) {
                 if (data.success) {
+
+                    if ($item.attr('data-type') == 'at') { // mark chatAt as readed.
+                        $.post('/admin/chat/markAsReaded/unmask', {
+                            chatAtId: $item.attr('data-chat-at-id')
+                        }, function(data, textStatus, xhr) {
+                            if (data.success) {
+
+                            } else {
+                                toastr.error(data.data, "错误提示!");
+                            }
+                        });
+                    }
 
                     var chats = data.data.content;
                     if (chats.length == 0) {
@@ -1986,6 +2052,15 @@
                         $('.btn-get-chat-news').attr('data-value', data.data[0]).hide();
                     }
 
+                    if (data.data[4] > 0) { // 有@消息
+                        // var lastCnt = $('.btn-get-chat-ats').children('.lbl-chat-ats-count').text();
+                        var atCnt = data.data[4];
+                        $('.btn-get-chat-ats').children('.lbl-chat-ats-count').text(atCnt > 99 ? '99+' : atCnt);
+                        $('.btn-get-chat-ats').show();
+                    } else {
+                        $('.btn-get-chat-ats').hide();
+                    }
+
                     if (data.msgs.length > 0) {
 
                         if (data.msgs[0].length > 0) {
@@ -2444,6 +2519,52 @@
             $(this).toggleClass('lock unlock alternate');
         });
         // -------------------------------------------------------------------------------- wiki dir end
+
+        // -------------------------------------------------------------------------------- chat ats start
+        $('.btn-get-chat-ats').click(function(event) {
+
+            $('.pp-ats-content').children('.ui.list').empty().append('<div class="item">加载中...</div>');
+
+            $('.pp-ats').show();
+
+            $.get('/admin/chat/getAtChats/unmask', {
+                size: 20
+            }, function(data) {
+                if (data.success) {
+                    var chatAts = data.data.content;
+                    var chats = [];
+                    $.each(chatAts, function(index, chatAt) {
+                        chatAt.chat.chatAtId = chatAt.id;
+                        chats.push(chatAt.chat);
+                    });
+
+                    $.each(chats, function(index, chat) {
+                        chat.contentBrief = chat.content.length > 50 ? chat.content.substr(0, 47) + '...' : chat.content;
+                        if (chat.creator.name) {
+                            chat.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                        }
+                        var d = new Date(chat.createDate);
+                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    });
+                    $("#chatAtsTpl").tmpl(chats).appendTo($('.pp-ats-content').children('.ui.list').empty());
+                    $('.pp-ats-content .timeago').timeago();
+                }
+            });
+        });
+        $('.btn-get-chat-ats').hover(function() {
+
+        }, function() {
+            if (!$('.pp-ats-lock').hasClass('lock')) {
+                $('.pp-ats').hide();
+            }
+        });
+
+        $('.pp-ats-lock').click(function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            $(this).toggleClass('lock unlock alternate');
+        });
+        // -------------------------------------------------------------------------------- chat ats end
 
     });
     </script>
