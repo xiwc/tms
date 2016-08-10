@@ -136,6 +136,15 @@
         z-index: 1;
     }
     
+    .ui.button.btn-get-chat-stows {
+        /*display: none;*/
+        position: fixed;
+        right: 430px;
+        top: 200px;
+        background-color: rgba(219, 40, 40, 0.54);
+        z-index: 1;
+    }
+    
     .ui.button.btn-chat-s2h {
         display: none;
         position: fixed;
@@ -333,6 +342,9 @@
         .ui.button.btn-get-chat-ats {
             display: none!important;
         }
+        .ui.button.btn-get-chat-stows {
+            display: none!important;
+        }
     }
     
     .cbutton {
@@ -432,6 +444,35 @@
     .pp-ats .pp-ats-content .ui.list .item {
         font-weight: normal;
     }
+    
+    .ui.segment.pp-stows {
+        display: none;
+        position: fixed;
+        top: 186px;
+        right: 0;
+        overflow: auto;
+        width: 469px;
+        height: 430px;
+        text-align: left;
+    }
+    
+    .pp-stows-lock {
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: rgba(0, 0, 0, .87);
+    }
+    
+    .pp-stows-refresh {
+        position: absolute;
+        top: 0;
+        left: 30px;
+        color: rgba(0, 0, 0, .87);
+    }
+    
+    .pp-stows .pp-stows-content .ui.list .item {
+        font-weight: normal;
+    }
     </style>
 </head>
 
@@ -510,6 +551,7 @@
                                     </div>
                                     <div class="actions">
                                         <a class="reply">回复</a>
+                                        <a class="stow">收藏</a>
                                         <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</a>
                                         <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</a>
                                         <div class="ui top right pointing dropdown dd-more-actions">
@@ -619,6 +661,16 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="ui circular red icon button btn-get-chat-stows" title="查看收藏消息">
+                            <i class="star icon"></i>
+                            <div class="pp-stows ui segment">
+                                <i class="circular unlock alternate tiny icon pp-stows-lock"></i>
+                                <i class="circular refresh tiny icon pp-stows-refresh"></i>
+                                <div class="pp-stows-content" style="margin-top: 10px;">
+                                    <div class="ui selection divided list"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -662,6 +714,7 @@
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
     <div th:replace="admin/template :: chatAtsTpl"></div>
+    <div th:replace="admin/template :: chatStowsTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
     <input type="hidden" name="page.number.next" th:value="${chats.number + 1}" />
     <input type="hidden" name="page.number.pre" th:value="${chats.number - 1}" />
@@ -917,7 +970,7 @@
             }
         });
 
-        $('.list-chat-search-results, .pp-ats-content').on('click', '.item', function(event) {
+        $('.list-chat-search-results, .pp-ats-content, .pp-stows-content').on('click', '.item', function(event) {
             event.preventDefault();
             event.stopImmediatePropagation();
             $item = $(this);
@@ -979,6 +1032,24 @@
                     s2m();
                 }
             });
+        });
+
+        $('.pp-stows-content').on('click', '.item .actions a.remove', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            $item = $(this).closest('.item');
+
+            $.post('/admin/chat/removeStow/unmask', {
+                id: $item.attr('data-chat-stow-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    $item.remove();
+                    toastr.success('移除收藏成功!');
+                } else {
+                    toastr.error(data.data, '移除收藏失败!');
+                }
+            });
+
         });
 
         // ------------------------------------------------------------------------------------- chat search end
@@ -1725,6 +1796,22 @@
                 .replace(/\{baseURL\}/g, baseURL)
                 .replace(/\{username\}/g, username);
             insertComment(cm, comment);
+
+        });
+
+        $('body').on('click', '.comments .actions a.stow', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+
+            $.post('/admin/chat/stow/unmask', {
+                id: $btn.closest('.comment').attr('data-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    toastr.success('收藏成功!');
+                } else {
+                    toastr.error(data.data, '收藏失败!');
+                }
+            });
 
         });
 
@@ -2529,6 +2616,50 @@
             $(this).toggleClass('lock unlock alternate');
         });
         // -------------------------------------------------------------------------------- chat ats end
+
+        // -------------------------------------------------------------------------------- chat stows end
+        $('.btn-get-chat-stows').click(function(event) {
+
+            $('.pp-stows-content').children('.ui.list').empty().append('<div class="item">加载中...</div>');
+
+            $('.pp-stows').show();
+
+            $.get('/admin/chat/getStows/unmask', function(data) {
+                if (data.success) {
+                    var chatStows = data.data;
+                    var chats = [];
+                    $.each(chatStows, function(index, chatStow) {
+                        chatStow.chat.chatStowId = chatStow.id;
+                        chats.push(chatStow.chat);
+                    });
+
+                    $.each(chats, function(index, chat) {
+                        chat.contentBrief = chat.content.length > 50 ? chat.content.substr(0, 47) + '...' : chat.content;
+                        if (chat.creator.name) {
+                            chat.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                        }
+                        var d = new Date(chat.createDate);
+                        chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    });
+                    $("#chatStowsTpl").tmpl(chats).appendTo($('.pp-stows-content').children('.ui.list').empty());
+                    $('.pp-stows-content .timeago').timeago();
+                }
+            });
+        });
+        $('.btn-get-chat-stows').hover(function() {
+
+        }, function() {
+            if (!$('.pp-stows-lock').hasClass('lock')) {
+                $('.pp-stows').hide();
+            }
+        });
+
+        $('.pp-stows-lock').click(function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            $(this).toggleClass('lock unlock alternate');
+        });
+        // -------------------------------------------------------------------------------- chat stows end
 
     });
     </script>
