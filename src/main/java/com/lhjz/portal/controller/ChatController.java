@@ -31,6 +31,7 @@ import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.ChatAt;
+import com.lhjz.portal.entity.ChatStow;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.security.Group;
@@ -46,6 +47,7 @@ import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.Enum.VoteType;
 import com.lhjz.portal.repository.ChatAtRepository;
 import com.lhjz.portal.repository.ChatRepository;
+import com.lhjz.portal.repository.ChatStowRepository;
 import com.lhjz.portal.repository.GroupMemberRepository;
 import com.lhjz.portal.repository.GroupRepository;
 import com.lhjz.portal.repository.LabelRepository;
@@ -88,6 +90,9 @@ public class ChatController extends BaseController {
 
 	@Autowired
 	ChatAtRepository chatAtRepository;
+
+	@Autowired
+	ChatStowRepository chatStowRepository;
 
 	@Autowired
 	MailSender2 mailSender;
@@ -348,6 +353,10 @@ public class ChatController extends BaseController {
 		List<ChatAt> chatAts = chatAtRepository.findByChat(chat);
 		chatAtRepository.delete(chatAts);
 		chatAtRepository.flush();
+
+		List<ChatStow> chatStows = chatStowRepository.findByChat(chat);
+		chatStowRepository.delete(chatStows);
+		chatStowRepository.flush();
 
 		chatRepository.delete(chat);
 		chatRepository.flush();
@@ -733,5 +742,53 @@ public class ChatController extends BaseController {
 		chatAtRepository.saveAndFlush(chatAt);
 
 		return RespBody.succeed(chatAt);
+	}
+
+	@RequestMapping(value = { "stow", "stow/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody stow(@RequestParam("id") Long id) {
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("收藏消息不存在,可能已经被删除!");
+		}
+
+		User loginUser = getLoginUser();
+		ChatStow chatStow = chatStowRepository.findOneByChatAndStowUser(chat,
+				loginUser);
+
+		if (chatStow != null) {
+			return RespBody.failed("收藏消息重复!");
+		}
+
+		ChatStow chatStow2 = new ChatStow();
+		chatStow2.setChat(chat);
+		chatStow2.setCreateDate(new Date());
+		chatStow2.setCreator(loginUser);
+		chatStow2.setStowUser(loginUser);
+
+		ChatStow chatStow3 = chatStowRepository.saveAndFlush(chatStow2);
+
+		return RespBody.succeed(chatStow3);
+	}
+
+	@RequestMapping(value = { "removeStow", "removeStow/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody removeStow(@RequestParam("id") Long id) {
+
+		chatStowRepository.delete(id);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = { "getStows", "getStows/unmask" }, method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody getStows() {
+
+		List<ChatStow> chatStows = chatStowRepository.findByStowUserAndStatus(
+				getLoginUser(), Status.New);
+
+		return RespBody.succeed(chatStows);
 	}
 }
