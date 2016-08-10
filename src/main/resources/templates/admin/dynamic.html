@@ -2112,7 +2112,7 @@
             var preMore = $('.btn-chat-pre-more').size() == 1;
 
             if (preMore) { // 如果有最新消息有分页, 取消轮询.
-                stopCb();
+                // stopCb();
                 return;
             }
 
@@ -2573,6 +2573,8 @@
 
         // -------------------------------------------------------------------------------- chat ats start
         $('.btn-get-chat-ats').click(function(event) {
+
+            window.poll.reset(); // 重置轮询频率
 
             $('.pp-ats-content').children('.ui.list').empty().append('<div class="item">加载中...</div>');
 
