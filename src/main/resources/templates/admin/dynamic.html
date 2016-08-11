@@ -120,7 +120,8 @@
         position: fixed;
         right: 430px;
         /* bottom: 300px; */
-        bottom: 400px;
+        top: 250px;
+        /* bottom: 400px; */
         background-color: rgba(219, 40, 40, 0.54);
         z-index: 1;
     }
@@ -317,6 +318,7 @@
         }
         .ui.button.btn-get-chat-news {
             right: 10px;
+            top: auto;
             bottom: 265px;
         }
         .chat-search {
@@ -1330,12 +1332,16 @@
                                         .replace(/\{baseURL\}/g, baseURL)
                                         .replace(/\{path\}/g, item.path)
                                         .replace(/\{uuidName\}/g, item.uuidName));
+                                    // .replace(/\{path\}/g, "admin/file/download/")
+                                    // .replace(/\{uuidName\}/g, item.id));
                                 } else {
                                     insertComment(cm, '[{name}]({baseURL}{path}{uuidName}) '
                                         .replace(/\{name\}/g, item.name)
                                         .replace(/\{baseURL\}/g, baseURL)
-                                        .replace(/\{path\}/g, item.path)
-                                        .replace(/\{uuidName\}/g, item.uuidName));
+                                        .replace(/\{path\}/g, "admin/file/download/")
+                                        .replace(/\{uuidName\}/g, item.id));
+                                    // .replace(/\{path\}/g, item.path)
+                                    // .replace(/\{uuidName\}/g, item.uuidName));
                                 }
                             });
                             toastr.success('上传成功!');
