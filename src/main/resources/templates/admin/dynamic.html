@@ -1330,10 +1330,10 @@
                                     insertComment(cm, '![{name}]({baseURL}{path}{uuidName}) '
                                         .replace(/\{name\}/g, item.name)
                                         .replace(/\{baseURL\}/g, baseURL)
-                                        .replace(/\{path\}/g, "admin/file/download/")
-                                        .replace(/\{uuidName\}/g, item.id));
-                                    // .replace(/\{path\}/g, item.path)
-                                    // .replace(/\{uuidName\}/g, item.uuidName));
+                                        .replace(/\{path\}/g, item.path)
+                                        .replace(/\{uuidName\}/g, item.uuidName));
+                                    // .replace(/\{path\}/g, "admin/file/download/")
+                                    // .replace(/\{uuidName\}/g, item.id));
                                 } else {
                                     insertComment(cm, '[{name}]({baseURL}{path}{uuidName}) '
                                         .replace(/\{name\}/g, item.name)
