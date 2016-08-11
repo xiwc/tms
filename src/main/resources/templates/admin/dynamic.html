@@ -1330,14 +1330,18 @@
                                     insertComment(cm, '![{name}]({baseURL}{path}{uuidName}) '
                                         .replace(/\{name\}/g, item.name)
                                         .replace(/\{baseURL\}/g, baseURL)
-                                        .replace(/\{path\}/g, item.path)
-                                        .replace(/\{uuidName\}/g, item.uuidName));
+                                        .replace(/\{path\}/g, "admin/file/download/")
+                                        .replace(/\{uuidName\}/g, item.id));
+                                    // .replace(/\{path\}/g, item.path)
+                                    // .replace(/\{uuidName\}/g, item.uuidName));
                                 } else {
                                     insertComment(cm, '[{name}]({baseURL}{path}{uuidName}) '
                                         .replace(/\{name\}/g, item.name)
                                         .replace(/\{baseURL\}/g, baseURL)
-                                        .replace(/\{path\}/g, item.path)
-                                        .replace(/\{uuidName\}/g, item.uuidName));
+                                        .replace(/\{path\}/g, "admin/file/download/")
+                                        .replace(/\{uuidName\}/g, item.id));
+                                    // .replace(/\{path\}/g, item.path)
+                                    // .replace(/\{uuidName\}/g, item.uuidName));
                                 }
                             });
                             toastr.success('上传成功!');
@@ -2204,6 +2208,8 @@
                     insertComment(cm, '![{name}]({baseURL}{path}{uuidName})'
                         .replace(/\{name\}/g, data.data.name)
                         .replace(/\{baseURL\}/g, baseURL)
+                        // .replace(/\{path\}/g, 'admin/file/download/')
+                        // .replace(/\{uuidName\}/g, data.data.id));
                         .replace(/\{path\}/g, data.data.path)
                         .replace(/\{uuidName\}/g, data.data.uuidName));
                 }
@@ -2223,6 +2229,8 @@
                     insertComment(cme, '![{name}]({baseURL}{path}{uuidName})'
                         .replace(/\{name\}/g, data.data.name)
                         .replace(/\{baseURL\}/g, baseURL)
+                        // .replace(/\{path\}/g, 'admin/file/download/')
+                        // .replace(/\{uuidName\}/g, data.data.id));
                         .replace(/\{path\}/g, data.data.path)
                         .replace(/\{uuidName\}/g, data.data.uuidName));
                 }
