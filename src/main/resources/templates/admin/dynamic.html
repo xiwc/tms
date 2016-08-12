@@ -2653,7 +2653,7 @@
                         var d = new Date(chat.createDate);
                         chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
-                    $("#chatStowsTpl").tmpl(chats).appendTo($('.pp-stows-content').children('.ui.list').empty());
+                    $("#chatStowsTpl").tmpl(chats.reverse()).appendTo($('.pp-stows-content').children('.ui.list').empty());
                     $('.pp-stows-content .timeago').timeago();
                 }
             });
