@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -311,6 +313,23 @@ public class FileController extends BaseController {
 
 	}
 
+	private static String encodingFileName(String fileName) {
+		String returnFileName = "";
+		try {
+			returnFileName = URLEncoder.encode(fileName, "UTF-8");
+			returnFileName = StringUtils.replace(returnFileName, "+", "%20");
+			if (returnFileName.length() > 100) {
+				returnFileName = new String(fileName.getBytes("GBK"),
+						"ISO8859-1");
+				returnFileName = StringUtils.replace(returnFileName, " ",
+						"%20");
+			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		return returnFileName;
+	}
+
 	@RequestMapping(value = "download/{id}", method = RequestMethod.GET)
 	public void download(HttpServletRequest request,
 			HttpServletResponse response, @PathVariable Long id)
@@ -344,19 +363,13 @@ public class FileController extends BaseController {
 			}
 		}
 
-		String fileName = file2.getName();
-		try {
-			fileName = new String(fileName.getBytes("utf-8"));
-		} catch (UnsupportedEncodingException e1) {
-			e1.printStackTrace();
-		}
-
 		// 1.设置文件ContentType类型，这样设置，会自动判断下载文件类型
 		// response.setContentType("multipart/form-data");
 		response.setContentType("application/x-msdownload;");
+		response.addHeader("Content-Type", "text/html; charset=utf-8");
 		// 2.设置文件头：最后一个参数是设置下载文件名
 		response.setHeader("Content-Disposition",
-				"attachment; fileName=" + fileName);
+				"attachment; fileName=" + encodingFileName(file2.getName().trim()));
 		response.setHeader("Content-Length", String.valueOf(fileLength));
 
 		java.io.BufferedInputStream bis = null;

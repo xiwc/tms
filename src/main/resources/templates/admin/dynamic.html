@@ -552,14 +552,14 @@
                                     <div class="actions">
                                         <a class="reply">回复</a>
                                         <a class="stow">收藏</a>
-                                        <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</a>
-                                        <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</a>
+                                        <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">编辑</a>
+                                        <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">删除</a>
                                         <div class="ui top right pointing dropdown dd-more-actions">
                                             <a class="text" style="margin: 0;">更多</a>
                                             <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                                             <div class="menu">
-                                                <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">编辑</div>
-                                                <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}">删除</div>
+                                                <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">编辑</div>
+                                                <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">删除</div>
                                                 <div class="item btn-read">阅读</div>
                                                 <a class="item" style="color: black;" target="_blank" th:href="@{/admin/wiki/edit(id=${c.id})}">安全编辑</a>
                                                 <div class="item btn-wiki" th:if="${#strings.toString(c.type) != 'Wiki'}">转博</div>
@@ -727,6 +727,7 @@
     <input type="hidden" name="page.size.logs" th:value="${logs.size}" />
     <input type="hidden" name="user.username" th:value="${user.username}" />
     <input type="hidden" name="role.admin" th:value="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" />
+    <input type="hidden" name="role.super" th:value="${#authorization.expression('hasRole(''ROLE_SUPER'')')}" />
     <input type="hidden" th:each="u : ${users}" data-group="users" th:attr="data-status=${u.enabled}" th:name="${u.username}" th:value="${u.name}" />
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/deps-dynamic.js}" src="../../static/admin/js/deps-dynamic.js"></script>
@@ -1662,7 +1663,8 @@
          * @return {[type]}       返回模板编译后的jquery dom
          */
         function convertChat(chats, markId, first) {
-            var isAdminRole = $('input:hidden[name="role.admin"]').val();
+            // var isAdminRole = $('input:hidden[name="role.admin"]').val();
+            var isSuperRole = $('input:hidden[name="role.super"]').val();
             var loginUsername = $('input:hidden[name="user.username"]').val();
             $.each(chats, function(index, chat) {
                 chat.contentMd = simplemde.markdown(preParse(chat.content));
@@ -1675,7 +1677,10 @@
                 if (chat.creator.name) {
                     chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                 }
-                if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
+                // if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
+                //     chat.actions = true;
+                // }
+                if (isSuperRole == 'true' || loginUsername == chat.creator.username) {
                     chat.actions = true;
                 }
                 var d = new Date(chat.createDate);
