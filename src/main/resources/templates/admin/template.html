@@ -84,7 +84,7 @@
         </tr>
     </script>
     <script th:fragment="chatMoreTpl" id="chatMoreTpl" type="text/x-jquery-tmpl">
-        <div class="comment ${marked}" data-id="${id}">
+        <div class="animated bounceInLeft comment ${marked} ${marker}" data-id="${id}">
             <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>
@@ -115,7 +115,8 @@
                     {{html contentMd}}
                 </div>
                 <div class="actions">
-                    <a class="reply">回复</a> {{if actions}}
+                    <a class="reply">回复</a>
+                    <a class="stow">收藏</a> {{if actions}}
                     <a class="edit">编辑</a>
                     <a class="delete">删除</a> {{/if}}
                     <div class="ui top right pointing dropdown dd-more-actions">
@@ -236,7 +237,7 @@
     </script>
     <!-- 沟通消息popup内容模板 -->
     <script th:fragment="chatSearchTpl" id="chatSearchTpl" type="text/x-jquery-tmpl">
-        <div class="item" data-id="${id}">
+        <div class="item" data-type="search" data-id="${id}">
             <div style="float: left;">
                 <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                     {{if iconName}}
@@ -256,6 +257,63 @@
                 </a>
                 <div class="metadata" style="float: right;">
                     <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                </div>
+                <div class="description">${contentBrief}</div>
+            </div>
+        </div>
+    </script>
+    <!-- 沟通at消息popup内容模板 -->
+    <script th:fragment="chatAtsTpl" id="chatAtsTpl" type="text/x-jquery-tmpl">
+        <div class="item" data-type="at" data-id="${id}" data-chat-at-id="${chatAtId}">
+            <div style="float: left;">
+                <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                    {{if iconName}}
+                        <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${iconName}</span>
+                    {{else}}
+                        <img src="/img/head.png">
+                    {{/if}}
+                </a>
+            </div>
+            <div class="content" style="width: 100%;">
+                <a class="header" data-value="${creator.username}" style="display: inline;">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata" style="float: right;">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                </div>
+                <div class="description">${contentBrief}</div>
+            </div>
+        </div>
+    </script>
+    <!-- 沟通stow消息popup内容模板 -->
+    <script th:fragment="chatStowsTpl" id="chatStowsTpl" type="text/x-jquery-tmpl">
+        <div class="item" data-type="stow" data-id="${id}" data-chat-stow-id="${chatStowId}">
+            <div style="float: left;">
+                <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                    {{if iconName}}
+                        <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${iconName}</span>
+                    {{else}}
+                        <img src="/img/head.png">
+                    {{/if}}
+                </a>
+            </div>
+            <div class="content" style="width: 100%;">
+                <a class="header" data-value="${creator.username}" style="display: inline;">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata" style="float: right;">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                </div>
+                <div class="actions" style="float: right; padding-right: 10px;">
+                    <a class="remove">移除</a>
                 </div>
                 <div class="description">${contentBrief}</div>
             </div>
@@ -634,7 +692,7 @@
         </div>
     </div>
     <!-- chat edit modal -->
-    <div th:fragment="ad-chat-edit" class="ui small modal ad-chat-edit">
+    <div th:fragment="ad-chat-edit" class="ui large modal ad-chat-edit" style="min-height: 350px;">
         <div class="header">
             编辑沟通内容
         </div>
@@ -662,6 +720,14 @@
                                 </a>
                                 <div class="content">
                                     <div class="header" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name) + ' - ' + u.mails + ' (' + u.username + ')'}">张三 - weicheng.xi@newtouch.cn (xiweicheng)</div>
+                                </div>
+                            </div>
+                            <div class="item" th:each="g : ${groups}" th:attr="data-type=${'group'}, data-value=${g.groupName}, data-label=${g.groupName}">
+                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${#strings.toUpperCase(#strings.substring(g.groupName,#strings.length(g.groupName) - 1,#strings.length(g.groupName)))}">管理员</span>
+                                </a>
+                                <div class="content">
+                                    <div class="header" th:text="${(g.groupName) + ' - (用户组)'}">张三 - (用户组)</div>
                                 </div>
                             </div>
                         </div>
