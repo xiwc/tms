@@ -1561,7 +1561,7 @@
         // 替换浏览器url地址,去掉查询参数.
         function replaceHistory() {
             if ('pushState' in history) {
-                history.replaceState(null, '', url('path'));
+                history.replaceState(null, '', url('path') + '?scroll=1');
                 Utils.remember();
                 var dynamicUrl = Utils.getRemember('/admin/dynamic');
                 dynamicUrl && $('a.item.mi-dynamic').attr('href', dynamicUrl);
