@@ -255,6 +255,13 @@
     .ui.button.btn-chat-s2h:hover {
         background-color: rgba(224, 225, 226, 1);
     }
+    
+    .btn-custom-chat-refresh {
+        position: fixed;
+        bottom: 140px;
+        right: 433px;
+        z-index: 1;
+    }
     /* Mobile */
     
     @media only screen and (max-width: 767px) {
@@ -315,6 +322,10 @@
         .ui.vertical.icon.buttons.btns-scroll {
             right: 13px;
             bottom: 190px;
+        }
+        .btn-custom-chat-refresh {
+            bottom: 110px;
+            right: 13px;
         }
         .ui.button.btn-get-chat-news {
             right: 10px;
@@ -1555,6 +1566,16 @@
 
         // ============================================================================ url? start
 
+        // 替换浏览器url地址,去掉查询参数.
+        function replaceHistory() {
+            if ('pushState' in history) {
+                history.replaceState(null, '', url('path') + '?scroll=1');
+                Utils.remember();
+                var dynamicUrl = Utils.getRemember('/admin/dynamic');
+                dynamicUrl && $('a.item.mi-dynamic').attr('href', dynamicUrl);
+            }
+        }
+
         if (url('?scroll') || url('?scroll') == '') {
             s2b();
             cm.focus();
@@ -1562,6 +1583,7 @@
 
         if (url('?id')) {
             s2m(); // 滚动到标记沟通消息处
+            replaceHistory();
         }
 
         if (url('?at')) {
@@ -1584,12 +1606,7 @@
                 .replace(/\{ats\}/g, ats.join(' & '));
             insertComment(cm, comment);
 
-            if ('pushState' in history) {
-                history.replaceState(null, '', url('path'));
-                Utils.remember();
-                var dynamicUrl = Utils.getRemember('/admin/dynamic');
-                dynamicUrl && $('a.item.mi-dynamic').attr('href', dynamicUrl);
-            }
+            replaceHistory();
         }
 
         // ============================================================================ url? end
