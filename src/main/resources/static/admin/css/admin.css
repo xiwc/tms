@@ -2,6 +2,24 @@ body {
     /* overflow: hidden; */
 }
 
+::-webkit-scrollbar
+{
+    width:12px;
+    height:12px;
+}
+::-webkit-scrollbar-thumb
+{
+    border-width:2px;
+    border-style:solid;
+    border-color:#fff;
+    border-radius:6px;
+    background-color:#c6c6c6;
+}
+::-webkit-scrollbar-thumb:hover
+{
+    background:#999;
+}
+
 div.admin.login {
     min-width: 300px;
     max-width: 300px;
