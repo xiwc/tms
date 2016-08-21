@@ -166,7 +166,7 @@ public class ProjectController extends BaseController {
 			userRepository.flush();
 		}
 
-		log(Action.Create, Target.Project, projectForm);
+		log(Action.Create, Target.Project, project2.getId());
 
 		return RespBody.succeed(project2);
 	}
@@ -293,7 +293,7 @@ public class ProjectController extends BaseController {
 
 		projectRepository.saveAndFlush(project);
 
-		log(Action.Update, Target.Project, projectForm);
+		log(Action.Update, Target.Project, project.getId());
 
 		return RespBody.succeed(project);
 	}
@@ -409,7 +409,7 @@ public class ProjectController extends BaseController {
 
 		projectRepository.saveAndFlush(project);
 
-		log(Action.Update, Target.Project, project);
+		log(Action.Update, Target.Project, project.getId());
 
 		return RespBody.succeed(id);
 	}

@@ -4,6 +4,7 @@
 package com.lhjz.portal.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,12 +33,14 @@ import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.Project;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.security.Authority;
+import com.lhjz.portal.entity.security.Group;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.UserInfo;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.FileRepository;
+import com.lhjz.portal.repository.GroupRepository;
 import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.LogRepository;
@@ -85,6 +88,9 @@ public class AdminController extends BaseController {
 	@Autowired
 	LogRepository logRepository;
 
+	@Autowired
+	GroupRepository groupRepository;
+
 	@RequestMapping("login")
 	public String login(Model model) {
 
@@ -130,7 +136,10 @@ public class AdminController extends BaseController {
 			userInfos.add(userInfo);
 		}
 
+		List<Group> groups = groupRepository.findAll();
+
 		model.addAttribute("users", userInfos);
+		model.addAttribute("groups", groups);
 
 		return "admin/user";
 	}
@@ -190,7 +199,8 @@ public class AdminController extends BaseController {
 				page--;
 			}
 
-			pageable = new PageRequest((int) page, size, Direction.DESC,
+			pageable = new PageRequest(page > -1 ? (int) page : 0, size,
+					Direction.DESC,
 					"createDate");
 		}
 
@@ -199,10 +209,18 @@ public class AdminController extends BaseController {
 				.getContent()), pageable, chats.getTotalElements());
 
 		Page<Log> logs = logRepository.findByTarget(Target.Translate,
-				new PageRequest(0, 10, Direction.DESC, "createDate"));
+				new PageRequest(0, 15, Direction.DESC, "createDate"));
+
+		List<User> users = userRepository.findAll();
+		Collections.sort(users);
+
+		List<Group> groups = groupRepository.findAll();
+		Collections.sort(groups);
 
 		model.addAttribute("chats", chats);
 		model.addAttribute("logs", logs);
+		model.addAttribute("users", users);
+		model.addAttribute("groups", groups);
 		model.addAttribute("user", getLoginUser());
 		
 		return "admin/dynamic";

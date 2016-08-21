@@ -84,7 +84,7 @@
         </tr>
     </script>
     <script th:fragment="chatMoreTpl" id="chatMoreTpl" type="text/x-jquery-tmpl">
-        <div class="comment" data-id="${id}">
+        <div class="animated bounceInLeft comment ${marked} ${marker}" data-id="${id}">
             <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>
@@ -93,7 +93,7 @@
                 {{/if}}
             </a>
             <div class="content">
-                <a class="author">
+                <a class="author" data-value="${creator.username}">
                     {{if creator.name}}
                         ${creator.name}
                     {{else}}
@@ -101,22 +101,42 @@
                     {{/if}}
                 </a>
                 <div class="metadata">
-                    <span class="date" th:text="">${createDateFormat}</span>
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZan}}
+                        <span title="${voteZan}">${zanCount} 赞</span> {{/if}}
+                    </div>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCai}}
+                        <span title="${voteCai}">${caiCount} 踩</span> {{/if}}
+                    </div>
                 </div>
                 <div class="text markdown-body">
                     {{html contentMd}}
                 </div>
-                {{if actions}}
                 <div class="actions">
+                    <a class="reply">回复</a>
+                    <a class="stow">收藏</a> {{if actions}}
                     <a class="edit">编辑</a>
-                    <a class="delete">删除</a>
+                    <a class="delete">删除</a> {{/if}}
+                    <div class="ui top right pointing dropdown dd-more-actions">
+                        <div class="text" style="margin: 0;">更多</div>
+                        <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
+                        <div class="menu">
+                            {{if actions}}
+                            <div class="item edit">编辑</div>
+                            <div class="item delete">删除</div> {{/if}}
+                            <div class="item btn-read">阅读</div>
+                            <div class="item btn-copy" data-clipboard-text="${content}">复制</div>
+                            <div class="item btn-share" data-clipboard-text="${textShare}">分享</div>
+                        </div>
+                    </div>
                 </div>
-                {{/if}}
             </div>
         </div>
     </script>
     <script th:fragment="logMoreTpl" id="logMoreTpl" type="text/x-jquery-tmpl">
-        <div class="event">
+        <div class="event" data-id="${id}">
             <div class="label">
                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
@@ -128,80 +148,177 @@
             </div>
             <div class="content">
                 <div class="summary">
-                    <a class="user">
+                    <a class="user" data-value="creator.username">
                         {{if creator.name}}
                             ${creator.name}
                         {{else}}
                             ${creator.username}
                         {{/if}}
                     </a>
-                    <span>${action}</span> 
-                    <a target="_blank" href="/admin/translate?id=${targetId}">翻译</a>
-                    <span>${properties}</span>
-                    <div class="date">
+                    <span>${actionMapping}</span>
+                    <a target="_blank" href="/admin/translate?id=${targetId}">翻译#${targetId}</a>
+                    <span>${propertiesMapping}</span>
+                    <div class="date timeago" title="${createDate}">
                         ${createDate}
                     </div>
                 </div>
                 {{if properties}}
                 <div class="extra text">
-                    {{if oldValue}}
-                    <div>${oldValue}</div>
-                    <div style="color: green; font-size: 12px; font-weight: bold;">变更为</div>
+                    {{if isOldValue}}
+                    <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${oldValue}</div>
+                    <div class="divider fitted horizontal ui" style="color: green; font-size: 12px; font-weight: bold;">更新为</div>
+                    {{/if}} {{if isLabels}}
+                    <div class="ui tag label">${newValue}</div>
+                    {{else isWatchers}}
+                    <div class="ui label">
+                        <i class="user icon"></i> <span class="mapping-user">${newValue}</span>
+                    </div>
+                    {{else}}
+                    <div style="word-break: break-all; font-size: .85714286rem; color: rgba(0,0,0,.6);">${newValue}</div>
                     {{/if}}
-                    <div>${newValue}</div>
-                </div>            
+                </div>
                 {{/if}}
             </div>
         </div>
     </script>
-    <!-- image select modal -->
-    <div th:fragment="ad-images" class="ui modal ad-images">
-        <!-- <i class="close icon"></i> -->
-        <div class="header">
-            图片选择
-        </div>
-        <div class="content">
-            <div class="ui cards grouped" th:remove="body">
-                <div class="card">
-                    <a class="image">
-                        <img src="../../static/landing/img/img-b1.jpg">
-                    </a>
-                    <div class="content">
-                        <div class="ui checkbox">
-                            <input type="checkbox" name="image" checked="checked">
-                            <label>图片1</label>
-                        </div>
+    <!-- 翻译popup内容模板 -->
+    <script th:fragment="tansPpTpl" id="tansPpTpl" type="text/x-jquery-tmpl">
+        <div class="ui items">
+            <div class="item">
+                <div class="content" style="width:300px; word-break: break-all;">
+                    <a class="header pp-not" href="admin/translate?id=${id}">翻译#${id}</a>
+                    <div class="meta" style="width:300px; word-break: break-all;">
+                        <span>
+                            ${creator}
+                        </span>
+                        <span>创建于</span>
+                        <span class="cinema timeago" title="${createDateFormat}">${createDateFormat}</span>
                     </div>
-                </div>
-                <div class="card">
-                    <a class="image">
-                        <img src="../../static/landing/img/img-b2.jpg">
-                    </a>
-                    <div class="content">
-                        <div class="ui radio checkbox">
-                            <input type="radio" name="image" checked="checked">
-                            <label>图片1</label>
-                        </div>
+                    <div class="description" style="width:300px; word-break: break-all;">
+                        <span class="cinema" title="${key}">${key}</span>
                     </div>
-                </div>
-                <div class="card">
-                    <a class="image">
-                        <img src="../../static/landing/img/img-b3.jpg">
-                    </a>
-                    <div class="content">
-                        <div class="ui radio checkbox">
-                            <input type="radio" name="image" checked="checked">
-                            <label>图片1</label>
-                        </div>
+                    <div class="description" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
+                        {{each translateItems}}
+                        <p title="${$value.content}">${$value.content}</p>
+                        {{/each}}
+                    </div>
+                    <div class="extra" style="width:300px; word-break: break-all;">
+                        {{each labels}}
+                        <div class="ui label" title="${$value.name}">${$value.name}</div>
+                        {{/each}}
                     </div>
                 </div>
             </div>
         </div>
-        <div class="actions">
-            <div class="ui cancel negative button">取消</div>
-            <div class="ui ok positive button">确定</div>
+    </script>
+    <!-- 沟通消息popup内容模板 -->
+    <script th:fragment="chatMsgPpTpl" id="chatMsgPpTpl" type="text/x-jquery-tmpl">
+        <div class="ui items">
+            <div class="item">
+                <div class="content" style="width:300px; word-break: break-all;">
+                    <a class="header pp-not" href="admin/dynamic?id=${id}">消息#${id}</a>
+                    <div class="meta" style="width:300px; word-break: break-all;">
+                        <span>
+                            {{if creatorName}}
+                            ${creatorName}
+                            {{else}}
+                            ${creator.username}
+                            {{/if}}
+                        </span>
+                        <span>发表于</span>
+                        <span class="cinema timeago" title="${createDateFormat}">${createDateFormat}</span>
+                    </div>
+                    <div class="description markdown-body" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
+                        {{html contentMd}}
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </script>
+    <!-- 沟通消息popup内容模板 -->
+    <script th:fragment="chatSearchTpl" id="chatSearchTpl" type="text/x-jquery-tmpl">
+        <div class="item" data-type="search" data-id="${id}">
+            <div style="float: left;">
+                <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                    {{if iconName}}
+                        <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${iconName}</span>
+                    {{else}}
+                        <img src="/img/head.png">
+                    {{/if}}
+                </a>
+            </div>
+            <div class="content" style="width: 100%;">
+                <a class="header" data-value="${creator.username}" style="display: inline;">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata" style="float: right;">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                </div>
+                <div class="description">${contentBrief}</div>
+            </div>
+        </div>
+    </script>
+    <!-- 沟通at消息popup内容模板 -->
+    <script th:fragment="chatAtsTpl" id="chatAtsTpl" type="text/x-jquery-tmpl">
+        <div class="item" data-type="at" data-id="${id}" data-chat-at-id="${chatAtId}">
+            <div style="float: left;">
+                <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                    {{if iconName}}
+                        <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${iconName}</span>
+                    {{else}}
+                        <img src="/img/head.png">
+                    {{/if}}
+                </a>
+            </div>
+            <div class="content" style="width: 100%;">
+                <a class="header" data-value="${creator.username}" style="display: inline;">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata" style="float: right;">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                </div>
+                <div class="description">${contentBrief}</div>
+            </div>
+        </div>
+    </script>
+    <!-- 沟通stow消息popup内容模板 -->
+    <script th:fragment="chatStowsTpl" id="chatStowsTpl" type="text/x-jquery-tmpl">
+        <div class="item" data-type="stow" data-id="${id}" data-chat-stow-id="${chatStowId}">
+            <div style="float: left;">
+                <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                    {{if iconName}}
+                        <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${iconName}</span>
+                    {{else}}
+                        <img src="/img/head.png">
+                    {{/if}}
+                </a>
+            </div>
+            <div class="content" style="width: 100%;">
+                <a class="header" data-value="${creator.username}" style="display: inline;">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata" style="float: right;">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                </div>
+                <div class="actions" style="float: right; padding-right: 10px;">
+                    <a class="remove">移除</a>
+                </div>
+                <div class="description">${contentBrief}</div>
+            </div>
+        </div>
+    </script>
     <!-- delete confirm modal -->
     <div th:fragment="ad-delete-confirm" class="ui small modal ad-delete-confirm">
         <!-- <i class="close icon"></i> -->
@@ -259,7 +376,7 @@
                         <i class="dropdown icon"></i>
                         <div class="default text">通知用户</div>
                         <div class="menu">
-                            <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                            <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                         </div>
                     </div>
                     <div class="ui checkbox ck-selectAll">
@@ -274,8 +391,15 @@
             <div class="ui ok positive button">确定</div>
         </div>
     </div>
-    <div th:fragment="ad-page-dimmer" class="ui page dimmer ad-page-dimmer">
+    <div th:fragment="ad-page-dimmer" style="z-index: 99999;" class="ui page dimmer ad-page-dimmer">
         <div class="ui large text loader">处理中...</div>
+    </div>
+    <div th:fragment="ad-comment-page-dimmer" style="z-index: 99999; display: none;" class="ui page ad-comment-page-dimmer">
+        <div class="container" style="display: flex; display: -webkit-flex; justify-content: center; align-items: center; max-width: 650px; margin: auto; overflow-y: auto;">
+            <div class="content">
+                <div class="text" style="max-width: 633px; background-color: white; padding: 15px; text-align: left;"></div>
+            </div>
+        </div>
     </div>
     <!-- user add modal -->
     <div th:fragment="ad-user-add" class="ui small modal ad-user-add">
@@ -309,6 +433,56 @@
                         <div class="ui radio checkbox chk-admin" sec:authorize="hasRole('ROLE_SUPER')">
                             <input type="radio" name="role" value="admin">
                             <label>管理员</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- user group add modal -->
+    <div th:fragment="ad-user-group-add" class="ui small modal ad-user-group-add">
+        <div class="header">
+            添加用户组
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="required field">
+                        <label>组名:</label>
+                        <input name="groupName" type="text" placeholder="组名">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
+    <!-- user group edit modal -->
+    <div th:fragment="ad-user-group-edit" class="ui small modal ad-user-group-edit">
+        <div class="header">
+            用户组成员编辑
+        </div>
+        <div class="content">
+            <div class="ui segment">
+                <div class="ui form">
+                    <div class="ui message">
+                        当前编辑用户组: <span></span>
+                    </div>
+                    <div class="required field">
+                        <label>组成员:</label>
+                        <div class="ui fluid multiple search selection dropdown dd-group-member">
+                            <input type="hidden" name="usernames" value="">
+                            <i class="dropdown icon"></i>
+                            <div class="default text">组成员</div>
+                            <div class="menu">
+                                <div th:each="u : ${users}" class="item" th:title="${u.name}" th:attr="data-value=${u.username}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -421,7 +595,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>
@@ -469,7 +643,7 @@
                     <i class="dropdown icon"></i>
                     <div class="default text">用户</div>
                     <div class="menu">
-                        <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                        <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                     </div>
                 </div>
                 <div class="ui checkbox ck-selectAll">
@@ -518,22 +692,52 @@
         </div>
     </div>
     <!-- chat edit modal -->
-    <div th:fragment="ad-chat-edit" class="ui small modal ad-chat-edit">
+    <div th:fragment="ad-chat-edit" class="ui large modal ad-chat-edit" style="min-height: 350px;">
         <div class="header">
             编辑沟通内容
         </div>
-        <div class="content" style="max-height: 295px; overflow: auto;">
+        <div class="content">
             <div class="">
-                <div class="ui form">
-                    <div class="field">
+                <div class="ui form fm-edit-reply markdown-body">
+                    <div class="field pp-edit-users dropzone" style="border: none;">
                         <textarea class="ta-chat-edit" name="content" rows="2" placeholder="编辑沟通内容"></textarea>
+                    </div>
+                    <div class="ui fluid popup bottom left transition hidden list-edit-users-container" style="max-height:150px; overflow:auto;">
+                        <div class="ui middle aligned selection list list-users">
+                            <div class="item" th:attr="data-value=${'all'}, data-label=${'全部用户'}">
+                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${'全'}">全部用户</span>
+                                </a>
+                                <div class="content">
+                                    <div class="header" th:text="${'全部用户 - (all)'}">全部用户 - (all)</div>
+                                </div>
+                            </div>
+                            <div class="item" th:each="u : ${users}" th:if="${u.enabled}" th:attr="data-value=${u.username}, data-label=${#strings.isEmpty(u.name) ? u.username : u.name}">
+                                <!-- <img class="ui avatar image" th:src="@{/img/head.png}" src="/images/avatar/small/helen.jpg"> -->
+                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(u.name)}" th:text="${#strings.toUpperCase(#strings.substring(u.name,#strings.length(u.name) - 1,#strings.length(u.name)))}">管理员</span>
+                                    <img style="height:35px;" th:if="${#strings.isEmpty(u.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
+                                </a>
+                                <div class="content">
+                                    <div class="header" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name) + ' - ' + u.mails + ' (' + u.username + ')'}">张三 - weicheng.xi@newtouch.cn (xiweicheng)</div>
+                                </div>
+                            </div>
+                            <div class="item" th:each="g : ${groups}" th:attr="data-type=${'group'}, data-value=${g.groupName}, data-label=${g.groupName}">
+                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center; padding-right: 0px;">
+                                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:text="${#strings.toUpperCase(#strings.substring(g.groupName,#strings.length(g.groupName) - 1,#strings.length(g.groupName)))}">管理员</span>
+                                </a>
+                                <div class="content">
+                                    <div class="header" th:text="${(g.groupName) + ' - (用户组)'}">张三 - (用户组)</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="actions">
             <div class="ui cancel negative button">取消</div>
-            <div class="ui ok positive button">确定</div>
+            <div class="ui ok positive button btn-chat-edit-submit">确定</div>
         </div>
     </div>
     <!-- project edit modal -->
@@ -581,7 +785,7 @@
                             <i class="dropdown icon"></i>
                             <div class="default text">关注者</div>
                             <div class="menu">
-                                <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                <div th:each="u : ${users}" th:if="${u.enabled}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                             </div>
                         </div>
                     </div>

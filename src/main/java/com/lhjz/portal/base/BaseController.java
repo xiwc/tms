@@ -4,15 +4,21 @@
 package com.lhjz.portal.base;
 
 import java.util.Date;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Message;
+import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.LogRepository;
@@ -38,12 +44,6 @@ public abstract class BaseController {
 	@Autowired
 	protected Environment env;
 
-	protected Log log(Action action, Target target, Object... vals) {
-
-		return logWithProperties(action, target, null, vals);
-
-	}
-
 	protected Log log(Action action, Target target, String targetId,
 			Object... vals) {
 
@@ -65,13 +65,6 @@ public abstract class BaseController {
 	}
 
 	protected Log logWithProperties(Action action, Target target,
-			String properties, Object... vals) {
-
-		return logWithProperties(action, target, StringUtil.EMPTY, properties,
-				vals);
-	}
-
-	protected Log logWithProperties(Action action, Target target,
 			Long targetId, String properties, Object... vals) {
 
 		return logWithProperties(action, target, String.valueOf(targetId),
@@ -79,8 +72,7 @@ public abstract class BaseController {
 	}
 
 	protected Log logWithProperties(Action action, Target target,
-			String targetId,
-			String properties, Object... vals) {
+			String targetId, String properties, Object... vals) {
 
 		Log log = new Log();
 		log.setAction(action);
@@ -106,8 +98,18 @@ public abstract class BaseController {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@ExceptionHandler(Exception.class)
-	public ModelAndView exceptionHandler(Exception ex) {
+	public ModelAndView exceptionHandler(HttpServletRequest request,
+			HttpServletResponse response, Exception ex) {
+
+		if ("XMLHttpRequest".equalsIgnoreCase(request
+				.getHeader("X-Requested-With"))) {
+
+			return new ModelAndView(new MappingJackson2JsonView(),
+					(Map<String, ?>) RespBody.failed(ex.getMessage())
+							.addMsg(ex.toString()).asMap());
+		}
 
 		return new ModelAndView("admin/error", "error", Message.error(
 				ex.getMessage()).detail(ex.toString()));

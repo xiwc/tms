@@ -5,6 +5,8 @@ package com.lhjz.portal.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,12 +14,17 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Version;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lhjz.portal.pojo.Enum.FileType;
 import com.lhjz.portal.pojo.Enum.Status;
 
 /**
@@ -47,11 +54,19 @@ public class File implements Serializable {
 	private String path;
 
 	@Enumerated(EnumType.STRING)
+	private FileType type;
+
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Status status = Status.Normal;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "file_translate", joinColumns = { @JoinColumn(name = "file_id") }, inverseJoinColumns = { @JoinColumn(name = "translate_id") })
+	private Set<Translate> fileTranslates = new HashSet<Translate>();
 
 	@Version
 	private long version;
@@ -120,12 +135,28 @@ public class File implements Serializable {
 		this.path = path;
 	}
 
+	public FileType getType() {
+		return type;
+	}
+
+	public void setType(FileType type) {
+		this.type = type;
+	}
+
+	public Set<Translate> getFileTranslates() {
+		return fileTranslates;
+	}
+
+	public void setFileTranslates(Set<Translate> fileTranslates) {
+		this.fileTranslates = fileTranslates;
+	}
+
 	@Override
 	public String toString() {
 		return "File [id=" + id + ", name=" + name + ", uuidName=" + uuidName
-				+ ", username=" + username + ", path=" + path + ", status="
-				+ status + ", createDate=" + createDate + ", version="
-				+ version + "]";
+				+ ", username=" + username + ", path=" + path + ", type="
+				+ type + ", status=" + status + ", createDate=" + createDate
+				+ ", version=" + version + "]";
 	}
 
 }

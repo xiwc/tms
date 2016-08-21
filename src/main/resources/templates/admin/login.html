@@ -12,6 +12,44 @@
     <link rel="shortcut icon" th:href="@{/favicon.ico}" href="../../static/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <style>
+    body {
+        background-color: #5a3636;
+    }
+    
+    h2 {
+        color: rgba(197, 164, 164, 0.8)!important;
+    }
+    
+    .ui.form {
+        background-color: #353131;
+    }
+    
+    .ui.error.message {
+        background-color: #5a3636;
+    }
+    
+    .ui.error.message .header {
+        color: #e0b4b4;
+    }
+    
+    .ui.checkbox label {
+        color: #ad8b8b;
+    }
+    
+    .ui.checkbox input:focus~label {
+        color: #ad8b8b;
+    }
+    
+    .ui.checkbox label:hover {
+        color: #ad8b8b;
+    }
+    
+    .ui.button {
+        background-color: #5a3636;
+        color: #ad8b75;
+    }
+    </style>
 </head>
 
 <body>
@@ -22,11 +60,10 @@
         <form th:action="@{/admin/signin}" action="" method="post">
             <div class="ui error form segment">
                 <div class="ui error message" th:if="${param.error}">
-                    <div class="header">错误信息</div>
-                    <p>用户名密码错误</p>
+                    <div class="header">用户名密码错误!</div>
                 </div>
-                <div class="ui message" th:if="${param.logout}">
-                    <div class="header">您已经退出登录</div>
+                <div class="ui error message" th:if="${param.logout}">
+                    <div class="header">您已经退出登录!</div>
                 </div>
                 <div class="field">
                     <div class="ui left icon input">
@@ -47,14 +84,17 @@
                     </div>
                 </div>
                 <div class="ui center aligned header">
-                    <button type="submit" class="ui submit button">登录</button>
+                    <button type="submit" class="ui submit fluid button">登录</button>
                 </div>
             </div>
         </form>
     </div>
+    <!--     
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
+     -->
+    <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script>
     jQuery(document).ready(function($) {
 

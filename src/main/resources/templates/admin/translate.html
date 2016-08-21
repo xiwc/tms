@@ -13,10 +13,17 @@
     <link rel="stylesheet" type="text/css" th:href="@{/lib/semantic/semantic.min.css}" href="../../static/lib/semantic/semantic.min.css" />
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
-    <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" />
-    <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" />
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/simplemde/simplemde.min.css}" href="../../static/lib/simplemde/simplemde.min.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/awesome/css/font-awesome.min.css}" href="../../static/lib/awesome/css/font-awesome.min.css" /> -->
+    <!-- <link rel="stylesheet" type="text/css" th:href="@{/lib/dropzone/basic.min.css}" href="../../static/lib/dropzone/basic.min.css" /> -->
+    <link rel="stylesheet" type="text/css" th:href="@{/lib/fancybox/jquery.fancybox.min.css}" href="../../static/lib/fancybox/jquery.fancybox.min.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
     <style>
+    body,
+    html {
+        height: auto;
+    }
+    
     .CodeMirror,
     .CodeMirror-scroll {
         min-height: 150px;
@@ -44,11 +51,27 @@
         margin: .21428571em .28571429rem .21428571em 0;
         box-shadow: 0 0 0 1px rgba(34, 36, 38, .15) inset;
     }
-
+    
+    .ad-hidden {
+        display: none;
+    }
+    
+    .btn-delete-file {
+        position: absolute;
+        z-index: 100;
+        top: -0.5em;
+        left: 130%;
+        margin: 0 0 0 -1.5em!important;
+    }
+    
     @media only screen and (max-width: 767px) {
         .hide-mobile {
             display: none!important;
         }
+        .pp-translate-history {
+            /*max-width: 315px!important;*/
+        }
+        .pp-translate-file {}
     }
     </style>
 </head>
@@ -91,7 +114,7 @@
                                 <div class="header">
                                     <i class="users icon"></i>其他创建者
                                 </div>
-                                <a th:each="u : ${users}" th:if="${u.username != user.username}" th:href="@{/admin/translate(projectId=${projectId}, creator=${u.username})}" class="item" th:title="${(not #strings.isEmpty(u.name)) ? u.name : u.username}" th:attr="data-value=${u.username}" th:text="${(not #strings.isEmpty(u.name)) ? u.name : u.username}"></a>
+                                <a th:each="u : ${users}" th:if="${u.enabled and (u.username != user.username)}" th:href="@{/admin/translate(projectId=${projectId}, creator=${u.username})}" class="item" th:title="${(not #strings.isEmpty(u.name)) ? u.name : u.username}" th:attr="data-value=${u.username}" th:text="${(not #strings.isEmpty(u.name)) ? u.name : u.username}"></a>
                             </div>
                         </div>
                         <a title="新创建的" th:href="@{/admin/translate(projectId=${projectId}, status=${'New'})}" th:classappend="${(param.containsKey('status') and (#strings.equals('New', param.status[0]))) ? 'active' : ''}" class="ui button btn-filter-new">新建</a>
@@ -149,14 +172,26 @@
                                     </div>
                                 </td>
                                 <td>
+                                    <div class="files-container" th:classappend="${#sets.isEmpty(t.files) ? 'ad-hidden' : ''}" style="height:20px;">
+                                        <i class="file image outline icon pp-files" style="float:right;"></i>
+                                        <div class="ui flowing popup transition hidden pp-translate-file" style="width: 315px;">
+                                            <h3 class="ui dividing header">翻译项截图</h3>
+                                            <div class="ui tiny images" style="max-height: 211px; overflow-y: auto; padding-top: 10px; padding-right: 13px;">
+                                                <a th:each="f : ${t.files}" th:attr="data-id=${f.id}, rel=${'fancybox-group-' + t.id}" th:href="${f.path + f.uuidName}" class="ui bordered image fancybox-image">
+                                                  <i class="remove circle link big red icon btn-delete-file"></i>
+                                                  <img th:src="${#strings.replace(f.path,'/0/','/120/') + f.uuidName}" />
+                                                </a>    
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="ui form fm-language">
                                         <div style="position: relative;" class="inline field fd-language" th:each="item : ${t.translateItems}" th:attr="data-language=${item.language.id}">
-                                            <label th:text="${item.language.description} + ':'">中文:</label>
+                                            <label th:title="${'提示:输入文本框可以直接粘贴图片'}" th:text="${item.language.description} + ':'">中文:</label>
                                             <textarea class="ta-translteItem" th:attr="data-id=${item.id}" th:title="${item.content}" name="zh" th:name="${item.language.name}" rows="1" th:placeholder="${item.language.description}" th:text="${item.content}">测试</textarea>
                                             <i style="position: absolute; right: 0px; top: 20px;" class="history link icon pp-history" th:unless="${#sets.isEmpty(item.translateItemHistories)}"></i>
-                                            <div class="ui flowing popup transition hidden" th:unless="${#sets.isEmpty(item.translateItemHistories)}">
+                                            <div class="ui flowing popup transition hidden pp-translate-history" style="width: 315px;" th:unless="${#sets.isEmpty(item.translateItemHistories)}">
                                                 <h3 class="ui dividing header">翻译更新历史<span th:text="${' (共: ' + #sets.size(item.translateItemHistories) + ' 条)'}"></span></h3>
-                                                <div class="ui comments" style="min-width: 350px; max-height: 300px; overflow: auto;">
+                                                <div class="ui comments" style="max-height: 300px; overflow-y: auto;">
                                                     <div class="comment" th:each="h : ${item.translateItemHistories}">
                                                         <a class="avatar">
                                                             <i class="history icon"></i>
@@ -164,7 +199,7 @@
                                                         <div class="content">
                                                             <div class="author" th:text="${h.itemCreator}">Matt</div>
                                                             <div class="metadata">
-                                                                <span class="date" th:text="${#calendars.format(h.itemCreateDate,'yyyy/MM/dd HH:mm:ss')}" ">Today at 5:42PM</span>
+                                                                <span class="date timeago" th:title="${#calendars.format(h.itemCreateDate,'yyyy/MM/dd HH:mm:ss')}" th:text="${#calendars.format(h.itemCreateDate,'yyyy/MM/dd HH:mm:ss')}">Today at 5:42PM</span>
                                                             </div>
                                                         <div class="text " th:text="${h.itemContent} ">
                                                           How artistic!
@@ -185,23 +220,23 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td style="word-break: break-word;" th:title="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}" th:utext="${#calendars.format(t.createDate,'yy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
+                                <td style="word-break: break-word;" class="timeago" th:title="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}" th:text="${#calendars.format(t.createDate,'yyyy/MM/dd HH:mm:ss')}">2016/05/10 12:00:00</td>
                                 <td class="td-watchers">
                                     <div>
                                         <div class="ui sub header" style="margin-top:10px; display: inline-block;">创建者:</div>
-                                        <a title="点击按当前创建者查询" th:href="@{/admin/translate(projectId=${projectId}, creator=${t.creator})}" class="ui label lbl-creator" th:text="${t.creator}"></a>
+                                        <a title="点击和创建者沟通" th:href="@{/admin/dynamic(at=${t.creator}, translateId=${t.id})}" class="ui label lbl-creator mapping-user" th:text="${t.creator}"></a>
                                     </div>                                    
                                     <div th:unless="${t.updater == null}">
                                         <div class="ui sub header" style="margin-top:10px; display: inline-block;">更新者:</div>
-                                        <a title="点击按当前更新者查询" th:href="@{/admin/translate(projectId=${projectId}, creator=${t.updater})}" class="ui label lbl-updater" th:text="${t.updater}"></a>
+                                        <a title="点击和更新者沟通" th:href="@{/admin/dynamic(at=${t.updater}, translateId=${t.id})}" class="ui label lbl-updater mapping-user" th:text="${t.updater}"></a>
                                     </div>
                                     <div class="ui sub header" style="margin-top:10px;">关注者:</div>
                                     <input type="hidden" th:each="w : ${t.watchers}" th:name="${w.username}" th:value="${w.username}">
-                                    <div class="ui fluid multiple search selection dropdown dd-row-watchers">
+                                    <div title="点击和关注者沟通" class="ui fluid multiple search selection dropdown dd-row-watchers">
                                         <input name="watchers" type="hidden">
                                         <div class="default text">关注者</div>
                                         <div class="menu">
-                                            <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username}" th:text="${((not #strings.isEmpty(u.name)) ? u.name : u.username)}"></div>
+                                            <div th:each="u : ${users}" class="item" th:if="${u.enabled}" th:attr="data-value=${u.username}" th:title="${u.username}" th:text="${((not #strings.isEmpty(u.name)) ? u.name : u.username)}"></div>
                                         </div>
                                     </div>
                                 </td>
@@ -215,7 +250,8 @@
                                         <i class="dropdown icon"></i>
                                         <div class="menu">
                                             <div class="item ddmi-edit">编辑</div>
-                                            <div class="item ddmi-mail">邮件</div>
+                                            <a class="item" th:href="@{/admin/dynamic(at=${t.creator + (#strings.isEmpty(t.updater) ?  '' :  (',' + t.updater))}, translateId=${t.id})}">沟通</a>
+                                            <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + t.id}">分享</div>
                                             <div th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (t.creator == user.username)}" class="item ddmi-delete">删除</div>
                                         </div>
                                     </div>
@@ -244,12 +280,6 @@
                             </td>
                         </tr>
                     </tbody>
-                    <!-- <tfoot>
-                            <tr>
-                                <td colspan="6">
-                                </td>
-                            </tr>
-                        </tfoot> -->
                 </table>
                 <!-- </div> -->
                 <!-- <div class="ui segment"> -->
@@ -291,17 +321,108 @@
     <input type="hidden" name="page.size" th:value="${page.size}" />
     <input type="hidden" name="projectId" th:value="${projectId}" />
     <input type="hidden" name="project.languageId" th:value="${project != null ? project.language.id : ''}" />
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:name="${u.username}" th:value="${u.name}" />
+    <!-- 
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
-    <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
+     -->
+    <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
+    <script type="text/javascript" th:src="@{/lib/paste.min.js}" src="../../static/lib/paste.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/scrollTo/jquery.scrollTo.min.js}" src="../../static/lib/scrollTo/jquery.scrollTo.min.js"></script>
+    <!-- <script type="text/javascript" th:src="@{/lib/dropzone/dropzone.min.js}" src="../../static/lib/dropzone/dropzone.min.js"></script> -->
+    <script type="text/javascript" th:src="@{/lib/fancybox/jquery.fancybox.pack.js}" src="../../static/lib/fancybox/jquery.fancybox.pack.js"></script>
+    <script type="text/javascript" th:src="@{/lib/autosize.min.js}" src="../../static/lib/autosize.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/clipboard.min.js}" src="../../static/lib/clipboard.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
+
+        jQuery('.timeago').timeago();
+        $(".fancybox-image").fancybox({
+            loop: false
+        });
+
+        // --------------------------------------------------------------------------------- username mapping to name start
+        Utils.showMappedTxt('.mapping-user');
+        // --------------------------------------------------------------------------------- username mapping to name end
+
+        var clipboard = new Clipboard('.btn-share');
+
+        clipboard.on('success', function(e) {
+            var $btn = $(e.trigger);
+            var msg = $btn.hasClass('btn-share') ? '分享链接复制到剪贴板成功!' : '内容复制到剪贴板成功!';
+            toastr.success(msg);
+        });
+
+        clipboard.on('error', function(e) {
+            toastr.success('复制到剪贴板失败!');
+        });
+
+        // ---------------------------------------------------------------------------------clipboard paste image start
+        function pasteImage(evt, data) {
+            var $txt = $(evt.currentTarget);
+            var tid = $txt.closest('tr').attr('data-id');
+
+            $.post('/admin/translate/base64', {
+                id: tid,
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    // console.log(data);
+                    $imgs = $txt.closest('td').find('.files-container').removeClass('ad-hidden').find('.images');
+
+                    var $img = $('<a rel="" href="" class="ui bordered image fancybox-image"><i class="remove circle link big red icon btn-delete-file"></i><img src=""></a>')
+                        .attr('rel', 'fancybox-group-' + tid)
+                        .attr('data-id', data.data.id)
+                        .attr('href', data.data.path + data.data.uuidName);
+
+                    $img.find('img').attr('src', data.data.path.replace('/0/', '/120/') + data.data.uuidName);
+
+                    $imgs.append($img);
+
+                    toastr.success('上传图片成功!');
+                }
+            });
+        }
+
+        $('.tb-translate .pp-translate-file').pastableNonInputable().on('pasteImage', pasteImage).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        }).on('mouseover', function(event) {
+            event.preventDefault();
+            $(this).click();
+        });;
+
+        $('.tb-translate .fm-language textarea').pastableTextarea().on('pasteImage', pasteImage).on('pasteImageError', function(ev, data) {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
+        });
+        // ---------------------------------------------------------------------------------clipboard paste image end
+
+        $('body').on('click', '.btn-delete-file', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            $btn = $(this);
+            $.post('/admin/translate/deleteFile', {
+                fileId: $btn.closest('.image').attr('data-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    $imgs = $btn.closest('.images').find('.image');
+                    if ($imgs.size() == 1) {
+                        $btn.closest('.files-container').addClass('ad-hidden');
+                    }
+                    $btn.closest('.image').remove();
+
+                    toastr.success('图片删除成功!');
+                } else {
+                    toastr.error('图片删除失败!');
+                }
+            });
+        });
 
         /**
          * 精简URI(将查询参数值为空的参数移除掉)
@@ -322,8 +443,8 @@
         $('table').tablesort().data('tablesort');
         $('.ui.checkbox').checkbox();
         $('.ui.dropdown').dropdown();
-        $('.popup').popup();
-        $('.pp-history').popup({
+        // $('.popup').popup();
+        $('.pp-history,.pp-files').popup({
             on: 'click',
             inline: true,
             hoverable: true,
@@ -347,16 +468,6 @@
 
         $('.dd-project .menu a.item, .ui.pagination.menu a.item').each(function(index, el) {
             uriSimple(el);
-        });
-
-        var simplemde = new SimpleMDE({
-            element: $(".ad-translate-mail textarea.ta-markdown")[0],
-            autoDownloadFontAwesome: false,
-            autosave: {
-                enabled: true,
-                delay: 5000,
-                uniqueId: "translate-talk-mail"
-            }
         });
 
         var source = [];
@@ -478,11 +589,7 @@
         });
 
         $('body').on('click', '.ui.dropdown.dd-row-watchers .ui.label', function(event) {
-            if (url('?projectId')) {
-                window.location.href = url('path') + '?projectId=' + url('?projectId') + '&creator=' + $(this).attr('data-value');
-            } else {
-                window.location.href = url('path') + '?creator=' + $(this).attr('data-value');
-            }
+            window.location.href = 'admin/dynamic?at=' + $(this).attr('data-value') + '&translateId=' + $(this).closest('tr').attr('data-id');
         });
 
         $('.ui.dropdown.dd-row-watchers').each(function(index, el) {
@@ -724,56 +831,6 @@
             }
         });
 
-        $('.tb-translate').on('click', '.ddmi-mail', function(event) {
-            var $btn = $(this);
-
-            $('.ad-translate-mail').modal({
-                autofocus: false,
-                onShow: function() {
-                    // 设置默认讨论邮件发送对象: 项目关注者, 自己, 创建者
-                    var usernames = [];
-                    $btn.closest('td').children('input:hidden[name]').each(function(index, el) {
-                        var username = $(el).val();
-                        if (usernames.indexOf(username) < 0) {
-                            usernames.push(username);
-                        }
-                    });
-                    $('.ad-translate-mail .dd-mailUsers').dropdown('set selected', usernames);
-                },
-                onApprove: function() {
-
-                    if (!$.trim(simplemde.value())) {
-                        toastr.error('邮件讨论内容不能为空!');
-                        return false;
-                    }
-
-                    var precontent = '';
-
-                    if (url('?projectId')) {
-                        precontent = '<h3><a href="' + baseURL + 'admin/translate?projectId=' + url('?projectId') + '&id=' + $btn.closest('tr').attr('data-id') + '">点击查看当前邮件讨论针对的翻译</a></h3>';
-                    } else {
-                        precontent = '<h3><a href="' + baseURL + 'admin/translate?id=' + $btn.closest('tr').attr('data-id') + '">点击查看当前邮件讨论针对的翻译</a></h3>';
-                    }
-
-                    var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + precontent + '<hr/>' + simplemde.markdown(simplemde.value())).wrap('<div/>').parent().html();
-
-                    $.post('admin/user/batchMail', {
-                        baseURL: baseURL,
-                        users: $('.ad-translate-mail .dd-mailUsers').dropdown('get value'),
-                        title: $('.ad-translate-mail input[name="title"]').val(),
-                        content: html
-                    }, function(data, textStatus, xhr) {
-                        if (data.success) {
-                            toastr.success('操作成功!');
-                        } else {
-                            toastr.error(data.data, '操作失败!');
-                        }
-                    });
-                }
-            }).modal('show');
-
-        });
-
         function updateHandler($ta) {
 
             if (typeof($ta.attr('title')) == "undefined" && !$ta.val()) {
@@ -806,7 +863,7 @@
             if (event.ctrlKey && event.keyCode == 13) {
                 updateHandler($ta);
             }
-        });;
+        });
 
     });
     </script>

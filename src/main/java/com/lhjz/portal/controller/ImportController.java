@@ -163,24 +163,25 @@ public class ImportController extends BaseController {
 					if (translateItem.getLanguage().getId()
 							.equals(languageId)) {
 						language = translateItem.getLanguage();
+
+						String oldContent = translateItem.getContent();
 						// 翻译内容变动(如果更新翻译内容为空,则不进行更新)
-						if (StringUtil.isNotEmpty(kvMaps.get(key)) && !kvMaps
-								.get(key).equals(translateItem.getContent())) {
+						if (StringUtil.isNotEmpty(kvMaps.get(key))
+								&& !kvMaps.get(key).equals(oldContent)) {
 
 							TranslateItemHistory translateItemHistory = new TranslateItemHistory();
 							translateItemHistory.setCreateDate(new Date());
+							translateItemHistory.setCreator(WebUtil
+									.getUsername());
+							translateItemHistory.setItemContent(oldContent);
 							translateItemHistory
-									.setCreator(WebUtil.getUsername());
-							translateItemHistory
-									.setItemContent(translateItem.getContent());
-							translateItemHistory.setItemCreateDate(
-									translateItem.getUpdateDate() != null
-											? translateItem.getUpdateDate()
-											: translateItem.getCreateDate());
-							translateItemHistory.setItemCreator(
-									translateItem.getUpdater() != null
-											? translateItem.getUpdater()
-											: translateItem.getCreator());
+									.setItemCreateDate(translateItem
+											.getUpdateDate() != null ? translateItem
+											.getUpdateDate() : translateItem
+											.getCreateDate());
+							translateItemHistory.setItemCreator(translateItem
+									.getUpdater() != null ? translateItem
+									.getUpdater() : translateItem.getCreator());
 							translateItemHistory
 									.setTranslateItem(translateItem);
 
@@ -193,6 +194,10 @@ public class ImportController extends BaseController {
 							translateItem.setStatus(Status.Updated);
 
 							translateItems2.add(translateItem);
+
+							log(Action.Update, Target.Translate,
+									translate2.getId(), kvMaps.get(key),
+									oldContent);
 
 							translates3.add(translate2);
 						}
@@ -212,6 +217,9 @@ public class ImportController extends BaseController {
 					translate2.getTranslateItems().add(translateItem);
 
 					translateItems2.add(translateItem);
+
+					log(Action.Update, Target.Translate, translate2.getId(),
+							kvMaps.get(key));
 
 					translates3.add(translate2);
 				}
@@ -332,6 +340,8 @@ public class ImportController extends BaseController {
 			translate.getLabels().addAll(labels2);
 
 			translate.setSearch(translate.toString());
+
+			log(Action.Create, Target.Translate, translate.getId());
 		}
 
 		translateRepository.save(translates2);
@@ -344,7 +354,7 @@ public class ImportController extends BaseController {
 			mail2.addHref("新增", baseURL, translateAction, projectId, newLabel);
 		}
 
-		log(Action.Import, Target.Import, content);
+		// log(Action.Import, Target.Import, content);
 
 		final Mail mail = Mail.instance();
 
@@ -432,7 +442,7 @@ public class ImportController extends BaseController {
 			}
 
 			String data = JsonUtil.toJson(root);
-			log(Action.Export, Target.Import, data);
+			// log(Action.Export, Target.Import, data);
 
 			return RespBody.succeed(data).addMsg(map.size());
 		} else {
@@ -448,7 +458,7 @@ public class ImportController extends BaseController {
 			Collections.sort(list);
 
 			String data = StringUtil.join("\r\n", list);
-			log(Action.Export, Target.Import, data);
+			// log(Action.Export, Target.Import, data);
 
 			return RespBody.succeed(data).addMsg(map.size());
 		}

@@ -10,11 +10,15 @@ package com.lhjz.portal.pojo;
 public class Enum {
 
 	public static enum Status {
-		Updated, Unknow, Normal, Deleted, Bultin, New, Opening, Analyzing, Accepted, Processing, Resolved, Closed, Ignored, Failed, Checked;
+		Updated, Unknow, Normal, Deleted, Bultin, New, Opening, Analyzing, Accepted, Processing, Resolved, Closed, Ignored, Failed, Checked, Readed;
 	}
 
 	public static enum Action {
-		Create, Read, Update, Delete, Upload, Visit, Import, Export;
+		Create, Read, Update, Delete, Upload, Visit, Import, Export, Vote;
+	}
+
+	public static enum FileType {
+		Image, Attachment;
 	}
 
 	public static enum Prop {
@@ -39,5 +43,9 @@ public class Enum {
 
 	public static enum Role {
 		ROLE_USER, ROLE_ADMIN;
+	}
+
+	public static enum VoteType {
+		Zan, Cai;
 	}
 }

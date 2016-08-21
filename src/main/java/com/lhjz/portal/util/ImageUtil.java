@@ -17,9 +17,13 @@ import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -27,6 +31,9 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.MemoryCacheImageInputStream;
+
+import sun.misc.BASE64Decoder;
+import sun.misc.BASE64Encoder;
 
 /**
  * 图片处理工具类.
@@ -38,6 +45,7 @@ import javax.imageio.stream.MemoryCacheImageInputStream;
  * @version 1.0
  * 
  */
+@SuppressWarnings("restriction")
 public final class ImageUtil {
 
 	private static final int IMAGE_SIZE = 120;
@@ -253,8 +261,8 @@ public final class ImageUtil {
 	 * @param cols
 	 *            目标切片列数。默认2，必须是范围 [1, 20] 之内
 	 */
-	public final static void cut2(String srcImageFile, String descDir, int rows,
-			int cols) {
+	public final static void cut2(String srcImageFile, String descDir,
+			int rows, int cols) {
 
 		try {
 
@@ -299,8 +307,8 @@ public final class ImageUtil {
 					for (int j = 0; j < cols; j++) {
 						// 四个参数分别为图像起点坐标和宽高
 						// 即: CropImageFilter(int x,int y,int width,int height)
-						cropFilter = new CropImageFilter(j * destWidth,
-								i * destHeight, destWidth, destHeight);
+						cropFilter = new CropImageFilter(j * destWidth, i
+								* destHeight, destWidth, destHeight);
 						img = Toolkit.getDefaultToolkit().createImage(
 								new FilteredImageSource(image.getSource(),
 										cropFilter));
@@ -310,8 +318,8 @@ public final class ImageUtil {
 						g.drawImage(img, 0, 0, null); // 绘制缩小后的图
 						g.dispose();
 						// 输出为文件
-						ImageIO.write(tag, "JPEG", new File(
-								descDir + "_r" + i + "_c" + j + ".jpg"));
+						ImageIO.write(tag, "JPEG", new File(descDir + "_r" + i
+								+ "_c" + j + ".jpg"));
 					}
 				}
 			}
@@ -378,8 +386,8 @@ public final class ImageUtil {
 					for (int j = 0; j < cols; j++) {
 						// 四个参数分别为图像起点坐标和宽高
 						// 即: CropImageFilter(int x,int y,int width,int height)
-						cropFilter = new CropImageFilter(j * destWidth,
-								i * destHeight, destWidth, destHeight);
+						cropFilter = new CropImageFilter(j * destWidth, i
+								* destHeight, destWidth, destHeight);
 						img = Toolkit.getDefaultToolkit().createImage(
 								new FilteredImageSource(image.getSource(),
 										cropFilter));
@@ -389,8 +397,8 @@ public final class ImageUtil {
 						g.drawImage(img, 0, 0, null); // 绘制缩小后的图
 						g.dispose();
 						// 输出为文件
-						ImageIO.write(tag, "JPEG", new File(
-								descDir + "_r" + i + "_c" + j + ".jpg"));
+						ImageIO.write(tag, "JPEG", new File(descDir + "_r" + i
+								+ "_c" + j + ".jpg"));
 					}
 				}
 			}
@@ -483,12 +491,11 @@ public final class ImageUtil {
 			g.drawImage(src, 0, 0, width, height, null);
 			g.setColor(color);
 			g.setFont(new Font(fontName, fontStyle, fontSize));
-			g.setComposite(
-					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
+					alpha));
 			// 在指定坐标绘制水印文字
-			g.drawString(pressText,
-					(width - (getLength(pressText) * fontSize)) / 2 + x,
-					(height - fontSize) / 2 + y);
+			g.drawString(pressText, (width - (getLength(pressText) * fontSize))
+					/ 2 + x, (height - fontSize) / 2 + y);
 			g.dispose();
 			ImageIO.write((BufferedImage) image, "JPEG",
 					new File(destImageFile));// 输出到文件流
@@ -536,12 +543,11 @@ public final class ImageUtil {
 			g.drawImage(src, 0, 0, width, height, null);
 			g.setColor(color);
 			g.setFont(new Font(fontName, fontStyle, fontSize));
-			g.setComposite(
-					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
+					alpha));
 			// 在指定坐标绘制水印文字
-			g.drawString(pressText,
-					(width - (getLength(pressText) * fontSize)) / 2 + x,
-					(height - fontSize) / 2 + y);
+			g.drawString(pressText, (width - (getLength(pressText) * fontSize))
+					/ 2 + x, (height - fontSize) / 2 + y);
 			g.dispose();
 			ImageIO.write((BufferedImage) image, "JPEG",
 					new File(destImageFile));
@@ -582,8 +588,8 @@ public final class ImageUtil {
 			Image src_biao = ImageIO.read(new File(pressImg));
 			int wideth_biao = src_biao.getWidth(null);
 			int height_biao = src_biao.getHeight(null);
-			g.setComposite(
-					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
+					alpha));
 			g.drawImage(src_biao, (wideth - wideth_biao) / 2,
 					(height - height_biao) / 2, wideth_biao, height_biao, null);
 			// 水印文件结束
@@ -643,8 +649,8 @@ public final class ImageUtil {
 			Image src_biao = ImageIO.read(new File(pressImg));
 			int wideth_biao = src_biao.getWidth(null);
 			int height_biao = src_biao.getHeight(null);
-			g.setComposite(
-					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
+					alpha));
 			g.drawImage(src_biao, (wideth - wideth_biao) / 2,
 					(height - height_biao) / 2, wideth_biao, height_biao, null);
 			// 水印文件结束
@@ -692,11 +698,10 @@ public final class ImageUtil {
 			g.drawImage(src, 0, 0, width, height, null);
 			g.setColor(color);
 			g.setFont(new Font(fontName, fontStyle, fontSize));
-			g.setComposite(
-					AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
-			g.drawString(pressText,
-					(width - (getLength(pressText) * fontSize)) / 2 + x,
-					(height - fontSize) / 2 + y);
+			g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,
+					alpha));
+			g.drawString(pressText, (width - (getLength(pressText) * fontSize))
+					/ 2 + x, (height - fontSize) / 2 + y);
 			g.dispose();
 			ImageIO.write((BufferedImage) image, "jpg", img);
 		} catch (Exception e) {
@@ -716,8 +721,7 @@ public final class ImageUtil {
 	 * @param bb
 	 *            比例不对时是否需要补白
 	 */
-	public static void resize(String filePath, int height, int width,
-			boolean bb) {
+	public static void resize(String filePath, int height, int width, boolean bb) {
 		try {
 			double ratio = 0.0; // 缩放比例
 			File f = new File(filePath);
@@ -769,7 +773,6 @@ public final class ImageUtil {
 	 * @return
 	 * @throws IOException
 	 */
-	@SuppressWarnings("restriction")
 	public static String getImageType(String path) throws IOException {
 		FileInputStream fis = new FileInputStream(path);
 
@@ -856,4 +859,56 @@ public final class ImageUtil {
 
 		return typeSet.contains(suffix.toLowerCase());
 	}
+
+	/**
+	 * 将本地图片进行Base64位编码
+	 * 
+	 * @param imgUrl
+	 *            图片的url路径，如http://.....xx.jpg
+	 * @return
+	 */
+	public static String encodeImgageToBase64(File imageFile) {// 将图片文件转化为字节数组字符串，并对其进行Base64编码处理
+		ByteArrayOutputStream outputStream = null;
+		try {
+			BufferedImage bufferedImage = ImageIO.read(imageFile);
+			outputStream = new ByteArrayOutputStream();
+			ImageIO.write(bufferedImage, "jpg", outputStream);
+		} catch (MalformedURLException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		// 对字节数组Base64编码
+		BASE64Encoder encoder = new BASE64Encoder();
+		return encoder.encode(outputStream.toByteArray());// 返回Base64编码过的字节数组字符串
+	}
+
+	// base64字符串转化成图片
+	public static boolean decodeBase64ToImage(String base64,
+			String imgFilePath) { // 对字节数组字符串进行Base64解码并生成图片
+
+		if (base64 == null) { // 图像数据为空
+			return false;
+		}
+
+		BASE64Decoder decoder = new BASE64Decoder();
+		try {
+			// Base64解码
+			byte[] b = decoder.decodeBuffer(base64);
+			for (int i = 0; i < b.length; ++i) {
+				if (b[i] < 0) {// 调整异常数据
+					b[i] += 256;
+				}
+			}
+			// 生成jpeg图片
+			OutputStream out = new FileOutputStream(imgFilePath);
+			out.write(b);
+			out.flush();
+			out.close();
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
 }

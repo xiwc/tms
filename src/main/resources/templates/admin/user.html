@@ -65,13 +65,45 @@
                                 <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
                                 <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
                                 <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div>
+                                <!-- <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div> -->
                             </td>
                         </tr>
                     </tbody>
                 </table>
                 <!-- </div> -->
-                <div class="ui styled fluid accordion" sec:authorize="hasRole('ROLE_ADMIN')">
+                <div class="ui styled fluid accordion">
+                    <div class="title">
+                        <i class="dropdown icon"></i> 用户组管理
+                    </div>
+                    <div class="content">
+                        <div class="ui segment" sec:authorize="hasRole('ROLE_ADMIN')">
+                            <div class="ui blue button btn-add-group">添加</div>
+                        </div>
+                        <table class="ui sortable celled striped compact table segment table-user-group">
+                            <thead>
+                                <th>组名</th>
+                                <th>成员</th>
+                                <!-- <th>角色</th> -->
+                                <th>创建时间</th>
+                                <th>状态</th>
+                                <th sec:authorize="hasRole('ROLE_ADMIN')">处理</th>
+                            </thead>
+                            <tbody th:remove="all-but-first">
+                                <tr th:each="g : ${groups}" th:attr="data-id=${g.id}">
+                                    <td class="groupName" th:title="${g.groupName}" th:text="${g.groupName}">groupName</td>
+                                    <td>
+                                        <div class="ui basic label mapping-user" th:each="m : ${g.groupMembers}" th:title="${m.username}" th:text="${m.username}"></div>
+                                    </td>
+                                    <td th:text="${#calendars.format(g.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
+                                    <td th:text="${g.status}"></td>
+                                    <td sec:authorize="hasRole('ROLE_ADMIN')">
+                                        <div class="ui compact tiny primary button btn-edit-group">编辑</div>
+                                        <div class="ui compact tiny red button btn-del-group">删除</div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="title" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')')}">
                         <i class="dropdown icon"></i> 批量创建用户
                     </div>
@@ -95,7 +127,7 @@
                                 <i class="dropdown icon"></i>
                                 <div class="default text">用户</div>
                                 <div class="menu">
-                                    <div th:each="u : ${users}" class="item" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
+                                    <div th:each="u : ${users}" class="item" th:if="${u.enabled}" th:attr="data-value=${u.username}" th:title="${u.username + (#strings.isEmpty(u.name) ? '' : '[' + u.name + ']')}" th:text="${(#strings.isEmpty(u.name) ? u.username : u.name)}"></div>
                                 </div>
                             </div>
                             <div class="ui checkbox ck-selectAll">
@@ -109,10 +141,6 @@
                                 <label>标题:</label>
                                 <input type="text" name="title" th:value="${'TMS翻译协作系统公告'}" value="TMS翻译协作系统公告" />
                             </div>
-                            <!-- <div class="field">
-                                <label>内容:</label>
-                                <textarea placeholder="公告内容(支持markdown语法)" name="content" rows="10"></textarea>
-                            </div> -->
                             <div class="field markdown-body">
                                 <label>内容:</label>
                                 <textarea class="ta-md" name="content" rows="10"></textarea>
@@ -127,14 +155,20 @@
     <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-user-add"></div>
     <div th:replace="admin/template :: ad-user-edit"></div>
+    <div th:replace="admin/template :: ad-user-group-add"></div>
+    <div th:replace="admin/template :: ad-user-group-edit"></div>
     <div th:include="admin/template :: ad-page-common"></div>
     <div th:replace="admin/template :: ad-page-dimmer"></div>
+    <input type="hidden" th:each="u : ${users}" data-group="users" th:name="${u.username}" th:value="${u.name}" />
+    <!-- 
     <script type="text/javascript" th:src="@{/lib/jquery-1.11.1.min.js}" src="../../static/lib/jquery-1.11.1.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/semantic/semantic.min.js}" src="../../static/lib/semantic/semantic.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/jquery.tablesort.min.js}" src="../../static/lib/jquery.tablesort.min.js"></script>
     <script type="text/javascript" th:src="@{/lib/url.min.js}" src="../../static/lib/url.min.js"></script>
-    <script th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
+    <script type="text/javascript" th:src="@{/lib/toastr/toastr.js}" src="../../static/lib/toastr/toastr.js"></script>
     <script type="text/javascript" th:src="@{/lib/showdown.min.js}" src="../../static/lib/showdown.min.js"></script>
+     -->
+    <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
@@ -143,7 +177,96 @@
         $('.ui.checkbox').checkbox();
         $('.pp').popup();
         $('.ui.dropdown.dd-mailUsers').dropdown();
+        $('.ui.dropdown.dd-group-member').dropdown();
         $('.ui.accordion').accordion();
+
+        // --------------------------------------------------------------------------------- username mapping to name start
+        Utils.showMappedTxt('.mapping-user');
+        // --------------------------------------------------------------------------------- username mapping to name end
+
+
+        // -------------------------------------------------------------user group start
+        $('.btn-add-group').click(function(event) {
+            $('.ad-user-group-add').modal({
+                onApprove: function() {
+                    $.post('admin/user/createGroup', {
+                        baseURL: baseURL,
+                        groupName: $(this).find('input[name="groupName"]').val()
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            toastr.success('操作成功!');
+                            window.location.reload();
+                        } else {
+                            toastr.error(data.data, '操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-user-group').on('click', '.btn-del-group', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+
+            $('.ad-handle-confirm').modal({
+                onApprove: function() {
+                    $.post('admin/user/deleteGroup', {
+                        baseURL: baseURL,
+                        groupId: $btn.closest('tr').attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            toastr.success('操作成功!');
+                            $btn.closest('tr').remove();
+                        } else {
+                            toastr.error(data.data, '操作失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
+
+        $('.table-user-group').on('click', '.btn-edit-group', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+
+            $.get('/admin/user/groupMemembers', {
+                groupId: $btn.closest('tr').attr('data-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    $('.ad-user-group-edit').modal({
+                        onShow: function() {
+                            var gms = data.data;
+                            var gmArr = [];
+                            $.each(gms, function(index, gm) {
+                                gmArr.push(gm.username);
+                            });
+                            $(this).find('.dd-group-member').dropdown('clear').dropdown('set selected', gmArr);
+                            $(this).find('.ui.message span').text($btn.closest('tr').find('td.groupName').text());
+                        },
+                        onApprove: function() {
+                            var $md = $(this);
+                            $.post('admin/user/updateGroupMembers', {
+                                baseURL: baseURL,
+                                groupId: $btn.closest('tr').attr('data-id'),
+                                usernames: $md.find('.dd-group-member').dropdown('get value')
+                            }, function(data, textStatus, xhr) {
+                                if (data.success) {
+                                    toastr.success('操作成功!');
+                                    window.location.reload();
+                                } else {
+                                    toastr.error(data.data, '操作失败!');
+                                }
+                            });
+                        }
+                    }).modal('show');
+                } else {
+                    toastr.error(data.data, '操作失败!');
+                }
+            });
+
+        });
+
+        // -------------------------------------------------------------user group end
 
         var simplemde = null;
         if ($(".ta-md").size() > 0) {
@@ -270,7 +393,7 @@
                             $btn.remove();
                             toastr.success('停用操作成功!');
                         } else {
-                            toastr.error('停用操作失败!');
+                            toastr.error(data.data, '停用操作失败!');
                         }
                     });
                 }
@@ -291,7 +414,7 @@
                             $btn.remove();
                             toastr.success('开启操作成功!');
                         } else {
-                            toastr.error('开启操作失败!');
+                            toastr.error(data.data, '开启操作失败!');
                         }
                     });
                 }
@@ -367,7 +490,7 @@
                         }
                     }).modal('show');
                 } else {
-                    toastr.error("获取用户信息失败!");
+                    toastr.error(data.data, "获取用户信息失败!");
                 }
             });
 
