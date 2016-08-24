@@ -30,5 +30,8 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 	@Query(value = "SELECT COUNT(*) FROM chat WHERE id > ?1", nativeQuery = true)
 	long countQueryRecent(Long lastId);
 
+	@Query(value = "SELECT COUNT(*) FROM chat_at WHERE at_user = ?1 AND chat_id > ?2", nativeQuery = true)
+	long countQueryRecentAt(String atUsername, Long lastId);
+
 	Page<Chat> findByContentLike(String search, Pageable pageable);
 }
