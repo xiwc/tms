@@ -106,6 +106,7 @@ public class AdminController extends BaseController {
 		model.addAttribute("cntUser", userRepository.count());
 		model.addAttribute("cntLanguage", languageRepository.count());
 		model.addAttribute("cntTranslate", translateRepository.count());
+		model.addAttribute("cntChat", chatRepository.count());
 
 		return "admin/index";
 	}
