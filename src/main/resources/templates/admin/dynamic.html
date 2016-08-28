@@ -2105,6 +2105,9 @@
                         log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
                     $("#logMoreTpl").tmpl(data.data.content).appendTo('.fd-dynamic');
+
+                    $('.btn-log-more').text('加载更多(' + (data.data.totalElements - (data.data.number + 1) * data.data.size) + ')');
+
                     jQuery(".timeago").timeago();
                     Utils.showMappedTxt('.mapping-user');
 
