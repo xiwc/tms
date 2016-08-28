@@ -53,7 +53,7 @@
             inc++;
             oneHandler();
             // TODO for debugging
-            console.log(interval);
+            // console.log(interval);
 
             if (inc > tolerate) { // 超过轮询容忍次数内
 
