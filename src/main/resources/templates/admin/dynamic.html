@@ -253,6 +253,10 @@
         text-align: center;
     }
     
+    .editor-toolbar {
+        z-index: 2;
+    }
+    
     .editor-toolbar.fullscreen {
         z-index: 999!important;
     }
@@ -1270,6 +1274,9 @@
                     "guide"
 
                 ],
+                insertTexts: {
+                    table: ["", "\n\n| 列1 | 列2 | 列3 |\n| ------ | ------ | ------ |\n| 文本 | 文本 | 文本 |\n\n"],
+                },
                 renderingConfig: {
                     codeSyntaxHighlighting: true,
                 },
@@ -1823,6 +1830,15 @@
             event.preventDefault();
             simplemde.clearAutosavedValue();
             simplemde.value('');
+            simplemde.autosave();
+
+            if (simplemde.isPreviewActive()) {
+                $('.fm-reply .editor-toolbar a.fa.fa-eye').click();
+            }
+            if (simplemde.isFullscreenActive()) {
+                $('.fm-reply .editor-toolbar a.fa.fa-arrows-alt').click();
+            }
+            
             record.back();
         });
 
