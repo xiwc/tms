@@ -621,9 +621,9 @@
                                     </div>
                                 </div>
                                 <div class="ui buttons">
-                                    <button class="cbutton cbutton--effect-novak ui button btn-chat-clear">取消</button>
+                                    <button class="cbutton cbutton--effect-novak ui button btn-chat-clear" title="取消(Esc)">取消</button>
                                     <div class="or"></div>
-                                    <button class="cbutton cbutton--effect-novak ui positive button btn-chat-submit">提交</button>
+                                    <button class="cbutton cbutton--effect-novak ui positive button btn-chat-submit" title="提交(Ctrl+Enter)">提交</button>
                                 </div>
                                 <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
                                     <i class="refresh icon"></i>
@@ -1301,13 +1301,17 @@
 
         // TODO simplemde edit also keyup
         simplemde.codemirror.on('keyup', function(cm, e) {
-            if (e.ctrlKey && e.keyCode == 13) {
+            if (e.ctrlKey && e.keyCode == 13) { // Ctrl+Enter
                 $('.btn-chat-submit').click();
+            } else if (e.keyCode == 27) { // Esc
+                $('.btn-chat-clear').click();
             }
         });
         simplemdeEdit.codemirror.on('keyup', function(cm, e) {
-            if (e.ctrlKey && e.keyCode == 13) {
+            if (e.ctrlKey && e.keyCode == 13) { // Ctrl+Enter
                 $('.ad-chat-edit .btn-chat-edit-submit').click();
+            } else if (e.keyCode == 27) { // Esc
+                $('.ad-chat-edit .btn-chat-edit-clear').click();
             }
         });
 
