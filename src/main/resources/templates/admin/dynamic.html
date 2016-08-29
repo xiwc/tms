@@ -624,8 +624,14 @@
                                 <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
                                     <i class="refresh icon"></i>
                                 </a>
-                                <div class="ui right floated compact basic segment" style="margin-top: 0px; padding-top: 8px;">
+                                <div class="ui right floated compact basic segment" style="margin-top: 0px; padding-top: 8px; margin-left: 0; padding-left: 0;">
                                     <div class="ui fitted toggle checkbox ck-auto-chat-refresh" title="开启自动刷新消息">
+                                        <input type="checkbox">
+                                        <label></label>
+                                    </div>
+                                </div>
+                                <div class="ui right floated compact basic segment" style="margin-top: 0px; padding-top: 8px; margin-left: 0; padding-left: 0;">
+                                    <div class="ui fitted toggle checkbox ck-only-at-msg" title="只提醒@沟通消息桌面通知">
                                         <input type="checkbox">
                                         <label></label>
                                     </div>
@@ -803,6 +809,31 @@
         }
 
         // ------------------------------------------------------------------------------------- ck-auto-chat-refresh end
+
+        // ------------------------------------------------------------------------------------- ck-only-at-msg start
+
+        var isOnlyAtOn = 0; // 聊天消息自动刷新开关状态
+
+        if (localStorage) {
+            var v = localStorage.getItem('admin/dynamic:only-at-msg');
+            isOnlyAtOn = v ? v : 0;
+        }
+
+        var $onlyAt = $('.ck-only-at-msg');
+        $onlyAt.checkbox({
+            onChecked: function() {
+                localStorage && localStorage.setItem('admin/dynamic:only-at-msg', 1);
+            },
+            onUnchecked: function() {
+                localStorage && localStorage.setItem('admin/dynamic:only-at-msg', 0);
+            }
+        });
+
+        if (isOnlyAtOn != 0) {
+            $onlyAt.checkbox('check');
+        }
+
+        // ------------------------------------------------------------------------------------- ck-only-at-msg end
 
 
         // ------------------------------------------------------------------------------------- fancybox image start
@@ -2147,7 +2178,8 @@
 
             $.get('/admin/chat/poll/unmask', {
                 lastEvtId: $first.size() == 0 ? -1 : $first.attr('data-id'),
-                lastId: $last.size() == 0 ? -1 : $last.attr('data-id')
+                lastId: $last.size() == 0 ? -1 : $last.attr('data-id'),
+                isAt: $onlyAt.checkbox('is checked')
             }, function(data) {
                 if (data.success) {
 

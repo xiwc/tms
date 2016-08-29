@@ -381,9 +381,12 @@ public class ChatController extends BaseController {
 	@RequestMapping(value = { "poll", "poll/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody poll(@RequestParam("lastId") Long lastId,
-			@RequestParam("lastEvtId") Long lastEvtId) {
+			@RequestParam("lastEvtId") Long lastEvtId,
+			@RequestParam(value = "isAt", required = false, defaultValue = "false") Boolean isAt) {
 
-		long cnt = chatRepository.countQueryRecent(lastId);
+		long cnt = isAt ? chatRepository.countQueryRecentAt(
+				WebUtil.getUsername(), lastId) : chatRepository
+				.countQueryRecent(lastId);
 		long cntLogs = logRepository.countQueryRecent(lastEvtId);
 		long cntAtUserNew = chatAtRepository.countAtUserNew(WebUtil
 				.getUsername());
