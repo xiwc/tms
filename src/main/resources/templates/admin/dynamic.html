@@ -538,13 +538,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <button th:unless="${logs.last}" class="fluid ui button btn-log-more">加载更多</button>
+                            <button th:unless="${logs.last}" class="fluid ui button btn-log-more" th:text="${'加载更多(' + (logs.totalElements - (logs.number + 1) * logs.size) + ')'}">加载更多</button>
                         </div>
                     </div>
                     <div class="chat">
                         <div class="ui minimal comments" style="display:none;">
                             <h3 class="ui dividing header">沟通</h3>
-                            <button th:unless="${chats.last}" class="fluid ui button btn-chat-more">加载更多</button>
+                            <button th:unless="${chats.last}" class="fluid ui button btn-chat-more" th:text="${'加载更多(' + (chats.totalElements - (chats.number + 1) * chats.size) + ')'}">加载更多</button>
                             <div class="animated bounceInLeft comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
                                 <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
@@ -585,7 +585,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <button th:unless="${chats.first}" class="fluid ui button btn-chat-pre-more">加载更多</button>
+                            <button th:unless="${chats.first}" class="fluid ui button btn-chat-pre-more" th:text="${'加载更多(' + (chats.number * chats.size) + ')'}">加载更多</button>
                             <form class="ui reply form fm-reply">
                                 <div class="field markdown-body pp-users">
                                     <textarea autofocus="autofocus" class="ta-md"></textarea>
@@ -621,9 +621,9 @@
                                     </div>
                                 </div>
                                 <div class="ui buttons">
-                                    <button class="cbutton cbutton--effect-novak ui button btn-chat-clear">取消</button>
+                                    <button class="cbutton cbutton--effect-novak ui button btn-chat-clear" title="取消(Esc)">取消</button>
                                     <div class="or"></div>
-                                    <button class="cbutton cbutton--effect-novak ui positive button btn-chat-submit">提交</button>
+                                    <button class="cbutton cbutton--effect-novak ui positive button btn-chat-submit" title="提交(Ctrl+Enter)">提交</button>
                                 </div>
                                 <a th:href="@{/admin/dynamic(scroll=${'1'})}" title="刷新消息" class="pp-not ui black circular icon right floated button btn-custom-chat-refresh">
                                     <i class="refresh icon"></i>
@@ -1055,7 +1055,8 @@
                         $btnUp = $('.chat .btn-chat-more');
                     } else {
                         if ($btnUp.size() == 0) {
-                            $btnUp = $('<button class="fluid ui button btn-chat-more">加载更多</button>');
+                            $btnUp = $('<button class="fluid ui button btn-chat-more">加载更多</button>')
+                                .text('加载更多(' + (data.data.totalElements - (data.data.number + 1) * data.data.size) + ')');
                             $btnUp.insertAfter('.chat .comments > h3');
                         }
 
@@ -1067,7 +1068,8 @@
                         $btnDown = $('.chat .btn-chat-pre-more');
                     } else {
                         if ($btnDown.size() == 0) {
-                            $btnDown = $('<button class="fluid ui button btn-chat-pre-more">加载更多</button>');
+                            $btnDown = $('<button class="fluid ui button btn-chat-pre-more">加载更多</button>')
+                                .text('加载更多(' + (data.data.number * data.data.size) + ')');
                             $btnDown.insertBefore('.chat .fm-reply')
                         }
                         $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
@@ -1299,13 +1301,17 @@
 
         // TODO simplemde edit also keyup
         simplemde.codemirror.on('keyup', function(cm, e) {
-            if (e.ctrlKey && e.keyCode == 13) {
+            if (e.ctrlKey && e.keyCode == 13) { // Ctrl+Enter
                 $('.btn-chat-submit').click();
+            } else if (e.keyCode == 27) { // Esc
+                $('.btn-chat-clear').click();
             }
         });
         simplemdeEdit.codemirror.on('keyup', function(cm, e) {
-            if (e.ctrlKey && e.keyCode == 13) {
+            if (e.ctrlKey && e.keyCode == 13) { // Ctrl+Enter
                 $('.ad-chat-edit .btn-chat-edit-submit').click();
+            } else if (e.keyCode == 27) { // Esc
+                $('.ad-chat-edit .btn-chat-edit-clear').click();
             }
         });
 
@@ -1988,6 +1994,8 @@
                     var $more = convertChat(data.data.content, null, false);
 
                     $more.insertAfter($('.btn-chat-more'));
+                    //(chats.totalElements - (chats.number + 1) * chats.size)
+                    $('.btn-chat-more').text('加载更多(' + (data.data.totalElements - (data.data.number + 1) * data.data.size) + ')');
 
                     s2mk();
 
@@ -2021,6 +2029,8 @@
 
                     var $more = convertChat(data.data.content, null, true);
                     $more.insertBefore($('.btn-chat-pre-more'));
+                    // (chats.number * chats.size)
+                    $('.btn-chat-pre-more').text('加载更多(' + (data.data.number * data.data.size) + ')');
 
                     s2mk();
 
@@ -2078,6 +2088,9 @@
                         log.createDate = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                     });
                     $("#logMoreTpl").tmpl(data.data.content).appendTo('.fd-dynamic');
+
+                    $('.btn-log-more').text('加载更多(' + (data.data.totalElements - (data.data.number + 1) * data.data.size) + ')');
+
                     jQuery(".timeago").timeago();
                     Utils.showMappedTxt('.mapping-user');
 
