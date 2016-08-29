@@ -232,7 +232,7 @@
 jQuery.timeago.settings.strings = {
   prefixAgo: null,
   prefixFromNow: "从现在开始",
-  suffixAgo: "之前",
+  suffixAgo: "前",
   suffixFromNow: null,
   seconds: "刚刚",
   minute: "1分钟",
