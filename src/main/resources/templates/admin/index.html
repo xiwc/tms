@@ -15,6 +15,12 @@
     <link rel="stylesheet" th:href="@{/lib/toastr/toastr.css}" href="../../static/lib/toastr/toastr.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/md-github.css}" href="../../static/admin/css/md-github.css" />
     <link rel="stylesheet" type="text/css" th:href="@{/admin/css/admin.css}" href="../../static/admin/css/admin.css" />
+    <style>
+    .ui.fade.reveal {
+        margin: auto;
+        width: 133px;
+    }
+    </style>
 </head>
 
 <body class="admin-index">
@@ -102,7 +108,7 @@
                                 <a target="_blank" class="item" href="http://220.248.17.34:8073/">Jenkins</a>
                                 <a target="_blank" class="item" href="http://220.248.17.34:8063/">Console(测试)</a>
                                 <a target="_blank" class="item" href="http://x-console-test.sh1.newtouch.com/">Console(开发)</a>
-                                <a target="_blank" class="item" href="https://www.draw.io/">绘图(draw)</a>
+                                <!-- <a target="_blank" class="item" href="https://www.draw.io/">绘图(draw)</a> -->
                                 <a target="_blank" class="item" href="https://www.processon.com/">绘图(processon)</a>
                             </div>
                         </div>
@@ -115,9 +121,9 @@
                   <i class="circular users icon"></i>
                   欢迎使用TMS团队协作系统!
                 </h2>
-                <div class="ui container four column stackable centered grid" style="margin-top:50px;">
+                <div class="ui container five column stackable centered grid" style="margin-top:50px;">
                     <div class="aligined centered column">
-                        <div class="ui fade rotate reveal">
+                        <div class="ui move reveal">
                             <div class="visible content centered">
                                 <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
                                   <i class="circular suitcase icon"></i>
@@ -135,7 +141,7 @@
                         </div>
                     </div>
                     <div class="aligined centered column">
-                        <div class="ui fade rotate reveal">
+                        <div class="ui move up reveal">
                             <div class="visible content">
                                 <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
                                   <i class="circular user icon"></i>
@@ -153,10 +159,28 @@
                         </div>
                     </div>
                     <div class="aligined centered column">
-                        <div class="ui fade rotate reveal">
+                        <div class="ui move down reveal">
                             <div class="visible content">
                                 <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
-                                  <i class="circular world icon"></i>
+                                  <i class="circular at icon"></i>
+                                  沟通
+                                </h2>
+                            </div>
+                            <div class="hidden content">
+                                <a th:href="@{/admin/dynamic}" class="ui inverted circular segment" style="width:133px; height:133px;">
+                                    <h2 class="ui inverted header">
+                                        总数:
+                                        <div class="sub header" th:text="${cntChat}">99</div>
+                                    </h2>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="aligined centered column">
+                        <div class="ui fade reveal">
+                            <div class="visible content">
+                                <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
+                                  <i class="circular flag icon"></i>
                                   语言
                                 </h2>
                             </div>
