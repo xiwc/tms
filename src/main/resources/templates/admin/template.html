@@ -85,7 +85,7 @@
     </script>
     <script th:fragment="chatMoreTpl" id="chatMoreTpl" type="text/x-jquery-tmpl">
         <div class="animated bounceInLeft comment ${marked} ${marker}" data-id="${id}">
-            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+            <a class="avatar ui mini circular image" data-value="${creator.username}" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>
                 {{else}}
@@ -232,6 +232,47 @@
                         {{html contentMd}}
                     </div>
                 </div>
+            </div>
+        </div>
+    </script>
+    <!-- 用户消息popup内容模板 -->
+    <script th:fragment="userInfoPpTpl" id="userInfoPpTpl" type="text/x-jquery-tmpl">
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <!-- <img class="right floated mini ui image" src="/images/avatar/large/elliot.jpg"> -->
+                    <div class="header">
+                        ${username}
+                    </div>
+                    <div class="meta">
+                        创建于<span class="timeago" title="${createDateFormat}">${createDateFormat}</span>
+                    </div>
+                    <div class="description">
+                        <div class="ui middle aligned divided list">
+                            <div class="item" style="padding-top: 5px!important; padding-bottom: 5px!important;">
+                                <div class="content">
+                                    <a class="header" style="display: inline;">姓名</a> ${name}
+                                </div>
+                            </div>
+                            <div class="item" style="padding-top: 5px!important; padding-bottom: 5px!important;">
+                                <div class="content">
+                                    <a class="header" style="display: inline;">邮箱</a> <a href="mailto:${mails}">${mails}</a>
+                                </div>
+                            </div>
+                            <div class="item" style="padding-top: 5px!important; padding-bottom: 5px!important;">
+                                <div class="content">
+                                    <a class="header" style="display: inline;">状态</a> ${sts}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="extra content">
+                    <div class="ui two buttons">
+                        <div class="ui basic green button">Approve</div>
+                        <div class="ui basic red button">Decline</div>
+                    </div>
+                </div> -->
             </div>
         </div>
     </script>

@@ -549,7 +549,7 @@
                             <h3 class="ui dividing header">沟通</h3>
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-more" th:text="${'加载更多(' + (chats.totalElements - (chats.number + 1) * chats.size) + ')'}">加载更多</button>
                             <div class="animated bounceInLeft comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
-                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                                <a class="avatar ui mini circular image" th:attr="data-value=${c.creator.username}" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
@@ -736,6 +736,7 @@
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
+    <div th:replace="admin/template :: userInfoPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
     <div th:replace="admin/template :: chatAtsTpl"></div>
     <div th:replace="admin/template :: chatStowsTpl"></div>
@@ -2407,6 +2408,46 @@
                             chat.contentMd = simplemde.markdown(preParse(chat.content));
 
                             $("#chatMsgPpTpl").tmpl(data.data).appendTo($pp.empty());
+                            $('.pp-translate .timeago').timeago();
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        });
+
+        // 用户消息popup
+        $('body').on('mouseover', '#context .chat span[data-value].at-user:not(.pp-not),#context .chat a[data-value].avatar:not(.pp-not),#context .chat a[data-value].author:not(.pp-not)', function(event) {
+            event.preventDefault();
+            var $a = $(this);
+
+            if ($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
+
+            $(this).popup({
+                popup: $('.pp-translate'),
+                hoverable: true,
+                inline: false,
+                movePopup: false,
+                position: 'top left',
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this).html('加载中...');
+                    $.get('admin/user/get', {
+                        username: $a.attr('data-value')
+                    }, function(data) {
+                        if (data.success) {
+                            var user = data.data;
+                            var d = new Date(user.createDate);
+                            user.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            user.sts = user.enabled ? '启用中' : '已禁用';
+
+                            $("#userInfoPpTpl").tmpl(data.data).appendTo($pp.empty());
                             $('.pp-translate .timeago').timeago();
                         } else {
                             toastr.error(data.data, "加载失败!");
