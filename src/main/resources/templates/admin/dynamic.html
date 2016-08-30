@@ -2455,7 +2455,10 @@
                     hide: 300
                 },
                 onShow: function() {
-                    var $pp = $(this).html('加载中...');
+                    $(this).html('加载中...');
+                },
+                onVisible: function() {
+                    var $pp = $(this);
                     $.get('admin/user/get', {
                         username: $a.attr('data-value')
                     }, function(data) {
