@@ -741,6 +741,7 @@
     <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
     <div th:replace="admin/template :: userInfoPpTpl"></div>
+    <div th:replace="admin/template :: userGroupInfoPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
     <div th:replace="admin/template :: chatAtsTpl"></div>
     <div th:replace="admin/template :: chatStowsTpl"></div>
@@ -2427,15 +2428,15 @@
             }).popup('show');
         });
 
-        // 用户消息popup
+        // 用户信息popup
         $('#context .chat').on('mouseenter', 'span[data-value].at-user:not(.pp-not)', function(event) {
             showUserInfoPp($(this), event);
         });
-        // 用户消息popup
+        // 用户信息popup
         $('#context .chat').on('mouseenter', 'a[data-value].avatar:not(.pp-not)', function(event) {
             showUserInfoPp($(this), event);
         });
-        // 用户消息popup
+        // 用户信息popup
         $('#context .chat').on('mouseenter', 'a[data-value].author:not(.pp-not)', function(event) {
             showUserInfoPp($(this), event);
         });
@@ -2462,10 +2463,7 @@
                     hide: 300
                 },
                 onShow: function() {
-                    $(this).html('加载中...');
-                },
-                onVisible: function() {
-                    var $pp = $(this);
+                    var $pp = $(this).html('加载中...');
                     $.get('admin/user/get', {
                         username: $a.attr('data-value')
                     }, function(data) {
@@ -2476,6 +2474,53 @@
                             user.sts = user.enabled ? '启用中' : '已禁用';
 
                             $("#userInfoPpTpl").tmpl(data.data).appendTo($pp.empty());
+                            $('.pp-translate .timeago').timeago();
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        }
+
+        // 用户组信息popup
+        $('#context .chat').on('mouseenter', 'span[data-value].at-group:not(.pp-not)', function(event) {
+            showUserGroupInfoPp($(this), event);
+        });
+
+        function showUserGroupInfoPp($a, event) {
+
+            event.preventDefault();
+
+            if ($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
+
+            $('.pp-translate').empty();
+
+            $a.popup({
+                popup: $('.pp-translate'),
+                hoverable: true,
+                inline: false,
+                movePopup: false,
+                position: 'top left',
+                maxSearchDepth: 50,
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this).html('加载中...');
+                    $.get('admin/user/getGroup', {
+                        groupName: $a.attr('data-value')
+                    }, function(data) {
+                        if (data.success) {
+                            var group = data.data;
+                            var d = new Date(group.createDate);
+                            group.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+
+                            $("#userGroupInfoPpTpl").tmpl(data.data).appendTo($pp.empty());
+                            Utils.showMappedTxt('.pp-translate .mapping-user');
                             $('.pp-translate .timeago').timeago();
                         } else {
                             toastr.error(data.data, "加载失败!");

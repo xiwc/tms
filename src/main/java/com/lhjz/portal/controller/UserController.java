@@ -483,6 +483,21 @@ public class UserController extends BaseController {
 		return RespBody.succeed(user);
 	}
 
+	@RequestMapping(value = "getGroup", method = RequestMethod.GET)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody getGroup(@RequestParam("groupName") String groupName) {
+
+		List<Group> groups = groupRepository.findByGroupName(groupName);
+
+		if (groups.size() == 0) {
+			logger.error("查询用户组不存在! ID: {}", groupName);
+			return RespBody.failed("查询用户组不存在!");
+		}
+
+		return RespBody.succeed(groups.get(0));
+	}
+
 	@RequestMapping(value = "groups", method = RequestMethod.GET)
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })

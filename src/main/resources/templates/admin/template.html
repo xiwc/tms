@@ -276,6 +276,40 @@
             </div>
         </div>
     </script>
+    <!-- 用户组信息popup内容模板 -->
+    <script th:fragment="userGroupInfoPpTpl" id="userGroupInfoPpTpl" type="text/x-jquery-tmpl">
+        <div class="ui cards">
+            <div class="card">
+                <div class="content">
+                    <!-- <img class="right floated mini ui image" src="/images/avatar/large/elliot.jpg"> -->
+                    <div class="header">
+                        ${groupName}
+                    </div>
+                    <div class="meta">
+                        <span class="mapping-user">${creator}</span>创建于<span class="timeago" title="${createDateFormat}">${createDateFormat}</span>
+                    </div>
+                    <div class="description">
+                        <div class="ui middle aligned divided list">
+                            <div class="item" style="padding-top: 5px!important; padding-bottom: 5px!important;">
+                                <div class="content">
+                                    <!-- <a class="header">组成员</a>  -->
+                                    {{each groupMembers}}
+                                    <div class="ui basic label mapping-user" title="${$value.username}">${$value.username}</div>
+                                    {{/each}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- <div class="extra content">
+                    <div class="ui two buttons">
+                        <div class="ui basic green button">Approve</div>
+                        <div class="ui basic red button">Decline</div>
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </script>
     <!-- 沟通消息popup内容模板 -->
     <script th:fragment="chatSearchTpl" id="chatSearchTpl" type="text/x-jquery-tmpl">
         <div class="item" data-type="search" data-id="${id}">
