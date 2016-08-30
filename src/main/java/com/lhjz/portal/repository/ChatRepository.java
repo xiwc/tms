@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.lhjz.portal.entity.Chat;
+import com.lhjz.portal.entity.security.User;
 
 /**
  * 
@@ -34,4 +35,6 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 	long countQueryRecentAt(String atUsername, Long lastId);
 
 	Page<Chat> findByContentLike(String search, Pageable pageable);
+
+	Page<Chat> findByCreator(User creator, Pageable pageable);
 }

@@ -126,6 +126,9 @@ public class AdminController extends BaseController {
 			userInfo.setUsername(user.getUsername());
 			userInfo.setMails(user.getMails());
 			userInfo.setName(user.getName());
+			userInfo.setLastLoginDate(user.getLastLoginDate());
+			userInfo.setLoginCount(user.getLoginCount());
+			userInfo.setLoginRemoteAddress(user.getLoginRemoteAddress());
 
 			Set<String> authorities = new HashSet<String>();
 			for (Authority authority : user.getAuthorities()) {
@@ -141,6 +144,7 @@ public class AdminController extends BaseController {
 
 		model.addAttribute("users", userInfos);
 		model.addAttribute("groups", groups);
+		model.addAttribute("loginUser", getLoginUser());
 
 		return "admin/user";
 	}
@@ -381,6 +385,12 @@ public class AdminController extends BaseController {
 			project = projectRepository.findOne(projectId);
 			if (project != null) {
 				languages = project.getLanguages();
+			} else {
+				if (projects.size() > 0) {
+					project = projects.get(0);
+					projectId = projects.get(0).getId();
+					languages = projects.get(0).getLanguages();
+				}
 			}
 		} else {
 			if (projects.size() > 0) {

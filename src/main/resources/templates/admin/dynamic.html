@@ -26,6 +26,10 @@
         height: auto;
     }
     
+    body {
+        position: relative;
+    }
+    
     .main.container {
         margin-right: 460px !important;
         margin-left: 3em !important;
@@ -90,6 +94,9 @@
     }
     
     .ui.comments .comment .text span.at-user,
+    .ui.comments .comment .text span.at-group,
+    .pp-translate .user-group,
+    .pp-translate .group-user,
     .pp-translate .ui.items>.item>.content>.description .at-user {
         cursor: pointer;
     }
@@ -438,9 +445,9 @@
         position: fixed;
         top: 150px;
         right: 0;
-        overflow: auto;
+        /*overflow: auto;*/
         width: 469px;
-        height: 430px;
+        /*height: 430px;*/
         text-align: left;
     }
     
@@ -467,9 +474,9 @@
         position: fixed;
         top: 186px;
         right: 0;
-        overflow: auto;
+        /*overflow: auto;*/
         width: 469px;
-        height: 430px;
+        /*height: 430px;*/
         text-align: left;
     }
     
@@ -548,7 +555,7 @@
                             <h3 class="ui dividing header">沟通</h3>
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-more" th:text="${'加载更多(' + (chats.totalElements - (chats.number + 1) * chats.size) + ')'}">加载更多</button>
                             <div class="animated bounceInLeft comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
-                                <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                                <a class="avatar ui mini circular image" th:attr="data-value=${c.creator.username}" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
                                 </a>
@@ -680,7 +687,7 @@
                                 <i class="circular unlock alternate tiny icon pp-ats-lock"></i>
                                 <i class="circular refresh tiny icon pp-ats-refresh"></i>
                                 <div class="pp-ats-content" style="margin-top: 10px;">
-                                    <div class="ui selection divided list"></div>
+                                    <div class="ui selection divided list" style="max-height:400px; overflow:auto;"></div>
                                 </div>
                             </div>
                         </div>
@@ -690,7 +697,7 @@
                                 <i class="circular unlock alternate tiny icon pp-stows-lock"></i>
                                 <i class="circular refresh tiny icon pp-stows-refresh"></i>
                                 <div class="pp-stows-content" style="margin-top: 10px;">
-                                    <div class="ui selection divided list"></div>
+                                    <div class="ui selection divided list" style="max-height:400px; overflow:auto;"></div>
                                 </div>
                             </div>
                         </div>
@@ -702,8 +709,8 @@
     <!-- popup container start -->
     <div class="ui flowing popup top left transition hidden pp-translate"></div>
     <div class="chat-search-loc"></div>
-    <div class="ui flowing popup top left transition hidden pp-chat-search-results">
-        <div class="ui selection divided list list-chat-search-results">
+    <div class="ui basic flowing popup top left transition hidden pp-chat-search-results">
+        <div class="ui selection divided list list-chat-search-results" style="max-height: 500px; overflow: auto;">
         </div>
     </div>
     <div class="ui flowing popup top left transition hidden pp-chat-upload-file">
@@ -735,6 +742,8 @@
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
+    <div th:replace="admin/template :: userInfoPpTpl"></div>
+    <div th:replace="admin/template :: userGroupInfoPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
     <div th:replace="admin/template :: chatAtsTpl"></div>
     <div th:replace="admin/template :: chatStowsTpl"></div>
@@ -841,11 +850,11 @@
 
         // ------------------------------------------------------------------------------------- fancybox image start
 
-        $('body').on('click', '.chat .comments .comment .content .text.markdown-body img', function(event) {
+        $('body').on('click', '.chat .comments .comment .content .text.markdown-body img, .pp-translate .description.markdown-body img', function(event) {
             event.preventDefault();
             $img = $(this);
             var imgArr = [];
-            var $imgs = $img.closest('.text.markdown-body').find('img').each(function(index, img) {
+            var $imgs = $img.closest('.markdown-body').find('img').each(function(index, img) {
                 imgArr.push({
                     href: $(img).attr('src'),
                     title: $(img).attr('alt')
@@ -898,7 +907,14 @@
         $('.chat-search').hover(function() {
             $(this).find('input').show();
             $(this).find('.btn-search').removeClass('circular button').addClass('input');
-            $(this).find('input').focus();
+            var $input = $(this).find('input');
+
+            if (!$input.val()) {
+                var loginUsername = $('input:hidden[name="user.username"]').val();
+                $input.val('is:' + loginUsername);
+            }
+
+            $input.focus().select();
         }, function() {
             $(this).find('input').hide();
             $(this).find('.btn-search').removeClass('input').addClass('circular button');
@@ -965,8 +981,11 @@
             popup: $('.pp-chat-search-results'),
             hoverable: true,
             on: 'click',
-            target: '.btn-search i.icon',
+            inline: false,
+            // maxSearchDepth: 50,
+            // target: '.btn-search i.icon',
             movePopup: false,
+            observeChanges: false,
             position: 'bottom right',
             closable: false,
             delay: {
@@ -981,6 +1000,7 @@
                 var search = $('.chat-search .ui.search input').val();
                 $pp.children('.ui.list').html('加载中...');
                 $.get('admin/chat/search/unmask', {
+                    size: 100,
                     search: search
                 }, function(data) {
                     if (data.success) {
@@ -1115,8 +1135,9 @@
             inline: true,
             hoverable: true,
             position: 'bottom left',
-            distanceAway: -40,
+            distanceAway: -10,
             on: 'manual',
+            observeChanges: false,
             delay: {
                 show: 300,
                 hide: 800
@@ -1453,6 +1474,7 @@
                 } else if (indexAt > 0) {
                     mk = ' @';
                 } else {
+                    $pp.popup('is visible') && $pp.popup('hide');
                     return;
                 }
 
@@ -1932,6 +1954,7 @@
                     var contentOld = data.data.content;
 
                     $('.ad-chat-edit').modal({
+                        autofocus: false,
                         observeChanges: true,
                         closable: false, // 防止修改内容没保存窗口关闭导致数据丢失
                         onVisible: function() {
@@ -1979,7 +2002,7 @@
             });
         });
 
-        $('body').on('click', '.chat .comments .comment .content .author, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user', function(event) {
+        $('body').on('click', '.chat .comments .comment .content .author, .chat .comments .comment .avatar, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user, .pp-translate .group-user, .pp-translate .user-group', function(event) {
             event.preventDefault();
             insertAtUserOrGroup(cm, $(this).attr('data-value'));
             s2b();
@@ -2333,7 +2356,7 @@
 
 
         // 翻译popup
-        $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
+        $('body').on('mouseenter', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
 
@@ -2345,12 +2368,15 @@
                 return;
             }
 
+            $('.pp-translate').empty();
+
             $(this).popup({
                 popup: $('.pp-translate'),
                 hoverable: true,
                 inline: false,
                 movePopup: false,
                 position: 'top left',
+                maxSearchDepth: 50,
                 delay: {
                     show: 300,
                     hide: 300
@@ -2375,7 +2401,7 @@
         });
 
         // 消息popup
-        $('body').on('mouseover', '#context .chat a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
+        $('body').on('mouseenter', '#context .chat a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
 
@@ -2383,12 +2409,15 @@
                 return;
             }
 
+            $('.pp-translate').empty();
+
             $(this).popup({
                 popup: $('.pp-translate'),
                 hoverable: true,
                 inline: false,
                 movePopup: false,
                 position: 'top left',
+                maxSearchDepth: 50,
                 delay: {
                     show: 300,
                     hide: 300
@@ -2415,6 +2444,118 @@
             }).popup('show');
         });
 
+        // 用户信息popup
+        $('#context .chat').on('mouseenter', 'span[data-value].at-user:not(.pp-not)', function(event) {
+            showUserInfoPp($(this), event);
+        });
+        // 用户信息popup
+        $('#context .chat').on('mouseenter', 'a[data-value].avatar:not(.pp-not)', function(event) {
+            showUserInfoPp($(this), event);
+        });
+        // 用户信息popup
+        $('#context .chat').on('mouseenter', 'a[data-value].author:not(.pp-not)', function(event) {
+            showUserInfoPp($(this), event);
+        });
+
+        function showUserInfoPp($a, event) {
+
+            event.preventDefault();
+
+            if ($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
+
+            $('.pp-translate').empty();
+
+            $a.popup({
+                popup: $('.pp-translate'),
+                hoverable: true,
+                inline: false,
+                movePopup: false,
+                position: 'top left',
+                maxSearchDepth: 50,
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this).html('加载中...');
+                    $.get('admin/user/get', {
+                        username: $a.attr('data-value')
+                    }, function(data) {
+                        if (data.success) {
+                            var user = data.data;
+                            var userGroups = data.msgs[0];
+                            if (userGroups && userGroups.length > 0) {
+                                user.userGroups = data.msgs[0];
+                            }
+
+                            var d = new Date(user.createDate);
+                            user.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            user.sts = user.enabled ? '启用中' : '已禁用';
+                            if (user.lastLoginDate) {
+                                d = new Date(user.lastLoginDate);
+                                user.lastLoginDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            }
+
+                            $("#userInfoPpTpl").tmpl(user).appendTo($pp.empty());
+                            Utils.showMappedTxt('.pp-translate .mapping-user');
+                            $('.pp-translate .timeago').timeago();
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        }
+
+        // 用户组信息popup
+        $('#context .chat').on('mouseenter', 'span[data-value].at-group:not(.pp-not)', function(event) {
+            showUserGroupInfoPp($(this), event);
+        });
+
+        function showUserGroupInfoPp($a, event) {
+
+            event.preventDefault();
+
+            if ($a.closest('.pp-translate').size() != 0) {
+                return;
+            }
+
+            $('.pp-translate').empty();
+
+            $a.popup({
+                popup: $('.pp-translate'),
+                hoverable: true,
+                inline: false,
+                movePopup: false,
+                position: 'top left',
+                maxSearchDepth: 50,
+                delay: {
+                    show: 300,
+                    hide: 300
+                },
+                onShow: function() {
+                    var $pp = $(this).html('加载中...');
+                    $.get('admin/user/getGroup', {
+                        groupName: $a.attr('data-value')
+                    }, function(data) {
+                        if (data.success) {
+                            var group = data.data;
+                            var d = new Date(group.createDate);
+                            group.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+
+                            $("#userGroupInfoPpTpl").tmpl(data.data).appendTo($pp.empty());
+                            Utils.showMappedTxt('.pp-translate .mapping-user');
+                            $('.pp-translate .timeago').timeago();
+                        } else {
+                            toastr.error(data.data, "加载失败!");
+                        }
+                    });
+                }
+            }).popup('show');
+        }
+
         function commentRead($comment) {
             var $md = $comment.find('.content .markdown-body');
             $('.ad-comment-page-dimmer')
@@ -2438,10 +2579,10 @@
             }).dimmer('show');
         }
 
-        $('body').on('dblclick', '.chat .comments .comment', function(event) {
-            event.preventDefault();
-            commentRead($(this));
-        });
+        // $('body').on('dblclick', '.chat .comments .comment', function(event) {
+        //     event.preventDefault();
+        //     commentRead($(this));
+        // });
         $('body').on('click', '.ad-comment-page-dimmer .container', function(event) {
             if (event.target == event.currentTarget) {
                 $(this).closest('.page.dimmer').dimmer('hide');

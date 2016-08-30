@@ -149,7 +149,8 @@ public class FileController extends BaseController {
 
 		for (MultipartFile file : files) {
 
-			String originalFileName = file.getOriginalFilename();
+			String originalFileName = file.getOriginalFilename().replaceAll("\\[|\\]|\\{|\\}|\\(|\\)",
+					"\\$");
 			String type = originalFileName
 					.substring(originalFileName.lastIndexOf("."));
 

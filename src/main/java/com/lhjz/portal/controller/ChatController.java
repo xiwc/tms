@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.ChatAt;
 import com.lhjz.portal.entity.ChatStow;
@@ -426,8 +427,21 @@ public class ChatController extends BaseController {
 			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam(value = "search", required = true) String search) {
 
-		Page<Chat> chats = chatRepository.findByContentLike("%" + search + "%",
-				pageable);
+		Page<Chat> chats = null;
+
+		if (search.startsWith(SysConstant.FILTER_PRE)) {
+			String username = search.substring(SysConstant.FILTER_PRE.length());
+			User user = getUser(username);
+			if (user != null) {
+				chats = chatRepository.findByCreator(user, pageable);
+			} else {
+				return RespBody.failed("查询指定创建者不存在!");
+			}
+		} else {
+			chats = chatRepository.findByContentLike("%" + search + "%",
+					pageable);
+		}
+
 		// chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
 		// .getContent()), pageable, chats.getTotalElements());
 

@@ -50,6 +50,8 @@ public class User implements java.io.Serializable, Comparable<User> {
 
 	private String name;
 
+	private String creator;
+
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled;
 
@@ -59,6 +61,13 @@ public class User implements java.io.Serializable, Comparable<User> {
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date createDate;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastLoginDate;
+
+	private String loginRemoteAddress;
+
+	private long loginCount = 0;
 
 	@Version
 	private long version;
@@ -207,6 +216,38 @@ public class User implements java.io.Serializable, Comparable<User> {
 		this.voterChats = voterChats;
 	}
 
+	public Date getLastLoginDate() {
+		return lastLoginDate;
+	}
+
+	public void setLastLoginDate(Date lastLoginDate) {
+		this.lastLoginDate = lastLoginDate;
+	}
+
+	public String getLoginRemoteAddress() {
+		return loginRemoteAddress;
+	}
+
+	public void setLoginRemoteAddress(String loginRemoteAddress) {
+		this.loginRemoteAddress = loginRemoteAddress;
+	}
+
+	public long getLoginCount() {
+		return loginCount;
+	}
+
+	public void setLoginCount(long loginCount) {
+		this.loginCount = loginCount;
+	}
+
+	public String getCreator() {
+		return creator;
+	}
+
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -236,9 +277,11 @@ public class User implements java.io.Serializable, Comparable<User> {
 	@Override
 	public String toString() {
 		return "User [username=" + username + ", password=" + password
-				+ ", mails=" + mails + ", name=" + name + ", enabled="
-				+ enabled + ", status=" + status + ", createDate=" + createDate
-				+ ", version=" + version + "]";
+				+ ", mails=" + mails + ", name=" + name + ", creator="
+				+ creator + ", enabled=" + enabled + ", status=" + status
+				+ ", createDate=" + createDate + ", lastLoginDate="
+				+ lastLoginDate + ", loginRemoteAddress=" + loginRemoteAddress
+				+ ", loginCount=" + loginCount + ", version=" + version + "]";
 	}
 
 	@Override

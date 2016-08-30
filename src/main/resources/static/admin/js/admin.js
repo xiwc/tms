@@ -93,7 +93,7 @@ jQuery(function($) {
             "debug": false,
             "newestOnTop": true,
             "progressBar": false,
-            "positionClass": "toast-bottom-center",
+            "positionClass": $(window).width() < 768 ? "toast-bottom-center" : "toast-top-center",
             "preventDuplicates": true,
             "onclick": null,
             "showDuration": "300",
