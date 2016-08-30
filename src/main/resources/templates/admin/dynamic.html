@@ -2335,7 +2335,7 @@
 
 
         // 翻译popup
-        $('body').on('mouseover', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
+        $('body').on('mouseenter', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
 
@@ -2379,7 +2379,7 @@
         });
 
         // 消息popup
-        $('body').on('mouseover', '#context .chat a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
+        $('body').on('mouseenter', '#context .chat a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
 
