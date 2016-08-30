@@ -2418,15 +2418,27 @@
         });
 
         // 用户消息popup
-        $('body').on('mouseover', '#context .chat span[data-value].at-user:not(.pp-not),#context .chat a[data-value].avatar:not(.pp-not),#context .chat a[data-value].author:not(.pp-not)', function(event) {
+        $('#context .chat').on('mouseover', 'span[data-value].at-user:not(.pp-not)', function(event) {
+            showUserInfoPp($(this), event);
+        });
+        // 用户消息popup
+        $('#context .chat').on('mouseover', 'a[data-value].avatar:not(.pp-not)', function(event) {
+            showUserInfoPp($(this), event);
+        });
+        // 用户消息popup
+        $('#context .chat').on('mouseover', 'a[data-value].author:not(.pp-not)', function(event) {
+            showUserInfoPp($(this), event);
+        });
+
+        function showUserInfoPp($a, event) {
+
             event.preventDefault();
-            var $a = $(this);
 
             if ($a.closest('.pp-translate').size() != 0) {
                 return;
             }
 
-            $(this).popup({
+            $a.popup({
                 popup: $('.pp-translate'),
                 hoverable: true,
                 inline: false,
@@ -2455,7 +2467,7 @@
                     });
                 }
             }).popup('show');
-        });
+        }
 
         function commentRead($comment) {
             var $md = $comment.find('.content .markdown-body');
