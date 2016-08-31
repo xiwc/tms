@@ -381,6 +381,12 @@ public class AdminController extends BaseController {
 			project = projectRepository.findOne(projectId);
 			if (project != null) {
 				languages = project.getLanguages();
+			} else {
+				if (projects.size() > 0) {
+					project = projects.get(0);
+					projectId = projects.get(0).getId();
+					languages = projects.get(0).getLanguages();
+				}
 			}
 		} else {
 			if (projects.size() > 0) {
