@@ -1122,7 +1122,7 @@
             inline: true,
             hoverable: true,
             position: 'bottom left',
-            distanceAway: -40,
+            distanceAway: -10,
             on: 'manual',
             delay: {
                 show: 300,
@@ -1460,6 +1460,7 @@
                 } else if (indexAt > 0) {
                     mk = ' @';
                 } else {
+                    $pp.popup('is visible') && $pp.popup('hide');
                     return;
                 }
 
