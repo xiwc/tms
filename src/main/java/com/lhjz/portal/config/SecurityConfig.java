@@ -3,6 +3,12 @@
  */
 package com.lhjz.portal.config;
 
+import java.io.IOException;
+import java.util.Date;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +21,17 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.stereotype.Component;
+
+import com.lhjz.portal.entity.security.User;
+import com.lhjz.portal.repository.UserRepository;
 
 /**
  * 
@@ -50,11 +64,14 @@ public class SecurityConfig {
 	@Configuration
 	@Order(1)
 	@Profile({ "dev", "prod" })
-	public static class SecurityConfiguration
-			extends WebSecurityConfigurerAdapter {
+	public static class SecurityConfiguration extends
+			WebSecurityConfigurerAdapter {
 
 		@Autowired
 		DataSource dataSource;
+
+		@Autowired
+		LoginSuccessHandler loginSuccessHandler;
 
 		@Bean
 		public PersistentTokenRepository persistentTokenRepository() {
@@ -66,14 +83,16 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/admin/**").authorizeRequests()
-					.antMatchers("/admin/file/download/**").permitAll()
+			http.antMatcher("/admin/**")
+					.authorizeRequests()
+					.antMatchers("/admin/file/download/**")
+					.permitAll()
 					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**", "/admin/login")
-					.permitAll().anyRequest().authenticated().and().formLogin()
+							"/admin/js/**", "/admin/login").permitAll()
+					.anyRequest().authenticated().and().formLogin()
 					.loginPage("/admin/login").permitAll()
 					.loginProcessingUrl("/admin/signin")
-					.defaultSuccessUrl("/admin").and().logout()
+					.successHandler(loginSuccessHandler).and().logout()
 					.logoutUrl("/admin/logout").permitAll()
 					.logoutSuccessUrl("/admin/login?logout").and().rememberMe()
 					.tokenRepository(persistentTokenRepository())
@@ -84,39 +103,65 @@ public class SecurityConfig {
 	}
 
 	@Configuration
-	@Order(2)
-	@Profile({ "dev", "prod" })
-	public static class SecurityConfiguration2
-			extends WebSecurityConfigurerAdapter {
+	@Order(1)
+	@Profile("test")
+	public static class SecurityConfigurationTest extends
+			WebSecurityConfigurerAdapter {
+
+		@Autowired
+		LoginSuccessHandler loginSuccessHandler;
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/").authorizeRequests().anyRequest().permitAll();
+			http.antMatcher("/admin/**")
+					.authorizeRequests()
+					.antMatchers("/admin/file/download/**")
+					.permitAll()
+					.antMatchers("/admin/css/**", "/admin/img/**",
+							"/admin/js/**").permitAll().anyRequest()
+					.authenticated().and().formLogin()
+					.loginPage("/admin/login").permitAll()
+					.loginProcessingUrl("/admin/signin")
+					.successHandler(loginSuccessHandler).and().logout()
+					.logoutUrl("/admin/logout")
+					.logoutSuccessUrl("/admin/login").and().csrf().disable();
 
 		}
 
 	}
 
-	@Configuration
-	@Order(1)
-	@Profile("test")
-	public static class SecurityConfigurationTest
-			extends WebSecurityConfigurerAdapter {
+	@Component("loginSuccessHandler")
+	public static class LoginSuccessHandler extends
+			SavedRequestAwareAuthenticationSuccessHandler {
+
+		@Autowired
+		UserRepository userRepository;
 
 		@Override
-		protected void configure(HttpSecurity http) throws Exception {
+		public void onAuthenticationSuccess(HttpServletRequest request,
+				HttpServletResponse response, Authentication authentication)
+				throws IOException, ServletException {
 
-			http.antMatcher("/admin/**").authorizeRequests()
-					.antMatchers("/admin/file/download/**").permitAll()
-					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**")
-					.permitAll().anyRequest().authenticated().and().formLogin()
-					.loginPage("/admin/login").permitAll()
-					.loginProcessingUrl("/admin/signin")
-					.defaultSuccessUrl("/admin").and().logout()
-					.logoutUrl("/admin/logout").logoutSuccessUrl("/admin/login")
-					.and().csrf().disable();
+			UserDetails uds = (UserDetails) authentication.getPrincipal();
+			WebAuthenticationDetails wauth = (WebAuthenticationDetails) authentication
+					.getDetails();
+
+			User loginUser = userRepository.findOne(uds.getUsername());
+			if (loginUser != null) {
+				loginUser.setLastLoginDate(new Date());
+				loginUser.setLoginRemoteAddress(wauth.getRemoteAddress());
+
+				long loginCount = loginUser.getLoginCount();
+				loginUser.setLoginCount(++loginCount);
+
+				userRepository.saveAndFlush(loginUser);
+			}
+
+			this.setDefaultTargetUrl("/admin");
+			this.setAlwaysUseDefaultTargetUrl(false);
+
+			super.onAuthenticationSuccess(request, response, authentication);
 
 		}
 

@@ -22,6 +22,8 @@ public interface GroupMemberRepository
 
 	List<GroupMember> findByGroup(Group group);
 
+	List<GroupMember> findByUsername(String username);
+	
 	List<GroupMember> findByGroupAndUsername(Group group, String username);
 
 }

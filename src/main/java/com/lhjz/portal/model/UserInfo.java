@@ -31,6 +31,10 @@ public class UserInfo implements Serializable {
 	private Date createDate;
 	private long version;
 
+	private Date lastLoginDate;
+	private String loginRemoteAddress;
+	private long loginCount = 0;
+
 	private Set<String> authorities = new HashSet<String>(0);
 
 	public UserInfo() {
@@ -108,12 +112,38 @@ public class UserInfo implements Serializable {
 		this.name = name;
 	}
 
+	public Date getLastLoginDate() {
+		return lastLoginDate;
+	}
+
+	public void setLastLoginDate(Date lastLoginDate) {
+		this.lastLoginDate = lastLoginDate;
+	}
+
+	public String getLoginRemoteAddress() {
+		return loginRemoteAddress;
+	}
+
+	public void setLoginRemoteAddress(String loginRemoteAddress) {
+		this.loginRemoteAddress = loginRemoteAddress;
+	}
+
+	public long getLoginCount() {
+		return loginCount;
+	}
+
+	public void setLoginCount(long loginCount) {
+		this.loginCount = loginCount;
+	}
+	
 	@Override
 	public String toString() {
 		return "UserInfo [username=" + username + ", password=" + password
 				+ ", mails=" + mails + ", name=" + name + ", enabled="
 				+ enabled + ", status=" + status + ", createDate=" + createDate
-				+ ", version=" + version + "]";
+				+ ", version=" + version + ", lastLoginDate=" + lastLoginDate
+				+ ", loginRemoteAddress=" + loginRemoteAddress
+				+ ", loginCount=" + loginCount + "]";
 	}
 
 }

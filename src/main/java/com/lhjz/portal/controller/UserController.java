@@ -108,6 +108,7 @@ public class UserController extends BaseController {
 		user.setCreateDate(new Date());
 		user.setName(StringUtils.trim(userForm.getName()));
 		user.setMails(StringUtils.trim(userForm.getMail()));
+		user.setCreator(WebUtil.getUsername());
 
 		userRepository.saveAndFlush(user);
 
@@ -480,7 +481,27 @@ public class UserController extends BaseController {
 			return RespBody.failed("查询用户不存在!");
 		}
 
-		return RespBody.succeed(user);
+		List<GroupMember> gms = groupMemberRepository.findByUsername(username);
+		List<String> gns = gms.stream().map((gm) -> {
+			return gm.getGroup().getGroupName();
+		}).collect(Collectors.toList());
+
+		return RespBody.succeed(user).addMsg(gns);
+	}
+
+	@RequestMapping(value = "getGroup", method = RequestMethod.GET)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody getGroup(@RequestParam("groupName") String groupName) {
+
+		List<Group> groups = groupRepository.findByGroupName(groupName);
+
+		if (groups.size() == 0) {
+			logger.error("查询用户组不存在! ID: {}", groupName);
+			return RespBody.failed("查询用户组不存在!");
+		}
+
+		return RespBody.succeed(groups.get(0));
 	}
 
 	@RequestMapping(value = "groups", method = RequestMethod.GET)
