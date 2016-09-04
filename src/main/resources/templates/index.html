@@ -180,6 +180,16 @@
         z-index: 1;
     }
     
+    .ui.button.btn-chat-s2b {
+        display: none;
+        position: fixed;
+        left: 200px;
+        top: 238px;
+        background-color: rgba(224, 225, 226, 0.54);
+        z-index: 1;
+    }
+    
+    .ui.button.btn-chat-s2b:hover,
     .ui.button.btn-chat-s2h:hover {
         background-color: rgba(224, 225, 226, 1);
     }
@@ -340,6 +350,7 @@
                             <form class="ui reply form fm-reply"></form>
                         </div>
                         <div class="ui circular icon button btn-chat-s2h" title="滚动至消息头"> <i class="chevron up icon"></i> </div>
+                        <div class="ui circular icon button btn-chat-s2b" title="滚动至下个消息头"> <i class="chevron down icon"></i> </div>
                         <div class="ui vertical circular icon buttons btns-scroll btn-ctrl">
                             <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
                                 <i class="arrow up icon"></i>
@@ -419,6 +430,7 @@
                 top: ($(window).height() - $('.btns-scroll').height()) / 2
             });
             $('.btn-chat-s2h').css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
+            $('.btn-chat-s2b').css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
         });
 
         // Set options
@@ -822,10 +834,10 @@
             }).dimmer('show');
         }
 
-        $('body').on('dblclick', '.chat .comments .comment', function(event) {
-            event.preventDefault();
-            commentRead($(this));
-        });
+        // $('body').on('dblclick', '.chat .comments .comment', function(event) {
+        //     event.preventDefault();
+        //     commentRead($(this));
+        // });
         $('body').on('click', '.ad-comment-page-dimmer .container', function(event) {
             if (event.target == event.currentTarget) {
                 $(this).closest('.page.dimmer').dimmer('hide');
@@ -855,6 +867,12 @@
             s2mk($btn.data('target'));
         }).css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
 
+        $('.btn-chat-s2b').click(function() {
+            var $t = $('.btn-chat-s2h').data('target');
+            $('.btn-chat-s2h').data('target', $t.next());
+            s2mk($('.btn-chat-s2h').data('target'));
+        }).css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
+
         $('body').on('mouseenter', '.chat .comment', function(event) {
             event.preventDefault();
             var $header = $(event.target).closest('.comment').find('.content a.author');
@@ -862,12 +880,14 @@
                 $('.btn-chat-s2h').data('target', $header.closest('.comment'));
                 if (!Utils.isElementInViewport($header)) {
                     $('.btn-chat-s2h').show();
+                    $('.btn-chat-s2b').show();
                 }
             }
         });
 
         $('.chat').mouseleave(function(event) {
             $('.btn-chat-s2h').removeData('target').hide();
+            $('.btn-chat-s2b').hide();
         });
 
         $(window).scroll(function(event) {
@@ -875,8 +895,10 @@
             var $header = $t && $t.find('.content a.author');
             if ($header && $header.size() > 0 && !Utils.isElementInViewport($header)) {
                 $('.btn-chat-s2h').show();
+                $('.btn-chat-s2b').show();
             } else {
                 $('.btn-chat-s2h').hide();
+                $('.btn-chat-s2b').hide();
             }
         });
 
