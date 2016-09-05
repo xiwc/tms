@@ -31,6 +31,10 @@ public class MailSender2 {
 	@Autowired
 	JavaMailSender mailSender;
 
+	public JavaMailSenderImpl getMailSender() {
+		return (JavaMailSenderImpl) mailSender;
+	}
+
 	public boolean sendText(String subject, String text, String... toAddr) {
 
 		SimpleMailMessage message = new SimpleMailMessage();
