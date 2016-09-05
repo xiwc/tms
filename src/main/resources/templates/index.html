@@ -143,7 +143,7 @@
         top: 137px;
         right: 0;
         overflow: auto;
-        width: 329px;
+        /* width: 329px; */
         height: 430px;
         text-align: left;
     }
@@ -459,6 +459,10 @@
             top: ($(window).height() - $('.btns-scroll').height()) / 2
         });
 
+        $('.wiki-dir').css({
+            left: $('.btn-chat-dir').css('left')
+        });
+
         $(window).resize(function(event) {
             $('.btn-ctrl').css({
                 right: ($(window).width() - $('.ui.container').width()) / 2 + 2 - 10
@@ -468,6 +472,9 @@
             });
             $('.btn-chat-s2h').css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
             $('.btn-chat-s2b').css('left', ($(window).width() - $('.main.container').width()) / 2 + 5);
+            $('.wiki-dir').css({
+                left: $('.btn-chat-dir').css('left')
+            });
         });
 
         // Set options
