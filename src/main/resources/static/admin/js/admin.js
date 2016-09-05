@@ -303,7 +303,7 @@ jQuery(function($) {
                 prodDir($l, item);
             } else {
                 var id = Utils.id();
-                var $item = $('<a class="item wiki-dir-item"></a>').text($(item).attr('id', id).text()).attr('data-id', id);
+                var $item = $('<a class="item wiki-dir-item" style="word-break: keep-all; white-space: nowrap;"></a>').text($(item).attr('id', id).text()).attr('data-id', id);
                 $list.append($item);
             }
         });
