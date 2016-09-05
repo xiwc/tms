@@ -127,6 +127,36 @@
         z-index: 1;
         margin-right: 0!important;
     }
+    
+    .btn-chat-dir {
+        display: none;
+        position: fixed;
+        top: 151px;
+        right: 0;
+        z-index: 1;
+        margin-right: 0!important;
+    }
+    
+    .ui.segment.wiki-dir {
+        display: none;
+        position: fixed;
+        top: 137px;
+        right: 0;
+        overflow: auto;
+        width: 329px;
+        height: 430px;
+        text-align: left;
+    }
+    
+    a.item.wiki-dir-item {
+        font-weight: normal;
+    }
+    
+    .btn-wiki-dir-lock {
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
     /* chat msg search start */
     
     .chat-search {
@@ -367,6 +397,13 @@
                                     <i class="search link icon"></i>
                                 </div>
                                 <div class="results"></div>
+                            </div>
+                        </div>
+                        <div class="ui circular icon button btn-chat-dir btn-ctrl">
+                            <i class="content icon"></i>
+                            <div class="wiki-dir ui segment">
+                                <i class="circular unlock alternate tiny icon btn-wiki-dir-lock"></i>
+                                <div class="wiki-dir-tree" style="margin-top: 10px;"></div>
                             </div>
                         </div>
                         <a th:href="@{/(scroll=${'t'})}" title="刷新博文" class="pp-not ui black circular icon button btn-custom-chat-refresh btn-ctrl">
@@ -883,6 +920,13 @@
                     $('.btn-chat-s2b').show();
                 }
             }
+
+            $('.wiki-dir .wiki-dir-tree').empty().append(Utils.dir($(this)));
+            if ($('.wiki-dir a.wiki-dir-item').size() == 0) {
+                $('.btn-chat-dir').hide();
+            } else {
+                $('.btn-chat-dir').show();
+            }
         });
 
         $('.chat').mouseleave(function(event) {
@@ -903,6 +947,24 @@
         });
 
         // -------------------------------------------------------------------------------- 滚动至消息头 end
+
+        // -------------------------------------------------------------------------------- wiki dir start
+
+        $('body').on('click', '.wiki-dir-item', function(event) {
+            event.preventDefault();
+            s2mk($('#' + $(this).attr('data-id')));
+        });
+        $('.btn-chat-dir').hover(function() {
+            $('.wiki-dir').show();
+        }, function() {
+            if (!$('.btn-wiki-dir-lock').hasClass('lock')) {
+                $('.wiki-dir').hide();
+            }
+        });
+        $('.btn-wiki-dir-lock').click(function(event) {
+            $(this).toggleClass('lock unlock alternate');
+        });
+        // -------------------------------------------------------------------------------- wiki dir end
     });
     </script>
 </body>
