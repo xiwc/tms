@@ -191,4 +191,6 @@ public final class SysConstant {
 
 	public static final Short COMMENT_TYPE_PLATFORM = 0;
 
+	public static final String FILTER_PRE = "is:";
+
 }

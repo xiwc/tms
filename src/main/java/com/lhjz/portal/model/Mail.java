@@ -130,10 +130,12 @@ public class Mail {
 	 * @param objs
 	 * @return
 	 */
-	private Mail add(String... mails) {
+	public Mail add(String... mails) {
 
-		for (String mail : mails) {
-			this.set.add(mail);
+		if (mails != null) {
+			for (String mail : mails) {
+				this.set.add(mail);
+			}
 		}
 
 		return this;

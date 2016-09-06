@@ -48,4 +48,8 @@ public class Enum {
 	public static enum VoteType {
 		Zan, Cai;
 	}
+
+	public static enum SettingType {
+		Mail;
+	}
 }

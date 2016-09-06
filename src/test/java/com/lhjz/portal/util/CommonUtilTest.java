@@ -50,6 +50,25 @@ public class CommonUtilTest {
 		Assert.assertEquals(StringUtil.join(",", new ArrayList<>()), "");
 	}
 
+	@Test
+	public void replaceAll() {
+		System.out
+				.println("(111)[]{}".replaceAll("\\[|\\]|\\{|\\}|\\(|\\)",
+						"\\$"));
+		System.out.println("111".replaceAll("\\[|\\]|\\{|\\}|\\(|\\)", "\\$"));
+		System.out.println("".replaceAll("\\[|\\]|\\{|\\}|\\(|\\)", "\\$"));
+		// String res = StringUtils.replaceEach("()[]{}",
+		// new String[] { "(", ")" },
+		// new String[] { "$", "$" });
+		//
+		// System.out.println(res);
+	}
+
+	@Test
+	public void substring() {
+		System.out.println("0123".substring(4));
+	}
+
 	// public static void main(String[] args) {
 	// String d = DateUtil.format(new Date(), DateUtil.FORMAT7);
 	// System.out.println(d);

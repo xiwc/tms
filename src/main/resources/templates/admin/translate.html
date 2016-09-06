@@ -21,7 +21,7 @@
     <style>
     body,
     html {
-        height: auto;
+        /* height: auto; */
     }
     
     .CodeMirror,
@@ -245,7 +245,7 @@
                                     <input type="hidden" th:each="w : ${t.project.watchers}" th:name="${w.username}" th:value="${w.username}">
                                     <input type="hidden" th:name="${t.creator}" th:value="${t.creator}">
                                     <input type="hidden" th:name="${user.username}" th:value="${user.username}">
-                                    <div class="ui dropdown dd-actions">
+                                    <div class="ui top right pointing dropdown dd-actions">
                                         <div class="text">操作</div>
                                         <i class="dropdown icon"></i>
                                         <div class="menu">

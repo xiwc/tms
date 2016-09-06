@@ -37,6 +37,9 @@
                         <th>邮箱</th>
                         <th>角色</th>
                         <th>创建时间</th>
+                        <th>登录时间</th>
+                        <th>登录次数</th>
+                        <th>登录IP</th>
                         <th>状态</th>
                         <th sec:authorize="hasRole('ROLE_ADMIN')">处理</th>
                     </thead>
@@ -48,7 +51,10 @@
                             <td>
                                 <div th:if="${not #sets.isEmpty(user.authorities)}" th:each="auth: ${user.authorities}" class="ui small basic label user-role" th:text="${auth}"></div>
                             </td>
-                            <td th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
+                            <td class="timeago" th:title="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}" th:text="${#calendars.format(user.createDate,'yyyy/MM/dd HH:mm:ss')}">2015/05/12 12:00:00</td>
+                            <td class="timeago" th:title="${user.lastLoginDate != null ? #calendars.format(user.lastLoginDate,'yyyy/MM/dd HH:mm:ss') : ''}" th:text="${user.lastLoginDate != null ? #calendars.format(user.lastLoginDate,'yyyy/MM/dd HH:mm:ss') : ''}">2015/05/12 12:00:00</td>
+                            <td th:text="${user.loginCount}">1</td>
+                            <td th:text="${user.loginRemoteAddress}">0.0.0.0</td>
                             <td class="user-status" th:if="${user.enabled}">
                                 <div class="ui green small tag label">开启</div>
                             </td>
@@ -56,16 +62,22 @@
                                 <div class="ui yellow small tag label">停用</div>
                             </td>
                             <td sec:authorize="hasRole('ROLE_ADMIN')">
-                                <!-- if is super role, super admin can mgr not super admin and user role -->
-                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
-                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
-                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="ui compact tiny red button lhjz-btn-del">删除</div>
-                                <!-- if is not super but admin(only can see this page, so no need judge is admin role) role, admin can only mgr user role -->
-                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="ui compact tiny yellow button lhjz-btn-disable">停用</div>
-                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="ui compact tiny green button lhjz-btn-enable">开启</div>
-                                <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny primary button lhjz-btn-edit">编辑</div>
-                                <!-- <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div> -->
+                                <div class="ui top right pointing dropdown dd-actions" th:if="${((#authorization.expression('hasRole(''ROLE_ADMIN'')') and !#sets.contains(user.authorities, 'ROLE_ADMIN')) or #authorization.expression('hasRole(''ROLE_SUPER'')')) and (user.username != loginUser.username)}">
+                                    <div class="text">操作</div>
+                                    <i class="dropdown icon"></i>
+                                    <div class="menu">
+                                        <!-- if is super role, super admin can mgr not super admin and user role -->
+                                        <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and user.enabled}" class="item lhjz-btn-disable">停用</div>
+                                        <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER') and not user.enabled}" class="item lhjz-btn-enable">开启</div>
+                                        <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="item lhjz-btn-edit">编辑</div>
+                                        <div th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') and !#sets.contains(user.authorities, 'ROLE_SUPER')}" class="item lhjz-btn-del">删除</div>
+                                        <!-- if is not super but admin(only can see this page, so no need judge is admin role) role, admin can only mgr user role -->
+                                        <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and user.enabled}" class="item lhjz-btn-disable">停用</div>
+                                        <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1 and not user.enabled}" class="item lhjz-btn-enable">开启</div>
+                                        <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="item lhjz-btn-edit">编辑</div>
+                                        <!-- <div th:if="${!#authorization.expression('hasRole(''ROLE_SUPER'')') and #sets.size(user.authorities) == 1}" class="ui compact tiny red button lhjz-btn-del">删除</div> -->
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
@@ -170,6 +182,7 @@
      -->
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/admin.js}" src="../../static/admin/js/admin.js"></script>
     <script type="text/javascript">
     jQuery(function($) {
@@ -179,6 +192,11 @@
         $('.ui.dropdown.dd-mailUsers').dropdown();
         $('.ui.dropdown.dd-group-member').dropdown();
         $('.ui.accordion').accordion();
+        $('.ui.dropdown.dd-actions').dropdown({
+            action: 'hide'
+        });
+
+        jQuery(".timeago").timeago();
 
         // --------------------------------------------------------------------------------- username mapping to name start
         Utils.showMappedTxt('.mapping-user');
@@ -362,7 +380,7 @@
                         username: $('.ad-user-add').find('input[name="username"]').val(),
                         name: $('.ad-user-add').find('input[name="name"]').val(),
                         mail: $('.ad-user-add').find('input[name="mail"]').val(),
-                        password: '888888',
+                        password: '88888888',
                         enabled: true,
                         baseURL: baseURL,
                         role: $('.ad-user-add').find('input:radio:checked').val()
@@ -388,7 +406,7 @@
                         enabled: false
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
-                            $btn.closest('td').prepend('<div class="ui compact tiny green button lhjz-btn-enable">开启</div>');
+                            $btn.closest('.menu').prepend('<div class="item lhjz-btn-enable">开启</div>');
                             $btn.closest('tr').find('td.user-status').empty().append('<div class="ui yellow small tag label">停用</div>');
                             $btn.remove();
                             toastr.success('停用操作成功!');
@@ -409,7 +427,7 @@
                         enabled: true
                     }, function(data, textStatus, xhr) {
                         if (data.success) {
-                            $btn.closest('td').prepend('<div class="ui compact tiny yellow button lhjz-btn-disable">停用</div>');
+                            $btn.closest('.menu').prepend('<div class="item lhjz-btn-disable">停用</div>');
                             $btn.closest('tr').find('td.user-status').empty().append('<div class="ui green small tag label">开启</div>')
                             $btn.remove();
                             toastr.success('开启操作成功!');
