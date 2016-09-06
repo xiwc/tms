@@ -177,11 +177,11 @@ public class SecurityConfig {
 			}
 			if (StringUtils.isBlank(ipString)
 					|| "unknown".equalsIgnoreCase(ipString)) {
-				request.getHeader("WL-Proxy-Client-IP");
+				ipString = request.getHeader("WL-Proxy-Client-IP");
 			}
 			if (StringUtils.isBlank(ipString)
 					|| "unknown".equalsIgnoreCase(ipString)) {
-				request.getRemoteAddr();
+				ipString = request.getRemoteAddr();
 			}
 
 			// 多个路由时，取第一个非unknown的ip
