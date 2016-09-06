@@ -5,8 +5,10 @@ package com.lhjz.portal.controller;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -20,6 +22,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,16 +31,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.lhjz.portal.base.BaseController;
+import com.lhjz.portal.component.MailSender2;
 import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Language;
 import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.Project;
+import com.lhjz.portal.entity.Setting;
 import com.lhjz.portal.entity.Translate;
 import com.lhjz.portal.entity.security.Authority;
 import com.lhjz.portal.entity.security.Group;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.UserInfo;
+import com.lhjz.portal.pojo.Enum.SettingType;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.repository.ChatRepository;
@@ -46,9 +53,11 @@ import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LanguageRepository;
 import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.repository.ProjectRepository;
+import com.lhjz.portal.repository.SettingRepository;
 import com.lhjz.portal.repository.TranslateRepository;
 import com.lhjz.portal.repository.UserRepository;
 import com.lhjz.portal.util.CollectionUtil;
+import com.lhjz.portal.util.JsonUtil;
 import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.WebUtil;
 
@@ -91,6 +100,12 @@ public class AdminController extends BaseController {
 
 	@Autowired
 	GroupRepository groupRepository;
+
+	@Autowired
+	SettingRepository settingRepository;
+
+	@Autowired
+	MailSender2 mailSender;
 
 	@RequestMapping("login")
 	public String login(Model model) {
@@ -467,5 +482,35 @@ public class AdminController extends BaseController {
 		model.addAttribute("chat", chatRepository.findOne(id));
 
 		return "admin/edit";
+	}
+
+	@SuppressWarnings("unchecked")
+	@RequestMapping("setting")
+	@Secured({ "ROLE_SUPER", "ROLE_ADMIN" })
+	public String setting(Model model) {
+
+		Setting setting = settingRepository
+				.findOneBySettingType(SettingType.Mail);
+
+		if (setting == null) {
+			JavaMailSenderImpl sender = mailSender.getMailSender();
+
+			Map<String, Object> mailSettings = new HashMap<String, Object>();
+			mailSettings.put("host", sender.getHost());
+			mailSettings.put("port", sender.getPort());
+			mailSettings.put("username", sender.getUsername());
+			mailSettings.put("password", "");
+
+			model.addAttribute("mail", mailSettings);
+		} else {
+			Map<String, Object> mailSettings = JsonUtil
+					.json2Object(setting.getContent(), Map.class);
+
+			mailSettings.put("password", "");
+
+			model.addAttribute("mail", mailSettings);
+		}
+
+		return "admin/setting";
 	}
 }

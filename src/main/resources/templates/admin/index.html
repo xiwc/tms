@@ -39,6 +39,8 @@
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html"> <i class="user icon"></i> 用户管理
         </a>
+        <a sec:authorize="hasRole('ROLE_SUPER')" th:classappend="${#strings.contains(uri, '/admin/setting')} ? 'active' : ''" class="item" th:href="@{/admin/setting}" href="setting.html"> <i class="settings icon"></i> 系统设置
+        </a>
     </div>
     <div th:fragment="top-fixed-menu" class="ui fixed inverted main menu">
         <a class="item ad-index-btn-menu">
@@ -98,6 +100,9 @@
                         </a>
                         <a th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
                             <i class="user icon"></i> 用户管理
+                        </a>
+                        <a sec:authorize="hasRole('ROLE_SUPER')" th:classappend="${#strings.contains(uri, '/admin/setting')} ? 'active' : ''" class="item" th:href="@{/admin/setting}" href="setting.html">
+                            <i class="settings icon"></i> 系统设置
                         </a>
                         <div class="item">
                             <i class="linkify icon"></i> 系统外链

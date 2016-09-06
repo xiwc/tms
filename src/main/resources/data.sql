@@ -30,12 +30,12 @@ SET NAMES 'utf8';
 -- ----------------------------
 -- Records of authorities
 -- ----------------------------
+INSERT INTO `authorities` (username, authority) VALUES ('super', 'ROLE_SUPER');
+INSERT INTO `authorities` (username, authority) VALUES ('super', 'ROLE_ADMIN');
+INSERT INTO `authorities` (username, authority) VALUES ('super', 'ROLE_USER');
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_ADMIN');
 INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_USER');
-INSERT INTO `authorities` (username, authority) VALUES ('admin', 'ROLE_SUPER');
-INSERT INTO `authorities` (username, authority) VALUES ('step', 'ROLE_ADMIN');
-INSERT INTO `authorities` (username, authority) VALUES ('step', 'ROLE_USER');
-INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
+INSERT INTO `authorities` (username, authority) VALUES ('user', 'ROLE_USER');
 
 -- ----------------------------
 -- Table structure for groups
@@ -97,9 +97,9 @@ INSERT INTO `authorities` (username, authority) VALUES ('test', 'ROLE_USER');
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiwc87@yeah.net', 'Bultin', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('step', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'xiweicheng@yeah.net', 'Normal', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('test', '$2a$10$nXC2YNfD4vPLFt46JADjJuivx8walsOAHES3wHgcpxbFXMVS32q8u', '', 'weicheng.xi@newtouch.cn', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('super', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'super@tms.com', 'Bultin', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'admin@tms.com', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('user', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'user@tms.com', 'Normal', '2015-04-25 10:01:51', '0');
 
 -- ----------------------------
 -- Table structure for persistent_logins
@@ -149,9 +149,9 @@ INSERT INTO `language_project` (`language_id`, `project_id`) VALUES ('2', '3');
 -- ----------------------------
 -- Records of watcher_project
 -- ----------------------------
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('super', '1');
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('super', '2');
+INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('super', '3');
 INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('admin', '1');
-INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('step', '1');
 INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('admin', '2');
-INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('step', '2');
 INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('admin', '3');
-INSERT INTO `watcher_project` (`user_id`, `project_id`) VALUES ('step', '3');
