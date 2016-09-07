@@ -38,6 +38,22 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 	@Query(value = "SELECT * FROM chat WHERE id > ?1 ORDER BY id ASC", nativeQuery = true)
 	List<Chat> queryRecent(Long lastId);
 
+	@Query(value = "SELECT * FROM chat WHERE id < ?1 ORDER BY create_date DESC LIMIT ?2", nativeQuery = true)
+	List<Chat> queryMoreOld(Long startId, int limit);
+
+	@Query(value = "SELECT * FROM chat WHERE id > ?1 ORDER BY create_date ASC LIMIT ?2", nativeQuery = true)
+	List<Chat> queryMoreNew(Long startId, int limit);
+
+	// @Query(value = "SELECT MAX(id) as max_id, MIN(id) as min_id FROM chat",
+	// nativeQuery = true)
+	// Map<String, Long> queryMaxAndMinId();
+
+	@Query(value = "SELECT COUNT(*) as cnt FROM chat WHERE id < ?1", nativeQuery = true)
+	long countAllOld(Long startId);
+
+	@Query(value = "SELECT COUNT(*) as cnt FROM chat WHERE id > ?1", nativeQuery = true)
+	long countAllNew(Long startId);
+
 	@Query(value = "SELECT COUNT(*) FROM chat WHERE id > ?1", nativeQuery = true)
 	long countQueryRecent(Long lastId);
 

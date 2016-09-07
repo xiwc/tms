@@ -2001,8 +2001,8 @@
 
             $btn = $(this);
 
-            $.get('/admin/chat/more', {
-                page: $('input:hidden[name="page.number.next"]').val(),
+            $.get('/admin/chat/more/old', {
+                startId: $btn.next(".comment").attr('data-id'),
                 size: $('input:hidden[name="page.size"]').val()
             }, function(data) {
                 if (data.success) {
@@ -2012,19 +2012,15 @@
                         return;
                     }
 
-                    $('input:hidden[name="page.number.next"]').val(data.data.number + 1);
-                    $('input:hidden[name="page.size"]').val(data.data.size);
-
                     var $more = convertChat(data.data.content, null, false);
 
                     $more.insertAfter($('.btn-chat-more'));
-                    //(chats.totalElements - (chats.number + 1) * chats.size)
-                    $('.btn-chat-more').text('加载更多(' + (data.data.totalElements - (data.data.number + 1) * data.data.size) + ')');
+                    $('.btn-chat-more').text('加载更多(' + data.data.countMore + ')');
 
                     s2mk();
 
                     jQuery(".timeago").timeago();
-                    data.data.last && $btn.remove();
+                    !data.data.hasMore && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
                     toastr.error(data.data, '加载失败!');
@@ -2037,8 +2033,8 @@
 
             $btn = $(this);
 
-            $.get('/admin/chat/more', {
-                page: $('input:hidden[name="page.number.pre"]').val(),
+            $.get('/admin/chat/more/new', {
+                startId: $btn.prev(".comment").attr('data-id'),
                 size: $('input:hidden[name="page.size"]').val()
             }, function(data) {
                 if (data.success) {
@@ -2048,19 +2044,15 @@
                         return;
                     }
 
-                    $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
-                    $('input:hidden[name="page.size"]').val(data.data.size);
-
                     var $more = convertChat(data.data.content, null, true);
                     $more.insertBefore($('.btn-chat-pre-more'));
-                    // (chats.number * chats.size)
-                    $('.btn-chat-pre-more').text('加载更多(' + (data.data.number * data.data.size) + ')');
+                    $('.btn-chat-pre-more').text('加载更多(' + data.data.countMore + ')');
 
                     s2mk();
 
                     jQuery(".timeago").timeago();
 
-                    data.data.first && $btn.remove();
+                    !data.data.hasMore && $btn.remove();
                     toastr.success('加载成功!');
                 } else {
                     toastr.error(data.data, '加载失败!');
