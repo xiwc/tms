@@ -411,6 +411,42 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chats);
 	}
 
+	@RequestMapping(value = "more/old", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody moreOld(@RequestParam("startId") Long startId,
+			@RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+
+		List<Chat> chats = chatRepository.queryMoreOld(startId, size);
+		long countAllOld = chatRepository.countAllOld(startId);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("content", CollectionUtil.reverseList(chats));
+		map.put("hasMore", countAllOld > chats.size());
+		map.put("countMore", countAllOld - chats.size());
+		map.put("numberOfElements", chats.size());
+		map.put("size", size);
+
+		return RespBody.succeed(map);
+	}
+
+	@RequestMapping(value = "more/new", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody moreNew(@RequestParam("startId") Long startId,
+			@RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+
+		List<Chat> chats = chatRepository.queryMoreNew(startId, size);
+		long countAllNew = chatRepository.countAllNew(startId);
+
+		Map<String, Object> map = new HashMap<>();
+		map.put("content", chats);
+		map.put("hasMore", countAllNew > chats.size());
+		map.put("countMore", countAllNew - chats.size());
+		map.put("numberOfElements", chats.size());
+		map.put("size", size);
+
+		return RespBody.succeed(map);
+	}
+
 	@RequestMapping(value = "moreLogs", method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody moreLogs(
