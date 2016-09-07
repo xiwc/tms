@@ -2219,13 +2219,6 @@
         // 轮询最新沟通消息
         window.poll.start(function(resetCb, stopCb) {
 
-            var preMore = $('.btn-chat-pre-more').size() == 1;
-
-            if (preMore) { // 如果有最新消息有分页, 取消轮询.
-                // stopCb();
-                return;
-            }
-
             var $last = $('.chat .comments .comment').last();
             var $first = $('.fd-dynamic .event').first();
 
@@ -2236,7 +2229,8 @@
             }, function(data) {
                 if (data.success) {
 
-                    if (data.data[1] > 0) {
+                    // 如果有最新消息没有有分页 & 轮询发现有新消息
+                    if (($('.btn-chat-pre-more').size() == 0) && data.data[1] > 0) {
                         resetCb();
                         var lastCnt = $('.btn-get-chat-news').children('.lbl-chat-news-count').text();
                         $('.btn-get-chat-news').children('.lbl-chat-news-count').text(data.data[1]);
@@ -2253,7 +2247,6 @@
                     }
 
                     if (data.data[4] > 0) { // 有@消息
-                        // var lastCnt = $('.btn-get-chat-ats').children('.lbl-chat-ats-count').text();
                         var atCnt = data.data[4];
                         $('.btn-get-chat-ats').children('.lbl-chat-ats-count').text(atCnt > 99 ? '99+' : atCnt);
                         $('.btn-get-chat-ats').show();
