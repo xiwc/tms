@@ -283,7 +283,7 @@ jQuery(function($) {
             return link;
         },
         generateDir: function(link) {
-            var $list = $('<div class="ui list"></div>');
+            var $list = $('<div class="ui bulleted list"></div>');
             prodDir($list, link);
             return $list;
         },
