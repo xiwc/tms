@@ -53,6 +53,8 @@ public class Chat implements Serializable {
 	@Column(length = 16777216)
 	private String voteCai;
 
+	private Boolean openEdit;
+
 	private Integer voteZanCnt;
 
 	private Integer voteCaiCnt;
@@ -230,15 +232,21 @@ public class Chat implements Serializable {
 		this.voteCaiCnt = voteCaiCnt;
 	}
 
+	public Boolean getOpenEdit() {
+		return openEdit;
+	}
+
+	public void setOpenEdit(Boolean openEdit) {
+		this.openEdit = openEdit;
+	}
+
 	@Override
 	public String toString() {
 		return "Chat [id=" + id + ", content=" + content + ", voteZan="
-				+ voteZan + ", voteCai=" + voteCai + ", voteZanCnt="
-				+ voteZanCnt + ", voteCaiCnt=" + voteCaiCnt + ", creator="
-				+ creator + ", updater=" + updater + ", status=" + status
-				+ ", type=" + type + ", createDate=" + createDate
-				+ ", updateDate=" + updateDate + ", version=" + version
-				+ ", privated=" + privated + ", title=" + title + "]";
+				+ voteZan + ", voteCai=" + voteCai + ", openEdit=" + openEdit
+				+ ", creator=" + creator + ", updater=" + updater + ", status="
+				+ status + ", createDate=" + createDate + ", updateDate="
+				+ updateDate + ", version=" + version + "]";
 	}
 
 }

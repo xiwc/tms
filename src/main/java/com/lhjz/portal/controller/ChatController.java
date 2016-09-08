@@ -229,13 +229,23 @@ public class ChatController extends BaseController {
 			return RespBody.failed("修改内容不能为空!");
 		}
 
+		final User loginUser = getLoginUser();
 		Chat chat = chatRepository.findOne(id);
+
+		boolean isSuper = WebUtil.getUserAuthorities()
+				.contains(SysConstant.ROLE_SUPER);
+		boolean isCreator = chat.getCreator().getUsername()
+				.equals(loginUser.getUsername());
+		Boolean isOpenEdit = chat.getOpenEdit() == null ? false
+				: chat.getOpenEdit();
+
+		if (!isSuper && !isCreator && !isOpenEdit) {
+			return RespBody.failed("您没有权限编辑该消息内容!");
+		}
 
 		if (content.equals(chat.getContent())) {
 			return RespBody.failed("修改内容没有任何变更的内容!");
 		}
-
-		final User loginUser = getLoginUser();
 
 		chat.setContent(content);
 		chat.setUpdateDate(new Date());
@@ -348,6 +358,15 @@ public class ChatController extends BaseController {
 		Chat chat = chatRepository.findOne(id);
 		if (chat == null) {
 			return RespBody.failed("删除聊天内容不存在!");
+		}
+
+		boolean isSuper = WebUtil.getUserAuthorities()
+				.contains(SysConstant.ROLE_SUPER);
+		boolean isCreator = chat.getCreator().getUsername()
+				.equals(WebUtil.getUsername());
+
+		if (!isSuper && !isCreator) {
+			return RespBody.failed("您没有权限删除该消息内容!");
 		}
 
 		List<ChatAt> chatAts = chatAtRepository.findByChat(chat);
@@ -841,5 +860,22 @@ public class ChatController extends BaseController {
 				getLoginUser(), Status.New);
 
 		return RespBody.succeed(chatStows);
+	}
+
+	@RequestMapping(value = "openEdit", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody openEdit(@RequestParam("id") Long id,
+			@RequestParam("open") Boolean open) {
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("操作消息不存在,可能已经被删除!");
+		}
+
+		chat.setOpenEdit(open);
+		chatRepository.saveAndFlush(chat);
+
+		return RespBody.succeed();
 	}
 }

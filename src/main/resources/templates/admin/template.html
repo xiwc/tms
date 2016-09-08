@@ -116,17 +116,27 @@
                 </div>
                 <div class="actions">
                     <a class="reply">回复</a>
-                    <a class="stow">收藏</a> {{if actions}}
-                    <a class="edit">编辑</a>
-                    <a class="delete">删除</a> {{/if}}
+                    <a class="stow">收藏</a> 
+                    {{if isEditable}}
+                    <a class="edit">编辑</a> 
+                    {{/if}}
+                    {{if actions}}
+                    <a class="delete">删除</a> 
+                    {{/if}}
                     <div class="ui top right pointing dropdown dd-more-actions">
                         <div class="text" style="margin: 0;">更多</div>
                         <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                         <div class="menu">
-                            {{if actions}}
+                            {{if isEditable}}
                             <div class="item edit">编辑</div>
-                            <div class="item delete">删除</div> {{/if}}
+                            {{/if}}
+                            {{if actions}}
+                            <div class="item delete">删除</div>
+                            {{/if}}
                             <div class="item btn-read">阅读</div>
+                            {{if actions}}
+                            <div class="item btn-openEdit" data-value="${isOpenEdit}">${openEditText}</div>
+                            {{/if}}
                             {{if isNotWiki}}
                             <div class="item btn-wiki">转博</div>
                             {{/if}}
