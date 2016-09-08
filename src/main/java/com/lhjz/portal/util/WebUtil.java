@@ -3,8 +3,11 @@ package com.lhjz.portal.util;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.request.RequestAttributes;
@@ -435,6 +439,53 @@ public final class WebUtil {
 			logger.warn("获取登录用户名错误，将返回空字符串。 错误信息 ：{}", e.getMessage());
 			return StringUtil.EMPTY;
 		}
+	}
+
+	/**
+	 * 获取验证登录的用户信息
+	 * 
+	 * @return
+	 */
+	public static UserDetails getUserDetails() {
+
+		try {
+			Object principal = SecurityContextHolder.getContext()
+					.getAuthentication().getPrincipal();
+
+			if (principal instanceof UserDetails) {
+				return ((UserDetails) principal);
+			} else {
+				logger.warn("获取登录用户信息类型错误。 用户信息 ：{}", principal.toString());
+				return null;
+			}
+		} catch (Exception e) {
+			logger.warn("获取登录用户信息错误。 错误信息 ：{}", e.getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * 获取验证登录的用户权限
+	 * 
+	 * @return
+	 */
+	public static List<String> getUserAuthorities() {
+
+		List<String> aus = new ArrayList<>();
+
+		try {
+			UserDetails userDetails = WebUtil.getUserDetails();
+			Collection<? extends GrantedAuthority> authorities = userDetails
+					.getAuthorities();
+			authorities.forEach((au) -> {
+				aus.add(au.getAuthority());
+			});
+
+		} catch (Exception e) {
+			logger.warn("获取登录用户权限信息错误。 错误信息 ：{}", e.getMessage());
+		}
+
+		return aus;
 	}
 
 	/**

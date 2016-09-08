@@ -49,6 +49,8 @@ public class Chat implements Serializable {
 	@Column(length = 16777216)
 	private String voteCai;
 
+	private Boolean openEdit;
+
 	@ManyToOne
 	@JoinColumn(name = "creator")
 	private User creator;
@@ -161,13 +163,21 @@ public class Chat implements Serializable {
 		this.voteCai = voteCai;
 	}
 
+	public Boolean getOpenEdit() {
+		return openEdit;
+	}
+
+	public void setOpenEdit(Boolean openEdit) {
+		this.openEdit = openEdit;
+	}
+
 	@Override
 	public String toString() {
 		return "Chat [id=" + id + ", content=" + content + ", voteZan="
-				+ voteZan + ", voteCai=" + voteCai + ", creator=" + creator
-				+ ", updater=" + updater + ", status=" + status
-				+ ", createDate=" + createDate + ", updateDate=" + updateDate
-				+ ", version=" + version + "]";
+				+ voteZan + ", voteCai=" + voteCai + ", openEdit=" + openEdit
+				+ ", creator=" + creator + ", updater=" + updater + ", status="
+				+ status + ", createDate=" + createDate + ", updateDate="
+				+ updateDate + ", version=" + version + "]";
 	}
 
 }

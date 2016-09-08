@@ -576,15 +576,16 @@
                                     <div class="actions">
                                         <a class="reply">回复</a>
                                         <a class="stow">收藏</a>
-                                        <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">编辑</a>
+                                        <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username) or (c.openEdit != null and c.openEdit)}">编辑</a>
                                         <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">删除</a>
                                         <div class="ui top right pointing dropdown dd-more-actions">
                                             <a class="text" style="margin: 0;">更多</a>
                                             <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                                             <div class="menu">
-                                                <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">编辑</div>
+                                                <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username) or (c.openEdit != null and c.openEdit)}">编辑</div>
                                                 <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">删除</div>
                                                 <div class="item btn-read">阅读</div>
+                                                <div class="item btn-openEdit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}" th:attr="data-value=${c.openEdit}" th:text="${(c.openEdit != null and c.openEdit) ? '关闭协作' : '开启协作'}">开启协作</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
                                             </div>
@@ -1769,11 +1770,18 @@
                 if (chat.creator.name) {
                     chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                 }
+
+                chat.isOpenEdit = !!chat.openEdit;
+                chat.openEditText = chat.isOpenEdit ? '关闭协作' : '开启协作';
+                
                 // if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
                 //     chat.actions = true;
                 // }
                 if (isSuperRole == 'true' || loginUsername == chat.creator.username) {
                     chat.actions = true;
+                }
+                if (isSuperRole == 'true' || loginUsername == chat.creator.username || chat.isOpenEdit) {
+                    chat.isEditable = true;
                 }
                 var d = new Date(chat.createDate);
                 chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
@@ -2585,6 +2593,27 @@
         $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-read', function(event) {
             event.preventDefault();
             commentRead($(this).closest('.comment'));
+        });
+
+        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-openEdit', function(event) {
+            event.preventDefault();
+            var $btn = $(this);
+
+            var sts = $btn.attr('data-value') == 'true';
+
+            $.post('admin/chat/openEdit', {
+                id: $btn.closest('.comment').attr('data-id'),
+                open: !sts
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    toastr.success(sts ? '关闭协作操作成功!' : '开启协作操作成功!');
+                    $btn.text(sts ? '开启协作' : '关闭协作');
+                    $btn.attr('data-value', !sts)
+                } else {
+                    toastr.error(data.data, "操作失败!");
+                }
+            });
+
         });
         //-----------------------------------------------------------chat comment more-actions end
 
