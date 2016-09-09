@@ -1996,7 +1996,7 @@
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
                                     $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(data.data.content)));
-                                    $btn.closest('.comment').attr('data-version', data.data.version)
+                                    $btn.closest('.comment').attr('data-version', data.data.version);
                                     simplemdeEdit.value('');
                                     simplemdeEdit.clearAutosavedValue();
                                     toastr.success('更新成功!');
