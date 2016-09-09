@@ -84,7 +84,7 @@
         </tr>
     </script>
     <script th:fragment="chatMoreTpl" id="chatMoreTpl" type="text/x-jquery-tmpl">
-        <div class="animated bounceInLeft comment ${marked} ${marker}" data-id="${id}">
+        <div class="animated bounceInLeft comment ${marked} ${marker}" data-id="${id}" data-version="${version}">
             <a class="avatar ui mini circular image" data-value="${creator.username}" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                 {{if creator.iconName}}
                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>

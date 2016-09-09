@@ -218,6 +218,7 @@ public class ChatController extends BaseController {
 	@ResponseBody
 	public RespBody update(
 			@RequestParam("id") Long id,
+			@RequestParam("version") Long version,
 			@RequestParam("content") String content,
 			@RequestParam("baseURL") String baseURL,
 			@RequestParam(value = "usernames", required = false) String usernames,
@@ -241,6 +242,10 @@ public class ChatController extends BaseController {
 
 		if (!isSuper && !isCreator && !isOpenEdit) {
 			return RespBody.failed("您没有权限编辑该消息内容!");
+		}
+
+		if (chat.getVersion() != version.longValue()) {
+			return RespBody.failed("该消息已经被其他人更新,请刷新消息重新编辑提交!");
 		}
 
 		if (content.equals(chat.getContent())) {
