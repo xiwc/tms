@@ -554,7 +554,7 @@
                         <div class="ui minimal comments" style="display:none;">
                             <h3 class="ui dividing header">沟通</h3>
                             <button th:unless="${chats.last}" class="fluid ui button btn-chat-more" th:text="${'加载更多(' + (chats.totalElements - (chats.number + 1) * chats.size) + ')'}">加载更多</button>
-                            <div class="animated bounceInLeft comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}">
+                            <div class="animated bounceInLeft comment" th:each="c : ${chats}" th:classappend="${(param.containsKey('id') and #strings.equals(param.id[0], c.id)) ? 'marked' : ''}" th:attr="data-id=${c.id}, data-version=${c.version}">
                                 <a class="avatar ui mini circular image" th:attr="data-value=${c.creator.username}" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                                     <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;" th:if="${not #strings.isEmpty(c.creator.name)}" th:text="${#strings.toUpperCase(#strings.substring(c.creator.name,#strings.length(c.creator.name) - 1,#strings.length(c.creator.name)))}">管理员</span>
                                     <img th:if="${#strings.isEmpty(c.creator.name)}" th:src="@{/img/head.png}" src="../../static/img/head.png">
@@ -1967,7 +1967,7 @@
                         closable: false, // 防止修改内容没保存窗口关闭导致数据丢失
                         onVisible: function() {
                             simplemdeEdit.codemirror.focus();
-                            simplemdeEdit.value(data.data.content);
+                            simplemdeEdit.value(contentOld);
                         },
                         onApprove: function() {
                             if (!simplemdeEdit.value()) {
@@ -1992,16 +1992,21 @@
                                 content: content,
                                 contentHtmlOld: htmlOld,
                                 contentHtml: html,
+                                version: data.data.version
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
-                                    $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(simplemdeEdit.value())));
+                                    $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(data.data.content)));
+                                    $btn.closest('.comment').attr('data-version', data.data.version)
                                     simplemdeEdit.value('');
                                     simplemdeEdit.clearAutosavedValue();
                                     toastr.success('更新成功!');
+                                    $('.ad-chat-edit').modal('hide');
                                 } else {
                                     toastr.error(data.data, '更新失败!');
                                 }
                             });
+
+                            return false;
                         }
                     }).modal('show');
                 } else {
