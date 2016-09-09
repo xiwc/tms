@@ -236,7 +236,7 @@
                             {{/if}}
                         </span>
                         <span>发表于</span>
-                        <span class="cinema timeago" title="${createDateFormat}">${createDateFormat}</span>
+                        <span class="cinema timeago" style="font-style: italic;" title="${createDateFormat}">${createDateFormat}</span>
                     </div>
                     <div class="description markdown-body" style="width:300px; word-break: break-all; max-height: 200px; overflow: auto;">
                         {{html contentMd}}
@@ -404,7 +404,7 @@
                     {{/if}}
                 </a>
             </div>
-            <div class="content" style="width: 100%;">
+            <div class="content" style="width: 100%; position: relative;">
                 <a class="header" data-value="${creator.username}" style="display: inline;">
                     {{if creator.name}}
                         ${creator.name}
@@ -413,9 +413,9 @@
                     {{/if}}
                 </a>
                 <div class="metadata" style="float: right;">
-                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                    <span class="date timeago" style="font-size: 12px;" title="${createDateFormat}">${createDateFormat}</span>
                 </div>
-                <div class="actions" style="float: right; padding-right: 10px;">
+                <div class="actions" style="position: absolute; right: 65px; top: 0;">
                     <a class="remove">移除</a>
                 </div>
                 <div class="description">${contentBrief}</div>
