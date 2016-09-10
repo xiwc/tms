@@ -48,7 +48,7 @@ public final class CollectionUtil {
 	 * @return
 	 */
 	public static boolean isNotEmpty(Collection<?> collection) {
-		return isEmpty(collection);
+		return !isEmpty(collection);
 	}
 	
 	/**

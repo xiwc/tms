@@ -9,6 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -224,12 +226,12 @@ public class ChatController extends BaseController {
 		final User loginUser = getLoginUser();
 		Chat chat = chatRepository.findOne(id);
 
-		boolean isSuper = WebUtil.getUserAuthorities()
-				.contains(SysConstant.ROLE_SUPER);
+		boolean isSuper = WebUtil.getUserAuthorities().contains(
+				SysConstant.ROLE_SUPER);
 		boolean isCreator = chat.getCreator().getUsername()
 				.equals(loginUser.getUsername());
-		Boolean isOpenEdit = chat.getOpenEdit() == null ? false
-				: chat.getOpenEdit();
+		Boolean isOpenEdit = chat.getOpenEdit() == null ? false : chat
+				.getOpenEdit();
 
 		if (!isSuper && !isCreator && !isOpenEdit) {
 			return RespBody.failed("您没有权限编辑该消息内容!");
@@ -356,8 +358,8 @@ public class ChatController extends BaseController {
 			return RespBody.failed("删除聊天内容不存在!");
 		}
 
-		boolean isSuper = WebUtil.getUserAuthorities()
-				.contains(SysConstant.ROLE_SUPER);
+		boolean isSuper = WebUtil.getUserAuthorities().contains(
+				SysConstant.ROLE_SUPER);
 		boolean isCreator = chat.getCreator().getUsername()
 				.equals(WebUtil.getUsername());
 
@@ -395,7 +397,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = { "poll", "poll/unmask" }, method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody poll(@RequestParam("lastId") Long lastId,
+	public RespBody poll(
+			@RequestParam("lastId") Long lastId,
 			@RequestParam("lastEvtId") Long lastEvtId,
 			@RequestParam(value = "isAt", required = false, defaultValue = "false") Boolean isAt) {
 
@@ -437,7 +440,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "more/old", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody moreOld(@RequestParam("startId") Long startId,
+	public RespBody moreOld(
+			@RequestParam("startId") Long startId,
 			@RequestParam(value = "size", required = false, defaultValue = "10") int size) {
 
 		List<Chat> chats = chatRepository.queryMoreOld(startId, size);
@@ -455,7 +459,8 @@ public class ChatController extends BaseController {
 
 	@RequestMapping(value = "more/new", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody moreNew(@RequestParam("startId") Long startId,
+	public RespBody moreNew(
+			@RequestParam("startId") Long startId,
 			@RequestParam(value = "size", required = false, defaultValue = "10") int size) {
 
 		List<Chat> chats = chatRepository.queryMoreNew(startId, size);
@@ -490,20 +495,39 @@ public class ChatController extends BaseController {
 		Page<Chat> chats = null;
 
 		if (search.startsWith(SysConstant.FILTER_PRE)) {
-			String username = search.substring(SysConstant.FILTER_PRE.length());
-			User user = getUser(username);
-			if (user != null) {
-				chats = chatRepository.findByCreator(user, pageable);
+			String query = search.substring(SysConstant.FILTER_PRE.length());
+			String[] querys = query.split(":");
+
+			List<User> users = null;
+			String searchContent = null;
+
+			if (querys.length > 0) {
+				users = Stream.of(querys[0].split("&")).filter((name) -> {
+					return StringUtil.isNotEmpty(name.trim());
+				}).map((name) -> {
+					return getUser(name.trim());
+				}).collect(Collectors.toList());
+			}
+
+			if (querys.length > 1) {
+				searchContent = querys[1].trim();
+			}
+
+			if (CollectionUtil.isNotEmpty(users)) {
+				if (StringUtil.isNotEmpty(searchContent)) {
+					chats = chatRepository.findByCreatorInAndContentContaining(
+							users, searchContent, pageable);
+				} else {
+					chats = chatRepository.findByCreatorIn(users, pageable);
+				}
 			} else {
 				return RespBody.failed("查询指定创建者不存在!");
 			}
+
 		} else {
 			chats = chatRepository.findByContentLike("%" + search + "%",
 					pageable);
 		}
-
-		// chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
-		// .getContent()), pageable, chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
@@ -692,6 +716,20 @@ public class ChatController extends BaseController {
 				getLoginUser(), Status.New);
 
 		return RespBody.succeed(chatStows);
+	}
+
+	@RequestMapping(value = "getReplies", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody getReplies(@RequestParam("id") Long id) {
+
+		// [回复#871](http://translation.sh1.newtouch.com/admin/dynamic?id=871)
+
+		String query = StringUtil.replaceByKV(
+				"%[回复#{id}](%/admin/dynamic?id={id})%", "id", id);
+
+		List<Chat> chats = chatRepository.queryReplies(id, query);
+
+		return RespBody.succeed(chats);
 	}
 
 	@RequestMapping(value = "openEdit", method = RequestMethod.POST)
