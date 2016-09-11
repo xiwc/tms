@@ -56,7 +56,7 @@
 <body>
     <div class="ui container chat-edit markdown-body">
         <textarea name="content" th:text="${chat.content}"></textarea>
-        <button class="ui right floated primary button btn-save" th:attr="data-id=${chat.id}">保存</button>
+        <button class="ui right floated primary button btn-save" th:attr="data-id=${chat.id}, data-version=${chat.version}">保存</button>
         <button class="ui left floated button btn-reset" th:attr="data-id=${chat.id}">重置</button>
         <div class="clearfix"></div>
     </div>
@@ -162,9 +162,11 @@
                 content: content,
                 contentHtmlOld: htmlOld,
                 contentHtml: html,
+                version: $btn.attr('data-version')
             }, function(data, textStatus, xhr) {
                 if (data.success) {
-                    $('input:hidden[name="content"]').val(content);
+                    $('input:hidden[name="content"]').val(data.data.content);
+                    $btn.attr('data-version', data.data.version);
                     simplemdeEdit.autosave();
                     toastr.success('更新成功!');
                 } else {

@@ -1970,6 +1970,7 @@
                                 content: content,
                                 contentHtmlOld: htmlOld,
                                 contentHtml: html,
+                                version: data.data.version
                             }, function(data, textStatus, xhr) {
                                 if (data.success) {
                                     $btn.closest('.comment').find('.content .text.markdown-body').html(simplemdeEdit.markdown(preParse(data.data.content)));
