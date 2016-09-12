@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -514,15 +513,18 @@ public class ChatController extends BaseController {
 			String query = search.substring(SysConstant.FILTER_PRE.length());
 			String[] querys = query.split(":");
 
-			List<User> users = null;
+			final List<User> users = new ArrayList<>();
 			String searchContent = null;
 
 			if (querys.length > 0) {
-				users = Stream.of(querys[0].split("&")).filter((name) -> {
+				Stream.of(querys[0].split("&")).filter((name) -> {
 					return StringUtil.isNotEmpty(name.trim());
-				}).map((name) -> {
-					return getUser(name.trim());
-				}).collect(Collectors.toList());
+				}).forEach((name) -> {
+					User user = getUser(name);
+					if (user != null) {
+						users.add(user);
+					}
+				});
 			}
 
 			if (querys.length > 1) {
