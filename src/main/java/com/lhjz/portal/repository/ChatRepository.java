@@ -3,6 +3,7 @@
  */
 package com.lhjz.portal.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -44,6 +45,9 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 	@Query(value = "SELECT * FROM chat WHERE id > ?1 ORDER BY create_date ASC LIMIT ?2", nativeQuery = true)
 	List<Chat> queryMoreNew(Long startId, int limit);
 
+	@Query(value = "SELECT * FROM chat WHERE id > ?1 AND content LIKE ?2 ORDER BY create_date ASC", nativeQuery = true)
+	List<Chat> queryReplies(Long id, String like);
+
 	@Query(value = "SELECT MAX(id) as max_id, MIN(id) as min_id FROM chat", nativeQuery = true)
 	Object queryMaxAndMinId();
 
@@ -62,4 +66,9 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
 	Page<Chat> findByContentLike(String search, Pageable pageable);
 	
 	Page<Chat> findByCreator(User creator, Pageable pageable);
+
+	Page<Chat> findByCreatorIn(Collection<User> creators, Pageable pageable);
+
+	Page<Chat> findByCreatorInAndContentContaining(Collection<User> creators,
+			String search, Pageable pageable);
 }

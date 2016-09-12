@@ -108,8 +108,8 @@
         overflow-y: auto;
     }
     
-    .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
-    .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
+    .comments .comment .content .actions .dd-more-actions .menu > .edit,
+    .comments .comment .content .actions .dd-more-actions .menu > .delete {
         display: none;
     }
     
@@ -276,12 +276,12 @@
     /* Mobile */
     
     @media only screen and (max-width: 767px) {
-        .chat .comments .comment .content .actions > a.edit,
-        .chat .comments .comment .content .actions > a.delete {
+        .comments .comment .content .actions > a.edit,
+        .comments .comment .content .actions > a.delete {
             display: none;
         }
-        .chat .comments .comment .content .actions .dd-more-actions .menu > .edit,
-        .chat .comments .comment .content .actions .dd-more-actions .menu > .delete {
+        .comments .comment .content .actions .dd-more-actions .menu > .edit,
+        .comments .comment .content .actions .dd-more-actions .menu > .delete {
             display: block;
         }
         .ui.button.btn-chat-s2b,
@@ -501,13 +501,13 @@
 <body>
     <div th:replace="admin/index :: sidebar-menu"></div>
     <div th:replace="admin/index :: top-fixed-menu"></div>
-    <div class="pusher ad-index-content" style="padding-top: 40px; padding-bottom: 0;">
+    <div class="pusher ad-index-content" style="padding-bottom: 0;">
         <div class="ad-index-container">
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
                 <!-- <div th:replace="admin/template :: ad-page-header ('沟通动态', 'dynamic')"></div> -->
-                <div class="main ui container">
-                    <div class="ui dividing right rail" style="min-height: 279px; padding-left: 1rem;">
+                <div class="main ui container" style="padding-top: 0;">
+                    <div class="ui dividing right rail" style="min-height: 279px; padding-left: 1rem; padding-top: 0;">
                         <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px; padding-bottom: 20px;">
                             <h4 class="ui dividing header">动态</h4>
                             <div class="ui feed fd-dynamic">
@@ -709,6 +709,9 @@
     </div>
     <!-- popup container start -->
     <div class="ui flowing popup top left transition hidden pp-translate"></div>
+    <div class="ui flowing popup transition hidden pp-comment-reply">
+        <div class="ui minimal comments" style="max-height:180px; overflow-y:auto; padding: 5px;"></div>
+    </div>
     <div class="chat-search-loc"></div>
     <div class="ui basic flowing popup top left transition hidden pp-chat-search-results">
         <div class="ui selection divided list list-chat-search-results" style="max-height:500px; overflow:auto;">
@@ -740,6 +743,7 @@
     <div th:replace="admin/template :: ad-page-dimmer"></div>
     <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
     <div th:replace="admin/template :: chatMoreTpl"></div>
+    <div th:replace="admin/template :: chatReplyTpl"></div>
     <div th:replace="admin/template :: logMoreTpl"></div>
     <div th:replace="admin/template :: tansPpTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
@@ -852,7 +856,7 @@
 
         // ------------------------------------------------------------------------------------- fancybox image start
 
-        $('body').on('click', '.chat .comments .comment .content .text.markdown-body img, .pp-translate .description.markdown-body img', function(event) {
+        $('body').on('click', '.comments .comment .content .text.markdown-body img, .pp-translate .description.markdown-body img', function(event) {
             event.preventDefault();
             $img = $(this);
             var imgArr = [];
@@ -874,7 +878,7 @@
 
         // ------------------------------------------------------------------------------------- rating start
 
-        $('body').on('click', '.chat .comments .comment .content .rating i.outline.icon', function(event) {
+        $('body').on('click', '.comments .comment .content .rating i.outline.icon', function(event) {
             event.preventDefault();
             $icon = $(this).removeClass('outline');
             $span = $icon.parent().children('span');
@@ -990,6 +994,7 @@
             observeChanges: false,
             position: 'bottom right',
             closable: false,
+            hideOnScroll: false,
             delay: {
                 show: 300,
                 hide: 300
@@ -1102,6 +1107,9 @@
 
                     var $more = convertChat(chats, $item.attr('data-id'));
                     $more.insertAfter($after);
+
+                    jQuery(".timeago").timeago();
+
                     s2m();
                 }
             });
@@ -1983,7 +1991,7 @@
                                     toastr.error(data.data, '更新失败!');
                                 }
                             });
-                            
+
                             return false;
                         }
                     }).modal('show');
@@ -1993,7 +2001,7 @@
             });
         });
 
-        $('body').on('click', '.chat .comments .comment .content .author, .chat .comments .comment .avatar, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user, .pp-translate .group-user, .pp-translate .user-group', function(event) {
+        $('body').on('click', '.comments .comment .content .author, .comments .comment .avatar, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user, .pp-translate .group-user, .pp-translate .user-group', function(event) {
             event.preventDefault();
             insertAtUserOrGroup(cm, $(this).attr('data-value'));
             s2b();
@@ -2328,7 +2336,7 @@
 
 
         // 翻译popup
-        $('body').on('mouseenter', '#context .chat a[href*="admin/translate"]:not(.pp-not)', function(event) {
+        $('body').on('mouseenter', '#context a[href*="admin/translate"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
 
@@ -2363,6 +2371,8 @@
                             var d = new Date(translate.createDate);
                             translate.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
                             $("#tansPpTpl").tmpl(data.data).appendTo($pp.empty());
+
+                            Utils.showMappedTxt('.pp-translate .mapping-user');
                             $('.pp-translate .timeago').timeago();
                         } else {
                             toastr.error(data.data, "加载失败!");
@@ -2373,7 +2383,7 @@
         });
 
         // 消息popup
-        $('body').on('mouseenter', '#context .chat a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
+        $('body').on('mouseenter', '#context a[href*="admin/dynamic"]:not(.pp-not)', function(event) {
             event.preventDefault();
             var $a = $(this);
 
@@ -2417,15 +2427,15 @@
         });
 
         // 用户信息popup
-        $('#context .chat').on('mouseenter', 'span[data-value].at-user:not(.pp-not)', function(event) {
+        $('#context').on('mouseenter', 'span[data-value].at-user:not(.pp-not)', function(event) {
             showUserInfoPp($(this), event);
         });
         // 用户信息popup
-        $('#context .chat').on('mouseenter', 'a[data-value].avatar:not(.pp-not)', function(event) {
+        $('#context').on('mouseenter', 'a[data-value].avatar:not(.pp-not)', function(event) {
             showUserInfoPp($(this), event);
         });
         // 用户信息popup
-        $('#context .chat').on('mouseenter', 'a[data-value].author:not(.pp-not)', function(event) {
+        $('#context').on('mouseenter', 'a[data-value].author:not(.pp-not)', function(event) {
             showUserInfoPp($(this), event);
         });
 
@@ -2482,7 +2492,7 @@
         }
 
         // 用户组信息popup
-        $('#context .chat').on('mouseenter', 'span[data-value].at-group:not(.pp-not)', function(event) {
+        $('#context').on('mouseenter', 'span[data-value].at-group:not(.pp-not)', function(event) {
             showUserGroupInfoPp($(this), event);
         });
 
@@ -2562,12 +2572,12 @@
         });
 
         //-----------------------------------------------------------chat comment more-actions start
-        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-read', function(event) {
+        $('body').on('click', '.comments .comment .dd-more-actions .btn-read', function(event) {
             event.preventDefault();
             commentRead($(this).closest('.comment'));
         });
 
-        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-openEdit', function(event) {
+        $('body').on('click', '.comments .comment .dd-more-actions .btn-openEdit', function(event) {
             event.preventDefault();
             var $btn = $(this);
 
@@ -2791,6 +2801,9 @@
 
         $('body').on('mouseenter', '.chat .comment', function(event) {
             event.preventDefault();
+
+            var $c = $(this);
+
             var $header = $(event.target).closest('.comment').find('.content a.author');
             if ($header.size() > 0) {
                 $('.btn-chat-s2h').data('target', $header.closest('.comment'));
@@ -2805,6 +2818,77 @@
             } else {
                 $('.btn-chat-dir').show();
             }
+
+
+            $.get('admin/chat/getReplies', {
+                id: $c.attr('data-id')
+            }, function(data) {
+                if (data.success) {
+
+                    var chats = data.data;
+                    if (chats.length > 0) {
+                        $('.pp-comment-reply').find('.comments').empty();
+                        $c.popup({
+                            popup: $('.pp-comment-reply'),
+                            hoverable: true,
+                            inline: false,
+                            movePopup: false,
+                            position: 'bottom left',
+                            prefer: 'opposite',
+                            maxSearchDepth: 50,
+                            // observeChanges: false,
+                            // offset: -50,
+                            // distanceAway: 50,
+                            delay: {
+                                show: 300,
+                                hide: 300
+                            },
+                            onShow: function() {
+                                $(this).find('.comments').html('加载中...');
+                            },
+                            onVisible: function() {
+                                var $pp = $(this); //.html('加载中...');
+
+                                var isSuperRole = $('input:hidden[name="role.super"]').val();
+                                var loginUsername = $('input:hidden[name="user.username"]').val();
+                                $.each(chats, function(index, chat) {
+                                    chat.contentMd = simplemde.markdown(preParse(chat.content));
+                                    chat.marked = '';
+                                    chat.marker = '';
+                                    chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
+                                    chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
+                                    chat.textShare = baseURL + 'admin/dynamic?id=' + chat.id;
+                                    if (chat.creator.name) {
+                                        chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
+                                    }
+
+                                    chat.isOpenEdit = !!chat.openEdit;
+                                    chat.openEditText = chat.isOpenEdit ? '关闭协作' : '开启协作';
+
+                                    if (isSuperRole == 'true' || loginUsername == chat.creator.username) {
+                                        chat.actions = true;
+                                    }
+                                    if (isSuperRole == 'true' || loginUsername == chat.creator.username || chat.isOpenEdit) {
+                                        chat.isEditable = true;
+                                    }
+                                    var d = new Date(chat.createDate);
+                                    chat.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                                });
+                                var $more = $("#chatReplyTpl").tmpl(chats).appendTo($pp.find('.comments').empty().width($c.width() * 0.7));
+                                $more.find('.ui.dropdown.dd-more-actions').dropdown({
+                                    action: 'hide'
+                                });
+
+                                $('.pp-comment-reply .timeago').timeago();
+                            }
+                        }).popup('show');
+
+                    }
+                    // console.log(data.data);
+                } else {
+                    toastr.error(data.data, '获取回复消息失败!');
+                }
+            });
         });
 
         $('.chat').mouseleave(function(event) {

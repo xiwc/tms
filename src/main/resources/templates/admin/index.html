@@ -79,7 +79,7 @@
         <div class="ad-index-container">
             <div th:fragment="rail-menu" class="ui dividing close left rail ad-index-rail" style="width:133px; min-height:450px;">
                 <div class="ui sticky ad-index-sticky">
-                    <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing menu" style="width: 9rem !important; background-color: #fafafa;">
+                    <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing inverted menu" style="width: 9rem !important;">
                         <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
                             <i class="home icon"></i> 主页
                         </a>
@@ -182,7 +182,7 @@
                         </div>
                     </div>
                     <div class="aligined centered column">
-                        <div class="ui fade reveal">
+                        <div class="ui move up reveal">
                             <div class="visible content">
                                 <h2 class="ui center aligned icon header" style="width:133px; height:133px; background-color: white;">
                                   <i class="circular flag icon"></i>

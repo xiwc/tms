@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
@@ -510,10 +511,31 @@ public class ChatController extends BaseController {
 		Page<Chat> chats = null;
 
 		if (search.startsWith(SysConstant.FILTER_PRE)) {
-			String username = search.substring(SysConstant.FILTER_PRE.length());
-			User user = getUser(username);
-			if (user != null) {
-				chats = chatRepository.findByCreator(user, pageable);
+			String query = search.substring(SysConstant.FILTER_PRE.length());
+			String[] querys = query.split(":");
+
+			List<User> users = null;
+			String searchContent = null;
+
+			if (querys.length > 0) {
+				users = Stream.of(querys[0].split("&")).filter((name) -> {
+					return StringUtil.isNotEmpty(name.trim());
+				}).map((name) -> {
+					return getUser(name.trim());
+				}).collect(Collectors.toList());
+			}
+
+			if (querys.length > 1) {
+				searchContent = querys[1].trim();
+			}
+
+			if (CollectionUtil.isNotEmpty(users)) {
+				if (StringUtil.isNotEmpty(searchContent)) {
+					chats = chatRepository.findByCreatorInAndContentContaining(
+							users, searchContent, pageable);
+				} else {
+					chats = chatRepository.findByCreatorIn(users, pageable);
+				}
 			} else {
 				return RespBody.failed("查询指定创建者不存在!");
 			}
@@ -521,8 +543,6 @@ public class ChatController extends BaseController {
 			chats = chatRepository.findByContentLike("%" + search + "%",
 					pageable);
 		}
-		// chats = new PageImpl<Chat>(CollectionUtil.reverseList(chats
-		// .getContent()), pageable, chats.getTotalElements());
 
 		return RespBody.succeed(chats);
 	}
@@ -865,6 +885,20 @@ public class ChatController extends BaseController {
 				getLoginUser(), Status.New);
 
 		return RespBody.succeed(chatStows);
+	}
+
+	@RequestMapping(value = "getReplies", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody getReplies(@RequestParam("id") Long id) {
+
+		// [回复#871](http://translation.sh1.newtouch.com/admin/dynamic?id=871)
+
+		String query = StringUtil
+				.replaceByKV("%[回复#{id}](%/admin/dynamic?id={id})%", "id", id);
+
+		List<Chat> chats = chatRepository.queryReplies(id, query);
+
+		return RespBody.succeed(chats);
 	}
 
 	@RequestMapping(value = "openEdit", method = RequestMethod.POST)
