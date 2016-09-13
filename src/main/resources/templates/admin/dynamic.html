@@ -508,10 +508,10 @@
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
                 <!-- <div th:replace="admin/template :: ad-page-header ('沟通动态', 'dynamic')"></div> -->
-                <div class="main ui container" style="padding-top: 0;">
+                <div class="main ui container" style="padding-top: 3px;">
                     <div class="ui dividing right rail" style="min-height: 279px; padding-left: 1rem; padding-top: 0;">
                         <div class="ui sticky sy-dynamic" style="z-index: 0; top: 0px; padding-bottom: 20px;">
-                            <h4 class="ui dividing header">动态</h4>
+                            <h3 class="ui dividing header">动态</h3>
                             <div class="ui feed fd-dynamic">
                                 <div class="event" th:each="l : ${logs}" th:attr="data-id=${l.id}">
                                     <div class="label">
@@ -2785,26 +2785,10 @@
             s2mk($('.btn-chat-s2h').data('target'));
         });
 
-        $('body').on('mouseenter', '.chat .comment', function(event) {
+        $('body').on('mouseenter', '.chat .comment .text.markdown-body', function(event) {
             event.preventDefault();
 
-            var $c = $(this);
-
-            var $header = $(event.target).closest('.comment').find('.content a.author');
-            if ($header.size() > 0) {
-                $('.btn-chat-s2h').data('target', $header.closest('.comment'));
-                if (!Utils.isElementInViewport($header)) {
-                    $('.btn-chat-s2h').show();
-                    $('.btn-chat-s2b').show();
-                }
-            }
-
-            $('.wiki-dir .wiki-dir-tree').empty().append(Utils.dir($(this)));
-            if ($('.wiki-dir a.wiki-dir-item').size() == 0) {
-                $('.btn-chat-dir').hide();
-            } else {
-                $('.btn-chat-dir').show();
-            }
+            var $c = $(this).closest('.comment');
 
             $.get('admin/chat/getReplies', {
                 id: $c.attr('data-id')
@@ -2831,6 +2815,9 @@
                             },
                             onShow: function() {
                                 $(this).find('.comments').html('加载中...');
+                            },
+                            onHidden: function() {
+                                $c.popup({});
                             },
                             onVisible: function() {
                                 var $pp = $(this); //.html('加载中...');
@@ -2875,6 +2862,28 @@
                     toastr.error(data.data, '获取回复消息失败!');
                 }
             });
+        });
+
+        $('body').on('mouseenter', '.chat .comment', function(event) {
+            event.preventDefault();
+
+            var $c = $(this);
+
+            var $header = $(event.target).closest('.comment').find('.content a.author');
+            if ($header.size() > 0) {
+                $('.btn-chat-s2h').data('target', $header.closest('.comment'));
+                if (!Utils.isElementInViewport($header)) {
+                    $('.btn-chat-s2h').show();
+                    $('.btn-chat-s2b').show();
+                }
+            }
+
+            $('.wiki-dir .wiki-dir-tree').empty().append(Utils.dir($(this)));
+            if ($('.wiki-dir a.wiki-dir-item').size() == 0) {
+                $('.btn-chat-dir').hide();
+            } else {
+                $('.btn-chat-dir').show();
+            }
         });
 
         $('.chat').mouseleave(function(event) {
