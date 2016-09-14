@@ -595,7 +595,7 @@
                             </div>
                             <button th:unless="${chats.first}" class="fluid ui button btn-chat-pre-more" th:text="${'加载更多(' + (chats.number * chats.size) + ')'}">加载更多</button>
                             <form class="ui reply form fm-reply">
-                                <div class="field markdown-body pp-users">
+                                <div class="field markdown-body pp-users dropzone" style="border: none;">
                                     <textarea autofocus="autofocus" class="ta-md"></textarea>
                                 </div>
                                 <div class="ui fluid popup bottom left transition hidden list-users-container" style="max-height:150px; overflow:auto;">
@@ -1355,6 +1355,9 @@
         initDropzone4IDE($(".pp-chat-upload-file form.dropzone"), cm);
         initDropzone4IDE($(".pp-chat-edit-upload-file form.dropzone"), cme);
 
+        initDropzone4IDE($(".fm-reply .CodeMirror-wrap"), cm, true);
+        initDropzone4IDE($(".fm-edit-reply .CodeMirror-wrap"), cme, true);
+
         function initEmojiPp4IDE($ppTarget, $pp, _cm) {
             $ppTarget.popup({
                 popup: $pp,
@@ -1398,14 +1401,21 @@
          * 初始化上传组件
          * @param  {[type]} $dz [description]
          * @param  {[type]} cm  [description]
+         * @param  {[type]} nonForm  [description]
          * @return {[type]}     [description]
          */
-        function initDropzone4IDE($dz, cm) {
+        function initDropzone4IDE($dz, cm, nonForm) {
             $dz.dropzone({
+                url: "/admin/file/upload",
                 paramName: 'file',
-                maxFilesize: 10, // MB
+                clickable: !nonForm,
+                // maxFilesize: 10, // MB
                 dictDefaultMessage: '拖拽或点击上传',
                 init: function() {
+                    this.on("sending", function(file, xhr, formData) {
+                        // Will send the filesize along with the file as POST data.
+                        nonForm && formData.append($('.ad-csrf input:hidden').attr('name'), $('.ad-csrf input:hidden').attr('value'));
+                    });
                     this.on("success", function(file, data) {
                         if (data.success) {
 
@@ -1416,16 +1426,12 @@
                                         .replace(/\{baseURL\}/g, baseURL)
                                         .replace(/\{path\}/g, item.path)
                                         .replace(/\{uuidName\}/g, item.uuidName));
-                                    // .replace(/\{path\}/g, "admin/file/download/")
-                                    // .replace(/\{uuidName\}/g, item.id));
                                 } else {
                                     insertComment(cm, '[{name}]({baseURL}{path}{uuidName}) '
                                         .replace(/\{name\}/g, item.name)
                                         .replace(/\{baseURL\}/g, baseURL)
                                         .replace(/\{path\}/g, "admin/file/download/")
                                         .replace(/\{uuidName\}/g, item.id));
-                                    // .replace(/\{path\}/g, item.path)
-                                    // .replace(/\{uuidName\}/g, item.uuidName));
                                 }
                             });
                             toastr.success('上传成功!');
