@@ -4,13 +4,13 @@ jQuery(function($) {
         $('.ad-index-menu').sidebar('toggle');
     });
 
-    if ($('#context').size() == 1 && $('.ad-index-rail').is(':visible')) {
-        $('.ui.sticky.ad-index-sticky').sticky({
-            offset: 70,
-            observeChanges: true,
-            context: '#context'
-        });
-    }
+    // if ($('#context').size() == 1 && $('.ad-index-rail').is(':visible')) {
+    //     $('.ui.sticky.ad-index-sticky').sticky({
+    //         offset: 70,
+    //         observeChanges: true,
+    //         context: '#context'
+    //     });
+    // }
 
     $('.ad-index-logout').click(function() {
         $(this).children('form').submit();

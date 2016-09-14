@@ -77,48 +77,48 @@
     </div>
     <div class="pusher ad-index-content">
         <div class="ad-index-container">
-            <div th:fragment="rail-menu" class="ui dividing close left rail ad-index-rail" style="width:133px; min-height:450px;">
-                <div class="ui sticky ad-index-sticky">
-                    <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing inverted menu" style="width: 9rem !important;">
-                        <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
-                            <i class="home icon"></i> 主页
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/dynamic')} ? 'active' : ''" class="item mi-dynamic" th:href="@{/admin/dynamic}" href="dynamic.html">
-                            <i class="at icon"></i> 沟通动态
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html">
-                            <i class="world icon"></i> 翻译管理
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item mi-import" th:href="@{/admin/import}" href="import.html">
-                            <i class="retweet icon"></i> 导入导出
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/project')} ? 'active' : ''" class="item" th:href="@{/admin/project}" href="project.html">
-                            <i class="suitcase icon"></i> 项目管理
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/language')} ? 'active' : ''" class="item" th:href="@{/admin/language}" href="language.html">
-                            <i class="flag icon"></i> 语言管理
-                        </a>
-                        <a th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
-                            <i class="user icon"></i> 用户管理
-                        </a>
-                        <a sec:authorize="hasRole('ROLE_SUPER')" th:classappend="${#strings.contains(uri, '/admin/setting')} ? 'active' : ''" class="item" th:href="@{/admin/setting}" href="setting.html">
-                            <i class="settings icon"></i> 系统设置
-                        </a>
-                        <div class="item">
-                            <i class="linkify icon"></i> 系统外链
-                            <div class="menu">
-                                <a target="_blank" class="item" href="http://220.248.17.34:7991/">JIRA</a>
-                                <a target="_blank" class="item" href="http://220.248.17.34:7992/">Confluence</a>
-                                <a target="_blank" class="item" href="http://220.248.17.34:7990/">Stash</a>
-                                <a target="_blank" class="item" href="http://220.248.17.34:8073/">Jenkins</a>
-                                <a target="_blank" class="item" href="http://220.248.17.34:8063/">Console(测试)</a>
-                                <a target="_blank" class="item" href="http://x-console-test.sh1.newtouch.com/">Console(开发)</a>
-                                <!-- <a target="_blank" class="item" href="https://www.draw.io/">绘图(draw)</a> -->
-                                <a target="_blank" class="item" href="https://www.processon.com/">绘图(processon)</a>
-                            </div>
+            <div th:fragment="rail-menu" class="ui dividing close left rail ad-index-rail" style="width:133px; min-height:450px; z-index:1;">
+                <div th:with="uri=${#httpServletRequest.requestURI}" class="ui vertical pointing inverted menu" style="width: 9rem !important; position: fixed;">
+                    <a th:classappend="(${#strings.contains(uri, '/admin/index')} or ${#strings.endsWith(uri,'/admin/')} or ${#strings.endsWith(uri,'/admin')}) ? 'active' : ''" class="item" th:href="@{/admin}" href="index.html">
+                        <i class="home icon"></i> 主页
+                    </a>
+                    <a th:classappend="${#strings.contains(uri, '/admin/dynamic')} ? 'active' : ''" class="item mi-dynamic" th:href="@{/admin/dynamic}" href="dynamic.html">
+                        <i class="at icon"></i> 沟通动态
+                    </a>
+                    <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html">
+                        <i class="world icon"></i> 翻译管理
+                    </a>
+                    <a th:classappend="${#strings.contains(uri, '/admin/import')} ? 'active' : ''" class="item mi-import" th:href="@{/admin/import}" href="import.html">
+                        <i class="retweet icon"></i> 导入导出
+                    </a>
+                    <a th:classappend="${#strings.contains(uri, '/admin/project')} ? 'active' : ''" class="item" th:href="@{/admin/project}" href="project.html">
+                        <i class="suitcase icon"></i> 项目管理
+                    </a>
+                    <a th:classappend="${#strings.contains(uri, '/admin/language')} ? 'active' : ''" class="item" th:href="@{/admin/language}" href="language.html">
+                        <i class="flag icon"></i> 语言管理
+                    </a>
+                    <a th:classappend="${#strings.contains(uri, '/admin/user')} ? 'active' : ''" class="item" th:href="@{/admin/user}" href="user.html">
+                        <i class="user icon"></i> 用户管理
+                    </a>
+                    <a sec:authorize="hasRole('ROLE_SUPER')" th:classappend="${#strings.contains(uri, '/admin/setting')} ? 'active' : ''" class="item" th:href="@{/admin/setting}" href="setting.html">
+                        <i class="settings icon"></i> 系统设置
+                    </a>
+                    <div class="item">
+                        <i class="linkify icon"></i> 系统外链
+                        <div class="menu">
+                            <a target="_blank" class="item" href="http://220.248.17.34:7991/">JIRA</a>
+                            <a target="_blank" class="item" href="http://220.248.17.34:7992/">Confluence</a>
+                            <a target="_blank" class="item" href="http://220.248.17.34:7990/">Stash</a>
+                            <a target="_blank" class="item" href="http://220.248.17.34:8073/">Jenkins</a>
+                            <a target="_blank" class="item" href="http://220.248.17.34:8063/">Console(测试)</a>
+                            <a target="_blank" class="item" href="http://x-console-test.sh1.newtouch.com/">Console(开发)</a>
+                            <!-- <a target="_blank" class="item" href="https://www.draw.io/">绘图(draw)</a> -->
+                            <a target="_blank" class="item" href="https://www.processon.com/">绘图(processon)</a>
                         </div>
                     </div>
                 </div>
+                <!-- <div class="ui sticky ad-index-sticky">
+                </div> -->
             </div>
             <div id="context">
                 <!-- <div th:replace="admin/template :: ad-page-header ('门户主页', 'index')"></div> -->
