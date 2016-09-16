@@ -292,6 +292,16 @@ jQuery(function($) {
         },
         dir: function($e) {
             return this.generateDir(this.catalog($e));
+        },
+        openLink: function(url) {
+            if (url) {
+                var $a = $('<a target="_blank" style="display:none;"></a>').attr('href', url).appendTo('body');
+                $('<input type="button">').appendTo($a).click();
+
+                setTimeout(function() {
+                    $a.remove();
+                }, 200);
+            }
         }
     });
 

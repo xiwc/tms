@@ -585,6 +585,7 @@
                                                 <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username) or (c.openEdit != null and c.openEdit)}">编辑</div>
                                                 <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">删除</div>
                                                 <div class="item btn-read">阅读</div>
+                                                <div class="item btn-jira">转JIRA</div>
                                                 <div class="item btn-openEdit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}" th:attr="data-value=${c.openEdit}" th:text="${(c.openEdit != null and c.openEdit) ? '关闭协作' : '开启协作'}">开启协作</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
@@ -789,6 +790,20 @@
 
         clipboard.on('error', function(e) {
             toastr.error('复制到剪贴板失败!');
+        });
+
+        new Clipboard('.btn-jira', {
+            text: function(trigger) {
+                var txt = $(trigger).siblings('.btn-copy').attr('data-clipboard-text');
+                var href = $(trigger).siblings('.btn-share').attr('data-clipboard-text');
+                var id = $(trigger).closest('.comment').attr('data-id');
+                return 'h1. [TMS沟通消息({title})|{href}]\n----\n'
+                    .replace(/\{title\}/g, '#' + id)
+                    .replace(/\{href\}/g, href) + J2M.toJ(txt);
+            }
+        }).on('success', function(e) {
+            toastr.success('复制[JIRA问题描述]到剪贴板成功!');
+            Utils.openLink('http://220.248.17.34:7991/secure/CreateIssue!default.jspa');
         });
 
         // --------------------------------------------------------------------------------- username mapping to name start
