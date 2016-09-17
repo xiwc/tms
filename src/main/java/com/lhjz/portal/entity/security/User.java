@@ -69,6 +69,11 @@ public class User implements java.io.Serializable, Comparable<User> {
 
 	private long loginCount = 0;
 
+	private String resetPwdToken;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date resetPwdDate;
+
 	@Version
 	private long version;
 
@@ -248,6 +253,22 @@ public class User implements java.io.Serializable, Comparable<User> {
 		this.creator = creator;
 	}
 
+	public String getResetPwdToken() {
+		return resetPwdToken;
+	}
+
+	public void setResetPwdToken(String resetPwdToken) {
+		this.resetPwdToken = resetPwdToken;
+	}
+
+	public Date getResetPwdDate() {
+		return resetPwdDate;
+	}
+
+	public void setResetPwdDate(Date resetPwdDate) {
+		this.resetPwdDate = resetPwdDate;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -281,7 +302,9 @@ public class User implements java.io.Serializable, Comparable<User> {
 				+ creator + ", enabled=" + enabled + ", status=" + status
 				+ ", createDate=" + createDate + ", lastLoginDate="
 				+ lastLoginDate + ", loginRemoteAddress=" + loginRemoteAddress
-				+ ", loginCount=" + loginCount + ", version=" + version + "]";
+				+ ", loginCount=" + loginCount + ", resetPwdToken="
+				+ resetPwdToken + ", resetPwdDate=" + resetPwdDate
+				+ ", version=" + version + "]";
 	}
 
 	@Override

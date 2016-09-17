@@ -23,4 +23,9 @@ public interface UserRepository extends JpaRepository<User, String> {
 	List<User> findByEnabledTrue();
 
 	List<User> findByEnabledFalse();
+
+	List<User> findByMails(String mail);
+
+	User findOneByResetPwdToken(String token);
+
 }

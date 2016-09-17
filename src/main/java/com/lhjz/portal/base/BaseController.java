@@ -3,6 +3,7 @@
  */
 package com.lhjz.portal.base;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 
@@ -103,8 +104,8 @@ public abstract class BaseController {
 	public ModelAndView exceptionHandler(HttpServletRequest request,
 			HttpServletResponse response, Exception ex) {
 
-		if ("XMLHttpRequest".equalsIgnoreCase(request
-				.getHeader("X-Requested-With"))) {
+		if (Arrays.asList("XMLHttpRequest|fetch".split("\\|")).contains(
+				request.getHeader("X-Requested-With"))) {
 
 			return new ModelAndView(new MappingJackson2JsonView(),
 					(Map<String, ?>) RespBody.failed(ex.getMessage())

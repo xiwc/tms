@@ -88,7 +88,8 @@ public class SecurityConfig {
 					.antMatchers("/admin/file/download/**")
 					.permitAll()
 					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**", "/admin/login").permitAll()
+							"/admin/js/**", "/admin/login", "/admin/page/**")
+					.permitAll()
 					.anyRequest().authenticated().and().formLogin()
 					.loginPage("/admin/login").permitAll()
 					.loginProcessingUrl("/admin/signin")

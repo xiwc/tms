@@ -59,10 +59,10 @@
             </div>
             <div class="ui floating top right pointing dropdown link item dd-top-menu-user">
                 <i class="user icon"></i>
-                <span class="" th:text="${#authentication.name}">admin</span>
+                <span class="" th:text="${#authentication != null ? #authentication.name : ''}">admin</span>
                 <div class="menu">
                     <div class="header">选择操作</div>
-                    <div class="item ad-index-user-edit" th:attr="data-id=${#authentication.name}">
+                    <div class="item ad-index-user-edit" th:attr="data-id=${#authentication != null ? #authentication.name : ''}">
                         <i class="edit icon"></i>
                         <span>修改 </span>
                     </div>

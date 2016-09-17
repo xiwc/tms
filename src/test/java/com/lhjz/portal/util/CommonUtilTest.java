@@ -1,6 +1,7 @@
 package com.lhjz.portal.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.testng.Assert;
@@ -67,6 +68,12 @@ public class CommonUtilTest {
 	@Test
 	public void substring() {
 		System.out.println("0123".substring(4));
+	}
+
+	@Test
+	public void split() {
+		System.out.println(Arrays.asList("XMLHttpRequest|fetch".split("\\|"))
+				.contains("fetch"));
 	}
 
 	// public static void main(String[] args) {
