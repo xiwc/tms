@@ -750,6 +750,7 @@
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
     <div th:replace="admin/template :: userInfoPpTpl"></div>
     <div th:replace="admin/template :: userGroupInfoPpTpl"></div>
+    <div th:replace="admin/template :: allUserInfoPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
     <div th:replace="admin/template :: chatAtsTpl"></div>
     <div th:replace="admin/template :: chatStowsTpl"></div>
@@ -2503,31 +2504,52 @@
                 },
                 onShow: function() {
                     var $pp = $(this).html('加载中...');
-                    $.get('admin/user/get', {
-                        username: $a.attr('data-value')
-                    }, function(data) {
-                        if (data.success) {
-                            var user = data.data;
-                            var userGroups = data.msgs[0];
-                            if (userGroups && userGroups.length > 0) {
-                                user.userGroups = data.msgs[0];
-                            }
 
-                            var d = new Date(user.createDate);
-                            user.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-                            user.sts = user.enabled ? '启用中' : '已禁用';
-                            if (user.lastLoginDate) {
-                                d = new Date(user.lastLoginDate);
-                                user.lastLoginDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                    if ($a.attr('data-value') == 'all') {
+                        $.get('admin/user/all', {
+                            enabled: true
+                        }, function(data) {
+                            if (data.success) {
+                                var users = data.data;
+                                var model = {
+                                    count: users.length,
+                                    users: users
+                                };
+                                $("#allUserInfoPpTpl").tmpl(model).appendTo($pp.empty());
+                                Utils.showMappedTxt('.pp-translate .mapping-user');
+                            } else {
+                                toastr.error(data.data, "加载失败!");
                             }
+                        });
+                    } else {
 
-                            $("#userInfoPpTpl").tmpl(user).appendTo($pp.empty());
-                            Utils.showMappedTxt('.pp-translate .mapping-user');
-                            $('.pp-translate .timeago').timeago();
-                        } else {
-                            toastr.error(data.data, "加载失败!");
-                        }
-                    });
+                        $.get('admin/user/get', {
+                            username: $a.attr('data-value')
+                        }, function(data) {
+                            if (data.success) {
+                                var user = data.data;
+                                var userGroups = data.msgs[0];
+                                if (userGroups && userGroups.length > 0) {
+                                    user.userGroups = data.msgs[0];
+                                }
+
+                                var d = new Date(user.createDate);
+                                user.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                                user.sts = user.enabled ? '启用中' : '已禁用';
+                                if (user.lastLoginDate) {
+                                    d = new Date(user.lastLoginDate);
+                                    user.lastLoginDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                                }
+
+                                $("#userInfoPpTpl").tmpl(user).appendTo($pp.empty());
+                                Utils.showMappedTxt('.pp-translate .mapping-user');
+                                $('.pp-translate .timeago').timeago();
+                            } else {
+                                toastr.error(data.data, "加载失败!");
+                            }
+                        });
+
+                    }
                 }
             }).popup('show');
         }
@@ -2567,6 +2589,7 @@
                             var group = data.data;
                             var d = new Date(group.createDate);
                             group.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+                            group.count = group.groupMembers.length;
 
                             $("#userGroupInfoPpTpl").tmpl(data.data).appendTo($pp.empty());
                             Utils.showMappedTxt('.pp-translate .mapping-user');

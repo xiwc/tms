@@ -489,6 +489,23 @@ public class UserController extends BaseController {
 		return RespBody.succeed(user).addMsg(gns);
 	}
 
+	@RequestMapping(value = "all", method = RequestMethod.GET)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody getAllUsers(
+			@RequestParam(value = "enabled", required = false) Boolean enabled) {
+		
+		List<User> users = null;
+		
+		if (enabled != null) {
+			users = userRepository.findByEnabled(enabled);
+		} else {
+			users = userRepository.findAll();
+		}
+		
+		return RespBody.succeed(users);
+	}
+
 	@RequestMapping(value = "getGroup", method = RequestMethod.GET)
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
