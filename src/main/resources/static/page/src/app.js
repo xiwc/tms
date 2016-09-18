@@ -61,9 +61,14 @@ export class App {
             route: ['pwd-reset'],
             name: 'reset',
             moduleId: 'user/user-pwd-reset',
-            // href: 'test',
             nav: false,
             title: '密码重置'
+        }, {
+            route: ['register'],
+            name: 'register',
+            moduleId: 'user/user-register',
+            nav: false,
+            title: '用户注册'
         }, {
             route: '',
             redirect: 'pwd-reset'
