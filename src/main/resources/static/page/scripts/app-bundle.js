@@ -71,9 +71,14 @@ define('app',['exports', 'toastr', 'wurl', 'common/common-utils', 'wlzc-semantic
                 route: ['pwd-reset'],
                 name: 'reset',
                 moduleId: 'user/user-pwd-reset',
-
                 nav: false,
                 title: '密码重置'
+            }, {
+                route: ['register'],
+                name: 'register',
+                moduleId: 'user/user-register',
+                nav: false,
+                title: '用户注册'
             }, {
                 route: '',
                 redirect: 'pwd-reset'
@@ -394,8 +399,112 @@ define('user/user-pwd-reset',['exports'], function (exports) {
         return UserPwdReset;
     }();
 });
-define('text!app.html', ['module'], function(module) { module.exports = "<template>\n\t<require from=\"./app.css\"></require>\n\t<require from=\"nprogress/nprogress.css\"></require>\n\t<require from=\"toastr/build/toastr.css\"></require>\n    <require from=\"wlzc-semantic-ui/semantic.css\"></require>\n    <router-view></router-view>\n</template>\n"; });
+define('user/user-register',['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var ViewModel = exports.ViewModel = function () {
+        function ViewModel() {
+            _classCallCheck(this, ViewModel);
+
+            this.header = '账户激活页面';
+        }
+
+        ViewModel.prototype.activate = function activate(params, routeConfig, navigationInstruction) {
+            var _this = this;
+
+            if (params.id) {
+                this.token = params.id;
+
+                this.isReq = true;
+                this.header = '账户激活中,请稍后...!';
+                http.fetch('/free/user/register/activate', {
+                    method: 'post',
+                    body: json({
+                        token: this.token
+                    })
+                }).then(function (resp) {
+                    if (resp.ok) {
+                        resp.json().then(function (data) {
+                            if (data.success) {
+                                _this.header = '账户激活成功,请返回登录页面登录!';
+                            } else {
+                                _this.header = '账户激活失败!';
+                                toastr.error(data.data, '账户激活失败!');
+                            }
+                        });
+                        _this.isReq = false;
+                    }
+                });
+            }
+        };
+
+        ViewModel.prototype.attached = function attached() {
+
+            $(this.fm).form({
+                on: 'blur',
+                inline: true,
+                fields: {
+                    username: ['empty'],
+                    pwd: ['empty', 'minLength[8]'],
+                    name: ['empty'],
+                    mail: ['empty', 'email']
+                }
+            });
+        };
+
+        ViewModel.prototype.okHandler = function okHandler() {
+            var _this2 = this;
+
+            if (!$(this.fm).form('is valid')) {
+                toastr.error('账户注册信息输入不合法!');
+                return;
+            }
+
+            this.isReq = true;
+            http.fetch('/free/user/register', {
+                method: 'post',
+                body: json({
+                    username: this.username,
+                    pwd: this.pwd,
+                    name: this.name,
+                    mail: this.mail,
+                    baseUrl: utils.getBaseUrl(),
+                    path: wurl('path')
+                })
+            }).then(function (resp) {
+                if (resp.ok) {
+                    resp.json().then(function (data) {
+                        if (data.success) {
+                            toastr.success('注册成功,请通过接收到的激活邮件激活账户!');
+                            _.delay(function () {
+                                window.location = "/admin/login";
+                            }, 2000);
+                        } else {
+                            toastr.error(data.data, '注册失败!');
+                            _this2.isReq = false;
+                        }
+                    });
+                }
+            });
+        };
+
+        return ViewModel;
+    }();
+});
+define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./app.css\"></require>\r\n\t<require from=\"nprogress/nprogress.css\"></require>\r\n\t<require from=\"toastr/build/toastr.css\"></require>\r\n    <require from=\"wlzc-semantic-ui/semantic.css\"></require>\r\n    <router-view></router-view>\r\n</template>\r\n"; });
 define('text!app.css', ['module'], function(module) { module.exports = "html,\r\nbody {\r\n    height: 100%;\r\n}\r\n"; });
-define('text!user/user-pwd-reset.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-pwd-reset.css\"></require>\r\n    <div class=\"ui container tms-user-pwd-reset\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">输入您的邮箱地址,我们会发送密码重置链接到您的邮箱!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">邮件地址</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的邮件地址\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"resetPwdHandler()\">发送密码重置邮件</div>\r\n            </div>\r\n            <div if.bind=\"token\" ref=\"fm2\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">设置您的新密码,密码长度要求至少8位字符!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">新密码</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"设置您的新密码\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"newPwdHandler()\">确认</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!user/user-pwd-reset.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-pwd-reset.css\"></require>\r\n    <div class=\"ui container tms-user-pwd-reset\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">输入您的邮箱地址,我们会发送密码重置链接到您的邮箱!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">邮件地址</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的邮件地址\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"resetPwdHandler()\">发送密码重置邮件</div>\r\n            </div>\r\n            <div if.bind=\"token\" ref=\"fm2\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">设置您的新密码,密码长度要求至少8位字符!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">新密码</label>\r\n                    <input type=\"password\" name=\"mail\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"设置您的新密码\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"newPwdHandler()\">确认</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!user/user-pwd-reset.css', ['module'], function(module) { module.exports = ".tms-user-pwd-reset {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-pwd-reset .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
+define('text!user/user-register.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-register.css\"></require>\r\n    <div class=\"ui container tms-user-register\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 280px;\">\r\n                <div class=\"ui message\">填写完账户注册信息,点击确认提交成功后,我们会发送到您注册邮箱一封账户激活邮件,激活后账户即可登录使用!</div>\r\n                <div class=\"required field\">\r\n                    <label>用户名</label>\r\n                    <input type=\"text\" name=\"username\" autofocus=\"\" value.bind=\"username\" placeholder=\"输入您的登录用户名\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>密码</label>\r\n                    <input type=\"password\" name=\"pwd\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"输入您的登录密码\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>姓名</label>\r\n                    <input type=\"text\" name=\"name\" autofocus=\"\" value.bind=\"name\" placeholder=\"输入您的显示名称\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>邮箱</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的账户激活邮箱\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"okHandler()\">确认</div>\r\n            </div>\r\n            <div if.bind=\"token\" class=\"ui center aligned very padded segment\" style=\"width: 320px;\">\r\n            \t<h1 class=\"ui header\">${header}</h1>\r\n            \t<a href=\"/admin/login\" class=\"ui green button\">返回登录页面</a>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!user/user-register.css', ['module'], function(module) { module.exports = ".tms-user-register {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-register .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
 //# sourceMappingURL=app-bundle.js.map
