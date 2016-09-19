@@ -16,8 +16,8 @@
     "jquery": "^1.11.2",
     "lodash": "^4.15.0",
     "nprogress": "^0.2.0",
+    "tms-semantic-ui": "^2.2.4",
     "toastr": "^2.1.2",
-    "wlzc-semantic-ui": "^3.2.3",
     "wurl": "^2.1.0"
   },
   "peerDependencies": {},

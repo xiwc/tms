@@ -3,7 +3,7 @@ body {
     height: 100%;
 }
 
-.ui.form input:not([type]),
+/* .ui.form input:not([type]),
 .ui.form input[type="date"],
 .ui.form input[type="datetime-local"],
 .ui.form input[type="email"],
@@ -16,4 +16,4 @@ body {
 .ui.form input[type="file"],
 .ui.form input[type="url"] {
 	line-height: normal!important;
-}
+} */

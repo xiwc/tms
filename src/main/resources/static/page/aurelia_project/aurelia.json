@@ -120,8 +120,8 @@
           "lodash",
           "jquery",
           {
-            "name": "wlzc-semantic-ui",
-            "path": "../node_modules/wlzc-semantic-ui",
+            "name": "semantic-ui",
+            "path": "../node_modules/tms-semantic-ui",
             "main": "semantic",
             "deps": ["jquery"],
             "exports": "$",

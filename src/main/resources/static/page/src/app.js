@@ -1,4 +1,5 @@
-import 'wlzc-semantic-ui';
+// import 'wlzc-semantic-ui';
+import 'semantic-ui';
 import {
     default as toastr
 }
