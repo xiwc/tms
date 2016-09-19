@@ -781,16 +781,12 @@
 
         jQuery(".timeago").timeago();
 
-        var clipboard = new Clipboard('.btn-share, .btn-copy');
-
-        clipboard.on('success', function(e) {
+        new Clipboard('.btn-share, .btn-copy').on('success', function(e) {
             var $btn = $(e.trigger);
             var msg = $btn.hasClass('btn-share') ? '分享链接复制到剪贴板成功!' : '沟通内容复制到剪贴板成功!';
             toastr.success(msg);
-        });
-
-        clipboard.on('error', function(e) {
-            toastr.error('复制到剪贴板失败!');
+        }).on('error', function(e) {
+            toastr.error('复制到剪贴板失败,可能您的浏览器不支持!');
         });
 
         new Clipboard('.btn-jira', {
@@ -804,6 +800,9 @@
             }
         }).on('success', function(e) {
             toastr.success('复制[JIRA问题描述]到剪贴板成功!');
+            Utils.openLink('http://220.248.17.34:7991/secure/CreateIssue!default.jspa');
+        }).on('error', function(e) {
+            toastr.error('复制到剪贴板失败,可能您的浏览器不支持!');
             Utils.openLink('http://220.248.17.34:7991/secure/CreateIssue!default.jspa');
         });
 
