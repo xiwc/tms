@@ -1348,7 +1348,9 @@
         // TODO simplemde edit also keyup
         simplemde.codemirror.on('keyup', function(cm, e) {
             if (e.ctrlKey && e.keyCode == 13) { // Ctrl+Enter
-                $('.btn-chat-submit').click();
+                if (!$('.btn-chat-submit').hasClass('disabled')) {
+                    $('.btn-chat-submit').click();
+                }
             } else if (e.keyCode == 27) { // Esc
                 $('.btn-chat-clear').click();
             }
@@ -1820,6 +1822,9 @@
 
         $('.btn-chat-submit').click(function(event) {
             event.preventDefault();
+
+            $btn = $(this);
+
             var content = simplemde.value();
             if (!$.trim(content)) {
                 toastr.error('提交内容不能为空!');
@@ -1839,6 +1844,8 @@
             var $domBefore = preMore ? $('.btn-chat-pre-more') : $('.fm-reply');
 
             window.poll.pause(); // 因为提交消息,会顺便拉取新消息, 所以暂停轮询
+
+            $btn.addClass('disabled');
 
             $.post('/admin/chat/create', {
                 preMore: preMore,
@@ -1883,6 +1890,7 @@
                 }
             }).always(function() {
                 window.poll.reset(); // 重置轮询频率
+                $btn.removeClass('disabled');
             });
         });
 
