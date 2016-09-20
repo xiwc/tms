@@ -1,0 +1,16 @@
+<template>
+    <require from="./user-login.css"></require>
+    <div class="ui tms-user-login">
+        <div class="ui form segment">
+            <div class="field">
+                <label>用户名:</label>
+                <input type="text" value.bind="username">
+            </div>
+            <div class="field">
+                <label>密码:</label>
+                <input type="password" value.bind="password">
+            </div>
+            <div class="ui green fluid button ${isReq ? 'disabled' : ''}" click.delegate="loginHandler()">登录</div>
+        </div>
+    </div>
+</template>

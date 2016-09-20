@@ -97,7 +97,7 @@ public class SecurityConfig {
 					.logoutUrl("/admin/logout").permitAll()
 					.logoutSuccessUrl("/admin/login?logout").and().rememberMe()
 					.tokenRepository(persistentTokenRepository())
-					.tokenValiditySeconds(1209600); // 2 weeks(14d)
+					.tokenValiditySeconds(1209600).and().csrf().disable();
 
 		}
 

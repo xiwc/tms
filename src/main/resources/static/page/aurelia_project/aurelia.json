@@ -120,13 +120,13 @@
           "lodash",
           "jquery",
           {
-            "name": "semantic-ui",
+            "name": "tms-semantic-ui",
             "path": "../node_modules/tms-semantic-ui",
-            "main": "semantic",
+            "main": "semantic.min",
             "deps": ["jquery"],
             "exports": "$",
             "resources": [
-              "semantic.css"
+              "semantic.min.css"
             ]
           },
           {

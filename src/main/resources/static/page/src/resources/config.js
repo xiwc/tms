@@ -14,7 +14,7 @@ from 'nprogress';
 export class Config {
 
     initHttp() {
-    	window.json = (param) => {
+        window.json = (param) => {
             console.log(JSON.stringify(param));
             return json(param);
         };
@@ -69,6 +69,20 @@ export class Config {
         // toastr弹出消息提示插件全局配置设置
         toastr.options.positionClass = 'toast-bottom-center';
         toastr.options.preventDuplicates = true;
+
+        return this;
+    }
+
+    initAjax() {
+
+        $(document).on('ajaxStart', function() {
+            NProgress && NProgress.start();
+        });
+        $(document).on('ajaxStop', function() {
+            NProgress && NProgress.done();
+        });
+
+        return this;
     }
 
     context(aurelia) {

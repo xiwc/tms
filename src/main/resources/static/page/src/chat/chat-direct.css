@@ -1,0 +1,76 @@
+.tms-chat-direct {
+    height: 100%;
+}
+
+.tms-chat-direct .top.fixed.menu {
+    padding-left: 220px;
+    height: 60px;
+}
+
+.tms-chat-direct .ui.left.sidebar {
+    width: 220px;
+}
+
+.tms-chat-direct .ui.left.sidebar .tms-header {
+    height: 40px;
+}
+
+.tms-chat-direct .tms-content {
+    padding-top: 60px;
+    padding-left: 220px;
+    display: flex;
+    align-items: stretch;
+    height: 100%;
+}
+
+.tms-chat-direct .tms-content .tms-col.w65 {
+    flex: auto;
+}
+
+.tms-chat-direct .tms-content .tms-col.w35 {
+    width: 380px;
+    border-left: 1px #e0e1e2 solid;
+}
+
+.tms-chat-direct .ui.basic.segment.tms-msg-input {
+    position: fixed;
+    bottom: 0;
+    right: 30%;
+    left: 220px;
+    background-color: white;
+}
+
+.tms-chat-direct .ui.comments {
+    margin-top: 20px;
+    margin-bottom: 50px;
+    max-width: none;
+}
+
+.tms-chat-direct .tms-msg-input .ui[class*="left action"].input>textarea {
+    border-top-left-radius: 0!important;
+    border-bottom-left-radius: 0!important;
+    border-left-color: transparent!important;
+}
+
+.tms-chat-direct .tms-msg-input .ui.icon.input textarea {
+    padding-right: 2.67142857em!important;
+}
+
+.tms-chat-direct .tms-msg-input .ui.input textarea {
+    margin: 0;
+    max-width: 100%;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 0 auto;
+    -ms-flex: 1 0 auto;
+    flex: 1 0 auto;
+    outline: 0;
+    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+    text-align: left;
+    line-height: 1.2142em;
+    padding: .67861429em 1em;
+    background: #FFF;
+    border: 1px solid rgba(34, 36, 38, .15);
+    color: rgba(0, 0, 0, .87);
+    border-radius: .28571429rem;
+    box-shadow: none;
+}

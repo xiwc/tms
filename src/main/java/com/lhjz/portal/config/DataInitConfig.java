@@ -6,6 +6,7 @@ import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import com.lhjz.portal.component.MailSender2;
@@ -15,6 +16,7 @@ import com.lhjz.portal.repository.SettingRepository;
 import com.lhjz.portal.util.JsonUtil;
 
 @Configuration
+@EnableJpaAuditing
 public class DataInitConfig {
 
 	@Autowired

@@ -1,5 +1,4 @@
-// import 'wlzc-semantic-ui';
-import 'semantic-ui';
+import 'tms-semantic-ui';
 import {
     default as toastr
 }
@@ -71,8 +70,20 @@ export class App {
             nav: false,
             title: '用户注册'
         }, {
+            route: ['chat-direct'],
+            name: 'chat-direct',
+            moduleId: 'chat/chat-direct',
+            nav: false,
+            title: '私聊'
+        }, {
+            route: ['login'],
+            name: 'login',
+            moduleId: 'user/user-login',
+            nav: false,
+            title: '登录'
+        }, {
             route: '',
-            redirect: 'pwd-reset'
+            redirect: 'chat-direct'
         }]);
 
         this.router = router;

@@ -723,7 +723,7 @@
             <div class="fallback">
                 <input name="file" type="file" multiple />
             </div>
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : ''}" th:value="${_csrf != null ? _csrf.token : ''}" />
         </form>
     </div>
     <div class="ui flowing popup top left transition hidden pp-chat-edit-upload-file">
@@ -731,7 +731,7 @@
             <div class="fallback">
                 <input name="file" type="file" multiple />
             </div>
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <input type="hidden" th:name="${_csrf != null ? _csrf.parameterName : ''}" th:value="${_csrf != null ? _csrf.token : ''}" />
         </form>
     </div>
     <div class="ui flowing popup top left transition hidden pp-chat-emoji"></div>

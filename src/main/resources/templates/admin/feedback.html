@@ -84,7 +84,7 @@
             method: 'post',
             //stateContext: '.ad-img-cards',
             data: {
-                /*[+ [[${_csrf.parameterName}]] : [[${_csrf.token}]] +]*/
+                /*[+ [[${_csrf != null ? _csrf.parameterName : ''}]] : [[${_csrf != null ? _csrf.token : ''}]] +]*/
             },
             beforeSend: function(settings) {
                 //settings.urlData = {};
