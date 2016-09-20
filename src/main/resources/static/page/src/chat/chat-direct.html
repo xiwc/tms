@@ -1,5 +1,6 @@
 <template>
     <require from="./chat-direct.css"></require>
+    <require from="./md-github.css"></require>
     <div class="tms-chat-direct">
         <div class="ui top fixed menu">
             <!-- <div class="item">
@@ -13,24 +14,12 @@
         <div class="ui left visible segment sidebar">
             <div class="tms-header"></div>
             <div class="ui middle aligned selection list">
-                <div class="item">
+                <a repeat.for="item of users" click.delegate="switchChatToHandler(item.username)" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
                     <i class="user icon"></i>
                     <div class="content">
-                        <div class="header">Helen</div>
+                        <div class="header">${item.name}</div>
                     </div>
-                </div>
-                <div class="item">
-                    <i class="user icon"></i>
-                    <div class="content">
-                        <div class="header">Christian</div>
-                    </div>
-                </div>
-                <div class="item">
-                    <i class="user icon"></i>
-                    <div class="content">
-                        <div class="header">Daniel</div>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
         <div class="tms-content">
@@ -46,9 +35,7 @@
                             <div class="metadata">
                                 <div class="date">${item.createDate | date:'MM/dd hh:mm:ss'}</div>
                             </div>
-                            <div class="text">
-                                ${item.content}
-                            </div>
+                            <div class="text markdown-body" innerhtml.bind="item.contentMd"></div>
                             <div class="actions">
                                 <a class="save">复制</a>
                                 <a class="hide">分享</a>

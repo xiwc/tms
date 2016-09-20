@@ -80,7 +80,7 @@ define('app',['exports', 'toastr', 'wurl', 'common/common-utils', 'tms-semantic-
                 nav: false,
                 title: '用户注册'
             }, {
-                route: ['chat-direct'],
+                route: ['chat-direct/:username'],
                 name: 'chat-direct',
                 moduleId: 'chat/chat-direct',
                 nav: false,
@@ -93,7 +93,7 @@ define('app',['exports', 'toastr', 'wurl', 'common/common-utils', 'tms-semantic-
                 title: '登录'
             }, {
                 route: '',
-                redirect: 'chat-direct'
+                redirect: 'chat-direct/admin'
             }]);
 
             this.router = router;
@@ -151,7 +151,7 @@ define('main',['exports', './environment'], function (exports, _environment) {
     });
   }
 });
-define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll', 'jquery.scrollto'], function (exports, _aureliaFramework, _commonPoll) {
+define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll', 'marked', 'jquery.scrollto'], function (exports, _aureliaFramework, _commonPoll, _marked) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -160,6 +160,8 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
     exports.ChatDirect = undefined;
 
     var _commonPoll2 = _interopRequireDefault(_commonPoll);
+
+    var _marked2 = _interopRequireDefault(_marked);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -223,17 +225,40 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
             _classCallCheck(this, ChatDirect);
 
             _initDefineProp(this, 'content', _descriptor, this);
+
+            _marked2.default.setOptions({
+                breaks: true
+            });
         }
 
-        ChatDirect.prototype.bind = function bind(ctx) {
+        ChatDirect.prototype.convertMd = function convertMd(chats) {
+            _.each(chats, function (item) {
+                item.contentMd = (0, _marked2.default)(item.content);
+            });
+            return chats;
+        };
+
+        ChatDirect.prototype.activate = function activate(params, routeConfig, navigationInstruction) {
+            this.init(params.username);
+        };
+
+        ChatDirect.prototype.switchChatToHandler = function switchChatToHandler(chatTo) {
+            this.init(chatTo);
+            _commonPoll2.default.reset();
+            return true;
+        };
+
+        ChatDirect.prototype.init = function init(chatTo) {
             var _this = this;
+
+            this.chatTo = chatTo;
 
             $.get('/admin/chat/direct/list', {
                 size: 20,
-                chatTo: 'test'
+                chatTo: chatTo
             }, function (data) {
                 if (data.success) {
-                    _this.chats = _.reverse(data.data.content);
+                    _this.chats = _.reverse(_this.convertMd(data.data.content));
                     _.defer(function () {
                         $('html,body').scrollTo('max');
                     });
@@ -241,19 +266,33 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                     toastr.error(data.data, '获取消息失败!');
                 }
             });
+        };
+
+        ChatDirect.prototype.bind = function bind(ctx) {
+            var _this2 = this;
+
+            $.get('/admin/user/all', {
+                enabled: true
+            }, function (data) {
+                if (data.success) {
+                    _this2.users = data.data;
+                } else {
+                    toastr.error(data.data, '获取全部用户失败!');
+                }
+            });
 
             _commonPoll2.default.start(function () {
                 $.get('/admin/chat/direct/latest', {
-                    id: _.last(_this.chats).id,
-                    chatTo: 'test'
+                    id: _.last(_this2.chats).id,
+                    chatTo: _this2.chatTo
                 }, function (data) {
                     if (data.success) {
-                        _this.chats = _.unionBy(_this.chats, data.data, 'id');
+                        _this2.chats = _.unionBy(_this2.chats, _this2.convertMd(data.data), 'id');
                         _.defer(function () {
                             $('html,body').scrollTo('max');
                         });
                     } else {
-                        toastr.error(data.data, '获取消息失败!');
+                        toastr.error(data.data, '轮询获取消息失败!');
                     }
                 });
             });
@@ -264,35 +303,36 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.sendKeydownHandler = function sendKeydownHandler(evt) {
-            var _this2 = this;
+            var _this3 = this;
 
             if (this.sending) {
                 return false;
             }
 
-            if (evt.keyCode === 13) {
+            if (!evt.ctrlKey && evt.keyCode === 13) {
 
                 this.sending = true;
 
                 $.post('/admin/chat/direct/create', {
-                    preMore: false,
-                    lastId: '',
-                    baseURL: '',
-                    chatTo: 'test',
+                    baseUrl: utils.getBaseUrl(),
+                    path: wurl('path'),
+                    chatTo: this.chatTo,
                     content: this.content,
-                    contentHtml: ''
+                    contentHtml: (0, _marked2.default)(this.content)
                 }, function (data, textStatus, xhr) {
                     if (data.success) {
-                        _this2.content = '';
+                        _this3.content = '';
                         _commonPoll2.default.reset();
                     } else {
                         toastr.error(data.data, '发送消息失败!');
                     }
                 }).always(function () {
-                    _this2.sending = false;
+                    _this3.sending = false;
                 });
 
                 return false;
+            } else if (evt.ctrlKey && evt.keyCode === 13) {
+                this.content += '\r\n';
             }
 
             return true;
@@ -925,12 +965,13 @@ define('resources/value-converters/common-vc',['exports', 'jquery-format'], func
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./app.css\"></require>\r\n\t<require from=\"nprogress/nprogress.css\"></require>\r\n\t<require from=\"toastr/build/toastr.css\"></require>\r\n    <require from=\"tms-semantic-ui/semantic.min.css\"></require>\r\n    <router-view></router-view>\r\n</template>\r\n"; });
 define('text!app.css', ['module'], function(module) { module.exports = "html,\r\nbody {\r\n    height: 100%;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 6px;\r\n    height: 6px;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 6px;\r\n    background-color: #c6c6c6;\r\n}\r\n\r\n::-webkit-scrollbar-thumb:hover {\r\n    background: #999;\r\n}\r\n"; });
-define('text!chat/chat-direct.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./chat-direct.css\"></require>\r\n    <div class=\"tms-chat-direct\">\r\n        <div class=\"ui top fixed menu\">\r\n            <!-- <div class=\"item\">\r\n                <i class=\"icon link sidebar\"></i>\r\n            </div> -->\r\n            <a class=\"item header\">@charts</a>\r\n            <div class=\"right menu\">\r\n                <a class=\"item\">...</a>\r\n            </div>\r\n        </div>\r\n        <div class=\"ui left visible segment sidebar\">\r\n            <div class=\"tms-header\"></div>\r\n            <div class=\"ui middle aligned selection list\">\r\n                <div class=\"item\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">Helen</div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"item\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">Christian</div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"item\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">Daniel</div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"tms-content\">\r\n            <div class=\"tms-col w65\">\r\n                <div class=\"ui basic segment minimal selection list segment comments\">\r\n                    <!-- <h3 class=\"ui dividing header\">私聊内容</h3> -->\r\n                    <div repeat.for=\"item of chats\" class=\"comment item\" data-id=\"${item.id}\">\r\n                        <a class=\"avatar\">\r\n                            <i class=\"user icon\"></i>\r\n                        </a>\r\n                        <div class=\"content\">\r\n                            <a class=\"author\">${item.chatTo.name}</a>\r\n                            <div class=\"metadata\">\r\n                                <div class=\"date\">${item.createDate | date:'MM/dd hh:mm:ss'}</div>\r\n                            </div>\r\n                            <div class=\"text\">\r\n                                ${item.content}\r\n                            </div>\r\n                            <div class=\"actions\">\r\n                                <a class=\"save\">复制</a>\r\n                                <a class=\"hide\">分享</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"ui basic segment tms-msg-input\">\r\n                    <div class=\"ui left action fluid icon input\">\r\n                        <button class=\"ui icon button\">\r\n                            <i class=\"plus icon\"></i>\r\n                        </button>\r\n                        <textarea value.bind=\"content\" keydown.trigger=\"sendKeydownHandler($event)\" rows=\"1\"></textarea>\r\n                        <i class=\"smile link icon\"></i>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"tms-col w35\"></div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!chat/chat-direct.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./chat-direct.css\"></require>\r\n    <require from=\"./md-github.css\"></require>\r\n    <div class=\"tms-chat-direct\">\r\n        <div class=\"ui top fixed menu\">\r\n            <!-- <div class=\"item\">\r\n                <i class=\"icon link sidebar\"></i>\r\n            </div> -->\r\n            <a class=\"item header\">@charts</a>\r\n            <div class=\"right menu\">\r\n                <a class=\"item\">...</a>\r\n            </div>\r\n        </div>\r\n        <div class=\"ui left visible segment sidebar\">\r\n            <div class=\"tms-header\"></div>\r\n            <div class=\"ui middle aligned selection list\">\r\n                <a repeat.for=\"item of users\" click.delegate=\"switchChatToHandler(item.username)\" href=\"#/chat-direct/${item.username}\" class=\"item ${item.username == chatTo ? 'active' : ''}\" data-id=\"${item.username}\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">${item.name}</div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div class=\"tms-content\">\r\n            <div class=\"tms-col w65\">\r\n                <div class=\"ui basic segment minimal selection list segment comments\">\r\n                    <!-- <h3 class=\"ui dividing header\">私聊内容</h3> -->\r\n                    <div repeat.for=\"item of chats\" class=\"comment item\" data-id=\"${item.id}\">\r\n                        <a class=\"avatar\">\r\n                            <i class=\"user icon\"></i>\r\n                        </a>\r\n                        <div class=\"content\">\r\n                            <a class=\"author\">${item.chatTo.name}</a>\r\n                            <div class=\"metadata\">\r\n                                <div class=\"date\">${item.createDate | date:'MM/dd hh:mm:ss'}</div>\r\n                            </div>\r\n                            <div class=\"text markdown-body\" innerhtml.bind=\"item.contentMd\"></div>\r\n                            <div class=\"actions\">\r\n                                <a class=\"save\">复制</a>\r\n                                <a class=\"hide\">分享</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"ui basic segment tms-msg-input\">\r\n                    <div class=\"ui left action fluid icon input\">\r\n                        <button class=\"ui icon button\">\r\n                            <i class=\"plus icon\"></i>\r\n                        </button>\r\n                        <textarea value.bind=\"content\" keydown.trigger=\"sendKeydownHandler($event)\" rows=\"1\"></textarea>\r\n                        <i class=\"smile link icon\"></i>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"tms-col w35\"></div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!chat/chat-direct.css', ['module'], function(module) { module.exports = ".tms-chat-direct {\r\n    height: 100%;\r\n}\r\n\r\n.tms-chat-direct .top.fixed.menu {\r\n    padding-left: 220px;\r\n    height: 60px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar {\r\n    width: 220px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar .tms-header {\r\n    height: 40px;\r\n}\r\n\r\n.tms-chat-direct .tms-content {\r\n    padding-top: 60px;\r\n    padding-left: 220px;\r\n    display: flex;\r\n    align-items: stretch;\r\n    height: 100%;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w65 {\r\n    flex: auto;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w35 {\r\n    width: 380px;\r\n    border-left: 1px #e0e1e2 solid;\r\n}\r\n\r\n.tms-chat-direct .ui.basic.segment.tms-msg-input {\r\n    position: fixed;\r\n    bottom: 0;\r\n    right: 30%;\r\n    left: 220px;\r\n    background-color: white;\r\n}\r\n\r\n.tms-chat-direct .ui.comments {\r\n    margin-top: 20px;\r\n    margin-bottom: 50px;\r\n    max-width: none;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui[class*=\"left action\"].input>textarea {\r\n    border-top-left-radius: 0!important;\r\n    border-bottom-left-radius: 0!important;\r\n    border-left-color: transparent!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.icon.input textarea {\r\n    padding-right: 2.67142857em!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.input textarea {\r\n    margin: 0;\r\n    max-width: 100%;\r\n    -webkit-box-flex: 1;\r\n    -webkit-flex: 1 0 auto;\r\n    -ms-flex: 1 0 auto;\r\n    flex: 1 0 auto;\r\n    outline: 0;\r\n    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);\r\n    text-align: left;\r\n    line-height: 1.2142em;\r\n    padding: .67861429em 1em;\r\n    background: #FFF;\r\n    border: 1px solid rgba(34, 36, 38, .15);\r\n    color: rgba(0, 0, 0, .87);\r\n    border-radius: .28571429rem;\r\n    box-shadow: none;\r\n}\r\n"; });
 define('text!user/user-login.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-login.css\"></require>\r\n    <div class=\"ui tms-user-login\">\r\n        <div class=\"ui form segment\">\r\n            <div class=\"field\">\r\n                <label>用户名:</label>\r\n                <input type=\"text\" value.bind=\"username\">\r\n            </div>\r\n            <div class=\"field\">\r\n                <label>密码:</label>\r\n                <input type=\"password\" value.bind=\"password\">\r\n            </div>\r\n            <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"loginHandler()\">登录</div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
-define('text!user/user-login.css', ['module'], function(module) { module.exports = ".tms-user-login {\r\n\tdisplay: flex;\r\n\theight: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}"; });
+define('text!chat/md-github.css', ['module'], function(module) { module.exports = ".markdown-body {\r\n    font-size: 14px;\r\n    line-height: 1.6;\r\n}\r\n\r\n.markdown-body > *:first-child {\r\n    margin-top: 0 !important;\r\n}\r\n\r\n.markdown-body > *:last-child {\r\n    margin-bottom: 0 !important;\r\n}\r\n\r\n.markdown-body a.absent {\r\n    color: #CC0000;\r\n}\r\n\r\n.markdown-body a.anchor {\r\n    bottom: 0;\r\n    cursor: pointer;\r\n    display: block;\r\n    left: 0;\r\n    margin-left: -30px;\r\n    padding-left: 30px;\r\n    position: absolute;\r\n    top: 0;\r\n}\r\n\r\n.markdown-body h1,\r\n.markdown-body h2,\r\n.markdown-body h3,\r\n.markdown-body h4,\r\n.markdown-body h5,\r\n.markdown-body h6 {\r\n    cursor: text;\r\n    font-weight: bold;\r\n    margin: 20px 0 10px;\r\n    padding: 0;\r\n    position: relative;\r\n}\r\n\r\n.markdown-body h1 .mini-icon-link,\r\n.markdown-body h2 .mini-icon-link,\r\n.markdown-body h3 .mini-icon-link,\r\n.markdown-body h4 .mini-icon-link,\r\n.markdown-body h5 .mini-icon-link,\r\n.markdown-body h6 .mini-icon-link {\r\n    color: #000000;\r\n    display: none;\r\n}\r\n\r\n.markdown-body h1:hover a.anchor,\r\n.markdown-body h2:hover a.anchor,\r\n.markdown-body h3:hover a.anchor,\r\n.markdown-body h4:hover a.anchor,\r\n.markdown-body h5:hover a.anchor,\r\n.markdown-body h6:hover a.anchor {\r\n    line-height: 1;\r\n    margin-left: -22px;\r\n    padding-left: 0;\r\n    text-decoration: none;\r\n    top: 15%;\r\n}\r\n\r\n.markdown-body h1:hover a.anchor .mini-icon-link,\r\n.markdown-body h2:hover a.anchor .mini-icon-link,\r\n.markdown-body h3:hover a.anchor .mini-icon-link,\r\n.markdown-body h4:hover a.anchor .mini-icon-link,\r\n.markdown-body h5:hover a.anchor .mini-icon-link,\r\n.markdown-body h6:hover a.anchor .mini-icon-link {\r\n    display: inline-block;\r\n}\r\n\r\n.markdown-body h1 tt,\r\n.markdown-body h1 code,\r\n.markdown-body h2 tt,\r\n.markdown-body h2 code,\r\n.markdown-body h3 tt,\r\n.markdown-body h3 code,\r\n.markdown-body h4 tt,\r\n.markdown-body h4 code,\r\n.markdown-body h5 tt,\r\n.markdown-body h5 code,\r\n.markdown-body h6 tt,\r\n.markdown-body h6 code {\r\n    font-size: inherit;\r\n}\r\n\r\n.markdown-body h1 {\r\n    color: #000000;\r\n    font-size: 28px;\r\n}\r\n\r\n.markdown-body h2 {\r\n    border-bottom: 1px solid #CCCCCC;\r\n    color: #000000;\r\n    font-size: 24px;\r\n}\r\n\r\n.markdown-body h3 {\r\n    font-size: 18px;\r\n}\r\n\r\n.markdown-body h4 {\r\n    font-size: 16px;\r\n}\r\n\r\n.markdown-body h5 {\r\n    font-size: 14px;\r\n}\r\n\r\n.markdown-body h6 {\r\n    color: #777777;\r\n    font-size: 14px;\r\n}\r\n\r\n.markdown-body p,\r\n.markdown-body blockquote,\r\n.markdown-body ul,\r\n.markdown-body ol,\r\n.markdown-body dl,\r\n.markdown-body table,\r\n.markdown-body pre {\r\n    margin: 15px 0;\r\n}\r\n\r\n.markdown-body hr {\r\n    overflow: hidden;\r\n    background: 0 0\r\n}\r\n\r\n.markdown-body hr:before {\r\n    display: table;\r\n    content: \"\"\r\n}\r\n\r\n.markdown-body hr:after {\r\n    display: table;\r\n    clear: both;\r\n    content: \"\"\r\n}\r\n\r\n.markdown-body hr {\r\n    height: 4px;\r\n    padding: 0;\r\n    margin: 16px 0;\r\n    background-color: #e7e7e7;\r\n    border: 0\r\n}\r\n\r\n.markdown-body hr {\r\n    -moz-box-sizing: content-box;\r\n    box-sizing: content-box\r\n}\r\n\r\n.markdown-body > h2:first-child,\r\n.markdown-body > h1:first-child,\r\n.markdown-body > h1:first-child + h2,\r\n.markdown-body > h3:first-child,\r\n.markdown-body > h4:first-child,\r\n.markdown-body > h5:first-child,\r\n.markdown-body > h6:first-child {\r\n    margin-top: 0;\r\n    padding-top: 0;\r\n}\r\n\r\n.markdown-body a:first-child h1,\r\n.markdown-body a:first-child h2,\r\n.markdown-body a:first-child h3,\r\n.markdown-body a:first-child h4,\r\n.markdown-body a:first-child h5,\r\n.markdown-body a:first-child h6 {\r\n    margin-top: 0;\r\n    padding-top: 0;\r\n}\r\n\r\n.markdown-body h1 + p,\r\n.markdown-body h2 + p,\r\n.markdown-body h3 + p,\r\n.markdown-body h4 + p,\r\n.markdown-body h5 + p,\r\n.markdown-body h6 + p {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body li p.first {\r\n    display: inline-block;\r\n}\r\n\r\n.markdown-body ul,\r\n.markdown-body ol {\r\n    padding-left: 30px;\r\n}\r\n\r\n.markdown-body ul.no-list,\r\n.markdown-body ol.no-list {\r\n    list-style-type: none;\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body ul li > *:first-child,\r\n.markdown-body ol li > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body ul ul,\r\n.markdown-body ul ol,\r\n.markdown-body ol ol,\r\n.markdown-body ol ul {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body dl {\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body dl dt {\r\n    font-size: 14px;\r\n    font-style: italic;\r\n    font-weight: bold;\r\n    margin: 15px 0 5px;\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body dl dt:first-child {\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body dl dt > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body dl dt > *:last-child {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body dl dd {\r\n    margin: 0 0 15px;\r\n    padding: 0 15px;\r\n}\r\n\r\n.markdown-body dl dd > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body dl dd > *:last-child {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body blockquote {\r\n    border-left: 4px solid #DDDDDD;\r\n    color: #777777;\r\n    padding: 0 15px;\r\n}\r\n\r\n.markdown-body blockquote > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body blockquote > *:last-child {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body table th {\r\n    font-weight: bold;\r\n}\r\n\r\n.markdown-body table th,\r\n.markdown-body table td {\r\n    border: 1px solid #CCCCCC;\r\n    padding: 6px 13px;\r\n}\r\n\r\n.markdown-body table tr {\r\n    background-color: #FFFFFF;\r\n    border-top: 1px solid #CCCCCC;\r\n}\r\n\r\n.markdown-body table tr:nth-child(2n) {\r\n    background-color: #F8F8F8;\r\n}\r\n\r\n.markdown-body img {\r\n    max-width: 100%;\r\n}\r\n\r\n.markdown-body span.frame {\r\n    display: block;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.frame > span {\r\n    border: 1px solid #DDDDDD;\r\n    display: block;\r\n    float: left;\r\n    margin: 13px 0 0;\r\n    overflow: hidden;\r\n    padding: 7px;\r\n    width: auto;\r\n}\r\n\r\n.markdown-body span.frame span img {\r\n    display: block;\r\n    float: left;\r\n}\r\n\r\n.markdown-body span.frame span span {\r\n    clear: both;\r\n    color: #333333;\r\n    display: block;\r\n    padding: 5px 0 0;\r\n}\r\n\r\n.markdown-body span.align-center {\r\n    clear: both;\r\n    display: block;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.align-center > span {\r\n    display: block;\r\n    margin: 13px auto 0;\r\n    overflow: hidden;\r\n    text-align: center;\r\n}\r\n\r\n.markdown-body span.align-center span img {\r\n    margin: 0 auto;\r\n    text-align: center;\r\n}\r\n\r\n.markdown-body span.align-right {\r\n    clear: both;\r\n    display: block;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.align-right > span {\r\n    display: block;\r\n    margin: 13px 0 0;\r\n    overflow: hidden;\r\n    text-align: right;\r\n}\r\n\r\n.markdown-body span.align-right span img {\r\n    margin: 0;\r\n    text-align: right;\r\n}\r\n\r\n.markdown-body span.float-left {\r\n    display: block;\r\n    float: left;\r\n    margin-right: 13px;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.float-left span {\r\n    margin: 13px 0 0;\r\n}\r\n\r\n.markdown-body span.float-right {\r\n    display: block;\r\n    float: right;\r\n    margin-left: 13px;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.float-right > span {\r\n    display: block;\r\n    margin: 13px auto 0;\r\n    overflow: hidden;\r\n    text-align: right;\r\n}\r\n\r\n.markdown-body code,\r\n.markdown-body tt {\r\n    background-color: #F8F8F8;\r\n    border: 1px solid #EAEAEA;\r\n    border-radius: 3px 3px 3px 3px;\r\n    margin: 0 2px;\r\n    padding: 0 5px;\r\n    white-space: nowrap;\r\n}\r\n\r\n.markdown-body pre > code {\r\n    background: none repeat scroll 0 0 transparent;\r\n    border: medium none;\r\n    margin: 0;\r\n    padding: 0;\r\n    white-space: pre;\r\n}\r\n\r\n.markdown-body .highlight pre,\r\n.markdown-body pre {\r\n    background-color: #F8F8F8;\r\n    border: 1px solid #CCCCCC;\r\n    border-radius: 3px 3px 3px 3px;\r\n    font-size: 13px;\r\n    line-height: 19px;\r\n    overflow: auto;\r\n    padding: 6px 10px;\r\n}\r\n\r\n.markdown-body pre code,\r\n.markdown-body pre tt {\r\n    background-color: transparent;\r\n    border: medium none;\r\n}\r\n"; });
 define('text!user/user-pwd-reset.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-pwd-reset.css\"></require>\r\n    <div class=\"ui container tms-user-pwd-reset\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">输入您的邮箱地址,我们会发送密码重置链接到您的邮箱!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">邮件地址</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的邮件地址\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"resetPwdHandler()\">发送密码重置邮件</div>\r\n            </div>\r\n            <div if.bind=\"token\" ref=\"fm2\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">设置您的新密码,密码长度要求至少8位字符!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">新密码</label>\r\n                    <input type=\"password\" name=\"mail\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"设置您的新密码\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"newPwdHandler()\">确认</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
-define('text!user/user-pwd-reset.css', ['module'], function(module) { module.exports = ".tms-user-pwd-reset {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-pwd-reset .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
+define('text!user/user-login.css', ['module'], function(module) { module.exports = ".tms-user-login {\r\n\tdisplay: flex;\r\n\theight: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}"; });
 define('text!user/user-register.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-register.css\"></require>\r\n    <div class=\"ui container tms-user-register\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 280px;\">\r\n                <div class=\"ui message\">提交账户注册信息成功后,我们会向您的注册邮箱发送一封账户激活邮件,激活账户后即可登录!</div>\r\n                <div class=\"required field\">\r\n                    <label>用户名</label>\r\n                    <input type=\"text\" name=\"username\" autofocus=\"\" value.bind=\"username\" placeholder=\"输入您的登录用户名\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>密码</label>\r\n                    <input type=\"password\" name=\"pwd\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"输入您的登录密码\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>姓名</label>\r\n                    <input type=\"text\" name=\"name\" autofocus=\"\" value.bind=\"name\" placeholder=\"输入您的显示名称\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>邮箱</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的账户激活邮箱\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"okHandler()\">确认</div>\r\n            </div>\r\n            <div if.bind=\"token\" class=\"ui center aligned very padded segment\" style=\"width: 320px;\">\r\n            \t<h1 class=\"ui header\">${header}</h1>\r\n            \t<a href=\"/admin/login\" class=\"ui green button\">返回登录页面</a>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!user/user-pwd-reset.css', ['module'], function(module) { module.exports = ".tms-user-pwd-reset {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-pwd-reset .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
 define('text!user/user-register.css', ['module'], function(module) { module.exports = ".tms-user-register {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-register .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
 //# sourceMappingURL=app-bundle.js.map

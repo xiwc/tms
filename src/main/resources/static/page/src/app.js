@@ -70,7 +70,7 @@ export class App {
             nav: false,
             title: '用户注册'
         }, {
-            route: ['chat-direct'],
+            route: ['chat-direct/:username'],
             name: 'chat-direct',
             moduleId: 'chat/chat-direct',
             nav: false,
@@ -83,7 +83,7 @@ export class App {
             title: '登录'
         }, {
             route: '',
-            redirect: 'chat-direct'
+            redirect: 'chat-direct/admin'
         }]);
 
         this.router = router;

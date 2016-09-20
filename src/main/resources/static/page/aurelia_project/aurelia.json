@@ -81,6 +81,12 @@
         ]
       },
       {
+        "name": "deps-bundle.js",
+        "dependencies": [
+          "marked"
+        ]
+      },
+      {
         "name": "vendor-bundle.js",
         "prepend": [
           "node_modules/bluebird/js/browser/bluebird.core.js",

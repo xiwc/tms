@@ -4,6 +4,7 @@
 package com.lhjz.portal.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -31,7 +32,11 @@ import com.lhjz.portal.repository.GroupMemberRepository;
 import com.lhjz.portal.repository.GroupRepository;
 import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.repository.UserRepository;
+import com.lhjz.portal.util.DateUtil;
+import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
+import com.lhjz.portal.util.TemplateUtil;
+import com.lhjz.portal.util.ThreadUtil;
 
 /**
  * 
@@ -70,24 +75,22 @@ public class ChatDirectController extends BaseController {
 	@Autowired
 	MailSender2 mailSender;
 
-	String dynamicAction = "admin/dynamic";
+	String hash = "#/chat-direct";
 
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	@ResponseBody
-	public RespBody create(
-			@RequestParam("baseURL") String baseURL,
+	public RespBody create(@RequestParam("baseUrl") String baseUrl,
+			@RequestParam("path") String path,
 			@RequestParam("chatTo") String chatTo,
 			@RequestParam("content") String content,
-			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
-			@RequestParam("lastId") Long lastId,
-			@RequestParam("contentHtml") String contentHtml) {
+			@RequestParam("contentHtml") final String contentHtml) {
 
 		if (StringUtil.isEmpty(content)) {
 			return RespBody.failed("提交内容不能为空!");
 		}
-		
-		User chatToUser = userRepository.findOne(chatTo);
-		
+
+		final User chatToUser = userRepository.findOne(chatTo);
+
 		if (chatToUser == null) {
 			return RespBody.failed("聊天对象不存在!");
 		}
@@ -96,33 +99,32 @@ public class ChatDirectController extends BaseController {
 		chatDirect.setChatTo(chatToUser);
 		chatDirect.setContent(content);
 
-		chatDirectRepository.saveAndFlush(chatDirect);
+		ChatDirect chatDirect2 = chatDirectRepository.saveAndFlush(chatDirect);
 
-		// final User loginUser = getLoginUser();
-		//
-		// ThreadUtil.exec(() -> {
-		//
-		// try {
-		// Thread.sleep(3000);
-		// mailSender.sendHtml(String.format("TMS-沟通动态@消息_%s",
-		// DateUtil.format(new Date(), DateUtil.FORMAT7)),
-		// TemplateUtil.process("templates/mail/mail-dynamic",
-		// MapUtil.objArr2Map("user", loginUser,
-		// "date", new Date(), "href", href,
-		// "title", "下面的沟通消息中有@到你", "content",
-		// html)), mail.get());
-		// logger.info("沟通邮件发送成功！");
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// logger.error("沟通邮件发送失败！");
-		// }
-		//
-		// });
-		//
-		// if (!preMore && chatRepository.countQueryRecent(lastId) <= 50) {
-		// List<Chat> chats = chatRepository.queryRecent(lastId);
-		// return RespBody.succeed(chats);
-		// }
+		final User loginUser = getLoginUser();
+		final String href = baseUrl + path + hash + "?id="
+				+ chatDirect2.getId();
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				Thread.sleep(3000);
+				mailSender.sendHtml(String.format("TMS-私聊@消息_%s",
+						DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil
+								.process("templates/mail/mail-dynamic", MapUtil
+										.objArr2Map("user", loginUser, "date",
+												new Date(), "href", href,
+												"title", "下面的沟通消息中有@到你",
+												"content", contentHtml)),
+						chatToUser.getMails());
+				logger.info("私聊邮件发送成功！");
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("私聊邮件发送失败！");
+			}
+
+		});
 
 		return RespBody.succeed();
 	}
@@ -132,10 +134,10 @@ public class ChatDirectController extends BaseController {
 	public RespBody list(
 			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam("chatTo") String chatTo) {
-		
+
 		User chatToUser = userRepository.findOne(chatTo);
-		
-		if(chatToUser == null) {
+
+		if (chatToUser == null) {
 			return RespBody.failed("聊天对象不存在!");
 		}
 
