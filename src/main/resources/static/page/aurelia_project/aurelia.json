@@ -119,6 +119,7 @@
           },
           "lodash",
           "jquery",
+          "jquery.scrollto",
           {
             "name": "tms-semantic-ui",
             "path": "../node_modules/tms-semantic-ui",
@@ -128,6 +129,13 @@
             "resources": [
               "semantic.min.css"
             ]
+          },
+          {
+            "name": "jquery-format",
+            "path": "../node_modules/jquery-format",
+            "main": "src/jquery.format",
+            "deps": ["jquery"],
+            "exports": "$"
           },
           {
             "name": "toastr",

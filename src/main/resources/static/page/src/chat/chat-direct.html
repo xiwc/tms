@@ -37,153 +37,21 @@
             <div class="tms-col w65">
                 <div class="ui basic segment minimal selection list segment comments">
                     <!-- <h3 class="ui dividing header">私聊内容</h3> -->
-                    <div class="comment item">
+                    <div repeat.for="item of chats" class="comment item" data-id="${item.id}">
                         <a class="avatar">
                             <i class="user icon"></i>
                         </a>
                         <div class="content">
-                            <a class="author">Stevie Feliciano</a>
+                            <a class="author">${item.chatTo.name}</a>
                             <div class="metadata">
-                                <div class="date">2 days ago</div>
-                                <div class="rating">
-                                    <i class="star icon"></i> 5 Faves
-                                </div>
+                                <div class="date">${item.createDate | date:'MM/dd hh:mm:ss'}</div>
                             </div>
                             <div class="text">
-                                Hey guys, I hope this example comment is helping you read this documentation.
+                                ${item.content}
                             </div>
                             <div class="actions">
-                                <a class="reply">Reply</a>
-                                <a class="save">Save</a>
-                                <a class="hide">Hide</a>
-                                <a>
-                                    <i class="expand icon"></i> Full-screen
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="comment item">
-                        <a class="avatar">
-                            <i class="user icon"></i>
-                        </a>
-                        <div class="content">
-                            <a class="author">Stevie Feliciano</a>
-                            <div class="metadata">
-                                <div class="date">2 days ago</div>
-                                <div class="rating">
-                                    <i class="star icon"></i> 5 Faves
-                                </div>
-                            </div>
-                            <div class="text">
-                                Hey guys, I hope this example comment is helping you read this documentation.
-                            </div>
-                            <div class="actions">
-                                <a class="reply">Reply</a>
-                                <a class="save">Save</a>
-                                <a class="hide">Hide</a>
-                                <a>
-                                    <i class="expand icon"></i> Full-screen
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="comment item">
-                        <a class="avatar">
-                            <i class="user icon"></i>
-                        </a>
-                        <div class="content">
-                            <a class="author">Stevie Feliciano</a>
-                            <div class="metadata">
-                                <div class="date">2 days ago</div>
-                                <div class="rating">
-                                    <i class="star icon"></i> 5 Faves
-                                </div>
-                            </div>
-                            <div class="text">
-                                Hey guys, I hope this example comment is helping you read this documentation.
-                            </div>
-                            <div class="actions">
-                                <a class="reply">Reply</a>
-                                <a class="save">Save</a>
-                                <a class="hide">Hide</a>
-                                <a>
-                                    <i class="expand icon"></i> Full-screen
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="comment item">
-                        <a class="avatar">
-                            <i class="user icon"></i>
-                        </a>
-                        <div class="content">
-                            <a class="author">Stevie Feliciano</a>
-                            <div class="metadata">
-                                <div class="date">2 days ago</div>
-                                <div class="rating">
-                                    <i class="star icon"></i> 5 Faves
-                                </div>
-                            </div>
-                            <div class="text">
-                                Hey guys, I hope this example comment is helping you read this documentation.
-                            </div>
-                            <div class="actions">
-                                <a class="reply">Reply</a>
-                                <a class="save">Save</a>
-                                <a class="hide">Hide</a>
-                                <a>
-                                    <i class="expand icon"></i> Full-screen
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="comment item">
-                        <a class="avatar">
-                            <i class="user icon"></i>
-                        </a>
-                        <div class="content">
-                            <a class="author">Stevie Feliciano</a>
-                            <div class="metadata">
-                                <div class="date">2 days ago</div>
-                                <div class="rating">
-                                    <i class="star icon"></i> 5 Faves
-                                </div>
-                            </div>
-                            <div class="text">
-                                Hey guys, I hope this example comment is helping you read this documentation.
-                            </div>
-                            <div class="actions">
-                                <a class="reply">Reply</a>
-                                <a class="save">Save</a>
-                                <a class="hide">Hide</a>
-                                <a>
-                                    <i class="expand icon"></i> Full-screen
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="comment item">
-                        <a class="avatar">
-                            <i class="user icon"></i>
-                        </a>
-                        <div class="content">
-                            <a class="author">Stevie Feliciano</a>
-                            <div class="metadata">
-                                <div class="date">2 days ago</div>
-                                <div class="rating">
-                                    <i class="star icon"></i> 5 Faves
-                                </div>
-                            </div>
-                            <div class="text">
-                                Hey guys, I hope this example comment is helping you read this documentation.
-                            </div>
-                            <div class="actions">
-                                <a class="reply">Reply</a>
-                                <a class="save">Save</a>
-                                <a class="hide">Hide</a>
-                                <a>
-                                    <i class="expand icon"></i> Full-screen
-                                </a>
+                                <a class="save">复制</a>
+                                <a class="hide">分享</a>
                             </div>
                         </div>
                     </div>
@@ -193,7 +61,6 @@
                         <button class="ui icon button">
                             <i class="plus icon"></i>
                         </button>
-                        <!-- <input type="text"> -->
                         <textarea value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
                         <i class="smile link icon"></i>
                     </div>

@@ -1,5 +1,6 @@
 import { bindable } from 'aurelia-framework';
 import poll from "common/common-poll";
+import 'jquery.scrollto'; // https://github.com/flesler/jquery.scrollTo
 
 export class ChatDirect {
 
@@ -10,8 +11,36 @@ export class ChatDirect {
      * @param  {[object]} ctx 视图绑定上下文环境对象
      */
     bind(ctx) {
+
+        $.get('/admin/chat/direct/list', {
+            size: 20,
+            chatTo: 'test'
+        }, (data) => {
+            if (data.success) {
+                this.chats = _.reverse(data.data.content);
+                _.defer(() => {
+                    $('html,body').scrollTo('max');
+                });
+            } else {
+                toastr.error(data.data, '获取消息失败!');
+            }
+        });
+
         poll.start(() => {
-            console.log('polling...');
+            $.get('/admin/chat/direct/latest', {
+                id: _.last(this.chats).id,
+                chatTo: 'test'
+            }, (data) => {
+                if (data.success) {
+                    // this.chats = _.concat(this.chats, data.data);
+                    this.chats = _.unionBy(this.chats, data.data, 'id');
+                    _.defer(() => {
+                        $('html,body').scrollTo('max');
+                    });
+                } else {
+                    toastr.error(data.data, '获取消息失败!');
+                }
+            });
         });
     }
 
@@ -23,7 +52,14 @@ export class ChatDirect {
     }
 
     sendKeydownHandler(evt) {
+
+        if (this.sending) {
+            return false;
+        }
+
         if (evt.keyCode === 13) {
+
+            this.sending = true;
 
             $.post('/admin/chat/direct/create', {
                 preMore: false,
@@ -32,15 +68,17 @@ export class ChatDirect {
                 chatTo: 'test',
                 content: this.content,
                 contentHtml: '',
-            }, function(data, textStatus, xhr) {
+            }, (data, textStatus, xhr) => {
                 if (data.success) {
                     this.content = '';
-                    console.log('...........');
+                    poll.reset();
+                } else {
+                    toastr.error(data.data, '发送消息失败!');
                 }
+            }).always(() => {
+                this.sending = false;
             });
 
-            console.log(this.content);
-            evt.stopPropagation();
             return false;
         }
 

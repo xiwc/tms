@@ -3,9 +3,14 @@
  */
 package com.lhjz.portal.repository;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.lhjz.portal.entity.ChatDirect;
+import com.lhjz.portal.entity.security.User;
 
 /**
  * 
@@ -16,5 +21,9 @@ import com.lhjz.portal.entity.ChatDirect;
  */
 public interface ChatDirectRepository extends JpaRepository<ChatDirect, Long> {
 
+	Page<ChatDirect> findByChatTo(User chatTo, Pageable pageable);
 
+	List<ChatDirect> findByChatToAndIdGreaterThan(User chatTo, long id);
+
+	Long countByChatToAndIdGreaterThan(User chatTo, long id);
 }

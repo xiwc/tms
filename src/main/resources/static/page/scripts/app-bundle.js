@@ -151,7 +151,7 @@ define('main',['exports', './environment'], function (exports, _environment) {
     });
   }
 });
-define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll'], function (exports, _aureliaFramework, _commonPoll) {
+define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll', 'jquery.scrollto'], function (exports, _aureliaFramework, _commonPoll) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -226,8 +226,36 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll']
         }
 
         ChatDirect.prototype.bind = function bind(ctx) {
+            var _this = this;
+
+            $.get('/admin/chat/direct/list', {
+                size: 20,
+                chatTo: 'test'
+            }, function (data) {
+                if (data.success) {
+                    _this.chats = _.reverse(data.data.content);
+                    _.defer(function () {
+                        $('html,body').scrollTo('max');
+                    });
+                } else {
+                    toastr.error(data.data, '获取消息失败!');
+                }
+            });
+
             _commonPoll2.default.start(function () {
-                console.log('polling...');
+                $.get('/admin/chat/direct/latest', {
+                    id: _.last(_this.chats).id,
+                    chatTo: 'test'
+                }, function (data) {
+                    if (data.success) {
+                        _this.chats = _.unionBy(_this.chats, data.data, 'id');
+                        _.defer(function () {
+                            $('html,body').scrollTo('max');
+                        });
+                    } else {
+                        toastr.error(data.data, '获取消息失败!');
+                    }
+                });
             });
         };
 
@@ -236,7 +264,15 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll']
         };
 
         ChatDirect.prototype.sendKeydownHandler = function sendKeydownHandler(evt) {
+            var _this2 = this;
+
+            if (this.sending) {
+                return false;
+            }
+
             if (evt.keyCode === 13) {
+
+                this.sending = true;
 
                 $.post('/admin/chat/direct/create', {
                     preMore: false,
@@ -247,13 +283,15 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll']
                     contentHtml: ''
                 }, function (data, textStatus, xhr) {
                     if (data.success) {
-                        this.content = '';
-                        console.log('...........');
+                        _this2.content = '';
+                        _commonPoll2.default.reset();
+                    } else {
+                        toastr.error(data.data, '发送消息失败!');
                     }
+                }).always(function () {
+                    _this2.sending = false;
                 });
 
-                console.log(this.content);
-                evt.stopPropagation();
                 return false;
             }
 
@@ -309,6 +347,7 @@ define('common/common-poll',['exports'], function (exports) {
 
         _isPause = false;
 
+        oneHandler();
         timer = setInterval(function () {
             inc++;
             oneHandler();
@@ -530,7 +569,49 @@ define('resources/index',['exports', './config'], function (exports, _config) {
     function configure(aurelia) {
 
         _config2.default.context(aurelia).initHttp().initToastr().initAjax();
+
+        aurelia.globalResources(['resources/value-converters/common-vc']);
     }
+});
+define('user/user-login',['exports'], function (exports) {
+    'use strict';
+
+    Object.defineProperty(exports, "__esModule", {
+        value: true
+    });
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError("Cannot call a class as a function");
+        }
+    }
+
+    var UserLogin = exports.UserLogin = function () {
+        function UserLogin() {
+            _classCallCheck(this, UserLogin);
+
+            this.username = 'admin';
+            this.password = '88888888';
+        }
+
+        UserLogin.prototype.loginHandler = function loginHandler() {
+            var _this = this;
+
+            $.get('/admin/login', function (data) {
+
+                $.post('/admin/signin', {
+                    username: _this.username,
+                    password: _this.password,
+                    "remember-me": 'on'
+                }).always(function () {
+                    toastr.success('登录成功!');
+                    window.location = '/';
+                });
+            });
+        };
+
+        return UserLogin;
+    }();
 });
 define('user/user-pwd-reset',['exports'], function (exports) {
     'use strict';
@@ -776,86 +857,13 @@ define('user/user-register',['exports'], function (exports) {
         return ViewModel;
     }();
 });
-define('resources/elements/user-login',['exports', 'aurelia-framework'], function (exports, _aureliaFramework) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.UserLogin = undefined;
-
-  function _initDefineProp(target, property, descriptor, context) {
-    if (!descriptor) return;
-    Object.defineProperty(target, property, {
-      enumerable: descriptor.enumerable,
-      configurable: descriptor.configurable,
-      writable: descriptor.writable,
-      value: descriptor.initializer ? descriptor.initializer.call(context) : void 0
-    });
-  }
-
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-    var desc = {};
-    Object['ke' + 'ys'](descriptor).forEach(function (key) {
-      desc[key] = descriptor[key];
-    });
-    desc.enumerable = !!desc.enumerable;
-    desc.configurable = !!desc.configurable;
-
-    if ('value' in desc || desc.initializer) {
-      desc.writable = true;
-    }
-
-    desc = decorators.slice().reverse().reduce(function (desc, decorator) {
-      return decorator(target, property, desc) || desc;
-    }, desc);
-
-    if (context && desc.initializer !== void 0) {
-      desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-      desc.initializer = undefined;
-    }
-
-    if (desc.initializer === void 0) {
-      Object['define' + 'Property'](target, property, desc);
-      desc = null;
-    }
-
-    return desc;
-  }
-
-  function _initializerWarningHelper(descriptor, context) {
-    throw new Error('Decorating class property failed. Please ensure that transform-class-properties is enabled.');
-  }
-
-  var _desc, _value, _class, _descriptor;
-
-  var UserLogin = exports.UserLogin = (_class = function () {
-    function UserLogin() {
-      _classCallCheck(this, UserLogin);
-
-      _initDefineProp(this, 'value', _descriptor, this);
-    }
-
-    UserLogin.prototype.valueChanged = function valueChanged(newValue, oldValue) {};
-
-    return UserLogin;
-  }(), (_descriptor = _applyDecoratedDescriptor(_class.prototype, 'value', [_aureliaFramework.bindable], {
-    enumerable: true,
-    initializer: null
-  })), _class);
-});
-define('user/user-login',['exports'], function (exports) {
+define('resources/value-converters/common-vc',['exports', 'jquery-format'], function (exports) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
         value: true
     });
+    exports.NumberValueConverter = exports.DateValueConverter = exports.LowerValueConverter = exports.UpperValueConverter = undefined;
 
     function _classCallCheck(instance, Constructor) {
         if (!(instance instanceof Constructor)) {
@@ -863,42 +871,66 @@ define('user/user-login',['exports'], function (exports) {
         }
     }
 
-    var UserLogin = exports.UserLogin = function () {
-        function UserLogin() {
-            _classCallCheck(this, UserLogin);
-
-            this.username = 'admin';
-            this.password = '88888888';
+    var UpperValueConverter = exports.UpperValueConverter = function () {
+        function UpperValueConverter() {
+            _classCallCheck(this, UpperValueConverter);
         }
 
-        UserLogin.prototype.loginHandler = function loginHandler() {
-            var _this = this;
-
-            $.get('/admin/login', function (data) {
-
-                $.post('/admin/signin', {
-                    username: _this.username,
-                    password: _this.password,
-                    "remember-me": 'on'
-                }).always(function () {
-                    toastr.success('登录成功!');
-                    window.location = '/';
-                });
-            });
+        UpperValueConverter.prototype.toView = function toView(value) {
+            return value && value.toUpperCase();
         };
 
-        return UserLogin;
+        return UpperValueConverter;
+    }();
+
+    var LowerValueConverter = exports.LowerValueConverter = function () {
+        function LowerValueConverter() {
+            _classCallCheck(this, LowerValueConverter);
+        }
+
+        LowerValueConverter.prototype.toView = function toView(value) {
+            return value && value.toLowerCase();
+        };
+
+        return LowerValueConverter;
+    }();
+
+    var DateValueConverter = exports.DateValueConverter = function () {
+        function DateValueConverter() {
+            _classCallCheck(this, DateValueConverter);
+        }
+
+        DateValueConverter.prototype.toView = function toView(value) {
+            var format = arguments.length <= 1 || arguments[1] === undefined ? 'yyyy-MM-dd hh:mm:ss' : arguments[1];
+
+            return _.isInteger(_.toNumber(value)) ? $.format.date(new Date(value), format) : value ? value : '';
+        };
+
+        return DateValueConverter;
+    }();
+
+    var NumberValueConverter = exports.NumberValueConverter = function () {
+        function NumberValueConverter() {
+            _classCallCheck(this, NumberValueConverter);
+        }
+
+        NumberValueConverter.prototype.toView = function toView(value) {
+            var format = arguments.length <= 1 || arguments[1] === undefined ? '#,##0.00' : arguments[1];
+
+            return _.isNumber(_.toNumber(value)) ? $.format.number(value, format) : value ? value : '';
+        };
+
+        return NumberValueConverter;
     }();
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./app.css\"></require>\r\n\t<require from=\"nprogress/nprogress.css\"></require>\r\n\t<require from=\"toastr/build/toastr.css\"></require>\r\n    <require from=\"tms-semantic-ui/semantic.min.css\"></require>\r\n    <router-view></router-view>\r\n</template>\r\n"; });
 define('text!app.css', ['module'], function(module) { module.exports = "html,\r\nbody {\r\n    height: 100%;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 6px;\r\n    height: 6px;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 6px;\r\n    background-color: #c6c6c6;\r\n}\r\n\r\n::-webkit-scrollbar-thumb:hover {\r\n    background: #999;\r\n}\r\n"; });
-define('text!chat/chat-direct.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"./chat-direct.css\"></require>\n    <div class=\"tms-chat-direct\">\n        <div class=\"ui top fixed menu\">\n            <!-- <div class=\"item\">\n                <i class=\"icon link sidebar\"></i>\n            </div> -->\n            <a class=\"item header\">@charts</a>\n            <div class=\"right menu\">\n                <a class=\"item\">...</a>\n            </div>\n        </div>\n        <div class=\"ui left visible segment sidebar\">\n            <div class=\"tms-header\"></div>\n            <div class=\"ui middle aligned selection list\">\n                <div class=\"item\">\n                    <i class=\"user icon\"></i>\n                    <div class=\"content\">\n                        <div class=\"header\">Helen</div>\n                    </div>\n                </div>\n                <div class=\"item\">\n                    <i class=\"user icon\"></i>\n                    <div class=\"content\">\n                        <div class=\"header\">Christian</div>\n                    </div>\n                </div>\n                <div class=\"item\">\n                    <i class=\"user icon\"></i>\n                    <div class=\"content\">\n                        <div class=\"header\">Daniel</div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <div class=\"tms-content\">\n            <div class=\"tms-col w65\">\n                <div class=\"ui basic segment minimal selection list segment comments\">\n                    <!-- <h3 class=\"ui dividing header\">私聊内容</h3> -->\n                    <div class=\"comment item\">\n                        <a class=\"avatar\">\n                            <i class=\"user icon\"></i>\n                        </a>\n                        <div class=\"content\">\n                            <a class=\"author\">Stevie Feliciano</a>\n                            <div class=\"metadata\">\n                                <div class=\"date\">2 days ago</div>\n                                <div class=\"rating\">\n                                    <i class=\"star icon\"></i> 5 Faves\n                                </div>\n                            </div>\n                            <div class=\"text\">\n                                Hey guys, I hope this example comment is helping you read this documentation.\n                            </div>\n                            <div class=\"actions\">\n                                <a class=\"reply\">Reply</a>\n                                <a class=\"save\">Save</a>\n                                <a class=\"hide\">Hide</a>\n                                <a>\n                                    <i class=\"expand icon\"></i> Full-screen\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"comment item\">\n                        <a class=\"avatar\">\n                            <i class=\"user icon\"></i>\n                        </a>\n                        <div class=\"content\">\n                            <a class=\"author\">Stevie Feliciano</a>\n                            <div class=\"metadata\">\n                                <div class=\"date\">2 days ago</div>\n                                <div class=\"rating\">\n                                    <i class=\"star icon\"></i> 5 Faves\n                                </div>\n                            </div>\n                            <div class=\"text\">\n                                Hey guys, I hope this example comment is helping you read this documentation.\n                            </div>\n                            <div class=\"actions\">\n                                <a class=\"reply\">Reply</a>\n                                <a class=\"save\">Save</a>\n                                <a class=\"hide\">Hide</a>\n                                <a>\n                                    <i class=\"expand icon\"></i> Full-screen\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"comment item\">\n                        <a class=\"avatar\">\n                            <i class=\"user icon\"></i>\n                        </a>\n                        <div class=\"content\">\n                            <a class=\"author\">Stevie Feliciano</a>\n                            <div class=\"metadata\">\n                                <div class=\"date\">2 days ago</div>\n                                <div class=\"rating\">\n                                    <i class=\"star icon\"></i> 5 Faves\n                                </div>\n                            </div>\n                            <div class=\"text\">\n                                Hey guys, I hope this example comment is helping you read this documentation.\n                            </div>\n                            <div class=\"actions\">\n                                <a class=\"reply\">Reply</a>\n                                <a class=\"save\">Save</a>\n                                <a class=\"hide\">Hide</a>\n                                <a>\n                                    <i class=\"expand icon\"></i> Full-screen\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"comment item\">\n                        <a class=\"avatar\">\n                            <i class=\"user icon\"></i>\n                        </a>\n                        <div class=\"content\">\n                            <a class=\"author\">Stevie Feliciano</a>\n                            <div class=\"metadata\">\n                                <div class=\"date\">2 days ago</div>\n                                <div class=\"rating\">\n                                    <i class=\"star icon\"></i> 5 Faves\n                                </div>\n                            </div>\n                            <div class=\"text\">\n                                Hey guys, I hope this example comment is helping you read this documentation.\n                            </div>\n                            <div class=\"actions\">\n                                <a class=\"reply\">Reply</a>\n                                <a class=\"save\">Save</a>\n                                <a class=\"hide\">Hide</a>\n                                <a>\n                                    <i class=\"expand icon\"></i> Full-screen\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"comment item\">\n                        <a class=\"avatar\">\n                            <i class=\"user icon\"></i>\n                        </a>\n                        <div class=\"content\">\n                            <a class=\"author\">Stevie Feliciano</a>\n                            <div class=\"metadata\">\n                                <div class=\"date\">2 days ago</div>\n                                <div class=\"rating\">\n                                    <i class=\"star icon\"></i> 5 Faves\n                                </div>\n                            </div>\n                            <div class=\"text\">\n                                Hey guys, I hope this example comment is helping you read this documentation.\n                            </div>\n                            <div class=\"actions\">\n                                <a class=\"reply\">Reply</a>\n                                <a class=\"save\">Save</a>\n                                <a class=\"hide\">Hide</a>\n                                <a>\n                                    <i class=\"expand icon\"></i> Full-screen\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                    <div class=\"comment item\">\n                        <a class=\"avatar\">\n                            <i class=\"user icon\"></i>\n                        </a>\n                        <div class=\"content\">\n                            <a class=\"author\">Stevie Feliciano</a>\n                            <div class=\"metadata\">\n                                <div class=\"date\">2 days ago</div>\n                                <div class=\"rating\">\n                                    <i class=\"star icon\"></i> 5 Faves\n                                </div>\n                            </div>\n                            <div class=\"text\">\n                                Hey guys, I hope this example comment is helping you read this documentation.\n                            </div>\n                            <div class=\"actions\">\n                                <a class=\"reply\">Reply</a>\n                                <a class=\"save\">Save</a>\n                                <a class=\"hide\">Hide</a>\n                                <a>\n                                    <i class=\"expand icon\"></i> Full-screen\n                                </a>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n                <div class=\"ui basic segment tms-msg-input\">\n                    <div class=\"ui left action fluid icon input\">\n                        <button class=\"ui icon button\">\n                            <i class=\"plus icon\"></i>\n                        </button>\n                        <!-- <input type=\"text\"> -->\n                        <textarea value.bind=\"content\" keydown.trigger=\"sendKeydownHandler($event)\" rows=\"1\"></textarea>\n                        <i class=\"smile link icon\"></i>\n                    </div>\n                </div>\n            </div>\n            <div class=\"tms-col w35\"></div>\n        </div>\n    </div>\n</template>\n"; });
+define('text!chat/chat-direct.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./chat-direct.css\"></require>\r\n    <div class=\"tms-chat-direct\">\r\n        <div class=\"ui top fixed menu\">\r\n            <!-- <div class=\"item\">\r\n                <i class=\"icon link sidebar\"></i>\r\n            </div> -->\r\n            <a class=\"item header\">@charts</a>\r\n            <div class=\"right menu\">\r\n                <a class=\"item\">...</a>\r\n            </div>\r\n        </div>\r\n        <div class=\"ui left visible segment sidebar\">\r\n            <div class=\"tms-header\"></div>\r\n            <div class=\"ui middle aligned selection list\">\r\n                <div class=\"item\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">Helen</div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"item\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">Christian</div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"item\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">Daniel</div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"tms-content\">\r\n            <div class=\"tms-col w65\">\r\n                <div class=\"ui basic segment minimal selection list segment comments\">\r\n                    <!-- <h3 class=\"ui dividing header\">私聊内容</h3> -->\r\n                    <div repeat.for=\"item of chats\" class=\"comment item\" data-id=\"${item.id}\">\r\n                        <a class=\"avatar\">\r\n                            <i class=\"user icon\"></i>\r\n                        </a>\r\n                        <div class=\"content\">\r\n                            <a class=\"author\">${item.chatTo.name}</a>\r\n                            <div class=\"metadata\">\r\n                                <div class=\"date\">${item.createDate | date:'MM/dd hh:mm:ss'}</div>\r\n                            </div>\r\n                            <div class=\"text\">\r\n                                ${item.content}\r\n                            </div>\r\n                            <div class=\"actions\">\r\n                                <a class=\"save\">复制</a>\r\n                                <a class=\"hide\">分享</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"ui basic segment tms-msg-input\">\r\n                    <div class=\"ui left action fluid icon input\">\r\n                        <button class=\"ui icon button\">\r\n                            <i class=\"plus icon\"></i>\r\n                        </button>\r\n                        <textarea value.bind=\"content\" keydown.trigger=\"sendKeydownHandler($event)\" rows=\"1\"></textarea>\r\n                        <i class=\"smile link icon\"></i>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"tms-col w35\"></div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!chat/chat-direct.css', ['module'], function(module) { module.exports = ".tms-chat-direct {\r\n    height: 100%;\r\n}\r\n\r\n.tms-chat-direct .top.fixed.menu {\r\n    padding-left: 220px;\r\n    height: 60px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar {\r\n    width: 220px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar .tms-header {\r\n    height: 40px;\r\n}\r\n\r\n.tms-chat-direct .tms-content {\r\n    padding-top: 60px;\r\n    padding-left: 220px;\r\n    display: flex;\r\n    align-items: stretch;\r\n    height: 100%;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w65 {\r\n    flex: auto;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w35 {\r\n    width: 380px;\r\n    border-left: 1px #e0e1e2 solid;\r\n}\r\n\r\n.tms-chat-direct .ui.basic.segment.tms-msg-input {\r\n    position: fixed;\r\n    bottom: 0;\r\n    right: 30%;\r\n    left: 220px;\r\n    background-color: white;\r\n}\r\n\r\n.tms-chat-direct .ui.comments {\r\n    margin-top: 20px;\r\n    margin-bottom: 50px;\r\n    max-width: none;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui[class*=\"left action\"].input>textarea {\r\n    border-top-left-radius: 0!important;\r\n    border-bottom-left-radius: 0!important;\r\n    border-left-color: transparent!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.icon.input textarea {\r\n    padding-right: 2.67142857em!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.input textarea {\r\n    margin: 0;\r\n    max-width: 100%;\r\n    -webkit-box-flex: 1;\r\n    -webkit-flex: 1 0 auto;\r\n    -ms-flex: 1 0 auto;\r\n    flex: 1 0 auto;\r\n    outline: 0;\r\n    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);\r\n    text-align: left;\r\n    line-height: 1.2142em;\r\n    padding: .67861429em 1em;\r\n    background: #FFF;\r\n    border: 1px solid rgba(34, 36, 38, .15);\r\n    color: rgba(0, 0, 0, .87);\r\n    border-radius: .28571429rem;\r\n    box-shadow: none;\r\n}\r\n"; });
+define('text!user/user-login.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-login.css\"></require>\r\n    <div class=\"ui tms-user-login\">\r\n        <div class=\"ui form segment\">\r\n            <div class=\"field\">\r\n                <label>用户名:</label>\r\n                <input type=\"text\" value.bind=\"username\">\r\n            </div>\r\n            <div class=\"field\">\r\n                <label>密码:</label>\r\n                <input type=\"password\" value.bind=\"password\">\r\n            </div>\r\n            <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"loginHandler()\">登录</div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!user/user-login.css', ['module'], function(module) { module.exports = ".tms-user-login {\r\n\tdisplay: flex;\r\n\theight: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}"; });
 define('text!user/user-pwd-reset.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-pwd-reset.css\"></require>\r\n    <div class=\"ui container tms-user-pwd-reset\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">输入您的邮箱地址,我们会发送密码重置链接到您的邮箱!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">邮件地址</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的邮件地址\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"resetPwdHandler()\">发送密码重置邮件</div>\r\n            </div>\r\n            <div if.bind=\"token\" ref=\"fm2\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">设置您的新密码,密码长度要求至少8位字符!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">新密码</label>\r\n                    <input type=\"password\" name=\"mail\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"设置您的新密码\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"newPwdHandler()\">确认</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!user/user-pwd-reset.css', ['module'], function(module) { module.exports = ".tms-user-pwd-reset {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-pwd-reset .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
-define('text!user/user-register.css', ['module'], function(module) { module.exports = ".tms-user-register {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-register .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
 define('text!user/user-register.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-register.css\"></require>\r\n    <div class=\"ui container tms-user-register\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 280px;\">\r\n                <div class=\"ui message\">提交账户注册信息成功后,我们会向您的注册邮箱发送一封账户激活邮件,激活账户后即可登录!</div>\r\n                <div class=\"required field\">\r\n                    <label>用户名</label>\r\n                    <input type=\"text\" name=\"username\" autofocus=\"\" value.bind=\"username\" placeholder=\"输入您的登录用户名\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>密码</label>\r\n                    <input type=\"password\" name=\"pwd\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"输入您的登录密码\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>姓名</label>\r\n                    <input type=\"text\" name=\"name\" autofocus=\"\" value.bind=\"name\" placeholder=\"输入您的显示名称\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>邮箱</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的账户激活邮箱\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"okHandler()\">确认</div>\r\n            </div>\r\n            <div if.bind=\"token\" class=\"ui center aligned very padded segment\" style=\"width: 320px;\">\r\n            \t<h1 class=\"ui header\">${header}</h1>\r\n            \t<a href=\"/admin/login\" class=\"ui green button\">返回登录页面</a>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
-define('text!resources/elements/user-login.html', ['module'], function(module) { module.exports = "<template>\n  <h1>${value}</h1>\n</template>"; });
-define('text!user/user-login.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"./user-login.css\"></require>\n    <div class=\"ui tms-user-login\">\n        <div class=\"ui form segment\">\n            <div class=\"field\">\n                <label>用户名:</label>\n                <input type=\"text\" value.bind=\"username\">\n            </div>\n            <div class=\"field\">\n                <label>密码:</label>\n                <input type=\"password\" value.bind=\"password\">\n            </div>\n            <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"loginHandler()\">登录</div>\n        </div>\n    </div>\n</template>\n"; });
-define('text!user/user-login.css', ['module'], function(module) { module.exports = ".tms-user-login {\r\n\tdisplay: flex;\r\n\theight: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}"; });
+define('text!user/user-register.css', ['module'], function(module) { module.exports = ".tms-user-register {\r\n    height: 100%;\r\n}\r\n\r\n.tms-user-register .tms-flex {\r\n    height: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}\r\n"; });
 //# sourceMappingURL=app-bundle.js.map

@@ -3,9 +3,16 @@
  */
 package com.lhjz.portal.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -69,7 +76,7 @@ public class ChatDirectController extends BaseController {
 	@ResponseBody
 	public RespBody create(
 			@RequestParam("baseURL") String baseURL,
-			@RequestParam(value = "chatTo", required = false) String chatTo,
+			@RequestParam("chatTo") String chatTo,
 			@RequestParam("content") String content,
 			@RequestParam(value = "preMore", defaultValue = "true") Boolean preMore,
 			@RequestParam("lastId") Long lastId,
@@ -118,6 +125,46 @@ public class ChatDirectController extends BaseController {
 		// }
 
 		return RespBody.succeed();
+	}
+
+	@RequestMapping(value = "list", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody list(
+			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
+			@RequestParam("chatTo") String chatTo) {
+		
+		User chatToUser = userRepository.findOne(chatTo);
+		
+		if(chatToUser == null) {
+			return RespBody.failed("聊天对象不存在!");
+		}
+
+		Page<ChatDirect> page = chatDirectRepository.findByChatTo(chatToUser,
+				pageable);
+
+		return RespBody.succeed(page);
+	}
+
+	@RequestMapping(value = "latest", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody latest(@RequestParam("id") Long id,
+			@RequestParam("chatTo") String chatTo) {
+
+		User chatToUser = userRepository.findOne(chatTo);
+
+		if (chatToUser == null) {
+			return RespBody.failed("聊天对象不存在!");
+		}
+
+		long cnt = chatDirectRepository.countByChatToAndIdGreaterThan(
+				chatToUser, id);
+		List<ChatDirect> chats = new ArrayList<ChatDirect>();
+		if (cnt <= 10) {
+			chats = chatDirectRepository.findByChatToAndIdGreaterThan(
+					chatToUser, id);
+		}
+
+		return RespBody.succeed(chats);
 	}
 
 }
