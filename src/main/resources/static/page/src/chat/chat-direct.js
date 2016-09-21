@@ -10,11 +10,15 @@ import {
 import {
     default as autosize
 } from 'autosize';
+import 'paste';
+import {
+    default as Dropzone
+} from 'dropzone';
 
 
 export class ChatDirect {
 
-    @bindable content;
+    @bindable content = '';
 
     offset = -70;
 
@@ -30,6 +34,8 @@ export class ChatDirect {
         marked.setOptions({
             breaks: true
         });
+
+        Dropzone.autoDiscover = false;
 
         new Clipboard('.tms-chat-direct .tms-clipboard')
             .on('success', function(e) {
@@ -184,6 +190,10 @@ export class ChatDirect {
 
         poll.start(() => {
 
+            if (!this.chats) {
+                return;
+            }
+
             let lastChat = _.last(this.chats);
 
             $.get('/admin/chat/direct/latest', {
@@ -210,6 +220,19 @@ export class ChatDirect {
      */
     unbind() {
         poll.stop();
+    }
+
+    chatToUserFilerKeyupHanlder() {
+        _.each(this.users, (item) => {
+            item.hidden = item.username.indexOf(this.filter) == -1;
+        });
+    }
+
+    clearFilterHandler() {
+        this.filter = '';
+        _.each(this.users, (item) => {
+            item.hidden = item.username.indexOf(this.filter) == -1;
+        });
     }
 
     sendKeydownHandler(evt) {
@@ -320,16 +343,79 @@ export class ChatDirect {
         item.isEditing = false;
     }
 
+    chatToUserFilerFocusinHanlder() {
+        $(this.userListRef).scrollTo(`a.item[data-id="${this.chatTo}"]`);
+    }
+
     /**
      * 当视图被附加到DOM中时被调用
      */
     attached() {
+
+        let _this = this;
+
         autosize(this.chatInputRef);
 
-        _.delay(() => {
-            $(this.sidebarRef).scrollTo(`.tms-left-sidebar .list a.item[data-id=${this.chatTo}]`, {
-                offset: this.offset
-            }, 1000);
+        // clipboard paste image
+        $(this.chatInputRef).pastableTextarea().on('pasteImage', (ev, data) => {
+
+            $.post('/admin/file/base64', {
+                dataURL: data.dataURL,
+                type: data.blob.type
+            }, (data, textStatus, xhr) => {
+                if (data.success) {
+                    this.content += '![{name}]({baseURL}{path}{uuidName})'
+                        .replace(/\{name\}/g, data.data.name)
+                        .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
+                        .replace(/\{path\}/g, data.data.path)
+                        .replace(/\{uuidName\}/g, data.data.uuidName);
+                }
+            });
+        }).on('pasteImageError', (ev, data) => {
+            toastr.error(data.message, '剪贴板粘贴图片错误!');
         });
+
+        $(this.inputRef).dropzone({
+            url: "/admin/file/upload",
+            paramName: 'file',
+            clickable: false,
+            dictDefaultMessage: '',
+            init: function() {
+                this.on("success", function(file, data) {
+                    if (data.success) {
+
+                        $.each(data.data, function(index, item) {
+                            if (item.type == 'Image') {
+                                _this.content += '![{name}]({baseURL}{path}{uuidName}) '
+                                    .replace(/\{name\}/g, item.name)
+                                    .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
+                                    .replace(/\{path\}/g, item.path)
+                                    .replace(/\{uuidName\}/g, item.uuidName);
+                            } else {
+                                _this.content += '[{name}]({baseURL}{path}{uuidName}) '
+                                    .replace(/\{name\}/g, item.name)
+                                    .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
+                                    .replace(/\{path\}/g, "admin/file/download/")
+                                    .replace(/\{uuidName\}/g, item.id);
+                            }
+                        });
+                        toastr.success('上传成功!');
+                    } else {
+                        toastr.error(data.data, '上传失败!');
+                    }
+
+                });
+                this.on("error", function(file, errorMessage, xhr) {
+                    toastr.error(errorMessage, '上传失败!');
+                });
+                this.on("complete", function(file) {
+                    this.removeFile(file);
+                });
+            }
+        });
+
+        _.delay(() => {
+            $(this.userListRef).scrollTo(`a.item[data-id="${this.chatTo}"]`);
+        }, 1000);
     }
 }

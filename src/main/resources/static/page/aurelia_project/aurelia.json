@@ -89,6 +89,19 @@
             "name": "clipboard",
             "path": "../node_modules/clipboard",
             "main": "dist/clipboard.min"
+          },
+          {
+            "name": "dropzone",
+            "path": "../node_modules/dropzone",
+            "main": "dist/dropzone",
+            "resources": [
+              "dist/basic.css"
+            ]
+          },
+          {
+            "name": "paste",
+            "path": "../node_modules/paste.js",
+            "main": "paste"
           }
         ]
       },

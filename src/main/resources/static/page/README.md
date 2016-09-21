@@ -2,3 +2,5 @@
 https://github.com/flesler/jquery.scrollTo
 https://github.com/chjj/marked
 https://github.com/zenorocha/clipboard.js
+https://www.npmjs.com/package/dropzone https://github.com/enyo/dropzone
+https://github.com/layerssss/paste.js

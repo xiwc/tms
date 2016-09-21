@@ -32,7 +32,7 @@ let serve = gulp.series(
                         res.setHeader('Access-Control-Allow-Origin', '*');
                         next();
                     },
-                    proxyMiddleware(['/free', '/admin'], {
+                    proxyMiddleware(['/free', '/admin', '/upload'], {
                         target: 'http://localhost',
                         changeOrigin: true
                     }),

@@ -1,6 +1,7 @@
 <template>
     <require from="./chat-direct.css"></require>
     <require from="./md-github.css"></require>
+    <require from="dropzone/dist/basic.css"></require>
     <div class="tms-chat-direct">
         <div class="ui top fixed menu">
             <!-- <div class="item">
@@ -14,9 +15,11 @@
         <div ref="sidebarRef" class="ui left visible segment sidebar tms-left-sidebar">
             <div class="tms-header">
                 <h1 class="ui header">私聊频道</h1>
+                <input value.bind="filter" focusin.trigger="chatToUserFilerFocusinHanlder()" keyup.trigger="chatToUserFilerKeyupHanlder()" type="text" placeholder="私聊对象查找">
+                <i title="清空过滤输入" click.delegate="clearFilterHandler()" class="bordered close icon link small"></i>
             </div>
-            <div class="ui middle aligned selection list">
-                <a repeat.for="item of users" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
+            <div ref="userListRef" class="ui middle aligned selection list">
+                <a repeat.for="item of users" title="${item.username}" show.bind="!item.hidden" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
                     <i class="user icon"></i>
                     <div class="content">
                         <div class="header">${item.name ? item.name : item.username}</div>
@@ -51,9 +54,9 @@
                     <button if.bind="!first" click.delegate="firstMoreHandler()" class="fluid ui button">加载更多(${firstCnt})</button>
                 </div>
                 <div class="ui basic segment tms-msg-input">
-                    <div class="ui left action fluid icon input">
+                    <div ref="inputRef" class="ui left action fluid icon input dropzone">
                         <button class="ui icon button">
-                            <i class="plus icon"></i>
+                            <i class="chat icon"></i>
                         </button>
                         <textarea ref="chatInputRef" value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
                         <i class="smile link icon"></i>

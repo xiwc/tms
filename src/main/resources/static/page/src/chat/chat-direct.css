@@ -11,8 +11,26 @@
     width: 220px;
 }
 
+.tms-chat-direct .ui.left.sidebar .ui.list {
+    position: absolute;
+    bottom: 0;
+    top: 60px;
+    overflow-y: auto;
+    width: 190px;
+}
+
 .tms-chat-direct .ui.left.sidebar .tms-header {
     height: 40px;
+}
+
+.tms-chat-direct .ui.left.sidebar .tms-header input {
+    border: 1px #e0e1e2 solid;
+    font-size: 12px;
+    padding: 4px;
+}
+
+.tms-chat-direct .ui.left.sidebar .tms-header .ui.header {
+    margin-bottom: 0;
 }
 
 .tms-chat-direct .tms-content {
