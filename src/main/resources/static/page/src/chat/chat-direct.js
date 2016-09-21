@@ -177,12 +177,6 @@ export class ChatDirect {
                 this.user = _.find(this.users, {
                     username: this.chatTo
                 });
-
-                _.delay(() => {
-                    $(this.sidebarRef).scrollTo(`.tms-left-sidebar .list a.item[data-id=${this.chatTo}]`, {
-                        offset: this.offset
-                    }, 1000);
-                });
             } else {
                 toastr.error(data.data, '获取全部用户失败!');
             }
@@ -331,5 +325,11 @@ export class ChatDirect {
      */
     attached() {
         autosize(this.chatInputRef);
+
+        _.delay(() => {
+            $(this.sidebarRef).scrollTo(`.tms-left-sidebar .list a.item[data-id=${this.chatTo}]`, {
+                offset: this.offset
+            }, 1000);
+        });
     }
 }
