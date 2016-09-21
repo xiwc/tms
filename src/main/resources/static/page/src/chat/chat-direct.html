@@ -6,12 +6,12 @@
             <!-- <div class="item">
                 <i class="icon link sidebar"></i>
             </div> -->
-            <a class="item header">私聊@${user.name}(${chatTo})</a>
+            <a class="item header">私聊@${user.name ? user.name : chatTo}</a>
             <div class="right menu">
                 <a class="item">${loginUser.name}</a>
             </div>
         </div>
-        <div class="ui left visible segment sidebar">
+        <div ref="sidebarRef" class="ui left visible segment sidebar tms-left-sidebar">
             <div class="tms-header">
                 <h1 class="ui header">私聊频道</h1>
             </div>
@@ -19,7 +19,7 @@
                 <a repeat.for="item of users" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
                     <i class="user icon"></i>
                     <div class="content">
-                        <div class="header">${item.name}(${item.username})</div>
+                        <div class="header">${item.name ? item.name : item.username}</div>
                     </div>
                 </a>
             </div>
@@ -43,8 +43,8 @@
                             <div class="actions">
                                 <a if.bind="item.creator.username == loginUser.username" click.delegate="editHandler(item, editTxtRef)" class="tms-edit">编辑</a>
                                 <a if.bind="item.creator.username == loginUser.username" click.delegate="deleteHandler(item)" class="tms-delete">删除</a>
-                                <a class="tms-copy tms-clipboard" data-clipboard-text="${selfLink + '?id=' + item.id}">复制</a>
-                                <a class="tms-share tms-clipboard" data-clipboard-text="${item.content}">分享</a>
+                                <a class="tms-copy tms-clipboard" data-clipboard-text="${item.content}">复制</a>
+                                <a class="tms-share tms-clipboard" data-clipboard-text="${selfLink + '?id=' + item.id}">分享</a>
                             </div>
                         </div>
                     </div>

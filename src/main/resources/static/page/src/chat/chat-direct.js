@@ -177,6 +177,12 @@ export class ChatDirect {
                 this.user = _.find(this.users, {
                     username: this.chatTo
                 });
+
+                _.delay(() => {
+                    $(this.sidebarRef).scrollTo(`.tms-left-sidebar .list a.item[data-id=${this.chatTo}]`, {
+                        offset: this.offset
+                    }, 1000);
+                });
             } else {
                 toastr.error(data.data, '获取全部用户失败!');
             }
@@ -184,7 +190,7 @@ export class ChatDirect {
 
         poll.start(() => {
 
-        	let lastChat = _.last(this.chats);
+            let lastChat = _.last(this.chats);
 
             $.get('/admin/chat/direct/latest', {
                 id: lastChat ? lastChat.id : 0,
@@ -270,16 +276,16 @@ export class ChatDirect {
     }
 
     editHandler(item, editTxtRef) {
-    	item.isEditing = true;
-    	_.defer(() => {
-    		autosize(editTxtRef);
-    		$(editTxtRef).focus().select();
-    	});
+        item.isEditing = true;
+        _.defer(() => {
+            autosize(editTxtRef);
+            $(editTxtRef).focus().select();
+        });
     }
 
     eidtKeydownHandler(evt, item) {
 
-    	if (this.sending) {
+        if (this.sending) {
             return false;
         }
 
@@ -317,7 +323,7 @@ export class ChatDirect {
     }
 
     focusoutHandler(item) {
-    	item.isEditing = false;
+        item.isEditing = false;
     }
 
     /**

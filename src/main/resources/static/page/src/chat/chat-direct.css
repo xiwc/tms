@@ -79,3 +79,7 @@
 .tms-chat-direct .tms-edit-textarea {
     width: 100%;
 }
+
+.tms-chat-direct .ui.selection.list>.item {
+    cursor: default;
+}
