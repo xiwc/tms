@@ -1,7 +1,7 @@
 import 'jquery-format';
-// import BTimeAgo from 'better-timeago';
-// import locale_zh_cn from 'better-timeago-locale-zh-cn';
-// BTimeAgo.locale('zh-cn', locale_zh_cn);
+import BTimeAgo from 'better-timeago';
+import locale_zh_cn from 'better-timeago-locale-zh-cn';
+BTimeAgo.locale('zh-cn', locale_zh_cn);
 
 /**
  * 该文件用于定义值的过滤转换器
@@ -54,9 +54,9 @@ export class NumberValueConverter {
  * https://www.npmjs.com/package/better-timeago
  * https://www.npmjs.com/package/better-timeago-locale-zh-cn
  */
-// export class TimeagoValueConverter {
-//     toView(value) {
-//         return value ? BTimeAgo(value).print() : '';
-//     }
-// }
+export class TimeagoValueConverter {
+    toView(value) {
+        return value ? BTimeAgo(value).print() : '';
+    }
+}
 

@@ -27,6 +27,7 @@
     border: 1px #e0e1e2 solid;
     font-size: 12px;
     padding: 4px;
+    border-radius: 3px;
 }
 
 .tms-chat-direct .ui.left.sidebar .tms-header .ui.header {

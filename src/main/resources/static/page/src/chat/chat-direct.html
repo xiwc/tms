@@ -16,13 +16,13 @@
             <div class="tms-header">
                 <h1 class="ui header">私聊频道</h1>
                 <input value.bind="filter" focusin.trigger="chatToUserFilerFocusinHanlder()" keyup.trigger="chatToUserFilerKeyupHanlder()" type="text" placeholder="私聊对象查找">
-                <i title="清空过滤输入" click.delegate="clearFilterHandler()" class="bordered close icon link small"></i>
+                <i title="清空过滤输入" click.delegate="clearFilterHandler()" class="circular close icon link small"></i>
             </div>
             <div ref="userListRef" class="ui middle aligned selection list">
                 <a repeat.for="item of users" title="${item.username}" show.bind="!item.hidden" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
-                    <i class="user icon"></i>
+                    <i class="circular icon user"></i>
                     <div class="content">
-                        <div class="header">${item.name ? item.name : item.username}</div>
+                        <div style="color: black;">${item.name ? item.name : item.username}</div>
                     </div>
                 </a>
             </div>
@@ -34,12 +34,12 @@
                     <button if.bind="!last" click.delegate="lastMoreHandler()" class="fluid ui button">加载更多(${lastCnt})</button>
                     <div repeat.for="item of chats" class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
                         <a class="avatar">
-                            <i class="user icon"></i>
+                            <i class="circular icon large user"></i>
                         </a>
                         <div class="content">
                             <a class="author">${item.creator.name}</a>
                             <div class="metadata">
-                                <div class="date">${item.createDate | date:'MM/dd hh:mm:ss'}</div>
+                                <div class="timeago date" title="${item.createDate | date}">${item.createDate | timeago}</div>
                             </div>
                             <div show.bind="!item.isEditing" class="text markdown-body" innerhtml.bind="item.contentMd"></div>
                             <textarea focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item)" show.bind="item.isEditing" ref="editTxtRef" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea>

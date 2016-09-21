@@ -14,6 +14,7 @@ import 'paste';
 import {
     default as Dropzone
 } from 'dropzone';
+import 'common/common-plugin';
 
 
 export class ChatDirect {
@@ -268,10 +269,15 @@ export class ChatDirect {
 
             return false;
         } else if (evt.ctrlKey && evt.keyCode === 13) {
-            this.content += '\r\n';
+            this.insertTxt($(this.chatInputRef), '\n');
         }
 
         return true;
+    }
+
+    insertTxt($t, txt) {
+        $t.insertAtCaret(txt);
+        this.content = $t.val();
     }
 
     deleteHandler(item) {
@@ -333,7 +339,9 @@ export class ChatDirect {
 
             return false;
         } else if (evt.ctrlKey && evt.keyCode === 13) {
-            item.content += '\r\n';
+            let $t = $(evt.target);
+            $t.insertAtCaret('\n');
+            item.content = $t.val();
         }
 
         return true;
@@ -364,11 +372,11 @@ export class ChatDirect {
                 type: data.blob.type
             }, (data, textStatus, xhr) => {
                 if (data.success) {
-                    this.content += '![{name}]({baseURL}{path}{uuidName})'
+                    this.insertTxt($(this.chatInputRef), '![{name}]({baseURL}{path}{uuidName})'
                         .replace(/\{name\}/g, data.data.name)
                         .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
                         .replace(/\{path\}/g, data.data.path)
-                        .replace(/\{uuidName\}/g, data.data.uuidName);
+                        .replace(/\{uuidName\}/g, data.data.uuidName));
                 }
             });
         }).on('pasteImageError', (ev, data) => {
@@ -386,17 +394,17 @@ export class ChatDirect {
 
                         $.each(data.data, function(index, item) {
                             if (item.type == 'Image') {
-                                _this.content += '![{name}]({baseURL}{path}{uuidName}) '
+                                this.insertTxt($(this.chatInputRef), '![{name}]({baseURL}{path}{uuidName}) '
                                     .replace(/\{name\}/g, item.name)
                                     .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
                                     .replace(/\{path\}/g, item.path)
-                                    .replace(/\{uuidName\}/g, item.uuidName);
+                                    .replace(/\{uuidName\}/g, item.uuidName));
                             } else {
-                                _this.content += '[{name}]({baseURL}{path}{uuidName}) '
+                                this.insertTxt($(this.chatInputRef), '[{name}]({baseURL}{path}{uuidName}) '
                                     .replace(/\{name\}/g, item.name)
                                     .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
                                     .replace(/\{path\}/g, "admin/file/download/")
-                                    .replace(/\{uuidName\}/g, item.id);
+                                    .replace(/\{uuidName\}/g, item.id));
                             }
                         });
                         toastr.success('上传成功!');
