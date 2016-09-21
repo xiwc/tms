@@ -83,7 +83,12 @@
       {
         "name": "deps-bundle.js",
         "dependencies": [
-          "marked"
+          "marked",
+          {
+            "name": "clipboard",
+            "path": "../node_modules/clipboard",
+            "main": "dist/clipboard.min"
+          }
         ]
       },
       {

@@ -151,7 +151,7 @@ define('main',['exports', './environment'], function (exports, _environment) {
     });
   }
 });
-define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll', 'marked', 'jquery.scrollto'], function (exports, _aureliaFramework, _commonPoll, _marked) {
+define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll', 'marked', 'clipboard', 'jquery.scrollto'], function (exports, _aureliaFramework, _commonPoll, _marked, _clipboard) {
     'use strict';
 
     Object.defineProperty(exports, "__esModule", {
@@ -162,6 +162,8 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
     var _commonPoll2 = _interopRequireDefault(_commonPoll);
 
     var _marked2 = _interopRequireDefault(_marked);
+
+    var _clipboard2 = _interopRequireDefault(_clipboard);
 
     function _interopRequireDefault(obj) {
         return obj && obj.__esModule ? obj : {
@@ -226,8 +228,17 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
 
             _initDefineProp(this, 'content', _descriptor, this);
 
+            this.offset = -70;
+            this.selfLink = utils.getBaseUrl() + wurl('path') + '#' + utils.getHash();
+
             _marked2.default.setOptions({
-                breaks: true
+                breaks: false
+            });
+
+            new _clipboard2.default('.tms-chat-direct .tms-clipboard').on('success', function (e) {
+                toastr.success('复制到剪贴板成功!');
+            }).on('error', function (e) {
+                toastr.error('复制到剪贴板成功!');
             });
         }
 
@@ -239,28 +250,102 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.activate = function activate(params, routeConfig, navigationInstruction) {
+            this.markId = params.id;
+            routeConfig.navModel.setTitle('@' + params.username + ' | 私聊 | TMS');
             this.init(params.username);
+            this.user = _.find(this.users, {
+                username: this.chatTo
+            });
+
+            if (this.markId) {
+                if ('pushState' in history) {
+                    history.replaceState(null, '', utils.removeUrlQuery('id'));
+                } else {
+                    window.location.href = utils.removeUrlQuery('id');
+                }
+            }
         };
 
-        ChatDirect.prototype.switchChatToHandler = function switchChatToHandler(chatTo) {
-            this.init(chatTo);
-            _commonPoll2.default.reset();
-            return true;
+        ChatDirect.prototype.lastMoreHandler = function lastMoreHandler() {
+            var _this = this;
+
+            var start = _.first(this.chats).id;
+            $.get('/admin/chat/direct/more', {
+                last: true,
+                start: start,
+                size: 20,
+                chatTo: this.chatTo
+            }, function (data) {
+                if (data.success) {
+                    _this.chats = _.unionBy(_.reverse(_this.convertMd(data.data)), _this.chats);
+                    _this.last = data.msgs[0] - data.data.length <= 0;
+                    !_this.last && (_this.lastCnt = data.msgs[0] - data.data.length);
+                    _.defer(function () {
+                        $('html,body').scrollTo('.tms-chat-direct .comments .comment[data-id=' + start + ']', {
+                            offset: _this.offset
+                        });
+                    });
+                } else {
+                    toastr.error(data.data, '获取更多消息失败!');
+                }
+            });
+        };
+
+        ChatDirect.prototype.firstMoreHandler = function firstMoreHandler() {
+            var _this2 = this;
+
+            var start = _.last(this.chats).id;
+            $.get('/admin/chat/direct/more', {
+                last: false,
+                start: start,
+                size: 20,
+                chatTo: this.chatTo
+            }, function (data) {
+                if (data.success) {
+                    _this2.chats = _.unionBy(_this2.chats, _this2.convertMd(data.data));
+                    _this2.first = data.msgs[0] - data.data.length <= 0;
+                    !_this2.first && (_this2.firstCnt = data.msgs[0] - data.data.length);
+                    _.defer(function () {
+                        $('html,body').scrollTo('.tms-chat-direct .comments .comment[data-id=' + start + ']', {
+                            offset: _this2.offset
+                        });
+                    });
+                } else {
+                    toastr.error(data.data, '获取更多消息失败!');
+                }
+            });
         };
 
         ChatDirect.prototype.init = function init(chatTo) {
-            var _this = this;
+            var _this3 = this;
 
             this.chatTo = chatTo;
 
-            $.get('/admin/chat/direct/list', {
+            var data = {
                 size: 20,
                 chatTo: chatTo
-            }, function (data) {
+            };
+
+            if (this.markId) {
+                data.id = this.markId;
+            }
+
+            $.get('/admin/chat/direct/list', data, function (data) {
                 if (data.success) {
-                    _this.chats = _.reverse(_this.convertMd(data.data.content));
+                    _this3.chats = _.reverse(_this3.convertMd(data.data.content));
+                    _this3.last = data.data.last;
+                    _this3.first = data.data.first;
+                    !_this3.last && (_this3.lastCnt = data.data.totalElements - data.data.numberOfElements);
+                    !_this3.first && (_this3.firstCnt = data.data.size * data.data.number);
+
                     _.defer(function () {
-                        $('html,body').scrollTo('max');
+                        if (_this3.markId) {
+                            $('html,body').scrollTo('.tms-chat-direct .comments .comment[data-id=' + _this3.markId + ']', {
+                                offset: _this3.offset
+                            });
+                        } else {
+                            $('html,body').scrollTo('max');
+                        }
                     });
                 } else {
                     toastr.error(data.data, '获取消息失败!');
@@ -269,13 +354,16 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.bind = function bind(ctx) {
-            var _this2 = this;
+            var _this4 = this;
 
             $.get('/admin/user/all', {
                 enabled: true
             }, function (data) {
                 if (data.success) {
-                    _this2.users = data.data;
+                    _this4.users = data.data;
+                    _this4.user = _.find(_this4.users, {
+                        username: _this4.chatTo
+                    });
                 } else {
                     toastr.error(data.data, '获取全部用户失败!');
                 }
@@ -283,11 +371,14 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
 
             _commonPoll2.default.start(function () {
                 $.get('/admin/chat/direct/latest', {
-                    id: _.last(_this2.chats).id,
-                    chatTo: _this2.chatTo
+                    id: _.last(_this4.chats).id,
+                    chatTo: _this4.chatTo
                 }, function (data) {
                     if (data.success) {
-                        _this2.chats = _.unionBy(_this2.chats, _this2.convertMd(data.data), 'id');
+                        if (data.data.length == 0) {
+                            return;
+                        }
+                        _this4.chats = _.unionBy(_this4.chats, _this4.convertMd(data.data), 'id');
                         _.defer(function () {
                             $('html,body').scrollTo('max');
                         });
@@ -303,7 +394,7 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.sendKeydownHandler = function sendKeydownHandler(evt) {
-            var _this3 = this;
+            var _this5 = this;
 
             if (this.sending) {
                 return false;
@@ -313,21 +404,24 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
 
                 this.sending = true;
 
+                var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + (0, _marked2.default)(this.content)).wrap('<div/>').parent().html();
+
                 $.post('/admin/chat/direct/create', {
                     baseUrl: utils.getBaseUrl(),
                     path: wurl('path'),
+                    hash: utils.getHash(),
                     chatTo: this.chatTo,
-                    content: this.content,
+                    content: html,
                     contentHtml: (0, _marked2.default)(this.content)
                 }, function (data, textStatus, xhr) {
                     if (data.success) {
-                        _this3.content = '';
+                        _this5.content = '';
                         _commonPoll2.default.reset();
                     } else {
                         toastr.error(data.data, '发送消息失败!');
                     }
                 }).always(function () {
-                    _this3.sending = false;
+                    _this5.sending = false;
                 });
 
                 return false;
@@ -476,8 +570,40 @@ define('common/common-utils',['exports'], function (exports) {
             return '';
         };
 
+        CommonUtils.prototype.getHash = function getHash() {
+            var hash = wurl('hash');
+            var index = hash.indexOf('?');
+            if (index != -1) {
+                return hash.substring(0, index);
+            }
+
+            return hash;
+        };
+
         CommonUtils.prototype.urlQuery = function urlQuery(name) {
             return wurl('?' + name) || wurl('?' + name, wurl('hash'));
+        };
+
+        CommonUtils.prototype.removeUrlQuery = function removeUrlQuery(name, href) {
+
+            var s = href ? href : window.location.href;
+
+            var rs = new RegExp('(&|\\?)?' + name + '=?[^&#]*(.)?', 'g').exec(s);
+
+
+            if (rs) {
+                if (rs[1] == '&') {
+                    return s.replace(new RegExp('&' + name + '=?[^&#]+', 'g'), '');
+                } else if (rs[1] == '?') {
+                    if (rs[2] != '&') {
+                        return s.replace(new RegExp('\\?' + name + '=?[^&#]*', 'g'), '');
+                    } else {
+                        return s.replace(new RegExp('' + name + '=?[^&#]*&', 'g'), '');
+                    }
+                }
+            }
+
+            return s;
         };
 
         return CommonUtils;
@@ -965,9 +1091,9 @@ define('resources/value-converters/common-vc',['exports', 'jquery-format'], func
 });
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./app.css\"></require>\r\n\t<require from=\"nprogress/nprogress.css\"></require>\r\n\t<require from=\"toastr/build/toastr.css\"></require>\r\n    <require from=\"tms-semantic-ui/semantic.min.css\"></require>\r\n    <router-view></router-view>\r\n</template>\r\n"; });
 define('text!app.css', ['module'], function(module) { module.exports = "html,\r\nbody {\r\n    height: 100%;\r\n}\r\n\r\n::-webkit-scrollbar {\r\n    width: 6px;\r\n    height: 6px;\r\n}\r\n\r\n::-webkit-scrollbar-thumb {\r\n    border-radius: 6px;\r\n    background-color: #c6c6c6;\r\n}\r\n\r\n::-webkit-scrollbar-thumb:hover {\r\n    background: #999;\r\n}\r\n"; });
-define('text!chat/chat-direct.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./chat-direct.css\"></require>\r\n    <require from=\"./md-github.css\"></require>\r\n    <div class=\"tms-chat-direct\">\r\n        <div class=\"ui top fixed menu\">\r\n            <!-- <div class=\"item\">\r\n                <i class=\"icon link sidebar\"></i>\r\n            </div> -->\r\n            <a class=\"item header\">@charts</a>\r\n            <div class=\"right menu\">\r\n                <a class=\"item\">...</a>\r\n            </div>\r\n        </div>\r\n        <div class=\"ui left visible segment sidebar\">\r\n            <div class=\"tms-header\"></div>\r\n            <div class=\"ui middle aligned selection list\">\r\n                <a repeat.for=\"item of users\" click.delegate=\"switchChatToHandler(item.username)\" href=\"#/chat-direct/${item.username}\" class=\"item ${item.username == chatTo ? 'active' : ''}\" data-id=\"${item.username}\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">${item.name}</div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div class=\"tms-content\">\r\n            <div class=\"tms-col w65\">\r\n                <div class=\"ui basic segment minimal selection list segment comments\">\r\n                    <!-- <h3 class=\"ui dividing header\">私聊内容</h3> -->\r\n                    <div repeat.for=\"item of chats\" class=\"comment item\" data-id=\"${item.id}\">\r\n                        <a class=\"avatar\">\r\n                            <i class=\"user icon\"></i>\r\n                        </a>\r\n                        <div class=\"content\">\r\n                            <a class=\"author\">${item.chatTo.name}</a>\r\n                            <div class=\"metadata\">\r\n                                <div class=\"date\">${item.createDate | date:'MM/dd hh:mm:ss'}</div>\r\n                            </div>\r\n                            <div class=\"text markdown-body\" innerhtml.bind=\"item.contentMd\"></div>\r\n                            <div class=\"actions\">\r\n                                <a class=\"save\">复制</a>\r\n                                <a class=\"hide\">分享</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <div class=\"ui basic segment tms-msg-input\">\r\n                    <div class=\"ui left action fluid icon input\">\r\n                        <button class=\"ui icon button\">\r\n                            <i class=\"plus icon\"></i>\r\n                        </button>\r\n                        <textarea value.bind=\"content\" keydown.trigger=\"sendKeydownHandler($event)\" rows=\"1\"></textarea>\r\n                        <i class=\"smile link icon\"></i>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"tms-col w35\"></div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
-define('text!chat/chat-direct.css', ['module'], function(module) { module.exports = ".tms-chat-direct {\r\n    height: 100%;\r\n}\r\n\r\n.tms-chat-direct .top.fixed.menu {\r\n    padding-left: 220px;\r\n    height: 60px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar {\r\n    width: 220px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar .tms-header {\r\n    height: 40px;\r\n}\r\n\r\n.tms-chat-direct .tms-content {\r\n    padding-top: 60px;\r\n    padding-left: 220px;\r\n    display: flex;\r\n    align-items: stretch;\r\n    height: 100%;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w65 {\r\n    flex: auto;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w35 {\r\n    width: 380px;\r\n    border-left: 1px #e0e1e2 solid;\r\n}\r\n\r\n.tms-chat-direct .ui.basic.segment.tms-msg-input {\r\n    position: fixed;\r\n    bottom: 0;\r\n    right: 30%;\r\n    left: 220px;\r\n    background-color: white;\r\n}\r\n\r\n.tms-chat-direct .ui.comments {\r\n    margin-top: 20px;\r\n    margin-bottom: 50px;\r\n    max-width: none;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui[class*=\"left action\"].input>textarea {\r\n    border-top-left-radius: 0!important;\r\n    border-bottom-left-radius: 0!important;\r\n    border-left-color: transparent!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.icon.input textarea {\r\n    padding-right: 2.67142857em!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.input textarea {\r\n    margin: 0;\r\n    max-width: 100%;\r\n    -webkit-box-flex: 1;\r\n    -webkit-flex: 1 0 auto;\r\n    -ms-flex: 1 0 auto;\r\n    flex: 1 0 auto;\r\n    outline: 0;\r\n    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);\r\n    text-align: left;\r\n    line-height: 1.2142em;\r\n    padding: .67861429em 1em;\r\n    background: #FFF;\r\n    border: 1px solid rgba(34, 36, 38, .15);\r\n    color: rgba(0, 0, 0, .87);\r\n    border-radius: .28571429rem;\r\n    box-shadow: none;\r\n}\r\n"; });
-define('text!user/user-login.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-login.css\"></require>\r\n    <div class=\"ui tms-user-login\">\r\n        <div class=\"ui form segment\">\r\n            <div class=\"field\">\r\n                <label>用户名:</label>\r\n                <input type=\"text\" value.bind=\"username\">\r\n            </div>\r\n            <div class=\"field\">\r\n                <label>密码:</label>\r\n                <input type=\"password\" value.bind=\"password\">\r\n            </div>\r\n            <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"loginHandler()\">登录</div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!chat/chat-direct.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./chat-direct.css\"></require>\r\n    <require from=\"./md-github.css\"></require>\r\n    <div class=\"tms-chat-direct\">\r\n        <div class=\"ui top fixed menu\">\r\n            <!-- <div class=\"item\">\r\n                <i class=\"icon link sidebar\"></i>\r\n            </div> -->\r\n            <a class=\"item header\">私聊@${user.name}(${chatTo})</a>\r\n            <!-- <div class=\"right menu\">\r\n                <a class=\"item\">...</a>\r\n            </div> -->\r\n        </div>\r\n        <div class=\"ui left visible segment sidebar\">\r\n            <div class=\"tms-header\">\r\n                <h1 class=\"ui header\">私聊频道</h1>\r\n            </div>\r\n            <div class=\"ui middle aligned selection list\">\r\n                <a repeat.for=\"item of users\" href=\"#/chat-direct/${item.username}\" class=\"item ${item.username == chatTo ? 'active' : ''}\" data-id=\"${item.username}\">\r\n                    <i class=\"user icon\"></i>\r\n                    <div class=\"content\">\r\n                        <div class=\"header\">${item.name}(${item.username})</div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div class=\"tms-content\">\r\n            <div class=\"tms-col w65\">\r\n                <div class=\"ui basic segment minimal selection list segment comments\">\r\n                    <!-- <h3 class=\"ui dividing header\">私聊内容</h3> -->\r\n                    <button if.bind=\"!last\" click.delegate=\"lastMoreHandler()\" class=\"fluid ui button\">加载更多(${lastCnt})</button>\r\n                    <div repeat.for=\"item of chats\" class=\"comment item ${item.id == markId ? 'active' : ''}\" data-id=\"${item.id}\">\r\n                        <a class=\"avatar\">\r\n                            <i class=\"user icon\"></i>\r\n                        </a>\r\n                        <div class=\"content\">\r\n                            <a class=\"author\">${item.chatTo.name}</a>\r\n                            <div class=\"metadata\">\r\n                                <div class=\"date\">${item.createDate | date:'MM/dd hh:mm:ss'}</div>\r\n                            </div>\r\n                            <div class=\"text markdown-body\" innerhtml.bind=\"item.contentMd\"></div>\r\n                            <div class=\"actions\">\r\n                                <a class=\"tms-copy tms-clipboard\" data-clipboard-text=\"${selfLink + '?id=' + item.id}\">复制</a>\r\n                                <a class=\"tms-share tms-clipboard\" data-clipboard-text=\"${item.content}\">分享</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <button if.bind=\"!first\" click.delegate=\"firstMoreHandler()\" class=\"fluid ui button\">加载更多(${firstCnt})</button>\r\n                </div>\r\n                <div class=\"ui basic segment tms-msg-input\">\r\n                    <div class=\"ui left action fluid icon input\">\r\n                        <button class=\"ui icon button\">\r\n                            <i class=\"plus icon\"></i>\r\n                        </button>\r\n                        <textarea value.bind=\"content\" keydown.trigger=\"sendKeydownHandler($event)\" rows=\"1\"></textarea>\r\n                        <i class=\"smile link icon\"></i>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"tms-col w35\"></div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!chat/chat-direct.css', ['module'], function(module) { module.exports = ".tms-chat-direct {\r\n    height: 100%;\r\n}\r\n\r\n.tms-chat-direct .top.fixed.menu {\r\n    padding-left: 220px;\r\n    height: 60px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar {\r\n    width: 220px;\r\n}\r\n\r\n.tms-chat-direct .ui.left.sidebar .tms-header {\r\n    height: 40px;\r\n}\r\n\r\n.tms-chat-direct .tms-content {\r\n    padding-top: 60px;\r\n    padding-left: 220px;\r\n    display: flex;\r\n    align-items: stretch;\r\n    min-height: 100%;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w65 {\r\n    flex: auto;\r\n}\r\n\r\n.tms-chat-direct .tms-content .tms-col.w35 {\r\n    width: 380px;\r\n    border-left: 1px #e0e1e2 solid;\r\n}\r\n\r\n.tms-chat-direct .ui.basic.segment.tms-msg-input {\r\n    position: fixed;\r\n    bottom: 0;\r\n    right: 30%;\r\n    left: 220px;\r\n    background-color: white;\r\n}\r\n\r\n.tms-chat-direct .ui.comments {\r\n    margin-top: 20px;\r\n    margin-bottom: 50px;\r\n    max-width: none;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui[class*=\"left action\"].input>textarea {\r\n    border-top-left-radius: 0!important;\r\n    border-bottom-left-radius: 0!important;\r\n    border-left-color: transparent!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.icon.input textarea {\r\n    padding-right: 2.67142857em!important;\r\n}\r\n\r\n.tms-chat-direct .tms-msg-input .ui.input textarea {\r\n    margin: 0;\r\n    max-width: 100%;\r\n    -webkit-box-flex: 1;\r\n    -webkit-flex: 1 0 auto;\r\n    -ms-flex: 1 0 auto;\r\n    flex: 1 0 auto;\r\n    outline: 0;\r\n    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);\r\n    text-align: left;\r\n    line-height: 1.2142em;\r\n    padding: .67861429em 1em;\r\n    background: #FFF;\r\n    border: 1px solid rgba(34, 36, 38, .15);\r\n    color: rgba(0, 0, 0, .87);\r\n    border-radius: .28571429rem;\r\n    box-shadow: none;\r\n}\r\n"; });
+define('text!user/user-login.html', ['module'], function(module) { module.exports = "<template>\n    <require from=\"./user-login.css\"></require>\n    <div class=\"ui tms-user-login\">\n        <div class=\"ui form segment\">\n            <div class=\"field\">\n                <label>用户名:</label>\n                <input type=\"text\" value.bind=\"username\">\n            </div>\n            <div class=\"field\">\n                <label>密码:</label>\n                <input type=\"password\" value.bind=\"password\">\n            </div>\n            <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"loginHandler()\">登录</div>\n        </div>\n    </div>\n</template>\n"; });
 define('text!chat/md-github.css', ['module'], function(module) { module.exports = ".markdown-body {\r\n    font-size: 14px;\r\n    line-height: 1.6;\r\n}\r\n\r\n.markdown-body > *:first-child {\r\n    margin-top: 0 !important;\r\n}\r\n\r\n.markdown-body > *:last-child {\r\n    margin-bottom: 0 !important;\r\n}\r\n\r\n.markdown-body a.absent {\r\n    color: #CC0000;\r\n}\r\n\r\n.markdown-body a.anchor {\r\n    bottom: 0;\r\n    cursor: pointer;\r\n    display: block;\r\n    left: 0;\r\n    margin-left: -30px;\r\n    padding-left: 30px;\r\n    position: absolute;\r\n    top: 0;\r\n}\r\n\r\n.markdown-body h1,\r\n.markdown-body h2,\r\n.markdown-body h3,\r\n.markdown-body h4,\r\n.markdown-body h5,\r\n.markdown-body h6 {\r\n    cursor: text;\r\n    font-weight: bold;\r\n    margin: 20px 0 10px;\r\n    padding: 0;\r\n    position: relative;\r\n}\r\n\r\n.markdown-body h1 .mini-icon-link,\r\n.markdown-body h2 .mini-icon-link,\r\n.markdown-body h3 .mini-icon-link,\r\n.markdown-body h4 .mini-icon-link,\r\n.markdown-body h5 .mini-icon-link,\r\n.markdown-body h6 .mini-icon-link {\r\n    color: #000000;\r\n    display: none;\r\n}\r\n\r\n.markdown-body h1:hover a.anchor,\r\n.markdown-body h2:hover a.anchor,\r\n.markdown-body h3:hover a.anchor,\r\n.markdown-body h4:hover a.anchor,\r\n.markdown-body h5:hover a.anchor,\r\n.markdown-body h6:hover a.anchor {\r\n    line-height: 1;\r\n    margin-left: -22px;\r\n    padding-left: 0;\r\n    text-decoration: none;\r\n    top: 15%;\r\n}\r\n\r\n.markdown-body h1:hover a.anchor .mini-icon-link,\r\n.markdown-body h2:hover a.anchor .mini-icon-link,\r\n.markdown-body h3:hover a.anchor .mini-icon-link,\r\n.markdown-body h4:hover a.anchor .mini-icon-link,\r\n.markdown-body h5:hover a.anchor .mini-icon-link,\r\n.markdown-body h6:hover a.anchor .mini-icon-link {\r\n    display: inline-block;\r\n}\r\n\r\n.markdown-body h1 tt,\r\n.markdown-body h1 code,\r\n.markdown-body h2 tt,\r\n.markdown-body h2 code,\r\n.markdown-body h3 tt,\r\n.markdown-body h3 code,\r\n.markdown-body h4 tt,\r\n.markdown-body h4 code,\r\n.markdown-body h5 tt,\r\n.markdown-body h5 code,\r\n.markdown-body h6 tt,\r\n.markdown-body h6 code {\r\n    font-size: inherit;\r\n}\r\n\r\n.markdown-body h1 {\r\n    color: #000000;\r\n    font-size: 28px;\r\n}\r\n\r\n.markdown-body h2 {\r\n    border-bottom: 1px solid #CCCCCC;\r\n    color: #000000;\r\n    font-size: 24px;\r\n}\r\n\r\n.markdown-body h3 {\r\n    font-size: 18px;\r\n}\r\n\r\n.markdown-body h4 {\r\n    font-size: 16px;\r\n}\r\n\r\n.markdown-body h5 {\r\n    font-size: 14px;\r\n}\r\n\r\n.markdown-body h6 {\r\n    color: #777777;\r\n    font-size: 14px;\r\n}\r\n\r\n.markdown-body p,\r\n.markdown-body blockquote,\r\n.markdown-body ul,\r\n.markdown-body ol,\r\n.markdown-body dl,\r\n.markdown-body table,\r\n.markdown-body pre {\r\n    margin: 15px 0;\r\n}\r\n\r\n.markdown-body hr {\r\n    overflow: hidden;\r\n    background: 0 0\r\n}\r\n\r\n.markdown-body hr:before {\r\n    display: table;\r\n    content: \"\"\r\n}\r\n\r\n.markdown-body hr:after {\r\n    display: table;\r\n    clear: both;\r\n    content: \"\"\r\n}\r\n\r\n.markdown-body hr {\r\n    height: 4px;\r\n    padding: 0;\r\n    margin: 16px 0;\r\n    background-color: #e7e7e7;\r\n    border: 0\r\n}\r\n\r\n.markdown-body hr {\r\n    -moz-box-sizing: content-box;\r\n    box-sizing: content-box\r\n}\r\n\r\n.markdown-body > h2:first-child,\r\n.markdown-body > h1:first-child,\r\n.markdown-body > h1:first-child + h2,\r\n.markdown-body > h3:first-child,\r\n.markdown-body > h4:first-child,\r\n.markdown-body > h5:first-child,\r\n.markdown-body > h6:first-child {\r\n    margin-top: 0;\r\n    padding-top: 0;\r\n}\r\n\r\n.markdown-body a:first-child h1,\r\n.markdown-body a:first-child h2,\r\n.markdown-body a:first-child h3,\r\n.markdown-body a:first-child h4,\r\n.markdown-body a:first-child h5,\r\n.markdown-body a:first-child h6 {\r\n    margin-top: 0;\r\n    padding-top: 0;\r\n}\r\n\r\n.markdown-body h1 + p,\r\n.markdown-body h2 + p,\r\n.markdown-body h3 + p,\r\n.markdown-body h4 + p,\r\n.markdown-body h5 + p,\r\n.markdown-body h6 + p {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body li p.first {\r\n    display: inline-block;\r\n}\r\n\r\n.markdown-body ul,\r\n.markdown-body ol {\r\n    padding-left: 30px;\r\n}\r\n\r\n.markdown-body ul.no-list,\r\n.markdown-body ol.no-list {\r\n    list-style-type: none;\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body ul li > *:first-child,\r\n.markdown-body ol li > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body ul ul,\r\n.markdown-body ul ol,\r\n.markdown-body ol ol,\r\n.markdown-body ol ul {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body dl {\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body dl dt {\r\n    font-size: 14px;\r\n    font-style: italic;\r\n    font-weight: bold;\r\n    margin: 15px 0 5px;\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body dl dt:first-child {\r\n    padding: 0;\r\n}\r\n\r\n.markdown-body dl dt > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body dl dt > *:last-child {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body dl dd {\r\n    margin: 0 0 15px;\r\n    padding: 0 15px;\r\n}\r\n\r\n.markdown-body dl dd > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body dl dd > *:last-child {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body blockquote {\r\n    border-left: 4px solid #DDDDDD;\r\n    color: #777777;\r\n    padding: 0 15px;\r\n}\r\n\r\n.markdown-body blockquote > *:first-child {\r\n    margin-top: 0;\r\n}\r\n\r\n.markdown-body blockquote > *:last-child {\r\n    margin-bottom: 0;\r\n}\r\n\r\n.markdown-body table th {\r\n    font-weight: bold;\r\n}\r\n\r\n.markdown-body table th,\r\n.markdown-body table td {\r\n    border: 1px solid #CCCCCC;\r\n    padding: 6px 13px;\r\n}\r\n\r\n.markdown-body table tr {\r\n    background-color: #FFFFFF;\r\n    border-top: 1px solid #CCCCCC;\r\n}\r\n\r\n.markdown-body table tr:nth-child(2n) {\r\n    background-color: #F8F8F8;\r\n}\r\n\r\n.markdown-body img {\r\n    max-width: 100%;\r\n}\r\n\r\n.markdown-body span.frame {\r\n    display: block;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.frame > span {\r\n    border: 1px solid #DDDDDD;\r\n    display: block;\r\n    float: left;\r\n    margin: 13px 0 0;\r\n    overflow: hidden;\r\n    padding: 7px;\r\n    width: auto;\r\n}\r\n\r\n.markdown-body span.frame span img {\r\n    display: block;\r\n    float: left;\r\n}\r\n\r\n.markdown-body span.frame span span {\r\n    clear: both;\r\n    color: #333333;\r\n    display: block;\r\n    padding: 5px 0 0;\r\n}\r\n\r\n.markdown-body span.align-center {\r\n    clear: both;\r\n    display: block;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.align-center > span {\r\n    display: block;\r\n    margin: 13px auto 0;\r\n    overflow: hidden;\r\n    text-align: center;\r\n}\r\n\r\n.markdown-body span.align-center span img {\r\n    margin: 0 auto;\r\n    text-align: center;\r\n}\r\n\r\n.markdown-body span.align-right {\r\n    clear: both;\r\n    display: block;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.align-right > span {\r\n    display: block;\r\n    margin: 13px 0 0;\r\n    overflow: hidden;\r\n    text-align: right;\r\n}\r\n\r\n.markdown-body span.align-right span img {\r\n    margin: 0;\r\n    text-align: right;\r\n}\r\n\r\n.markdown-body span.float-left {\r\n    display: block;\r\n    float: left;\r\n    margin-right: 13px;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.float-left span {\r\n    margin: 13px 0 0;\r\n}\r\n\r\n.markdown-body span.float-right {\r\n    display: block;\r\n    float: right;\r\n    margin-left: 13px;\r\n    overflow: hidden;\r\n}\r\n\r\n.markdown-body span.float-right > span {\r\n    display: block;\r\n    margin: 13px auto 0;\r\n    overflow: hidden;\r\n    text-align: right;\r\n}\r\n\r\n.markdown-body code,\r\n.markdown-body tt {\r\n    background-color: #F8F8F8;\r\n    border: 1px solid #EAEAEA;\r\n    border-radius: 3px 3px 3px 3px;\r\n    margin: 0 2px;\r\n    padding: 0 5px;\r\n    white-space: nowrap;\r\n}\r\n\r\n.markdown-body pre > code {\r\n    background: none repeat scroll 0 0 transparent;\r\n    border: medium none;\r\n    margin: 0;\r\n    padding: 0;\r\n    white-space: pre;\r\n}\r\n\r\n.markdown-body .highlight pre,\r\n.markdown-body pre {\r\n    background-color: #F8F8F8;\r\n    border: 1px solid #CCCCCC;\r\n    border-radius: 3px 3px 3px 3px;\r\n    font-size: 13px;\r\n    line-height: 19px;\r\n    overflow: auto;\r\n    padding: 6px 10px;\r\n}\r\n\r\n.markdown-body pre code,\r\n.markdown-body pre tt {\r\n    background-color: transparent;\r\n    border: medium none;\r\n}\r\n"; });
 define('text!user/user-pwd-reset.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-pwd-reset.css\"></require>\r\n    <div class=\"ui container tms-user-pwd-reset\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">输入您的邮箱地址,我们会发送密码重置链接到您的邮箱!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">邮件地址</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的邮件地址\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"resetPwdHandler()\">发送密码重置邮件</div>\r\n            </div>\r\n            <div if.bind=\"token\" ref=\"fm2\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">设置您的新密码,密码长度要求至少8位字符!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">新密码</label>\r\n                    <input type=\"password\" name=\"mail\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"设置您的新密码\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"newPwdHandler()\">确认</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!user/user-login.css', ['module'], function(module) { module.exports = ".tms-user-login {\r\n\tdisplay: flex;\r\n\theight: 100%;\r\n    display: flex;\r\n    justify-content: center;\r\n    align-items: center;\r\n}"; });

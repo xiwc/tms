@@ -20,7 +20,7 @@
     padding-left: 220px;
     display: flex;
     align-items: stretch;
-    height: 100%;
+    min-height: 100%;
 }
 
 .tms-chat-direct .tms-content .tms-col.w65 {

@@ -6,18 +6,20 @@
             <!-- <div class="item">
                 <i class="icon link sidebar"></i>
             </div> -->
-            <a class="item header">@charts</a>
-            <div class="right menu">
+            <a class="item header">私聊@${user.name}(${chatTo})</a>
+            <!-- <div class="right menu">
                 <a class="item">...</a>
-            </div>
+            </div> -->
         </div>
         <div class="ui left visible segment sidebar">
-            <div class="tms-header"></div>
+            <div class="tms-header">
+                <h1 class="ui header">私聊频道</h1>
+            </div>
             <div class="ui middle aligned selection list">
-                <a repeat.for="item of users" click.delegate="switchChatToHandler(item.username)" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
+                <a repeat.for="item of users" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
                     <i class="user icon"></i>
                     <div class="content">
-                        <div class="header">${item.name}</div>
+                        <div class="header">${item.name}(${item.username})</div>
                     </div>
                 </a>
             </div>
@@ -26,7 +28,8 @@
             <div class="tms-col w65">
                 <div class="ui basic segment minimal selection list segment comments">
                     <!-- <h3 class="ui dividing header">私聊内容</h3> -->
-                    <div repeat.for="item of chats" class="comment item" data-id="${item.id}">
+                    <button if.bind="!last" click.delegate="lastMoreHandler()" class="fluid ui button">加载更多(${lastCnt})</button>
+                    <div repeat.for="item of chats" class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
                         <a class="avatar">
                             <i class="user icon"></i>
                         </a>
@@ -37,11 +40,12 @@
                             </div>
                             <div class="text markdown-body" innerhtml.bind="item.contentMd"></div>
                             <div class="actions">
-                                <a class="save">复制</a>
-                                <a class="hide">分享</a>
+                                <a class="tms-copy tms-clipboard" data-clipboard-text="${selfLink + '?id=' + item.id}">复制</a>
+                                <a class="tms-share tms-clipboard" data-clipboard-text="${item.content}">分享</a>
                             </div>
                         </div>
                     </div>
+                    <button if.bind="!first" click.delegate="firstMoreHandler()" class="fluid ui button">加载更多(${firstCnt})</button>
                 </div>
                 <div class="ui basic segment tms-msg-input">
                     <div class="ui left action fluid icon input">

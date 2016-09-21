@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -75,12 +76,11 @@ public class ChatDirectController extends BaseController {
 	@Autowired
 	MailSender2 mailSender;
 
-	String hash = "#/chat-direct";
-
 	@RequestMapping(value = "create", method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody create(@RequestParam("baseUrl") String baseUrl,
 			@RequestParam("path") String path,
+			@RequestParam("hash") String hash,
 			@RequestParam("chatTo") String chatTo,
 			@RequestParam("content") String content,
 			@RequestParam("contentHtml") final String contentHtml) {
@@ -102,7 +102,7 @@ public class ChatDirectController extends BaseController {
 		ChatDirect chatDirect2 = chatDirectRepository.saveAndFlush(chatDirect);
 
 		final User loginUser = getLoginUser();
-		final String href = baseUrl + path + hash + "?id="
+		final String href = baseUrl + path + "#" + hash + "?id="
 				+ chatDirect2.getId();
 
 		ThreadUtil.exec(() -> {
@@ -132,6 +132,7 @@ public class ChatDirectController extends BaseController {
 	@RequestMapping(value = "list", method = RequestMethod.GET)
 	@ResponseBody
 	public RespBody list(
+			@RequestParam(value = "id", required = false) Long id,
 			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam("chatTo") String chatTo) {
 
@@ -139,6 +140,18 @@ public class ChatDirectController extends BaseController {
 
 		if (chatToUser == null) {
 			return RespBody.failed("聊天对象不存在!");
+		}
+
+		if (StringUtil.isNotEmpty(id)) {
+			long cntGtId = chatDirectRepository.countGtId(id, chatToUser);
+			int size = pageable.getPageSize();
+			long page = cntGtId / size;
+			if (cntGtId % size == 0) {
+				page--;
+			}
+
+			pageable = new PageRequest(page > -1 ? (int) page : 0, size,
+					Direction.DESC, "createDate");
 		}
 
 		Page<ChatDirect> page = chatDirectRepository.findByChatTo(chatToUser,
@@ -167,6 +180,32 @@ public class ChatDirectController extends BaseController {
 		}
 
 		return RespBody.succeed(chats);
+	}
+
+	@RequestMapping(value = "more", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody more(@RequestParam("start") Long start,
+			@RequestParam("last") Boolean last,
+			@RequestParam("size") Integer size,
+			@RequestParam("chatTo") String chatTo) {
+
+		User chatToUser = userRepository.findOne(chatTo);
+
+		if (chatToUser == null) {
+			return RespBody.failed("聊天对象不存在!");
+		}
+
+		long count = 0;
+		List<ChatDirect> chats = null;
+		if (last) {
+			count = chatDirectRepository.countAllOld(start, chatToUser);
+			chats = chatDirectRepository.queryMoreOld(chatToUser, start, size);
+		} else {
+			count = chatDirectRepository.countAllNew(start, chatToUser);
+			chats = chatDirectRepository.queryMoreNew(chatToUser, start, size);
+		}
+
+		return RespBody.succeed(chats).addMsg(count);
 	}
 
 }
