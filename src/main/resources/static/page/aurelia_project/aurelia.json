@@ -84,6 +84,7 @@
         "name": "deps-bundle.js",
         "dependencies": [
           "marked",
+          "autosize",
           {
             "name": "clipboard",
             "path": "../node_modules/clipboard",

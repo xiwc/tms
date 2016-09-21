@@ -489,6 +489,14 @@ public class UserController extends BaseController {
 		return RespBody.succeed(user).addMsg(gns);
 	}
 
+	@RequestMapping(value = "loginUser", method = RequestMethod.GET)
+	@ResponseBody
+	@Secured({ "ROLE_ADMIN", "ROLE_USER" })
+	public RespBody loginUser() {
+
+		return RespBody.succeed(getLoginUser());
+	}
+
 	@RequestMapping(value = "all", method = RequestMethod.GET)
 	@ResponseBody
 	@Secured({ "ROLE_ADMIN", "ROLE_USER" })

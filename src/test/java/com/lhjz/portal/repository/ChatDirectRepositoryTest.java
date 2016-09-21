@@ -1,5 +1,7 @@
 package com.lhjz.portal.repository;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -30,5 +32,13 @@ public class ChatDirectRepositoryTest extends AbstractTestNGSpringContextTests {
 
 		chatDirectRepository.saveAndFlush(cd);
 
+	}
+
+	@Test
+	public void queryChatDirect() {
+		List<ChatDirect> chats = chatDirectRepository.queryChatDirect(
+				userRepository.findOne("admin"), userRepository.findOne("test"),
+				0, 10);
+		System.out.println(chats.size());
 	}
 }

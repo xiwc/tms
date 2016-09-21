@@ -3,6 +3,12 @@
     line-height: 1.6;
 }
 
+.markdown-body > br,
+.markdown-body ul br
+.markdown-body ol br {
+    display: none;
+}
+
 .markdown-body > *:first-child {
     margin-top: 0 !important;
 }

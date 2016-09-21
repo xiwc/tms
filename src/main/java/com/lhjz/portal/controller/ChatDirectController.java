@@ -3,7 +3,6 @@
  */
 package com.lhjz.portal.controller;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.lhjz.portal.base.BaseController;
 import com.lhjz.portal.component.MailSender2;
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.ChatDirect;
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.RespBody;
@@ -38,6 +39,7 @@ import com.lhjz.portal.util.MapUtil;
 import com.lhjz.portal.util.StringUtil;
 import com.lhjz.portal.util.TemplateUtil;
 import com.lhjz.portal.util.ThreadUtil;
+import com.lhjz.portal.util.WebUtil;
 
 /**
  * 
@@ -109,14 +111,13 @@ public class ChatDirectController extends BaseController {
 
 			try {
 				Thread.sleep(3000);
-				mailSender.sendHtml(String.format("TMS-私聊@消息_%s",
-						DateUtil.format(new Date(), DateUtil.FORMAT7)),
-						TemplateUtil
-								.process("templates/mail/mail-dynamic", MapUtil
-										.objArr2Map("user", loginUser, "date",
-												new Date(), "href", href,
-												"title", "下面的沟通消息中有@到你",
-												"content", contentHtml)),
+				mailSender.sendHtml(
+						String.format("TMS-私聊@消息_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil.process("templates/mail/mail-dynamic",
+								MapUtil.objArr2Map("user", loginUser, "date",
+										new Date(), "href", href, "title",
+										"发给你的私聊消息", "content", contentHtml)),
 						chatToUser.getMails());
 				logger.info("私聊邮件发送成功！");
 			} catch (Exception e) {
@@ -129,11 +130,88 @@ public class ChatDirectController extends BaseController {
 		return RespBody.succeed();
 	}
 
+	@RequestMapping(value = "update", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody update(@RequestParam("baseUrl") String baseUrl,
+			@RequestParam("id") Long id, @RequestParam("path") String path,
+			@RequestParam("hash") String hash,
+			@RequestParam("content") String content,
+			@RequestParam("contentHtml") final String contentHtml) {
+
+		if (StringUtil.isEmpty(content)) {
+			return RespBody.failed("更新内容不能为空!");
+		}
+
+		final ChatDirect chatDirect = chatDirectRepository.findOne(id);
+
+		if (chatDirect == null) {
+			return RespBody.failed("更新内容不存在!");
+		}
+
+		if (chatDirect.getContent().equals(content)) {
+			return RespBody.failed("更新内容没有任何变更!");
+		}
+
+		chatDirect.setContent(content);
+
+		chatDirectRepository.saveAndFlush(chatDirect);
+
+		final User loginUser = getLoginUser();
+		final String href = baseUrl + path + "#" + hash + "?id="
+				+ chatDirect.getId();
+
+		ThreadUtil.exec(() -> {
+
+			try {
+				Thread.sleep(3000);
+				mailSender.sendHtml(
+						String.format("TMS-私聊@消息更新_%s",
+								DateUtil.format(new Date(), DateUtil.FORMAT7)),
+						TemplateUtil.process("templates/mail/mail-dynamic",
+								MapUtil.objArr2Map("user", loginUser, "date",
+										new Date(), "href", href, "title",
+										"发给你的私聊消息更新", "content", contentHtml)),
+						chatDirect.getChatTo().getMails());
+				logger.info("私聊消息更新邮件发送成功！");
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error("私聊消息更新邮件发送失败！");
+			}
+
+		});
+
+		return RespBody.succeed();
+	}
+
+	@RequestMapping(value = "delete", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody delete(@RequestParam("id") Long id) {
+
+		final ChatDirect chatDirect = chatDirectRepository.findOne(id);
+
+		if (chatDirect == null) {
+			return RespBody.failed("删除内容不存在!");
+		}
+
+		boolean isSuper = WebUtil.getUserAuthorities()
+				.contains(SysConstant.ROLE_SUPER);
+		boolean isCreator = chatDirect.getCreator().getUsername()
+				.equals(WebUtil.getUsername());
+
+		if (!isSuper && !isCreator) {
+			return RespBody.failed("您没有权限删除该消息内容!");
+		}
+
+		chatDirectRepository.delete(chatDirect);
+
+		return RespBody.succeed();
+	}
+
 	@RequestMapping(value = "list", method = RequestMethod.GET)
 	@ResponseBody
-	public RespBody list(
-			@RequestParam(value = "id", required = false) Long id,
-			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable,
+	public RespBody list(@RequestParam(value = "id", required = false) Long id,
+			@PageableDefault(sort = {
+					"createDate" }, direction = Direction.DESC) Pageable pageable,
 			@RequestParam("chatTo") String chatTo) {
 
 		User chatToUser = userRepository.findOne(chatTo);
@@ -142,9 +220,15 @@ public class ChatDirectController extends BaseController {
 			return RespBody.failed("聊天对象不存在!");
 		}
 
+		long start = 0;
+		int limit = pageable.getPageSize();
+
+		User loginUser = getLoginUser();
+
 		if (StringUtil.isNotEmpty(id)) {
-			long cntGtId = chatDirectRepository.countGtId(id, chatToUser);
-			int size = pageable.getPageSize();
+			long cntGtId = chatDirectRepository.countGtId(loginUser, chatToUser,
+					id);
+			int size = limit;
 			long page = cntGtId / size;
 			if (cntGtId % size == 0) {
 				page--;
@@ -152,10 +236,17 @@ public class ChatDirectController extends BaseController {
 
 			pageable = new PageRequest(page > -1 ? (int) page : 0, size,
 					Direction.DESC, "createDate");
+			start = pageable.getOffset();
 		}
 
-		Page<ChatDirect> page = chatDirectRepository.findByChatTo(chatToUser,
-				pageable);
+		long total = chatDirectRepository.countChatDirect(loginUser,
+				chatToUser);
+
+		List<ChatDirect> chats = chatDirectRepository.queryChatDirect(loginUser,
+				chatToUser, start, limit);
+
+		Page<ChatDirect> page = new PageImpl<ChatDirect>(chats, pageable,
+				total);
 
 		return RespBody.succeed(page);
 	}
@@ -171,13 +262,9 @@ public class ChatDirectController extends BaseController {
 			return RespBody.failed("聊天对象不存在!");
 		}
 
-		long cnt = chatDirectRepository.countByChatToAndIdGreaterThan(
-				chatToUser, id);
-		List<ChatDirect> chats = new ArrayList<ChatDirect>();
-		if (cnt <= 10) {
-			chats = chatDirectRepository.findByChatToAndIdGreaterThan(
-					chatToUser, id);
-		}
+		List<ChatDirect> chats = chatDirectRepository
+				.queryChatDirectAndIdGreaterThan(getLoginUser(), chatToUser,
+						id);
 
 		return RespBody.succeed(chats);
 	}
@@ -198,11 +285,15 @@ public class ChatDirectController extends BaseController {
 		long count = 0;
 		List<ChatDirect> chats = null;
 		if (last) {
-			count = chatDirectRepository.countAllOld(start, chatToUser);
-			chats = chatDirectRepository.queryMoreOld(chatToUser, start, size);
+			count = chatDirectRepository.countAllOld(getLoginUser(), chatToUser,
+					start);
+			chats = chatDirectRepository.queryMoreOld(getLoginUser(),
+					chatToUser, start, size);
 		} else {
-			count = chatDirectRepository.countAllNew(start, chatToUser);
-			chats = chatDirectRepository.queryMoreNew(chatToUser, start, size);
+			count = chatDirectRepository.countAllNew(getLoginUser(), chatToUser,
+					start);
+			chats = chatDirectRepository.queryMoreNew(getLoginUser(),
+					chatToUser, start, size);
 		}
 
 		return RespBody.succeed(chats).addMsg(count);

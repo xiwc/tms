@@ -35,8 +35,9 @@
 .tms-chat-direct .ui.basic.segment.tms-msg-input {
     position: fixed;
     bottom: 0;
-    right: 30%;
+    /* right: 30%; */
     left: 220px;
+    right: 0;
     background-color: white;
 }
 
@@ -73,4 +74,8 @@
     color: rgba(0, 0, 0, .87);
     border-radius: .28571429rem;
     box-shadow: none;
+}
+
+.tms-chat-direct .tms-edit-textarea {
+    width: 100%;
 }
