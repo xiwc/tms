@@ -29,7 +29,7 @@
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/dynamic')} ? 'active' : ''" class="item mi-dynamic" th:href="@{/admin/dynamic}" href="dynamic.html"> <i class="at icon"></i> 沟通动态
         </a>
-        <a class="item" th:href="${'/page/index.html#/chat-direct/' + #authentication.name}" href="/page/index.html#/chat-direct/admin"> <i class="chat icon"></i> 私聊频道
+        <a class="item" target="_blank" th:href="${'/page/index.html#/chat-direct/' + #authentication.name}" href="/page/index.html#/chat-direct/admin"> <i class="chat icon"></i> 私聊频道
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译管理
         </a>
