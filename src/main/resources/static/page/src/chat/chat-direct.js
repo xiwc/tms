@@ -63,13 +63,17 @@ export class ChatDirect {
      * @return {[promise]}                      你可以可选的返回一个延迟许诺(promise), 告诉路由等待执行bind和attach视图(view), 直到你完成你的处理工作.
      */
     activate(params, routeConfig, navigationInstruction) {
+
         this.markId = params.id;
-        routeConfig.navModel.setTitle(`@${params.username} | 私聊 | TMS`);
-        this.init(params.username);
 
         this.user = _.find(this.users, {
-            username: this.chatTo
+            username: params.username
         });
+
+        let name = this.user ? this.user.name : params.username;
+        routeConfig.navModel.setTitle(`${name} | 私聊 | TMS`);
+
+        this.init(params.username);
 
         $(this.chatToDropdownRef).dropdown('set selected', this.chatTo);
 
@@ -233,10 +237,20 @@ export class ChatDirect {
         poll.stop();
     }
 
-    chatToUserFilerKeyupHanlder() {
+    chatToUserFilerKeyupHanlder(evt) {
         _.each(this.users, (item) => {
             item.hidden = item.username.indexOf(this.filter) == -1;
         });
+
+        if(evt.keyCode === 13) {
+            let user = _.find(this.users, {
+                hidden: false
+            });
+
+            if(user) {
+                window.location = wurl('path') + `#/chat-direct/${user.username}`;
+            }
+        }
     }
 
     clearFilterHandler() {
