@@ -23,6 +23,7 @@
         <div class="ad-index-container">
             <div th:replace="admin/index :: rail-menu"></div>
             <div id="context">
+                <div style="height:70px;"></div>
                 <div th:replace="admin/template :: ad-page-header ('项目管理', 'project')"></div>
                 <div class="ui attached segment">
                     <div sec:authorize="hasRole('ROLE_ADMIN')" class="ui primary compact button btn-add">添加</div>
