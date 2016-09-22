@@ -1,7 +1,7 @@
 export class UserLogin {
 
-    username = 'admin';
-    password = '88888888';
+    username = '';
+    password = '';
 
     loginHandler() {
 
