@@ -7,7 +7,28 @@
             <!-- <div class="item">
                 <i class="icon link sidebar"></i>
             </div> -->
-            <a class="item header">私聊@${user.name ? user.name : chatTo}</a>
+            <!-- <a class="item header">私聊@${user.name ? user.name : chatTo}</a> -->
+            <div ref="chatToDropdownRef" class="ui dropdown link item">
+                <!-- <span style="font-weight: bold; font-size: 20px;">私聊</span>
+                <i class="at icon"></i> -->
+                <span class="text"></span>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <div class="ui icon search input">
+                        <i class="search icon"></i>
+                        <input type="text" placeholder="过滤私聊对象">
+                    </div>
+                    <div class="divider"></div>
+                    <div class="header">
+                        <i class="user icon"></i> 切换私聊对象
+                    </div>
+                    <div class="scrolling menu">
+                        <a repeat.for="item of users" task.bind="initChatToDropdownHandler($last)" href="#/chat-direct/${item.username}" class="item" title="${item.username}" data-value="${item.username}">
+                            <i class="circular icon user"></i> ${item.name}
+                        </a>
+                    </div>
+                </div>
+            </div>
             <div class="right menu">
                 <a class="item">${loginUser.name}</a>
             </div>
@@ -16,7 +37,7 @@
             <div class="tms-header">
                 <h1 class="ui header">私聊频道</h1>
                 <input value.bind="filter" focusin.trigger="chatToUserFilerFocusinHanlder()" keyup.trigger="chatToUserFilerKeyupHanlder()" type="text" placeholder="私聊对象查找">
-                <i title="清空过滤输入" click.delegate="clearFilterHandler()" class="circular close icon link small"></i>
+                <i title="清空过滤输入" click.delegate="clearFilterHandler()" class="bordered close icon link small"></i>
             </div>
             <div ref="userListRef" class="ui middle aligned selection list">
                 <a repeat.for="item of users" title="${item.username}" show.bind="!item.hidden" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">

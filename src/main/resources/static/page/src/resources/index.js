@@ -4,5 +4,8 @@ export function configure(aurelia) {
 
     config.context(aurelia).initHttp().initToastr().initAjax();
 
-    aurelia.globalResources(['resources/value-converters/common-vc']);
+    aurelia.globalResources([
+        'resources/value-converters/common-vc',
+        'resources/attributes/attr-task'
+    ]);
 }

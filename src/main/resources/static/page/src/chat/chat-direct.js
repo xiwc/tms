@@ -162,6 +162,10 @@ export class ChatDirect {
                 toastr.error(data.data, '获取消息失败!');
                 window.location = utils.getBaseUrl() + wurl('path') + `#/login?redirect=${encodeURIComponent(this.originalHref)}`;
             }
+        }).always((xhr, sts, error) => {
+            if (sts == 'error') { // for loal dev & debug.
+                window.location = utils.getBaseUrl() + wurl('path') + `#/login?redirect=${encodeURIComponent(this.originalHref)}`;
+            }
         });
     }
 
@@ -426,5 +430,18 @@ export class ChatDirect {
         _.delay(() => {
             $(this.userListRef).scrollTo(`a.item[data-id="${this.chatTo}"]`);
         }, 1000);
+
+    }
+
+    initChatToDropdownHandler(last) {
+        if (last) {
+            _.defer(() => {
+                $(this.chatToDropdownRef).dropdown().dropdown('set selected', this.chatTo).dropdown({
+                    onChange: (value, text, $choice) => {
+                        window.location = wurl('path') + `#/chat-direct/${value}`;
+                    }
+                });
+            });
+        }
     }
 }
