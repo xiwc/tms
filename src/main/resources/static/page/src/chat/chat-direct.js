@@ -28,6 +28,8 @@ export class ChatDirect {
     first = true;
     last = true;
 
+    originalHref = wurl();
+
     /**
      * 构造函数
      */
@@ -158,7 +160,7 @@ export class ChatDirect {
                 });
             } else {
                 toastr.error(data.data, '获取消息失败!');
-                window.location = utils.getBaseUrl() + wurl('path') + `#/login?redirect=${encodeURIComponent(window.location.href)}`;
+                window.location = utils.getBaseUrl() + wurl('path') + `#/login?redirect=${encodeURIComponent(this.originalHref)}`;
             }
         });
     }
