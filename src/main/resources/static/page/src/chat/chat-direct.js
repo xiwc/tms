@@ -159,6 +159,10 @@ export class ChatDirect {
             } else {
                 toastr.error(data.data, '获取消息失败!');
             }
+        }).always((xhr, sts, err) => {
+        	if(sts == 'error') {
+        		window.location = utils.getBaseUrl() + wurl('path') + `#/login?redirect=${encodeURIComponent(window.location.href)}`;
+        	}
         });
     }
 

@@ -13,7 +13,13 @@ export class UserLogin {
                 "remember-me": 'on'
             }).always(() => {
                 toastr.success('登录成功!');
-                window.location = '/';
+                let redirect = utils.urlQuery('redirect');
+                if (redirect) {
+                    window.location = decodeURIComponent(redirect);
+                } else {
+                    window.location = wurl('path');
+                }
+
             });
         });
 

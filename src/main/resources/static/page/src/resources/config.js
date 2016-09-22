@@ -81,6 +81,12 @@ export class Config {
         $(document).on('ajaxStop', function() {
             NProgress && NProgress.done();
         });
+        // $(document).ajaxComplete(function(event, request, settings) {
+        //     console.log(request);
+        // });
+        // $(document).ajaxError(function(event, request, settings) {
+        //     console.log(request);
+        // });
 
         return this;
     }
