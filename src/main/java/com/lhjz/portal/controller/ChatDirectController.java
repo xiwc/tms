@@ -82,7 +82,6 @@ public class ChatDirectController extends BaseController {
 	@ResponseBody
 	public RespBody create(@RequestParam("baseUrl") String baseUrl,
 			@RequestParam("path") String path,
-			@RequestParam("hash") String hash,
 			@RequestParam("chatTo") String chatTo,
 			@RequestParam("content") String content,
 			@RequestParam("contentHtml") final String contentHtml) {
@@ -104,7 +103,8 @@ public class ChatDirectController extends BaseController {
 		ChatDirect chatDirect2 = chatDirectRepository.saveAndFlush(chatDirect);
 
 		final User loginUser = getLoginUser();
-		final String href = baseUrl + path + "#" + hash + "?id="
+		final String href = baseUrl + path + "#/chat-direct/"
+				+ loginUser.getUsername() + "?id="
 				+ chatDirect2.getId();
 
 		ThreadUtil.exec(() -> {
@@ -134,7 +134,6 @@ public class ChatDirectController extends BaseController {
 	@ResponseBody
 	public RespBody update(@RequestParam("baseUrl") String baseUrl,
 			@RequestParam("id") Long id, @RequestParam("path") String path,
-			@RequestParam("hash") String hash,
 			@RequestParam("content") String content,
 			@RequestParam("contentHtml") final String contentHtml) {
 
@@ -157,7 +156,8 @@ public class ChatDirectController extends BaseController {
 		chatDirectRepository.saveAndFlush(chatDirect);
 
 		final User loginUser = getLoginUser();
-		final String href = baseUrl + path + "#" + hash + "?id="
+		final String href = baseUrl + path + "#/chat-direct/"
+				+ loginUser.getUsername() + "?id="
 				+ chatDirect.getId();
 
 		ThreadUtil.exec(() -> {

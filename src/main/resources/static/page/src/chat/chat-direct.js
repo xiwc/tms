@@ -255,7 +255,6 @@ export class ChatDirect {
             $.post('/admin/chat/direct/create', {
                 baseUrl: utils.getBaseUrl(),
                 path: wurl('path'),
-                hash: utils.getHash(),
                 chatTo: this.chatTo,
                 content: this.content,
                 contentHtml: html
@@ -325,7 +324,6 @@ export class ChatDirect {
             $.post('/admin/chat/direct/update', {
                 baseUrl: utils.getBaseUrl(),
                 path: wurl('path'),
-                hash: utils.getHash(),
                 id: item.id,
                 content: item.content,
                 contentHtml: html
