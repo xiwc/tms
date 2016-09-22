@@ -66,9 +66,12 @@ export class ChatDirect {
         this.markId = params.id;
         routeConfig.navModel.setTitle(`@${params.username} | 私聊 | TMS`);
         this.init(params.username);
+
         this.user = _.find(this.users, {
             username: this.chatTo
         });
+
+        $(this.chatToDropdownRef).dropdown('set selected', this.chatTo);
 
         if (this.markId) {
             if ('pushState' in history) {
