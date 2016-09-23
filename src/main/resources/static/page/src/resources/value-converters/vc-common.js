@@ -1,7 +1,6 @@
 import 'jquery-format';
-import BTimeAgo from 'better-timeago';
-import locale_zh_cn from 'better-timeago-locale-zh-cn';
-BTimeAgo.locale('zh-cn', locale_zh_cn);
+import 'timeago';
+let timeagoInstance = timeago();
 
 /**
  * 该文件用于定义值的过滤转换器
@@ -56,7 +55,6 @@ export class NumberValueConverter {
  */
 export class TimeagoValueConverter {
     toView(value) {
-        return value ? BTimeAgo(value).print() : '';
+        return value ? timeagoInstance.format(value, 'zh_CN') : '';
     }
 }
-

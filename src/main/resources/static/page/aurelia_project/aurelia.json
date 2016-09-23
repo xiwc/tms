@@ -85,19 +85,15 @@
         "dependencies": [
           "marked",
           "autosize",
-          "fecha",
-          "better-timeago-locale-en",
-          "better-timeago-locale-zh-cn",
-          {
-            "name": "better-timeago",
-            "path": "../node_modules/better-timeago",
-            "main": "lib/better-timeago",
-            "deps": ["fecha", "better-timeago-locale-en"]
-          },
           {
             "name": "clipboard",
             "path": "../node_modules/clipboard",
             "main": "dist/clipboard.min"
+          },
+          {
+            "name": "timeago",
+            "path": "../node_modules/timeago.js",
+            "main": "dist/timeago.min"
           },
           {
             "name": "dropzone",

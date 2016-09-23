@@ -16,7 +16,6 @@ import {
 } from 'dropzone';
 import 'common/common-plugin';
 
-
 export class ChatDirect {
 
     @bindable content = '';
@@ -242,12 +241,12 @@ export class ChatDirect {
             item.hidden = item.username.indexOf(this.filter) == -1;
         });
 
-        if(evt.keyCode === 13) {
+        if (evt.keyCode === 13) {
             let user = _.find(this.users, {
                 hidden: false
             });
 
-            if(user) {
+            if (user) {
                 window.location = wurl('path') + `#/chat-direct/${user.username}`;
             }
         }

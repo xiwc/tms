@@ -60,7 +60,7 @@
                         <div class="content">
                             <a class="author">${item.creator.name}</a>
                             <div class="metadata">
-                                <div class="timeago date" title="${item.createDate | date}">${item.createDate | timeago}</div>
+                                <div class="date" title="${item.createDate | date}">${item.createDate | timeago}</div>
                             </div>
                             <div show.bind="!item.isEditing" class="text markdown-body" innerhtml.bind="item.contentMd"></div>
                             <textarea focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item)" show.bind="item.isEditing" ref="editTxtRef" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea>
