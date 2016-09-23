@@ -32,8 +32,9 @@ let serve = gulp.series(
                         res.setHeader('Access-Control-Allow-Origin', '*');
                         next();
                     },
-                    proxyMiddleware(['/free', '/admin', '/upload'], {
-                        target: 'http://localhost',
+                    proxyMiddleware(['/free', '/admin', '/upload', '/lib'], {
+                        // target: 'http://localhost',
+                        target: 'http://translation.sh1.newtouch.com',
                         changeOrigin: true
                     }),
                 ]

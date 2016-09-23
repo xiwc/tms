@@ -465,6 +465,13 @@
         color: rgba(0, 0, 0, .87);
     }
     
+    .pp-ats-remove {
+        position: absolute;
+        top: 0;
+        right: -3px;
+        color: rgba(0, 0, 0, .87);
+    }
+    
     .pp-ats .pp-ats-content .ui.list .item {
         font-weight: normal;
     }
@@ -688,6 +695,7 @@
                             <div class="pp-ats ui segment">
                                 <i class="circular unlock alternate tiny icon pp-ats-lock"></i>
                                 <i class="circular refresh tiny icon pp-ats-refresh"></i>
+                                <i title="全部知悉" class="circular remove tiny icon pp-ats-remove"></i>
                                 <div class="pp-ats-content" style="margin-top: 10px;">
                                     <div class="ui selection divided list" style="max-height:400px; overflow:auto;"></div>
                                 </div>
@@ -1129,6 +1137,7 @@
             });
         });
 
+        // 收藏 消息 移除处理
         $('.pp-stows-content').on('click', '.item .actions a.remove', function(event) {
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -1144,6 +1153,42 @@
                     toastr.error(data.data, '移除收藏失败!');
                 }
             });
+
+        });
+
+        // @消息 知悉 处理
+        $('.pp-ats-content').on('click', '.item .actions a.markAsRead', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            $item = $(this).closest('.item');
+
+            $.post('/admin/chat/markAsReaded/unmask', {
+                chatAtId: $item.attr('data-chat-at-id')
+            }, function(data, textStatus, xhr) {
+                if (data.success) {
+                    $item.remove();
+                    window.poll.reset();
+                } else {
+                    toastr.error(data.data, "知悉@消息失败!");
+                }
+            });
+
+        });
+
+        // @消息 全部知悉 处理
+        $('.pp-ats .pp-ats-remove').on('click', function(event) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+
+            $.post('/admin/chat/markAllAsReaded/unmask',
+                function(data, textStatus, xhr) {
+                    if (data.success) {
+                        $('.pp-ats-content .ui.list').empty();
+                        window.poll.reset();
+                    } else {
+                        toastr.error(data.data, "知悉全部@消息失败!");
+                    }
+                });
 
         });
 

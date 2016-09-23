@@ -49,6 +49,8 @@
 
         _isPause = false;
 
+        oneHandler();
+
         timer = setInterval(function() {
             inc++;
             oneHandler();
