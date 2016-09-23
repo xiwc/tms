@@ -12,7 +12,7 @@ export class UserLogin {
                 password: this.password,
                 "remember-me": 'on'
             }).always(() => {
-                toastr.success('登录成功!');
+                // toastr.success('登录成功!');
                 let redirect = utils.urlQuery('redirect');
                 if (redirect) {
                     window.location = decodeURIComponent(redirect);

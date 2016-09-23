@@ -94,7 +94,7 @@ function _pause() {
 export default {
     start: function(pollCb, errCb) {
         if (timer) {
-            throw new Error('轮询实例已经启动!');
+            _stop();
         }
         _pollCb = pollCb;
         _errCb = errCb;
