@@ -672,6 +672,16 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(chatAt);
 	}
 
+	@RequestMapping(value = { "markAllAsReaded",
+			"markAllAsReaded/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody markAllAsReaded() {
+
+		int cnt = chatAtRepository.markAllAsReaded(getLoginUser());
+
+		return RespBody.succeed(cnt);
+	}
+
 	@RequestMapping(value = { "stow", "stow/unmask" }, method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody stow(@RequestParam("id") Long id) {

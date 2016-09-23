@@ -5,9 +5,12 @@ package com.lhjz.portal.repository;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import com.lhjz.portal.entity.Chat;
@@ -33,4 +36,9 @@ public interface ChatAtRepository extends JpaRepository<ChatAt, Long> {
 
 	@Query(value = "SELECT COUNT(*) FROM `chat_at` WHERE at_user = ?1 AND `status` = 'New';", nativeQuery = true)
 	long countAtUserNew(String atUser);
+
+	@Transactional
+	@Modifying
+	@Query("update ChatAt ca set ca.status = 'Readed' where ca.atUser = ?1 and ca.status = 'New'")
+	int markAllAsReaded(User atUser);
 }
