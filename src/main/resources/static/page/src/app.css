@@ -16,3 +16,18 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #999;
 }
+
+.tms-md450.ui.modal {
+    width: 450px!important;
+    margin-left: -225px!important;
+}
+
+.tms-md510.ui.modal {
+    width: 510px!important;
+    margin-left: -255px!important;
+}
+
+.tms-md540.ui.modal {
+    width: 540px!important;
+    margin-left: -275px!important;
+}

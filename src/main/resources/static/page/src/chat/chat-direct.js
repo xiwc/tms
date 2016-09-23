@@ -308,20 +308,23 @@ export class ChatDirect {
 
     deleteHandler(item) {
 
-        // TODO 确认提示框
-
-        $.post('/admin/chat/direct/delete', {
-            id: item.id
-        }, (data, textStatus, xhr) => {
-            if (data.success) {
-                this.chats = _.reject(this.chats, {
+        this.emConfirmModal.show({
+            onapprove: () => {
+                $.post('/admin/chat/direct/delete', {
                     id: item.id
+                }, (data, textStatus, xhr) => {
+                    if (data.success) {
+                        this.chats = _.reject(this.chats, {
+                            id: item.id
+                        });
+                        toastr.success('删除消息成功!');
+                    } else {
+                        toastr.error(data.data, '删除消息失败!');
+                    }
                 });
-                toastr.success('删除消息成功!');
-            } else {
-                toastr.error(data.data, '删除消息失败!');
             }
         });
+
     }
 
     editHandler(item, editTxtRef) {
