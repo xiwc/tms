@@ -1,6 +1,5 @@
 import 'jquery-format';
 import 'timeago';
-let timeagoInstance = timeago();
 
 /**
  * 该文件用于定义值的过滤转换器
@@ -55,6 +54,6 @@ export class NumberValueConverter {
  */
 export class TimeagoValueConverter {
     toView(value) {
-        return value ? timeagoInstance.format(value, 'zh_CN') : '';
+        return value ? timeago().format(value, 'zh_CN') : '';
     }
 }
