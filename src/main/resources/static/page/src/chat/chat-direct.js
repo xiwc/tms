@@ -15,6 +15,7 @@ import {
     default as Dropzone
 } from 'dropzone';
 import 'common/common-plugin';
+import 'timeago';
 
 export class ChatDirect {
 
@@ -447,6 +448,20 @@ export class ChatDirect {
             $(this.userListRef).scrollTo(`a.item[data-id="${this.chatTo}"]`);
         }, 1000);
 
+        let tg = timeago();
+        this.timeagoTimer = setInterval(() => {
+            $(this.chatContainerRef).find('[data-timeago]').each((index, el) => {
+                $(el).text(tg.format($(el).attr('data-timeago'), 'zh_CN'));
+            });
+        }, 5000);
+
+    }
+
+    /**
+     * 当数据绑定引擎从视图解除绑定时被调用
+     */
+    unbind() {
+        clearInterval(this.timeagoTimer);
     }
 
     initChatToDropdownHandler(last) {

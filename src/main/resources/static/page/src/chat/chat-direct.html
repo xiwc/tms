@@ -2,7 +2,7 @@
     <require from="./chat-direct.css"></require>
     <require from="./md-github.css"></require>
     <require from="dropzone/dist/basic.css"></require>
-    <div class="tms-chat-direct">
+    <div ref="chatContainerRef" class="tms-chat-direct">
         <div class="ui top fixed menu">
             <!-- <div class="item">
                 <i class="icon link sidebar"></i>
@@ -60,7 +60,7 @@
                         <div class="content">
                             <a class="author">${item.creator.name}</a>
                             <div class="metadata">
-                                <div class="date" title="${item.createDate | date}">${item.createDate | timeago}</div>
+                                <div class="date" data-timeago="${item.createDate}" title="${item.createDate | date}">${item.createDate | timeago}</div>
                             </div>
                             <div show.bind="!item.isEditing" class="text markdown-body" innerhtml.bind="item.contentMd"></div>
                             <textarea focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item)" show.bind="item.isEditing" ref="editTxtRef" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea>
