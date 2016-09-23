@@ -9,8 +9,12 @@
             </div> -->
             <!-- <a class="item header">私聊@${user.name ? user.name : chatTo}</a> -->
             <div ref="chatToDropdownRef" class="ui dropdown link item">
-                <!-- <span style="font-weight: bold; font-size: 20px;">私聊</span>
-                <i class="at icon"></i> -->
+                <!-- <span style="font-weight: bold; font-size: 20px;">私聊</span> -->
+                <i class="big loading at icon"></i>
+                <!-- <i class="big icons">
+                    <i class="large loading sun icon"></i>
+                    <i class="at icon"></i>
+                </i> -->
                 <span class="text"></span>
                 <i class="dropdown icon"></i>
                 <div class="menu">
@@ -30,7 +34,9 @@
                 </div>
             </div>
             <div class="right menu">
-                <a class="item">${loginUser.name}</a>
+                <a class="item">
+                    <i class="circular user icon"></i> ${loginUser.name}
+                </a>
             </div>
         </div>
         <div ref="sidebarRef" class="ui left visible segment sidebar tms-left-sidebar">
@@ -76,11 +82,21 @@
                 </div>
                 <div class="ui basic segment tms-msg-input">
                     <div ref="inputRef" class="ui left action fluid icon input dropzone">
-                        <button class="ui icon button">
-                            <i class="chat icon"></i>
-                        </button>
+                        <div ref="chatBtnRef" class="ui icon button">
+                            <i class="plus icon"></i>
+                        </div>
+                        <div class="ui flowing popup bottom left transition hidden">
+                            <div class="ui middle aligned selection list">
+                                <div ref="btnItemUploadRef" class="item">
+                                    <i class="upload icon"></i>
+                                    <div class="content">
+                                        上传文件
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <textarea ref="chatInputRef" value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
-                        <i class="smile link icon"></i>
+                        <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
                 </div>
             </div>
