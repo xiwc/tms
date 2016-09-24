@@ -1068,6 +1068,7 @@
             }
         });
 
+        // 检索结果 | @消息 | 收藏消息 条目点击处理
         $('.list-chat-search-results, .pp-ats-content, .pp-stows-content').on('click', '.item', function(event) {
             event.preventDefault();
             event.stopImmediatePropagation();
@@ -1082,7 +1083,7 @@
                             chatAtId: $item.attr('data-chat-at-id')
                         }, function(data, textStatus, xhr) {
                             if (data.success) {
-
+                                window.poll.reset();
                             } else {
                                 toastr.error(data.data, "错误提示!");
                             }
@@ -1106,6 +1107,8 @@
                             $btnUp = $('<button class="fluid ui button btn-chat-more">加载更多</button>')
                                 .text('加载更多(' + (data.data.totalElements - (data.data.number + 1) * data.data.size) + ')');
                             $btnUp.insertAfter('.chat .comments > h3');
+                        } else {
+                            $btnUp.text('加载更多(' + (data.data.totalElements - (data.data.number + 1) * data.data.size) + ')');
                         }
 
                         $('input:hidden[name="page.number.next"]').val(data.data.number + 1);
@@ -1119,6 +1122,8 @@
                             $btnDown = $('<button class="fluid ui button btn-chat-pre-more">加载更多</button>')
                                 .text('加载更多(' + (data.data.number * data.data.size) + ')');
                             $btnDown.insertBefore('.chat .fm-reply')
+                        } else {
+                            $btnDown.text('加载更多(' + (data.data.number * data.data.size) + ')');
                         }
                         $('input:hidden[name="page.number.pre"]').val(data.data.number - 1);
                     }
