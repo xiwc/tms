@@ -302,8 +302,14 @@ export class ChatDirect {
     }
 
     insertTxt($t, txt) {
-        $t.insertAtCaret(txt);
-        this.content = $t.val();
+
+        if ($t && $t.size() > 0) {
+            $t.insertAtCaret(txt);
+
+            if($t[0] == this.chatInputRef) {
+                this.content = $t.val();
+            }
+        }
     }
 
     deleteHandler(item) {
@@ -330,12 +336,18 @@ export class ChatDirect {
     editHandler(item, editTxtRef) {
         item.isEditing = true;
         _.defer(() => {
-            autosize(editTxtRef);
+
+            if(!item.isInited) {
+                autosize(editTxtRef);
+                this.pasteImgHandler(editTxtRef);
+                item.isInited = true;
+            }
+            
             $(editTxtRef).focus().select();
         });
     }
 
-    eidtKeydownHandler(evt, item) {
+    eidtKeydownHandler(evt, item, txtRef) {
 
         if (this.sending) {
             return false;
@@ -347,6 +359,7 @@ export class ChatDirect {
 
             var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + marked(item.content)).wrap('<div/>').parent().html();
 
+            item.content = $(txtRef).val();
             $.post('/admin/chat/direct/update', {
                 baseUrl: utils.getBaseUrl(),
                 path: wurl('path'),
@@ -383,7 +396,7 @@ export class ChatDirect {
         $(this.userListRef).scrollTo(`a.item[data-id="${this.chatTo}"]`);
     }
 
-    initUploadDropzone(domRef, clickable) {
+    initUploadDropzone(domRef, getInputTargetCb, clickable) {
 
         let _this = this;
 
@@ -393,18 +406,23 @@ export class ChatDirect {
             clickable: !!clickable,
             dictDefaultMessage: '',
             init: function() {
+                this.on("sending", function(file, xhr, formData) {
+                    if (!getInputTargetCb()) {
+                        this.removeAllFiles(true);
+                    }
+                });
                 this.on("success", function(file, data) {
                     if (data.success) {
 
                         $.each(data.data, function(index, item) {
                             if (item.type == 'Image') {
-                                _this.insertTxt($(_this.chatInputRef), '![{name}]({baseURL}{path}{uuidName}) '
+                                _this.insertTxt($(getInputTargetCb()), '![{name}]({baseURL}{path}{uuidName}) '
                                     .replace(/\{name\}/g, item.name)
                                     .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
                                     .replace(/\{path\}/g, item.path)
                                     .replace(/\{uuidName\}/g, item.uuidName));
                             } else {
-                                _this.insertTxt($(_this.chatInputRef), '[{name}]({baseURL}{path}{uuidName}) '
+                                _this.insertTxt($(getInputTargetCb()), '[{name}]({baseURL}{path}{uuidName}) '
                                     .replace(/\{name\}/g, item.name)
                                     .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
                                     .replace(/\{path\}/g, "admin/file/download/")
@@ -427,24 +445,16 @@ export class ChatDirect {
         });
     }
 
-    /**
-     * 当视图被附加到DOM中时被调用
-     */
-    attached() {
-
-        let _this = this;
-
-        autosize(this.chatInputRef);
-
+    pasteImgHandler(target) {
         // clipboard paste image
-        $(this.chatInputRef).pastableTextarea().on('pasteImage', (ev, data) => {
+        $(target).pastableTextarea().on('pasteImage', (ev, data) => {
 
             $.post('/admin/file/base64', {
                 dataURL: data.dataURL,
                 type: data.blob.type
             }, (data, textStatus, xhr) => {
                 if (data.success) {
-                    this.insertTxt($(this.chatInputRef), '![{name}]({baseURL}{path}{uuidName})'
+                    this.insertTxt($(target), '![{name}]({baseURL}{path}{uuidName})'
                         .replace(/\{name\}/g, data.data.name)
                         .replace(/\{baseURL\}/g, utils.getBaseUrl() + '/')
                         .replace(/\{path\}/g, data.data.path)
@@ -454,10 +464,28 @@ export class ChatDirect {
         }).on('pasteImageError', (ev, data) => {
             toastr.error(data.message, '剪贴板粘贴图片错误!');
         });
+    }
 
-        this.initUploadDropzone(this.inputRef, false);
-        // this.initUploadDropzone(this.btnItemUploadRef, true);
-        this.initUploadDropzone($(this.btnItemUploadRef).children().andSelf(), true);
+    /**
+     * 当视图被附加到DOM中时被调用
+     */
+    attached() {
+
+        let _this = this;
+
+        autosize(this.chatInputRef);
+
+        this.pasteImgHandler(this.chatInputRef);
+
+        this.initUploadDropzone(this.inputRef, () => {
+            return this.chatInputRef
+        }, false);
+        this.initUploadDropzone($(this.btnItemUploadRef).children().andSelf(), () => {
+            return this.chatInputRef
+        }, true);
+        // this.initUploadDropzone($(this.commentsRef), () => {
+        //     return $(this.commentsRef).find('.comment > .content > textarea:visible').get(0);
+        // }, false);
 
         _.delay(() => {
             $(this.userListRef).scrollTo(`a.item[data-id="${this.chatTo}"]`);
