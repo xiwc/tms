@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.lhjz.portal.base.BaseController;
+import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
 import com.lhjz.portal.pojo.Enum.FileType;
@@ -151,8 +152,9 @@ public class FileController extends BaseController {
 
 			String originalFileName = file.getOriginalFilename().replaceAll("\\[|\\]|\\{|\\}|\\(|\\)",
 					"\\$");
-			String type = originalFileName
-					.substring(originalFileName.lastIndexOf("."));
+			int lIndex = originalFileName.lastIndexOf(".");
+			String type = lIndex == -1 ? SysConstant.EMPTY : originalFileName
+					.substring(lIndex);
 
 			String uuid = UUID.randomUUID().toString();
 
