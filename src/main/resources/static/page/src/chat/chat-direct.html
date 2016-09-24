@@ -97,7 +97,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea ref="chatInputRef" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
+                        <textarea ref="chatInputRef" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
                         <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
                 </div>
