@@ -71,7 +71,7 @@
                                 <div class="date" data-timeago="${item.createDate}" title="${item.createDate | date}">${item.createDate | timeago}</div>
                             </div>
                             <div show.bind="!item.isEditing" class="text markdown-body" innerhtml.bind="item.contentMd"></div>
-                            <textarea ref="editTxtRef" pastable focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item, editTxtRef)" show.bind="item.isEditing" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea>
+                            <textarea ref="editTxtRef" pastable autosize focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item, editTxtRef)" show.bind="item.isEditing" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea>
                             <div class="actions">
                                 <a if.bind="item.creator.username == loginUser.username" click.delegate="editHandler(item, editTxtRef)" class="tms-edit">编辑</a>
                                 <a if.bind="item.creator.username == loginUser.username" click.delegate="deleteHandler(item)" class="tms-delete">删除</a>
@@ -97,7 +97,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea ref="chatInputRef" pastable value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
+                        <textarea ref="chatInputRef" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
                         <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
                 </div>

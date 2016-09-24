@@ -9,5 +9,6 @@ export function configure(aurelia) {
         'resources/attributes/attr-task',
         'resources/attributes/attr-swipebox',
         'resources/attributes/attr-pastable',
+        'resources/attributes/attr-autosize',
     ]);
 }

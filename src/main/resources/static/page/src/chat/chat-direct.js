@@ -7,10 +7,7 @@ import {
 import {
     default as Clipboard
 } from 'clipboard';
-import {
-    default as autosize
-} from 'autosize';
-// import 'paste';
+import 'common/common-plugin'
 import {
     default as Dropzone
 } from 'dropzone';
@@ -329,13 +326,6 @@ export class ChatDirect {
     editHandler(item, editTxtRef) {
         item.isEditing = true;
         _.defer(() => {
-
-            if (!item.isInited) {
-                autosize(editTxtRef);
-                // this.pasteImgHandler(editTxtRef);
-                item.isInited = true;
-            }
-
             $(editTxtRef).focus().select();
         });
     }
@@ -442,10 +432,6 @@ export class ChatDirect {
      * 当视图被附加到DOM中时被调用
      */
     attached() {
-
-        let _this = this;
-
-        autosize(this.chatInputRef);
 
         this.initUploadDropzone(this.inputRef, () => {
             return this.chatInputRef
