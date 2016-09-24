@@ -395,8 +395,13 @@ export class ChatDirect {
             paramName: 'file',
             clickable: !!clickable,
             dictDefaultMessage: '',
+            maxFilesize: 10,
+            addRemoveLinks: true,
             previewsContainer: this.uploadProgressRef,
             previewTemplate: this.previewTemplateRef.innerHTML,
+            dictCancelUpload: '取消上传',
+            dictCancelUploadConfirmation: '确定要取消上传吗?',
+            dictFileTooBig: '文件过大({{filesize}}M),最大限制:{{maxFilesize}}M',
             init: function() {
                 this.on("sending", function(file, xhr, formData) {
                     if (!getInputTargetCb()) {
