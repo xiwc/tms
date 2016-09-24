@@ -814,6 +814,10 @@
             Utils.openLink('http://220.248.17.34:7991/secure/CreateIssue!default.jspa');
         });
 
+        // --------------------------------------------------------------------------------- var define start
+        var allUserInfo = Utils.getAllUserInfo();
+        // --------------------------------------------------------------------------------- var define end
+        
         // --------------------------------------------------------------------------------- username mapping to name start
         Utils.showMappedTxt('.mapping-user');
         // --------------------------------------------------------------------------------- username mapping to name end
@@ -2646,6 +2650,15 @@
                             var group = data.data;
                             var d = new Date(group.createDate);
                             group.createDateFormat = d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+
+                            var gms = [];
+                            $.each(group.groupMembers, function(index, gm) {
+                                var userInfo = allUserInfo[gm.username];
+                                if(userInfo && userInfo.status == 'true') {
+                                    gms.push(gm);
+                                }
+                            });
+                            group.groupMembers = gms;
                             group.count = group.groupMembers.length;
 
                             $("#userGroupInfoPpTpl").tmpl(data.data).appendTo($pp.empty());

@@ -231,6 +231,16 @@ jQuery(function($) {
                 }
             });
         },
+        getAllUserInfo: function() {
+            var userMap = {};
+            $('input:hidden[data-group="users"]').each(function(index, el) {
+                userMap[$(this).attr('name')] = {
+                    name: $(this).attr('value'),
+                    status: $(this).attr('data-status')
+                };
+            });
+            return userMap;
+        },
         isElementInViewport: function(el) {
 
             //special bonus for those using jQuery
