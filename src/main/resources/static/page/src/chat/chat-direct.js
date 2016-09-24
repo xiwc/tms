@@ -395,6 +395,8 @@ export class ChatDirect {
             paramName: 'file',
             clickable: !!clickable,
             dictDefaultMessage: '',
+            previewsContainer: this.uploadProgressRef,
+            previewTemplate: this.previewTemplateRef.innerHTML,
             init: function() {
                 this.on("sending", function(file, xhr, formData) {
                     if (!getInputTargetCb()) {

@@ -67,6 +67,25 @@
     left: 220px;
     right: 0;
     background-color: white;
+    padding-bottom: 25px;
+}
+
+.tms-chat-direct .ui.basic.segment.tms-msg-input .tms-upload-progress {
+    /* height: 15px; */
+    position: absolute;
+    /* width: 97.5%; */
+    /* top: 5px; */
+    /* bottom: 5px; */
+    bottom: 65px;
+    background-color: #e0e1e2;
+    right: 15px;
+    left: 15px;
+    // min-height: 10px;
+}
+
+.tms-chat-direct .ui.basic.segment.tms-msg-input .tms-upload-progress .dz-preview {
+    display: block!important;
+    width: auto!important;
 }
 
 .tms-chat-direct .ui.comments {

@@ -115,7 +115,8 @@
           {
             "name": "paste",
             "path": "../node_modules/paste.js",
-            "main": "paste"
+            "main": "paste",
+            "deps": ["jquery"]
           }
         ]
       },

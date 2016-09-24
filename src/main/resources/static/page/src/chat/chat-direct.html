@@ -82,7 +82,7 @@
                     </div>
                     <button if.bind="!first" click.delegate="firstMoreHandler()" class="fluid ui button">加载更多(${firstCnt})</button>
                 </div>
-                <div class="ui basic segment tms-msg-input">
+                <div class="ui basic segment tms-msg-input dropzone">
                     <div ref="inputRef" class="ui left action fluid icon input dropzone">
                         <div ref="chatBtnRef" class="ui icon button">
                             <i class="plus icon"></i>
@@ -100,9 +100,23 @@
                         <textarea ref="chatInputRef" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
                         <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
+                    <div ref="uploadProgressRef" class="tms-upload-progress dropzone-previews"></div>
                 </div>
             </div>
             <!-- <div class="tms-col w35"></div> -->
+        </div>
+    </div>
+    <div ref="previewTemplateRef" style="display: none;">
+        <div class="dz-preview dz-file-preview">
+            <div class="dz-details">
+                <div class="dz-filename"><span data-dz-name></span></div>
+                <div class="dz-size" data-dz-size></div>
+                <img data-dz-thumbnail />
+            </div>
+            <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
+            <div class="dz-success-mark"><span>✔</span></div>
+            <div class="dz-error-mark"><span>✘</span></div>
+            <div class="dz-error-message"><span data-dz-errormessage></span></div>
         </div>
     </div>
     <em-confirm-modal em-confirm-modal.ref="emConfirmModal"></em-confirm-modal>
