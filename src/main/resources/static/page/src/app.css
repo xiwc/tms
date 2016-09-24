@@ -31,3 +31,8 @@ body {
     width: 540px!important;
     margin-left: -275px!important;
 }
+
+/* for swipebox */
+#swipebox-overlay {
+    background: rgba(13, 13, 13, 0.5)!important;
+}

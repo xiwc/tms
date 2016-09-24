@@ -6,6 +6,8 @@ export function configure(aurelia) {
 
     aurelia.globalResources([
         'resources/value-converters/vc-common',
-        'resources/attributes/attr-task'
+        'resources/attributes/attr-task',
+        'resources/attributes/attr-swipebox',
+        'resources/attributes/attr-pastable',
     ]);
 }

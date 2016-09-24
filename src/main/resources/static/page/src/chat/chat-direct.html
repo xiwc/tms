@@ -2,6 +2,7 @@
     <require from="./chat-direct.css"></require>
     <require from="./md-github.css"></require>
     <require from="dropzone/dist/basic.css"></require>
+    <require from="swipebox/src/css/swipebox.min.css"></require>
     <require from="resources/elements/em-confirm-modal"></require>
     <div ref="chatContainerRef" class="tms-chat-direct">
         <div class="ui top fixed menu">
@@ -60,7 +61,7 @@
                 <div ref="commentsRef" class="ui basic segment minimal selection list segment comments">
                     <!-- <h3 class="ui dividing header">私聊内容</h3> -->
                     <button if.bind="!last" click.delegate="lastMoreHandler()" class="fluid ui button">加载更多(${lastCnt})</button>
-                    <div repeat.for="item of chats" class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
+                    <div repeat.for="item of chats" swipebox class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
                         <a class="avatar">
                             <i class="circular icon large user"></i>
                         </a>
@@ -70,7 +71,7 @@
                                 <div class="date" data-timeago="${item.createDate}" title="${item.createDate | date}">${item.createDate | timeago}</div>
                             </div>
                             <div show.bind="!item.isEditing" class="text markdown-body" innerhtml.bind="item.contentMd"></div>
-                            <textarea ref="editTxtRef" focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item, editTxtRef)" show.bind="item.isEditing" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea>
+                            <textarea ref="editTxtRef" pastable focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item, editTxtRef)" show.bind="item.isEditing" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea>
                             <div class="actions">
                                 <a if.bind="item.creator.username == loginUser.username" click.delegate="editHandler(item, editTxtRef)" class="tms-edit">编辑</a>
                                 <a if.bind="item.creator.username == loginUser.username" click.delegate="deleteHandler(item)" class="tms-delete">删除</a>
@@ -96,7 +97,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea ref="chatInputRef" value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
+                        <textarea ref="chatInputRef" pastable value.bind="content" keydown.trigger="sendKeydownHandler($event)" rows="1"></textarea>
                         <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
                 </div>
