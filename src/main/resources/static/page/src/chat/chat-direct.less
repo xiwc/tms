@@ -64,7 +64,7 @@
         /* top: 5px; */
         /* bottom: 5px; */
         bottom: 65px;
-        background-color: #e0e1e2;
+        /* background-color: #e0e1e2; */
         right: 15px;
         left: 15px;
         // min-height: 10px;
@@ -72,6 +72,9 @@
     .ui.basic.segment.tms-msg-input .tms-upload-progress .dz-preview {
         display: block!important;
         width: auto!important;
+        background: #e0e1e2;
+        margin: 0;
+        padding: 7px;
     }
     .ui.comments {
         margin-top: 20px;
@@ -125,6 +128,45 @@
         }
         .ui.basic.segment.tms-msg-input {
             left: 0;
+        }
+    }
+}
+
+.textcomplete-dropdown {
+    position: static!important;
+    border: 1px solid #ddd;
+    background-color: white;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-radius: 5px;
+    li {
+        /* border-top: 1px solid #ddd; */
+        padding: 2px 5px;
+    }
+    li:first-child {
+        border-top: none;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+    }
+    li:last-child {
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+    li:hover,
+    .active {
+        background-color: rgb(67, 159, 224);
+    }
+    a:hover {
+        cursor: pointer;
+    }
+    li.textcomplete-item {
+        a {
+            color: black;
+        }
+        &:hover a,
+        &.active a {
+            color: white;
         }
     }
 }

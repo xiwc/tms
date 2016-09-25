@@ -117,6 +117,12 @@
             "path": "../node_modules/paste.js",
             "main": "paste",
             "deps": ["jquery"]
+          },
+          {
+            "name": "hotkeys",
+            "path": "../node_modules/jquery.hotkeys",
+            "main": "jquery.hotkeys",
+            "deps": ["jquery"]
           }
         ]
       },
@@ -149,6 +155,12 @@
           "aurelia-task-queue",
           "aurelia-templating",
           "aurelia-templating-binding",
+          {
+            "name": "textcomplete",
+            "path": "../node_modules/jquery-textcomplete",
+            "main": "dist/jquery.textcomplete",
+            "deps": ["jquery"]
+          },
           "wurl",
           "whatwg-fetch",
           {

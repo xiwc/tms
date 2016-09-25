@@ -4,6 +4,7 @@
     <require from="dropzone/dist/basic.css"></require>
     <require from="swipebox/src/css/swipebox.min.css"></require>
     <require from="resources/elements/em-confirm-modal"></require>
+    <require from="resources/elements/em-hotkeys-modal"></require>
     <div ref="chatContainerRef" class="tms-chat-direct">
         <div class="ui top fixed menu">
             <!-- <div class="item">
@@ -97,7 +98,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea ref="chatInputRef" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
+                        <textarea ref="chatInputRef" token="@" search.bind="getMentions" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
                         <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
                     <div ref="uploadProgressRef" class="tms-upload-progress dropzone-previews"></div>
@@ -120,4 +121,5 @@
         </div>
     </div>
     <em-confirm-modal em-confirm-modal.ref="emConfirmModal"></em-confirm-modal>
+    <em-hotkeys-modal em-hotkeys-modal.ref="emHotkeysModal"></em-hotkeys-modal>
 </template>

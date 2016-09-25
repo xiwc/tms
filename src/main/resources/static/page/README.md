@@ -7,3 +7,7 @@ https://github.com/layerssss/paste.js
 https://github.com/hustcc/timeago.js
 https://www.npmjs.com/package/swipebox
 http://www.jacklmoore.com/autosize/
+https://www.npmjs.com/package/jquery.hotkeys
+https://github.com/yuku-t/jquery-textcomplete
+https://github.com/yuku-t/jquery-textcomplete/blob/master/doc/how_to_use.md
+https://www.npmjs.com/package/aurelia-textcomplete

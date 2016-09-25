@@ -3791,7 +3791,7 @@ K(require)||(w=require,require=void 0);g=requirejs=function(b,c,d,m){var r,q="_"
 0),importScripts(d),b.completeLoad(c)}catch(q){b.onError(F("importscripts","importScripts failed for "+c+" at "+d,q,[c]))}};E&&!w.skipDataMain&&X(document.getElementsByTagName("script"),function(b){C||(C=b.parentNode);if(O=b.getAttribute("data-main"))return u=O,w.baseUrl||-1!==u.indexOf("!")||(I=u.split("/"),u=I.pop(),T=I.length?I.join("/")+"/":"./",w.baseUrl=T),u=u.replace(U,""),g.jsExtRegExp.test(u)&&(u=O),w.deps=w.deps?w.deps.concat(u):[u],!0});define=function(b,c,d){var e,g;"string"!==typeof b&&
 (d=c,c=b,b=null);L(c)||(d=c,c=null);!c&&K(d)&&(c=[],d.length&&(d.toString().replace(qa,ka).replace(ra,function(b,d){c.push(d)}),c=(1===d.length?["require"]:["require","exports","module"]).concat(c)));S&&(e=P||pa())&&(b||(b=e.getAttribute("data-requiremodule")),g=J[e.getAttribute("data-requirecontext")]);g?(g.defQueue.push([b,c,d]),g.defQueueMap[b]=!0):V.push([b,c,d])};define.amd={jQuery:!0};g.exec=function(b){return eval(b)};g(w)}})(this);
 
-requirejs.config({"baseUrl":"src/","paths":{"text":"../scripts/text","marked":"../node_modules\\marked\\lib\\marked","autosize":"../node_modules\\autosize\\dist\\autosize","aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-fetch-client":"../node_modules\\aurelia-fetch-client\\dist\\amd\\aurelia-fetch-client","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","wurl":"../node_modules\\wurl\\wurl","whatwg-fetch":"../node_modules\\whatwg-fetch\\fetch","lodash":"../node_modules\\lodash\\lodash","jquery":"../node_modules\\jquery\\dist\\jquery","jquery.scrollto":"../node_modules\\jquery.scrollto\\jquery.scrollTo","app-bundle":"../scripts/app-bundle","deps-bundle":"../scripts/deps-bundle"},"packages":[{"name":"timeago","location":"../node_modules/timeago.js","main":"dist/timeago.min"},{"name":"clipboard","location":"../node_modules/clipboard","main":"dist/clipboard.min"},{"name":"dropzone","location":"../node_modules/dropzone","main":"dist/dropzone"},{"name":"swipebox","location":"../node_modules/swipebox","main":"src/js/jquery.swipebox.min"},{"name":"paste","location":"../node_modules/paste.js","main":"paste"},{"name":"isomorphic-fetch","location":"../node_modules/isomorphic-fetch","main":"fetch-npm-browserify"},{"name":"tms-semantic-ui","location":"../node_modules/tms-semantic-ui","main":"semantic.min"},{"name":"jquery-format","location":"../node_modules/jquery-format","main":"src/jquery.format"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"}],"stubModules":["text"],"shim":{"swipebox":{"deps":["jquery"]},"paste":{"deps":["jquery"]},"isomorphic-fetch":{"deps":["whatwg-fetch"]},"tms-semantic-ui":{"deps":["jquery"],"exports":"$"},"jquery-format":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["app","environment","main","chat/chat-direct","common/common-plugin","common/common-poll","common/common-utils","resources/config","resources/index","user/user-login","user/user-pwd-reset","user/user-register","resources/attributes/attr-autosize","resources/attributes/attr-pastable","resources/attributes/attr-swipebox","resources/attributes/attr-task","resources/elements/em-confirm-modal","resources/value-converters/vc-common","chat/md-github"],"deps-bundle":["marked","autosize","timeago/dist/timeago.min","clipboard/dist/clipboard.min","dropzone/dist/basic","dropzone/dist/dropzone","swipebox/src/css/swipebox.min","swipebox/src/js/jquery.swipebox.min","paste/paste"]}});
+requirejs.config({"baseUrl":"src/","paths":{"text":"../scripts/text","autosize":"../node_modules\\autosize\\dist\\autosize","marked":"../node_modules\\marked\\lib\\marked","aurelia-binding":"../node_modules\\aurelia-binding\\dist\\amd\\aurelia-binding","aurelia-bootstrapper":"../node_modules\\aurelia-bootstrapper\\dist\\amd\\aurelia-bootstrapper","aurelia-dependency-injection":"../node_modules\\aurelia-dependency-injection\\dist\\amd\\aurelia-dependency-injection","aurelia-event-aggregator":"../node_modules\\aurelia-event-aggregator\\dist\\amd\\aurelia-event-aggregator","aurelia-framework":"../node_modules\\aurelia-framework\\dist\\amd\\aurelia-framework","aurelia-fetch-client":"../node_modules\\aurelia-fetch-client\\dist\\amd\\aurelia-fetch-client","aurelia-history":"../node_modules\\aurelia-history\\dist\\amd\\aurelia-history","aurelia-history-browser":"../node_modules\\aurelia-history-browser\\dist\\amd\\aurelia-history-browser","aurelia-loader":"../node_modules\\aurelia-loader\\dist\\amd\\aurelia-loader","aurelia-loader-default":"../node_modules\\aurelia-loader-default\\dist\\amd\\aurelia-loader-default","aurelia-logging":"../node_modules\\aurelia-logging\\dist\\amd\\aurelia-logging","aurelia-logging-console":"../node_modules\\aurelia-logging-console\\dist\\amd\\aurelia-logging-console","aurelia-metadata":"../node_modules\\aurelia-metadata\\dist\\amd\\aurelia-metadata","aurelia-pal":"../node_modules\\aurelia-pal\\dist\\amd\\aurelia-pal","aurelia-pal-browser":"../node_modules\\aurelia-pal-browser\\dist\\amd\\aurelia-pal-browser","aurelia-path":"../node_modules\\aurelia-path\\dist\\amd\\aurelia-path","aurelia-polyfills":"../node_modules\\aurelia-polyfills\\dist\\amd\\aurelia-polyfills","aurelia-route-recognizer":"../node_modules\\aurelia-route-recognizer\\dist\\amd\\aurelia-route-recognizer","aurelia-router":"../node_modules\\aurelia-router\\dist\\amd\\aurelia-router","aurelia-task-queue":"../node_modules\\aurelia-task-queue\\dist\\amd\\aurelia-task-queue","aurelia-templating":"../node_modules\\aurelia-templating\\dist\\amd\\aurelia-templating","aurelia-templating-binding":"../node_modules\\aurelia-templating-binding\\dist\\amd\\aurelia-templating-binding","wurl":"../node_modules\\wurl\\wurl","whatwg-fetch":"../node_modules\\whatwg-fetch\\fetch","lodash":"../node_modules\\lodash\\lodash","jquery":"../node_modules\\jquery\\dist\\jquery","jquery.scrollto":"../node_modules\\jquery.scrollto\\jquery.scrollTo","app-bundle":"../scripts/app-bundle","deps-bundle":"../scripts/deps-bundle"},"packages":[{"name":"clipboard","location":"../node_modules/clipboard","main":"dist/clipboard.min"},{"name":"timeago","location":"../node_modules/timeago.js","main":"dist/timeago.min"},{"name":"swipebox","location":"../node_modules/swipebox","main":"src/js/jquery.swipebox.min"},{"name":"dropzone","location":"../node_modules/dropzone","main":"dist/dropzone"},{"name":"paste","location":"../node_modules/paste.js","main":"paste"},{"name":"hotkeys","location":"../node_modules/jquery.hotkeys","main":"jquery.hotkeys"},{"name":"textcomplete","location":"../node_modules/jquery-textcomplete","main":"dist/jquery.textcomplete"},{"name":"isomorphic-fetch","location":"../node_modules/isomorphic-fetch","main":"fetch-npm-browserify"},{"name":"tms-semantic-ui","location":"../node_modules/tms-semantic-ui","main":"semantic.min"},{"name":"jquery-format","location":"../node_modules/jquery-format","main":"src/jquery.format"},{"name":"toastr","location":"../node_modules/toastr","main":"toastr"},{"name":"nprogress","location":"../node_modules/nprogress","main":"nprogress"},{"name":"aurelia-templating-resources","location":"../node_modules/aurelia-templating-resources/dist/amd","main":"aurelia-templating-resources"},{"name":"aurelia-templating-router","location":"../node_modules/aurelia-templating-router/dist/amd","main":"aurelia-templating-router"},{"name":"aurelia-testing","location":"../node_modules/aurelia-testing/dist/amd","main":"aurelia-testing"}],"stubModules":["text"],"shim":{"swipebox":{"deps":["jquery"]},"paste":{"deps":["jquery"]},"hotkeys":{"deps":["jquery"]},"textcomplete":{"deps":["jquery"]},"isomorphic-fetch":{"deps":["whatwg-fetch"]},"tms-semantic-ui":{"deps":["jquery"],"exports":"$"},"jquery-format":{"deps":["jquery"],"exports":"$"}},"bundles":{"app-bundle":["app","environment","main","chat/chat-direct","common/common-plugin","common/common-poll","common/common-utils","resources/config","resources/index","user/user-login","user/user-pwd-reset","user/user-register","resources/attributes/attr-autosize","resources/attributes/attr-pastable","resources/attributes/attr-swipebox","resources/attributes/attr-task","resources/elements/em-confirm-modal","resources/elements/em-hotkeys-modal","resources/value-converters/vc-common","chat/md-github"],"deps-bundle":["autosize","marked","clipboard/dist/clipboard.min","timeago/dist/timeago.min","swipebox/src/css/swipebox.min","swipebox/src/js/jquery.swipebox.min","dropzone/dist/basic","dropzone/dist/dropzone","paste/paste","hotkeys/jquery.hotkeys"]}});
 define('text',{});
 define('aurelia-binding',['exports', 'aurelia-logging', 'aurelia-pal', 'aurelia-task-queue', 'aurelia-metadata'], function (exports, _aureliaLogging, _aureliaPal, _aureliaTaskQueue, _aureliaMetadata) {
   'use strict';
@@ -10170,261 +10170,6 @@ define('aurelia-event-aggregator',['exports', 'aurelia-logging'], function (expo
     config.instance(EventAggregator, includeEventsIn(config.aurelia));
   }
 });
-define('aurelia-fetch-client',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.json = json;
-
-  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-    return typeof obj;
-  } : function (obj) {
-    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
-  };
-
-  
-
-  function json(body) {
-    return new Blob([JSON.stringify(body)], { type: 'application/json' });
-  }
-
-  var HttpClientConfiguration = exports.HttpClientConfiguration = function () {
-    function HttpClientConfiguration() {
-      
-
-      this.baseUrl = '';
-      this.defaults = {};
-      this.interceptors = [];
-    }
-
-    HttpClientConfiguration.prototype.withBaseUrl = function withBaseUrl(baseUrl) {
-      this.baseUrl = baseUrl;
-      return this;
-    };
-
-    HttpClientConfiguration.prototype.withDefaults = function withDefaults(defaults) {
-      this.defaults = defaults;
-      return this;
-    };
-
-    HttpClientConfiguration.prototype.withInterceptor = function withInterceptor(interceptor) {
-      this.interceptors.push(interceptor);
-      return this;
-    };
-
-    HttpClientConfiguration.prototype.useStandardConfiguration = function useStandardConfiguration() {
-      var standardConfig = { credentials: 'same-origin' };
-      Object.assign(this.defaults, standardConfig, this.defaults);
-      return this.rejectErrorResponses();
-    };
-
-    HttpClientConfiguration.prototype.rejectErrorResponses = function rejectErrorResponses() {
-      return this.withInterceptor({ response: rejectOnError });
-    };
-
-    return HttpClientConfiguration;
-  }();
-
-  function rejectOnError(response) {
-    if (!response.ok) {
-      throw response;
-    }
-
-    return response;
-  }
-
-  var HttpClient = exports.HttpClient = function () {
-    function HttpClient() {
-      
-
-      this.activeRequestCount = 0;
-      this.isRequesting = false;
-      this.isConfigured = false;
-      this.baseUrl = '';
-      this.defaults = null;
-      this.interceptors = [];
-
-      if (typeof fetch === 'undefined') {
-        throw new Error('HttpClient requires a Fetch API implementation, but the current environment doesn\'t support it. You may need to load a polyfill such as https://github.com/github/fetch.');
-      }
-    }
-
-    HttpClient.prototype.configure = function configure(config) {
-      var _interceptors;
-
-      var normalizedConfig = void 0;
-
-      if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) === 'object') {
-        normalizedConfig = { defaults: config };
-      } else if (typeof config === 'function') {
-        normalizedConfig = new HttpClientConfiguration();
-        var c = config(normalizedConfig);
-        if (HttpClientConfiguration.prototype.isPrototypeOf(c)) {
-          normalizedConfig = c;
-        }
-      } else {
-        throw new Error('invalid config');
-      }
-
-      var defaults = normalizedConfig.defaults;
-      if (defaults && Headers.prototype.isPrototypeOf(defaults.headers)) {
-        throw new Error('Default headers must be a plain object.');
-      }
-
-      this.baseUrl = normalizedConfig.baseUrl;
-      this.defaults = defaults;
-      (_interceptors = this.interceptors).push.apply(_interceptors, normalizedConfig.interceptors || []);
-      this.isConfigured = true;
-
-      return this;
-    };
-
-    HttpClient.prototype.fetch = function (_fetch) {
-      function fetch(_x, _x2) {
-        return _fetch.apply(this, arguments);
-      }
-
-      fetch.toString = function () {
-        return _fetch.toString();
-      };
-
-      return fetch;
-    }(function (input, init) {
-      var _this = this;
-
-      trackRequestStart.call(this);
-
-      var request = Promise.resolve().then(function () {
-        return buildRequest.call(_this, input, init, _this.defaults);
-      });
-      var promise = processRequest(request, this.interceptors).then(function (result) {
-        var response = null;
-
-        if (Response.prototype.isPrototypeOf(result)) {
-          response = result;
-        } else if (Request.prototype.isPrototypeOf(result)) {
-          request = Promise.resolve(result);
-          response = fetch(result);
-        } else {
-          throw new Error('An invalid result was returned by the interceptor chain. Expected a Request or Response instance, but got [' + result + ']');
-        }
-
-        return request.then(function (_request) {
-          return processResponse(response, _this.interceptors, _request);
-        });
-      });
-
-      return trackRequestEndWith.call(this, promise);
-    });
-
-    return HttpClient;
-  }();
-
-  var absoluteUrlRegexp = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
-
-  function trackRequestStart() {
-    this.isRequesting = !! ++this.activeRequestCount;
-  }
-
-  function trackRequestEnd() {
-    this.isRequesting = !! --this.activeRequestCount;
-  }
-
-  function trackRequestEndWith(promise) {
-    var handle = trackRequestEnd.bind(this);
-    promise.then(handle, handle);
-    return promise;
-  }
-
-  function parseHeaderValues(headers) {
-    var parsedHeaders = {};
-    for (var name in headers || {}) {
-      if (headers.hasOwnProperty(name)) {
-        parsedHeaders[name] = typeof headers[name] === 'function' ? headers[name]() : headers[name];
-      }
-    }
-    return parsedHeaders;
-  }
-
-  function buildRequest(input, init) {
-    var defaults = this.defaults || {};
-    var request = void 0;
-    var body = void 0;
-    var requestContentType = void 0;
-
-    var parsedDefaultHeaders = parseHeaderValues(defaults.headers);
-    if (Request.prototype.isPrototypeOf(input)) {
-      request = input;
-      requestContentType = new Headers(request.headers).get('Content-Type');
-    } else {
-      init || (init = {});
-      body = init.body;
-      var bodyObj = body ? { body: body } : null;
-      var requestInit = Object.assign({}, defaults, { headers: {} }, init, bodyObj);
-      requestContentType = new Headers(requestInit.headers).get('Content-Type');
-      request = new Request(getRequestUrl(this.baseUrl, input), requestInit);
-    }
-    if (!requestContentType && new Headers(parsedDefaultHeaders).has('content-type')) {
-      request.headers.set('Content-Type', new Headers(parsedDefaultHeaders).get('content-type'));
-    }
-    setDefaultHeaders(request.headers, parsedDefaultHeaders);
-    if (body && Blob.prototype.isPrototypeOf(body) && body.type) {
-      request.headers.set('Content-Type', body.type);
-    }
-    return request;
-  }
-
-  function getRequestUrl(baseUrl, url) {
-    if (absoluteUrlRegexp.test(url)) {
-      return url;
-    }
-
-    return (baseUrl || '') + url;
-  }
-
-  function setDefaultHeaders(headers, defaultHeaders) {
-    for (var name in defaultHeaders || {}) {
-      if (defaultHeaders.hasOwnProperty(name) && !headers.has(name)) {
-        headers.set(name, defaultHeaders[name]);
-      }
-    }
-  }
-
-  function processRequest(request, interceptors) {
-    return applyInterceptors(request, interceptors, 'request', 'requestError');
-  }
-
-  function processResponse(response, interceptors, request) {
-    return applyInterceptors(response, interceptors, 'response', 'responseError', request);
-  }
-
-  function applyInterceptors(input, interceptors, successName, errorName) {
-    for (var _len = arguments.length, interceptorArgs = Array(_len > 4 ? _len - 4 : 0), _key = 4; _key < _len; _key++) {
-      interceptorArgs[_key - 4] = arguments[_key];
-    }
-
-    return (interceptors || []).reduce(function (chain, interceptor) {
-      var successHandler = interceptor[successName];
-      var errorHandler = interceptor[errorName];
-
-      return chain.then(successHandler && function (value) {
-        return successHandler.call.apply(successHandler, [interceptor, value].concat(interceptorArgs));
-      } || identity, errorHandler && function (reason) {
-        return errorHandler.call.apply(errorHandler, [interceptor, reason].concat(interceptorArgs));
-      } || thrower);
-    }, Promise.resolve(input));
-  }
-
-  function identity(x) {
-    return x;
-  }
-
-  function thrower(x) {
-    throw x;
-  }
-});
 define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-binding', 'aurelia-metadata', 'aurelia-templating', 'aurelia-loader', 'aurelia-task-queue', 'aurelia-path', 'aurelia-pal', 'aurelia-logging'], function (exports, _aureliaDependencyInjection, _aureliaBinding, _aureliaMetadata, _aureliaTemplating, _aureliaLoader, _aureliaTaskQueue, _aureliaPath, _aureliaPal, _aureliaLogging) {
   'use strict';
 
@@ -10973,6 +10718,261 @@ define('aurelia-framework',['exports', 'aurelia-dependency-injection', 'aurelia-
 
   exports.FrameworkConfiguration = FrameworkConfiguration;
   var LogManager = exports.LogManager = TheLogManager;
+});
+define('aurelia-fetch-client',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.json = json;
+
+  var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+    return typeof obj;
+  } : function (obj) {
+    return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  };
+
+  
+
+  function json(body) {
+    return new Blob([JSON.stringify(body)], { type: 'application/json' });
+  }
+
+  var HttpClientConfiguration = exports.HttpClientConfiguration = function () {
+    function HttpClientConfiguration() {
+      
+
+      this.baseUrl = '';
+      this.defaults = {};
+      this.interceptors = [];
+    }
+
+    HttpClientConfiguration.prototype.withBaseUrl = function withBaseUrl(baseUrl) {
+      this.baseUrl = baseUrl;
+      return this;
+    };
+
+    HttpClientConfiguration.prototype.withDefaults = function withDefaults(defaults) {
+      this.defaults = defaults;
+      return this;
+    };
+
+    HttpClientConfiguration.prototype.withInterceptor = function withInterceptor(interceptor) {
+      this.interceptors.push(interceptor);
+      return this;
+    };
+
+    HttpClientConfiguration.prototype.useStandardConfiguration = function useStandardConfiguration() {
+      var standardConfig = { credentials: 'same-origin' };
+      Object.assign(this.defaults, standardConfig, this.defaults);
+      return this.rejectErrorResponses();
+    };
+
+    HttpClientConfiguration.prototype.rejectErrorResponses = function rejectErrorResponses() {
+      return this.withInterceptor({ response: rejectOnError });
+    };
+
+    return HttpClientConfiguration;
+  }();
+
+  function rejectOnError(response) {
+    if (!response.ok) {
+      throw response;
+    }
+
+    return response;
+  }
+
+  var HttpClient = exports.HttpClient = function () {
+    function HttpClient() {
+      
+
+      this.activeRequestCount = 0;
+      this.isRequesting = false;
+      this.isConfigured = false;
+      this.baseUrl = '';
+      this.defaults = null;
+      this.interceptors = [];
+
+      if (typeof fetch === 'undefined') {
+        throw new Error('HttpClient requires a Fetch API implementation, but the current environment doesn\'t support it. You may need to load a polyfill such as https://github.com/github/fetch.');
+      }
+    }
+
+    HttpClient.prototype.configure = function configure(config) {
+      var _interceptors;
+
+      var normalizedConfig = void 0;
+
+      if ((typeof config === 'undefined' ? 'undefined' : _typeof(config)) === 'object') {
+        normalizedConfig = { defaults: config };
+      } else if (typeof config === 'function') {
+        normalizedConfig = new HttpClientConfiguration();
+        var c = config(normalizedConfig);
+        if (HttpClientConfiguration.prototype.isPrototypeOf(c)) {
+          normalizedConfig = c;
+        }
+      } else {
+        throw new Error('invalid config');
+      }
+
+      var defaults = normalizedConfig.defaults;
+      if (defaults && Headers.prototype.isPrototypeOf(defaults.headers)) {
+        throw new Error('Default headers must be a plain object.');
+      }
+
+      this.baseUrl = normalizedConfig.baseUrl;
+      this.defaults = defaults;
+      (_interceptors = this.interceptors).push.apply(_interceptors, normalizedConfig.interceptors || []);
+      this.isConfigured = true;
+
+      return this;
+    };
+
+    HttpClient.prototype.fetch = function (_fetch) {
+      function fetch(_x, _x2) {
+        return _fetch.apply(this, arguments);
+      }
+
+      fetch.toString = function () {
+        return _fetch.toString();
+      };
+
+      return fetch;
+    }(function (input, init) {
+      var _this = this;
+
+      trackRequestStart.call(this);
+
+      var request = Promise.resolve().then(function () {
+        return buildRequest.call(_this, input, init, _this.defaults);
+      });
+      var promise = processRequest(request, this.interceptors).then(function (result) {
+        var response = null;
+
+        if (Response.prototype.isPrototypeOf(result)) {
+          response = result;
+        } else if (Request.prototype.isPrototypeOf(result)) {
+          request = Promise.resolve(result);
+          response = fetch(result);
+        } else {
+          throw new Error('An invalid result was returned by the interceptor chain. Expected a Request or Response instance, but got [' + result + ']');
+        }
+
+        return request.then(function (_request) {
+          return processResponse(response, _this.interceptors, _request);
+        });
+      });
+
+      return trackRequestEndWith.call(this, promise);
+    });
+
+    return HttpClient;
+  }();
+
+  var absoluteUrlRegexp = /^([a-z][a-z0-9+\-.]*:)?\/\//i;
+
+  function trackRequestStart() {
+    this.isRequesting = !! ++this.activeRequestCount;
+  }
+
+  function trackRequestEnd() {
+    this.isRequesting = !! --this.activeRequestCount;
+  }
+
+  function trackRequestEndWith(promise) {
+    var handle = trackRequestEnd.bind(this);
+    promise.then(handle, handle);
+    return promise;
+  }
+
+  function parseHeaderValues(headers) {
+    var parsedHeaders = {};
+    for (var name in headers || {}) {
+      if (headers.hasOwnProperty(name)) {
+        parsedHeaders[name] = typeof headers[name] === 'function' ? headers[name]() : headers[name];
+      }
+    }
+    return parsedHeaders;
+  }
+
+  function buildRequest(input, init) {
+    var defaults = this.defaults || {};
+    var request = void 0;
+    var body = void 0;
+    var requestContentType = void 0;
+
+    var parsedDefaultHeaders = parseHeaderValues(defaults.headers);
+    if (Request.prototype.isPrototypeOf(input)) {
+      request = input;
+      requestContentType = new Headers(request.headers).get('Content-Type');
+    } else {
+      init || (init = {});
+      body = init.body;
+      var bodyObj = body ? { body: body } : null;
+      var requestInit = Object.assign({}, defaults, { headers: {} }, init, bodyObj);
+      requestContentType = new Headers(requestInit.headers).get('Content-Type');
+      request = new Request(getRequestUrl(this.baseUrl, input), requestInit);
+    }
+    if (!requestContentType && new Headers(parsedDefaultHeaders).has('content-type')) {
+      request.headers.set('Content-Type', new Headers(parsedDefaultHeaders).get('content-type'));
+    }
+    setDefaultHeaders(request.headers, parsedDefaultHeaders);
+    if (body && Blob.prototype.isPrototypeOf(body) && body.type) {
+      request.headers.set('Content-Type', body.type);
+    }
+    return request;
+  }
+
+  function getRequestUrl(baseUrl, url) {
+    if (absoluteUrlRegexp.test(url)) {
+      return url;
+    }
+
+    return (baseUrl || '') + url;
+  }
+
+  function setDefaultHeaders(headers, defaultHeaders) {
+    for (var name in defaultHeaders || {}) {
+      if (defaultHeaders.hasOwnProperty(name) && !headers.has(name)) {
+        headers.set(name, defaultHeaders[name]);
+      }
+    }
+  }
+
+  function processRequest(request, interceptors) {
+    return applyInterceptors(request, interceptors, 'request', 'requestError');
+  }
+
+  function processResponse(response, interceptors, request) {
+    return applyInterceptors(response, interceptors, 'response', 'responseError', request);
+  }
+
+  function applyInterceptors(input, interceptors, successName, errorName) {
+    for (var _len = arguments.length, interceptorArgs = Array(_len > 4 ? _len - 4 : 0), _key = 4; _key < _len; _key++) {
+      interceptorArgs[_key - 4] = arguments[_key];
+    }
+
+    return (interceptors || []).reduce(function (chain, interceptor) {
+      var successHandler = interceptor[successName];
+      var errorHandler = interceptor[errorName];
+
+      return chain.then(successHandler && function (value) {
+        return successHandler.call.apply(successHandler, [interceptor, value].concat(interceptorArgs));
+      } || identity, errorHandler && function (reason) {
+        return errorHandler.call.apply(errorHandler, [interceptor, reason].concat(interceptorArgs));
+      } || thrower);
+    }, Promise.resolve(input));
+  }
+
+  function identity(x) {
+    return x;
+  }
+
+  function thrower(x) {
+    throw x;
+  }
 });
 define('aurelia-history',['exports'], function (exports) {
   'use strict';
@@ -11942,87 +11942,6 @@ define('aurelia-logging-console',['exports', 'aurelia-logging'], function (expor
     return ConsoleAppender;
   }();
 });
-define('aurelia-pal',['exports'], function (exports) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.AggregateError = AggregateError;
-  exports.initializePAL = initializePAL;
-  function AggregateError(message, innerError, skipIfAlreadyAggregate) {
-    if (innerError) {
-      if (innerError.innerError && skipIfAlreadyAggregate) {
-        return innerError;
-      }
-
-      var separator = '\n------------------------------------------------\n';
-
-      message += separator + 'Inner Error:\n';
-
-      if (typeof innerError === 'string') {
-        message += 'Message: ' + innerError;
-      } else {
-        if (innerError.message) {
-          message += 'Message: ' + innerError.message;
-        } else {
-          message += 'Unknown Inner Error Type. Displaying Inner Error as JSON:\n ' + JSON.stringify(innerError, null, '  ');
-        }
-
-        if (innerError.stack) {
-          message += '\nInner Error Stack:\n' + innerError.stack;
-          message += '\nEnd Inner Error Stack';
-        }
-      }
-
-      message += separator;
-    }
-
-    var e = new Error(message);
-    if (innerError) {
-      e.innerError = innerError;
-    }
-
-    return e;
-  }
-
-  var FEATURE = exports.FEATURE = {};
-
-  var PLATFORM = exports.PLATFORM = {
-    noop: function noop() {},
-    eachModule: function eachModule() {}
-  };
-
-  PLATFORM.global = function () {
-    if (typeof self !== 'undefined') {
-      return self;
-    }
-
-    if (typeof global !== 'undefined') {
-      return global;
-    }
-
-    return new Function('return this')();
-  }();
-
-  var DOM = exports.DOM = {};
-
-  function initializePAL(callback) {
-    if (typeof Object.getPropertyDescriptor !== 'function') {
-      Object.getPropertyDescriptor = function (subject, name) {
-        var pd = Object.getOwnPropertyDescriptor(subject, name);
-        var proto = Object.getPrototypeOf(subject);
-        while (typeof pd === 'undefined' && proto !== null) {
-          pd = Object.getOwnPropertyDescriptor(proto, name);
-          proto = Object.getPrototypeOf(proto);
-        }
-        return pd;
-      };
-    }
-
-    callback(PLATFORM, FEATURE, DOM);
-  }
-});
 define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
 
@@ -12294,6 +12213,87 @@ define('aurelia-metadata',['exports', 'aurelia-pal'], function (exports, _aureli
 
     return result;
   };
+});
+define('aurelia-pal',['exports'], function (exports) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.AggregateError = AggregateError;
+  exports.initializePAL = initializePAL;
+  function AggregateError(message, innerError, skipIfAlreadyAggregate) {
+    if (innerError) {
+      if (innerError.innerError && skipIfAlreadyAggregate) {
+        return innerError;
+      }
+
+      var separator = '\n------------------------------------------------\n';
+
+      message += separator + 'Inner Error:\n';
+
+      if (typeof innerError === 'string') {
+        message += 'Message: ' + innerError;
+      } else {
+        if (innerError.message) {
+          message += 'Message: ' + innerError.message;
+        } else {
+          message += 'Unknown Inner Error Type. Displaying Inner Error as JSON:\n ' + JSON.stringify(innerError, null, '  ');
+        }
+
+        if (innerError.stack) {
+          message += '\nInner Error Stack:\n' + innerError.stack;
+          message += '\nEnd Inner Error Stack';
+        }
+      }
+
+      message += separator;
+    }
+
+    var e = new Error(message);
+    if (innerError) {
+      e.innerError = innerError;
+    }
+
+    return e;
+  }
+
+  var FEATURE = exports.FEATURE = {};
+
+  var PLATFORM = exports.PLATFORM = {
+    noop: function noop() {},
+    eachModule: function eachModule() {}
+  };
+
+  PLATFORM.global = function () {
+    if (typeof self !== 'undefined') {
+      return self;
+    }
+
+    if (typeof global !== 'undefined') {
+      return global;
+    }
+
+    return new Function('return this')();
+  }();
+
+  var DOM = exports.DOM = {};
+
+  function initializePAL(callback) {
+    if (typeof Object.getPropertyDescriptor !== 'function') {
+      Object.getPropertyDescriptor = function (subject, name) {
+        var pd = Object.getOwnPropertyDescriptor(subject, name);
+        var proto = Object.getPrototypeOf(subject);
+        while (typeof pd === 'undefined' && proto !== null) {
+          pd = Object.getOwnPropertyDescriptor(proto, name);
+          proto = Object.getPrototypeOf(proto);
+        }
+        return pd;
+      };
+    }
+
+    callback(PLATFORM, FEATURE, DOM);
+  }
 });
 define('aurelia-pal-browser',['exports', 'aurelia-pal'], function (exports, _aureliaPal) {
   'use strict';
@@ -13022,481 +13022,6 @@ define('aurelia-path',['exports'], function (exports) {
       }
     }
     return queryParams;
-  }
-});
-define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
-  'use strict';
-
-  Object.defineProperty(exports, "__esModule", {
-    value: true
-  });
-  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
-
-  
-
-  var State = exports.State = function () {
-    function State(charSpec) {
-      
-
-      this.charSpec = charSpec;
-      this.nextStates = [];
-    }
-
-    State.prototype.get = function get(charSpec) {
-      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
-        var _ref;
-
-        if (_isArray) {
-          if (_i >= _iterator.length) break;
-          _ref = _iterator[_i++];
-        } else {
-          _i = _iterator.next();
-          if (_i.done) break;
-          _ref = _i.value;
-        }
-
-        var child = _ref;
-
-        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
-
-        if (isEqual) {
-          return child;
-        }
-      }
-
-      return undefined;
-    };
-
-    State.prototype.put = function put(charSpec) {
-      var state = this.get(charSpec);
-
-      if (state) {
-        return state;
-      }
-
-      state = new State(charSpec);
-
-      this.nextStates.push(state);
-
-      if (charSpec.repeat) {
-        state.nextStates.push(state);
-      }
-
-      return state;
-    };
-
-    State.prototype.match = function match(ch) {
-      var nextStates = this.nextStates;
-      var results = [];
-
-      for (var i = 0, l = nextStates.length; i < l; i++) {
-        var child = nextStates[i];
-        var charSpec = child.charSpec;
-
-        if (charSpec.validChars !== undefined) {
-          if (charSpec.validChars.indexOf(ch) !== -1) {
-            results.push(child);
-          }
-        } else if (charSpec.invalidChars !== undefined) {
-          if (charSpec.invalidChars.indexOf(ch) === -1) {
-            results.push(child);
-          }
-        }
-      }
-
-      return results;
-    };
-
-    return State;
-  }();
-
-  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
-
-  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
-
-  var StaticSegment = exports.StaticSegment = function () {
-    function StaticSegment(string, caseSensitive) {
-      
-
-      this.string = string;
-      this.caseSensitive = caseSensitive;
-    }
-
-    StaticSegment.prototype.eachChar = function eachChar(callback) {
-      var s = this.string;
-      for (var i = 0, ii = s.length; i < ii; ++i) {
-        var ch = s[i];
-        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
-      }
-    };
-
-    StaticSegment.prototype.regex = function regex() {
-      return this.string.replace(escapeRegex, '\\$1');
-    };
-
-    StaticSegment.prototype.generate = function generate() {
-      return this.string;
-    };
-
-    return StaticSegment;
-  }();
-
-  var DynamicSegment = exports.DynamicSegment = function () {
-    function DynamicSegment(name) {
-      
-
-      this.name = name;
-    }
-
-    DynamicSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '/', repeat: true });
-    };
-
-    DynamicSegment.prototype.regex = function regex() {
-      return '([^/]+)';
-    };
-
-    DynamicSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return DynamicSegment;
-  }();
-
-  var StarSegment = exports.StarSegment = function () {
-    function StarSegment(name) {
-      
-
-      this.name = name;
-    }
-
-    StarSegment.prototype.eachChar = function eachChar(callback) {
-      callback({ invalidChars: '', repeat: true });
-    };
-
-    StarSegment.prototype.regex = function regex() {
-      return '(.+)';
-    };
-
-    StarSegment.prototype.generate = function generate(params, consumed) {
-      consumed[this.name] = true;
-      return params[this.name];
-    };
-
-    return StarSegment;
-  }();
-
-  var EpsilonSegment = exports.EpsilonSegment = function () {
-    function EpsilonSegment() {
-      
-    }
-
-    EpsilonSegment.prototype.eachChar = function eachChar() {};
-
-    EpsilonSegment.prototype.regex = function regex() {
-      return '';
-    };
-
-    EpsilonSegment.prototype.generate = function generate() {
-      return '';
-    };
-
-    return EpsilonSegment;
-  }();
-
-  var RouteRecognizer = exports.RouteRecognizer = function () {
-    function RouteRecognizer() {
-      
-
-      this.rootState = new State();
-      this.names = {};
-    }
-
-    RouteRecognizer.prototype.add = function add(route) {
-      var _this = this;
-
-      if (Array.isArray(route)) {
-        route.forEach(function (r) {
-          return _this.add(r);
-        });
-        return undefined;
-      }
-
-      var currentState = this.rootState;
-      var regex = '^';
-      var types = { statics: 0, dynamics: 0, stars: 0 };
-      var names = [];
-      var routeName = route.handler.name;
-      var isEmpty = true;
-      var segments = parse(route.path, names, types, route.caseSensitive);
-
-      for (var i = 0, ii = segments.length; i < ii; i++) {
-        var segment = segments[i];
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        isEmpty = false;
-
-        currentState = currentState.put({ validChars: '/' });
-        regex += '/';
-
-        currentState = addSegment(currentState, segment);
-        regex += segment.regex();
-      }
-
-      if (isEmpty) {
-        currentState = currentState.put({ validChars: '/' });
-        regex += '/';
-      }
-
-      var handlers = [{ handler: route.handler, names: names }];
-
-      if (routeName) {
-        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
-        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
-          this.names[routeNames[_i2]] = {
-            segments: segments,
-            handlers: handlers
-          };
-        }
-      }
-
-      currentState.handlers = handlers;
-      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
-      currentState.types = types;
-
-      return currentState;
-    };
-
-    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      return [].concat(route.handlers);
-    };
-
-    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
-      return !!this.names[name];
-    };
-
-    RouteRecognizer.prototype.generate = function generate(name, params) {
-      var route = this.names[name];
-      if (!route) {
-        throw new Error('There is no route named ' + name);
-      }
-
-      var handler = route.handlers[0].handler;
-      if (handler.generationUsesHref) {
-        return handler.href;
-      }
-
-      var routeParams = Object.assign({}, params);
-      var segments = route.segments;
-      var consumed = {};
-      var output = '';
-
-      for (var i = 0, l = segments.length; i < l; i++) {
-        var segment = segments[i];
-
-        if (segment instanceof EpsilonSegment) {
-          continue;
-        }
-
-        output += '/';
-        var segmentValue = segment.generate(routeParams, consumed);
-        if (segmentValue === null || segmentValue === undefined) {
-          throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
-        }
-
-        output += segmentValue;
-      }
-
-      if (output.charAt(0) !== '/') {
-        output = '/' + output;
-      }
-
-      for (var param in consumed) {
-        delete routeParams[param];
-      }
-
-      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
-      output += queryString ? '?' + queryString : '';
-
-      return output;
-    };
-
-    RouteRecognizer.prototype.recognize = function recognize(path) {
-      var states = [this.rootState];
-      var queryParams = {};
-      var isSlashDropped = false;
-      var normalizedPath = path;
-
-      var queryStart = normalizedPath.indexOf('?');
-      if (queryStart !== -1) {
-        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
-        normalizedPath = normalizedPath.substr(0, queryStart);
-        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
-      }
-
-      normalizedPath = decodeURI(normalizedPath);
-
-      if (normalizedPath.charAt(0) !== '/') {
-        normalizedPath = '/' + normalizedPath;
-      }
-
-      var pathLen = normalizedPath.length;
-      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
-        normalizedPath = normalizedPath.substr(0, pathLen - 1);
-        isSlashDropped = true;
-      }
-
-      for (var i = 0, l = normalizedPath.length; i < l; i++) {
-        states = recognizeChar(states, normalizedPath.charAt(i));
-        if (!states.length) {
-          break;
-        }
-      }
-
-      var solutions = [];
-      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
-        if (states[_i3].handlers) {
-          solutions.push(states[_i3]);
-        }
-      }
-
-      states = sortSolutions(solutions);
-
-      var state = solutions[0];
-      if (state && state.handlers) {
-        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
-          normalizedPath = normalizedPath + '/';
-        }
-
-        return findHandler(state, normalizedPath, queryParams);
-      }
-
-      return undefined;
-    };
-
-    return RouteRecognizer;
-  }();
-
-  var RecognizeResults = function RecognizeResults(queryParams) {
-    
-
-    this.splice = Array.prototype.splice;
-    this.slice = Array.prototype.slice;
-    this.push = Array.prototype.push;
-    this.length = 0;
-    this.queryParams = queryParams || {};
-  };
-
-  function parse(route, names, types, caseSensitive) {
-    var normalizedRoute = route;
-    if (route.charAt(0) === '/') {
-      normalizedRoute = route.substr(1);
-    }
-
-    var results = [];
-
-    var splitRoute = normalizedRoute.split('/');
-    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
-      var segment = splitRoute[i];
-      var match = segment.match(/^:([^\/]+)$/);
-      if (match) {
-        results.push(new DynamicSegment(match[1]));
-        names.push(match[1]);
-        types.dynamics++;
-        continue;
-      }
-
-      match = segment.match(/^\*([^\/]+)$/);
-      if (match) {
-        results.push(new StarSegment(match[1]));
-        names.push(match[1]);
-        types.stars++;
-      } else if (segment === '') {
-        results.push(new EpsilonSegment());
-      } else {
-        results.push(new StaticSegment(segment, caseSensitive));
-        types.statics++;
-      }
-    }
-
-    return results;
-  }
-
-  function sortSolutions(states) {
-    return states.sort(function (a, b) {
-      if (a.types.stars !== b.types.stars) {
-        return a.types.stars - b.types.stars;
-      }
-
-      if (a.types.stars) {
-        if (a.types.statics !== b.types.statics) {
-          return b.types.statics - a.types.statics;
-        }
-        if (a.types.dynamics !== b.types.dynamics) {
-          return b.types.dynamics - a.types.dynamics;
-        }
-      }
-
-      if (a.types.dynamics !== b.types.dynamics) {
-        return a.types.dynamics - b.types.dynamics;
-      }
-
-      if (a.types.statics !== b.types.statics) {
-        return b.types.statics - a.types.statics;
-      }
-
-      return 0;
-    });
-  }
-
-  function recognizeChar(states, ch) {
-    var nextStates = [];
-
-    for (var i = 0, l = states.length; i < l; i++) {
-      var state = states[i];
-      nextStates.push.apply(nextStates, state.match(ch));
-    }
-
-    return nextStates;
-  }
-
-  function findHandler(state, path, queryParams) {
-    var handlers = state.handlers;
-    var regex = state.regex;
-    var captures = path.match(regex);
-    var currentCapture = 1;
-    var result = new RecognizeResults(queryParams);
-
-    for (var i = 0, l = handlers.length; i < l; i++) {
-      var _handler = handlers[i];
-      var _names = _handler.names;
-      var _params = {};
-
-      for (var j = 0, m = _names.length; j < m; j++) {
-        _params[_names[j]] = captures[currentCapture++];
-      }
-
-      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
-    }
-
-    return result;
-  }
-
-  function addSegment(currentState, segment) {
-    var state = currentState;
-    segment.eachChar(function (ch) {
-      state = state.put(ch);
-    });
-
-    return state;
   }
 });
 define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
@@ -14306,6 +13831,481 @@ define('aurelia-polyfills',['aurelia-pal'], function (_aureliaPal) {
     Reflect.ownKeys = function (o) {
       return Object.getOwnPropertyNames(o).concat(Object.getOwnPropertySymbols(o));
     };
+  }
+});
+define('aurelia-route-recognizer',['exports', 'aurelia-path'], function (exports, _aureliaPath) {
+  'use strict';
+
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.RouteRecognizer = exports.EpsilonSegment = exports.StarSegment = exports.DynamicSegment = exports.StaticSegment = exports.State = undefined;
+
+  
+
+  var State = exports.State = function () {
+    function State(charSpec) {
+      
+
+      this.charSpec = charSpec;
+      this.nextStates = [];
+    }
+
+    State.prototype.get = function get(charSpec) {
+      for (var _iterator = this.nextStates, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator]();;) {
+        var _ref;
+
+        if (_isArray) {
+          if (_i >= _iterator.length) break;
+          _ref = _iterator[_i++];
+        } else {
+          _i = _iterator.next();
+          if (_i.done) break;
+          _ref = _i.value;
+        }
+
+        var child = _ref;
+
+        var isEqual = child.charSpec.validChars === charSpec.validChars && child.charSpec.invalidChars === charSpec.invalidChars;
+
+        if (isEqual) {
+          return child;
+        }
+      }
+
+      return undefined;
+    };
+
+    State.prototype.put = function put(charSpec) {
+      var state = this.get(charSpec);
+
+      if (state) {
+        return state;
+      }
+
+      state = new State(charSpec);
+
+      this.nextStates.push(state);
+
+      if (charSpec.repeat) {
+        state.nextStates.push(state);
+      }
+
+      return state;
+    };
+
+    State.prototype.match = function match(ch) {
+      var nextStates = this.nextStates;
+      var results = [];
+
+      for (var i = 0, l = nextStates.length; i < l; i++) {
+        var child = nextStates[i];
+        var charSpec = child.charSpec;
+
+        if (charSpec.validChars !== undefined) {
+          if (charSpec.validChars.indexOf(ch) !== -1) {
+            results.push(child);
+          }
+        } else if (charSpec.invalidChars !== undefined) {
+          if (charSpec.invalidChars.indexOf(ch) === -1) {
+            results.push(child);
+          }
+        }
+      }
+
+      return results;
+    };
+
+    return State;
+  }();
+
+  var specials = ['/', '.', '*', '+', '?', '|', '(', ')', '[', ']', '{', '}', '\\'];
+
+  var escapeRegex = new RegExp('(\\' + specials.join('|\\') + ')', 'g');
+
+  var StaticSegment = exports.StaticSegment = function () {
+    function StaticSegment(string, caseSensitive) {
+      
+
+      this.string = string;
+      this.caseSensitive = caseSensitive;
+    }
+
+    StaticSegment.prototype.eachChar = function eachChar(callback) {
+      var s = this.string;
+      for (var i = 0, ii = s.length; i < ii; ++i) {
+        var ch = s[i];
+        callback({ validChars: this.caseSensitive ? ch : ch.toUpperCase() + ch.toLowerCase() });
+      }
+    };
+
+    StaticSegment.prototype.regex = function regex() {
+      return this.string.replace(escapeRegex, '\\$1');
+    };
+
+    StaticSegment.prototype.generate = function generate() {
+      return this.string;
+    };
+
+    return StaticSegment;
+  }();
+
+  var DynamicSegment = exports.DynamicSegment = function () {
+    function DynamicSegment(name) {
+      
+
+      this.name = name;
+    }
+
+    DynamicSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '/', repeat: true });
+    };
+
+    DynamicSegment.prototype.regex = function regex() {
+      return '([^/]+)';
+    };
+
+    DynamicSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return DynamicSegment;
+  }();
+
+  var StarSegment = exports.StarSegment = function () {
+    function StarSegment(name) {
+      
+
+      this.name = name;
+    }
+
+    StarSegment.prototype.eachChar = function eachChar(callback) {
+      callback({ invalidChars: '', repeat: true });
+    };
+
+    StarSegment.prototype.regex = function regex() {
+      return '(.+)';
+    };
+
+    StarSegment.prototype.generate = function generate(params, consumed) {
+      consumed[this.name] = true;
+      return params[this.name];
+    };
+
+    return StarSegment;
+  }();
+
+  var EpsilonSegment = exports.EpsilonSegment = function () {
+    function EpsilonSegment() {
+      
+    }
+
+    EpsilonSegment.prototype.eachChar = function eachChar() {};
+
+    EpsilonSegment.prototype.regex = function regex() {
+      return '';
+    };
+
+    EpsilonSegment.prototype.generate = function generate() {
+      return '';
+    };
+
+    return EpsilonSegment;
+  }();
+
+  var RouteRecognizer = exports.RouteRecognizer = function () {
+    function RouteRecognizer() {
+      
+
+      this.rootState = new State();
+      this.names = {};
+    }
+
+    RouteRecognizer.prototype.add = function add(route) {
+      var _this = this;
+
+      if (Array.isArray(route)) {
+        route.forEach(function (r) {
+          return _this.add(r);
+        });
+        return undefined;
+      }
+
+      var currentState = this.rootState;
+      var regex = '^';
+      var types = { statics: 0, dynamics: 0, stars: 0 };
+      var names = [];
+      var routeName = route.handler.name;
+      var isEmpty = true;
+      var segments = parse(route.path, names, types, route.caseSensitive);
+
+      for (var i = 0, ii = segments.length; i < ii; i++) {
+        var segment = segments[i];
+        if (segment instanceof EpsilonSegment) {
+          continue;
+        }
+
+        isEmpty = false;
+
+        currentState = currentState.put({ validChars: '/' });
+        regex += '/';
+
+        currentState = addSegment(currentState, segment);
+        regex += segment.regex();
+      }
+
+      if (isEmpty) {
+        currentState = currentState.put({ validChars: '/' });
+        regex += '/';
+      }
+
+      var handlers = [{ handler: route.handler, names: names }];
+
+      if (routeName) {
+        var routeNames = Array.isArray(routeName) ? routeName : [routeName];
+        for (var _i2 = 0; _i2 < routeNames.length; _i2++) {
+          this.names[routeNames[_i2]] = {
+            segments: segments,
+            handlers: handlers
+          };
+        }
+      }
+
+      currentState.handlers = handlers;
+      currentState.regex = new RegExp(regex + '$', route.caseSensitive ? '' : 'i');
+      currentState.types = types;
+
+      return currentState;
+    };
+
+    RouteRecognizer.prototype.handlersFor = function handlersFor(name) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
+
+      return [].concat(route.handlers);
+    };
+
+    RouteRecognizer.prototype.hasRoute = function hasRoute(name) {
+      return !!this.names[name];
+    };
+
+    RouteRecognizer.prototype.generate = function generate(name, params) {
+      var route = this.names[name];
+      if (!route) {
+        throw new Error('There is no route named ' + name);
+      }
+
+      var handler = route.handlers[0].handler;
+      if (handler.generationUsesHref) {
+        return handler.href;
+      }
+
+      var routeParams = Object.assign({}, params);
+      var segments = route.segments;
+      var consumed = {};
+      var output = '';
+
+      for (var i = 0, l = segments.length; i < l; i++) {
+        var segment = segments[i];
+
+        if (segment instanceof EpsilonSegment) {
+          continue;
+        }
+
+        output += '/';
+        var segmentValue = segment.generate(routeParams, consumed);
+        if (segmentValue === null || segmentValue === undefined) {
+          throw new Error('A value is required for route parameter \'' + segment.name + '\' in route \'' + name + '\'.');
+        }
+
+        output += segmentValue;
+      }
+
+      if (output.charAt(0) !== '/') {
+        output = '/' + output;
+      }
+
+      for (var param in consumed) {
+        delete routeParams[param];
+      }
+
+      var queryString = (0, _aureliaPath.buildQueryString)(routeParams);
+      output += queryString ? '?' + queryString : '';
+
+      return output;
+    };
+
+    RouteRecognizer.prototype.recognize = function recognize(path) {
+      var states = [this.rootState];
+      var queryParams = {};
+      var isSlashDropped = false;
+      var normalizedPath = path;
+
+      var queryStart = normalizedPath.indexOf('?');
+      if (queryStart !== -1) {
+        var queryString = normalizedPath.substr(queryStart + 1, normalizedPath.length);
+        normalizedPath = normalizedPath.substr(0, queryStart);
+        queryParams = (0, _aureliaPath.parseQueryString)(queryString);
+      }
+
+      normalizedPath = decodeURI(normalizedPath);
+
+      if (normalizedPath.charAt(0) !== '/') {
+        normalizedPath = '/' + normalizedPath;
+      }
+
+      var pathLen = normalizedPath.length;
+      if (pathLen > 1 && normalizedPath.charAt(pathLen - 1) === '/') {
+        normalizedPath = normalizedPath.substr(0, pathLen - 1);
+        isSlashDropped = true;
+      }
+
+      for (var i = 0, l = normalizedPath.length; i < l; i++) {
+        states = recognizeChar(states, normalizedPath.charAt(i));
+        if (!states.length) {
+          break;
+        }
+      }
+
+      var solutions = [];
+      for (var _i3 = 0, _l = states.length; _i3 < _l; _i3++) {
+        if (states[_i3].handlers) {
+          solutions.push(states[_i3]);
+        }
+      }
+
+      states = sortSolutions(solutions);
+
+      var state = solutions[0];
+      if (state && state.handlers) {
+        if (isSlashDropped && state.regex.source.slice(-5) === '(.+)$') {
+          normalizedPath = normalizedPath + '/';
+        }
+
+        return findHandler(state, normalizedPath, queryParams);
+      }
+
+      return undefined;
+    };
+
+    return RouteRecognizer;
+  }();
+
+  var RecognizeResults = function RecognizeResults(queryParams) {
+    
+
+    this.splice = Array.prototype.splice;
+    this.slice = Array.prototype.slice;
+    this.push = Array.prototype.push;
+    this.length = 0;
+    this.queryParams = queryParams || {};
+  };
+
+  function parse(route, names, types, caseSensitive) {
+    var normalizedRoute = route;
+    if (route.charAt(0) === '/') {
+      normalizedRoute = route.substr(1);
+    }
+
+    var results = [];
+
+    var splitRoute = normalizedRoute.split('/');
+    for (var i = 0, ii = splitRoute.length; i < ii; ++i) {
+      var segment = splitRoute[i];
+      var match = segment.match(/^:([^\/]+)$/);
+      if (match) {
+        results.push(new DynamicSegment(match[1]));
+        names.push(match[1]);
+        types.dynamics++;
+        continue;
+      }
+
+      match = segment.match(/^\*([^\/]+)$/);
+      if (match) {
+        results.push(new StarSegment(match[1]));
+        names.push(match[1]);
+        types.stars++;
+      } else if (segment === '') {
+        results.push(new EpsilonSegment());
+      } else {
+        results.push(new StaticSegment(segment, caseSensitive));
+        types.statics++;
+      }
+    }
+
+    return results;
+  }
+
+  function sortSolutions(states) {
+    return states.sort(function (a, b) {
+      if (a.types.stars !== b.types.stars) {
+        return a.types.stars - b.types.stars;
+      }
+
+      if (a.types.stars) {
+        if (a.types.statics !== b.types.statics) {
+          return b.types.statics - a.types.statics;
+        }
+        if (a.types.dynamics !== b.types.dynamics) {
+          return b.types.dynamics - a.types.dynamics;
+        }
+      }
+
+      if (a.types.dynamics !== b.types.dynamics) {
+        return a.types.dynamics - b.types.dynamics;
+      }
+
+      if (a.types.statics !== b.types.statics) {
+        return b.types.statics - a.types.statics;
+      }
+
+      return 0;
+    });
+  }
+
+  function recognizeChar(states, ch) {
+    var nextStates = [];
+
+    for (var i = 0, l = states.length; i < l; i++) {
+      var state = states[i];
+      nextStates.push.apply(nextStates, state.match(ch));
+    }
+
+    return nextStates;
+  }
+
+  function findHandler(state, path, queryParams) {
+    var handlers = state.handlers;
+    var regex = state.regex;
+    var captures = path.match(regex);
+    var currentCapture = 1;
+    var result = new RecognizeResults(queryParams);
+
+    for (var i = 0, l = handlers.length; i < l; i++) {
+      var _handler = handlers[i];
+      var _names = _handler.names;
+      var _params = {};
+
+      for (var j = 0, m = _names.length; j < m; j++) {
+        _params[_names[j]] = captures[currentCapture++];
+      }
+
+      result.push({ handler: _handler.handler, params: _params, isDynamic: !!_names.length });
+    }
+
+    return result;
+  }
+
+  function addSegment(currentState, segment) {
+    var state = currentState;
+    segment.eachChar(function (ch) {
+      state = state.put(ch);
+    });
+
+    return state;
   }
 });
 define('aurelia-router',['exports', 'aurelia-logging', 'aurelia-route-recognizer', 'aurelia-dependency-injection', 'aurelia-history', 'aurelia-event-aggregator'], function (exports, _aureliaLogging, _aureliaRouteRecognizer, _aureliaDependencyInjection, _aureliaHistory, _aureliaEventAggregator) {
@@ -21737,6 +21737,1491 @@ define('aurelia-templating-binding',['exports', 'aurelia-logging', 'aurelia-bind
     config.container.registerAlias(_aureliaTemplating.BindingLanguage, TemplatingBindingLanguage);
   }
 });
+(function (factory) {
+  if (typeof define === 'function' && define.amd) {
+    // AMD. Register as an anonymous module.
+    define('textcomplete/dist/jquery.textcomplete',['jquery'], factory);
+  } else if (typeof module === "object" && module.exports) {
+    var $ = require('jquery');
+    module.exports = factory($);
+  } else {
+    // Browser globals
+    factory(jQuery);
+  }
+}(function (jQuery) {
+
+/*!
+ * jQuery.textcomplete
+ *
+ * Repository: https://github.com/yuku-t/jquery-textcomplete
+ * License:    MIT (https://github.com/yuku-t/jquery-textcomplete/blob/master/LICENSE)
+ * Author:     Yuku Takahashi
+ */
+
+if (typeof jQuery === 'undefined') {
+  throw new Error('jQuery.textcomplete requires jQuery');
+}
+
++function ($) {
+  'use strict';
+
+  var warn = function (message) {
+    if (console.warn) { console.warn(message); }
+  };
+
+  var id = 1;
+
+  $.fn.textcomplete = function (strategies, option) {
+    var args = Array.prototype.slice.call(arguments);
+    return this.each(function () {
+      var self = this;
+      var $this = $(this);
+      var completer = $this.data('textComplete');
+      if (!completer) {
+        option || (option = {});
+        option._oid = id++;  // unique object id
+        completer = new $.fn.textcomplete.Completer(this, option);
+        $this.data('textComplete', completer);
+      }
+      if (typeof strategies === 'string') {
+        if (!completer) return;
+        args.shift()
+        completer[strategies].apply(completer, args);
+        if (strategies === 'destroy') {
+          $this.removeData('textComplete');
+        }
+      } else {
+        // For backward compatibility.
+        // TODO: Remove at v0.4
+        $.each(strategies, function (obj) {
+          $.each(['header', 'footer', 'placement', 'maxCount'], function (name) {
+            if (obj[name]) {
+              completer.option[name] = obj[name];
+              warn(name + 'as a strategy param is deprecated. Use option.');
+              delete obj[name];
+            }
+          });
+        });
+        completer.register($.fn.textcomplete.Strategy.parse(strategies, {
+          el: self,
+          $el: $this
+        }));
+      }
+    });
+  };
+
+}(jQuery);
+
++function ($) {
+  'use strict';
+
+  // Exclusive execution control utility.
+  //
+  // func - The function to be locked. It is executed with a function named
+  //        `free` as the first argument. Once it is called, additional
+  //        execution are ignored until the free is invoked. Then the last
+  //        ignored execution will be replayed immediately.
+  //
+  // Examples
+  //
+  //   var lockedFunc = lock(function (free) {
+  //     setTimeout(function { free(); }, 1000); // It will be free in 1 sec.
+  //     console.log('Hello, world');
+  //   });
+  //   lockedFunc();  // => 'Hello, world'
+  //   lockedFunc();  // none
+  //   lockedFunc();  // none
+  //   // 1 sec past then
+  //   // => 'Hello, world'
+  //   lockedFunc();  // => 'Hello, world'
+  //   lockedFunc();  // none
+  //
+  // Returns a wrapped function.
+  var lock = function (func) {
+    var locked, queuedArgsToReplay;
+
+    return function () {
+      // Convert arguments into a real array.
+      var args = Array.prototype.slice.call(arguments);
+      if (locked) {
+        // Keep a copy of this argument list to replay later.
+        // OK to overwrite a previous value because we only replay
+        // the last one.
+        queuedArgsToReplay = args;
+        return;
+      }
+      locked = true;
+      var self = this;
+      args.unshift(function replayOrFree() {
+        if (queuedArgsToReplay) {
+          // Other request(s) arrived while we were locked.
+          // Now that the lock is becoming available, replay
+          // the latest such request, then call back here to
+          // unlock (or replay another request that arrived
+          // while this one was in flight).
+          var replayArgs = queuedArgsToReplay;
+          queuedArgsToReplay = undefined;
+          replayArgs.unshift(replayOrFree);
+          func.apply(self, replayArgs);
+        } else {
+          locked = false;
+        }
+      });
+      func.apply(this, args);
+    };
+  };
+
+  var isString = function (obj) {
+    return Object.prototype.toString.call(obj) === '[object String]';
+  };
+
+  var uniqueId = 0;
+
+  function Completer(element, option) {
+    this.$el        = $(element);
+    this.id         = 'textcomplete' + uniqueId++;
+    this.strategies = [];
+    this.views      = [];
+    this.option     = $.extend({}, Completer.defaults, option);
+
+    if (!this.$el.is('input[type=text]') && !this.$el.is('input[type=search]') && !this.$el.is('textarea') && !element.isContentEditable && element.contentEditable != 'true') {
+      throw new Error('textcomplete must be called on a Textarea or a ContentEditable.');
+    }
+
+    // use ownerDocument to fix iframe / IE issues
+    if (element === element.ownerDocument.activeElement) {
+      // element has already been focused. Initialize view objects immediately.
+      this.initialize()
+    } else {
+      // Initialize view objects lazily.
+      var self = this;
+      this.$el.one('focus.' + this.id, function () { self.initialize(); });
+
+      // Special handling for CKEditor: lazy init on instance load
+      if ((!this.option.adapter || this.option.adapter == 'CKEditor') && typeof CKEDITOR != 'undefined' && (this.$el.is('textarea'))) {
+        CKEDITOR.on("instanceReady", function(event) {
+          event.editor.once("focus", function(event2) {
+            // replace the element with the Iframe element and flag it as CKEditor
+            self.$el = $(event.editor.editable().$);
+            if (!self.option.adapter) {
+              self.option.adapter = $.fn.textcomplete['CKEditor'];
+              self.option.ckeditor_instance = event.editor;
+            }
+            self.initialize();
+          });
+        });
+      }
+    }
+  }
+
+  Completer.defaults = {
+    appendTo: 'body',
+    className: '',  // deprecated option
+    dropdownClassName: 'dropdown-menu textcomplete-dropdown',
+    maxCount: 10,
+    zIndex: '100',
+    rightEdgeOffset: 30
+  };
+
+  $.extend(Completer.prototype, {
+    // Public properties
+    // -----------------
+
+    id:         null,
+    option:     null,
+    strategies: null,
+    adapter:    null,
+    dropdown:   null,
+    $el:        null,
+    $iframe:    null,
+
+    // Public methods
+    // --------------
+
+    initialize: function () {
+      var element = this.$el.get(0);
+      
+      // check if we are in an iframe
+      // we need to alter positioning logic if using an iframe
+      if (this.$el.prop('ownerDocument') !== document && window.frames.length) {
+        for (var iframeIndex = 0; iframeIndex < window.frames.length; iframeIndex++) {
+          if (this.$el.prop('ownerDocument') === window.frames[iframeIndex].document) {
+            this.$iframe = $(window.frames[iframeIndex].frameElement);
+            break;
+          }
+        }
+      }
+      
+      
+      // Initialize view objects.
+      this.dropdown = new $.fn.textcomplete.Dropdown(element, this, this.option);
+      var Adapter, viewName;
+      if (this.option.adapter) {
+        Adapter = this.option.adapter;
+      } else {
+        if (this.$el.is('textarea') || this.$el.is('input[type=text]') || this.$el.is('input[type=search]')) {
+          viewName = typeof element.selectionEnd === 'number' ? 'Textarea' : 'IETextarea';
+        } else {
+          viewName = 'ContentEditable';
+        }
+        Adapter = $.fn.textcomplete[viewName];
+      }
+      this.adapter = new Adapter(element, this, this.option);
+    },
+
+    destroy: function () {
+      this.$el.off('.' + this.id);
+      if (this.adapter) {
+        this.adapter.destroy();
+      }
+      if (this.dropdown) {
+        this.dropdown.destroy();
+      }
+      this.$el = this.adapter = this.dropdown = null;
+    },
+
+    deactivate: function () {
+      if (this.dropdown) {
+        this.dropdown.deactivate();
+      }
+    },
+
+    // Invoke textcomplete.
+    trigger: function (text, skipUnchangedTerm) {
+      if (!this.dropdown) { this.initialize(); }
+      text != null || (text = this.adapter.getTextFromHeadToCaret());
+      var searchQuery = this._extractSearchQuery(text);
+      if (searchQuery.length) {
+        var term = searchQuery[1];
+        // Ignore shift-key, ctrl-key and so on.
+        if (skipUnchangedTerm && this._term === term && term !== "") { return; }
+        this._term = term;
+        this._search.apply(this, searchQuery);
+      } else {
+        this._term = null;
+        this.dropdown.deactivate();
+      }
+    },
+
+    fire: function (eventName) {
+      var args = Array.prototype.slice.call(arguments, 1);
+      this.$el.trigger(eventName, args);
+      return this;
+    },
+
+    register: function (strategies) {
+      Array.prototype.push.apply(this.strategies, strategies);
+    },
+
+    // Insert the value into adapter view. It is called when the dropdown is clicked
+    // or selected.
+    //
+    // value    - The selected element of the array callbacked from search func.
+    // strategy - The Strategy object.
+    // e        - Click or keydown event object.
+    select: function (value, strategy, e) {
+      this._term = null;
+      this.adapter.select(value, strategy, e);
+      this.fire('change').fire('textComplete:select', value, strategy);
+      this.adapter.focus();
+    },
+
+    // Private properties
+    // ------------------
+
+    _clearAtNext: true,
+    _term:        null,
+
+    // Private methods
+    // ---------------
+
+    // Parse the given text and extract the first matching strategy.
+    //
+    // Returns an array including the strategy, the query term and the match
+    // object if the text matches an strategy; otherwise returns an empty array.
+    _extractSearchQuery: function (text) {
+      for (var i = 0; i < this.strategies.length; i++) {
+        var strategy = this.strategies[i];
+        var context = strategy.context(text);
+        if (context || context === '') {
+          var matchRegexp = $.isFunction(strategy.match) ? strategy.match(text) : strategy.match;
+          if (isString(context)) { text = context; }
+          var match = text.match(matchRegexp);
+          if (match) { return [strategy, match[strategy.index], match]; }
+        }
+      }
+      return []
+    },
+
+    // Call the search method of selected strategy..
+    _search: lock(function (free, strategy, term, match) {
+      var self = this;
+      strategy.search(term, function (data, stillSearching) {
+        if (!self.dropdown.shown) {
+          self.dropdown.activate();
+        }
+        if (self._clearAtNext) {
+          // The first callback in the current lock.
+          self.dropdown.clear();
+          self._clearAtNext = false;
+        }
+        self.dropdown.setPosition(self.adapter.getCaretPosition());
+        self.dropdown.render(self._zip(data, strategy, term));
+        if (!stillSearching) {
+          // The last callback in the current lock.
+          free();
+          self._clearAtNext = true; // Call dropdown.clear at the next time.
+        }
+      }, match);
+    }),
+
+    // Build a parameter for Dropdown#render.
+    //
+    // Examples
+    //
+    //  this._zip(['a', 'b'], 's');
+    //  //=> [{ value: 'a', strategy: 's' }, { value: 'b', strategy: 's' }]
+    _zip: function (data, strategy, term) {
+      return $.map(data, function (value) {
+        return { value: value, strategy: strategy, term: term };
+      });
+    }
+  });
+
+  $.fn.textcomplete.Completer = Completer;
+}(jQuery);
+
++function ($) {
+  'use strict';
+
+  var $window = $(window);
+
+  var include = function (zippedData, datum) {
+    var i, elem;
+    var idProperty = datum.strategy.idProperty
+    for (i = 0; i < zippedData.length; i++) {
+      elem = zippedData[i];
+      if (elem.strategy !== datum.strategy) continue;
+      if (idProperty) {
+        if (elem.value[idProperty] === datum.value[idProperty]) return true;
+      } else {
+        if (elem.value === datum.value) return true;
+      }
+    }
+    return false;
+  };
+
+  var dropdownViews = {};
+  $(document).on('click', function (e) {
+    var id = e.originalEvent && e.originalEvent.keepTextCompleteDropdown;
+    $.each(dropdownViews, function (key, view) {
+      if (key !== id) { view.deactivate(); }
+    });
+  });
+
+  var commands = {
+    SKIP_DEFAULT: 0,
+    KEY_UP: 1,
+    KEY_DOWN: 2,
+    KEY_ENTER: 3,
+    KEY_PAGEUP: 4,
+    KEY_PAGEDOWN: 5,
+    KEY_ESCAPE: 6
+  };
+
+  // Dropdown view
+  // =============
+
+  // Construct Dropdown object.
+  //
+  // element - Textarea or contenteditable element.
+  function Dropdown(element, completer, option) {
+    this.$el       = Dropdown.createElement(option);
+    this.completer = completer;
+    this.id        = completer.id + 'dropdown';
+    this._data     = []; // zipped data.
+    this.$inputEl  = $(element);
+    this.option    = option;
+
+    // Override setPosition method.
+    if (option.listPosition) { this.setPosition = option.listPosition; }
+    if (option.height) { this.$el.height(option.height); }
+    var self = this;
+    $.each(['maxCount', 'placement', 'footer', 'header', 'noResultsMessage', 'className'], function (_i, name) {
+      if (option[name] != null) { self[name] = option[name]; }
+    });
+    this._bindEvents(element);
+    dropdownViews[this.id] = this;
+  }
+
+  $.extend(Dropdown, {
+    // Class methods
+    // -------------
+
+    createElement: function (option) {
+      var $parent = option.appendTo;
+      if (!($parent instanceof $)) { $parent = $($parent); }
+      var $el = $('<ul></ul>')
+        .addClass(option.dropdownClassName)
+        .attr('id', 'textcomplete-dropdown-' + option._oid)
+        .css({
+          display: 'none',
+          left: 0,
+          position: 'absolute',
+          zIndex: option.zIndex
+        })
+        .appendTo($parent);
+      return $el;
+    }
+  });
+
+  $.extend(Dropdown.prototype, {
+    // Public properties
+    // -----------------
+
+    $el:       null,  // jQuery object of ul.dropdown-menu element.
+    $inputEl:  null,  // jQuery object of target textarea.
+    completer: null,
+    footer:    null,
+    header:    null,
+    id:        null,
+    maxCount:  null,
+    placement: '',
+    shown:     false,
+    data:      [],     // Shown zipped data.
+    className: '',
+
+    // Public methods
+    // --------------
+
+    destroy: function () {
+      // Don't remove $el because it may be shared by several textcompletes.
+      this.deactivate();
+
+      this.$el.off('.' + this.id);
+      this.$inputEl.off('.' + this.id);
+      this.clear();
+      this.$el.remove();
+      this.$el = this.$inputEl = this.completer = null;
+      delete dropdownViews[this.id]
+    },
+
+    render: function (zippedData) {
+      var contentsHtml = this._buildContents(zippedData);
+      var unzippedData = $.map(zippedData, function (d) { return d.value; });
+      if (zippedData.length) {
+        var strategy = zippedData[0].strategy;
+        if (strategy.id) {
+          this.$el.attr('data-strategy', strategy.id);
+        } else {
+          this.$el.removeAttr('data-strategy');
+        }
+        this._renderHeader(unzippedData);
+        this._renderFooter(unzippedData);
+        if (contentsHtml) {
+          this._renderContents(contentsHtml);
+          this._fitToBottom();
+          this._fitToRight();
+          this._activateIndexedItem();
+        }
+        this._setScroll();
+      } else if (this.noResultsMessage) {
+        this._renderNoResultsMessage(unzippedData);
+      } else if (this.shown) {
+        this.deactivate();
+      }
+    },
+
+    setPosition: function (pos) {
+      // Make the dropdown fixed if the input is also fixed
+      // This can't be done during init, as textcomplete may be used on multiple elements on the same page
+      // Because the same dropdown is reused behind the scenes, we need to recheck every time the dropdown is showed
+      var position = 'absolute';
+      // Check if input or one of its parents has positioning we need to care about
+      this.$inputEl.add(this.$inputEl.parents()).each(function() {
+        if($(this).css('position') === 'absolute') // The element has absolute positioning, so it's all OK
+          return false;
+        if($(this).css('position') === 'fixed') {
+          pos.top -= $window.scrollTop();
+          pos.left -= $window.scrollLeft();
+          position = 'fixed';
+          return false;
+        }
+      });
+      this.$el.css(this._applyPlacement(pos));
+      this.$el.css({ position: position }); // Update positioning
+
+      return this;
+    },
+
+    clear: function () {
+      this.$el.html('');
+      this.data = [];
+      this._index = 0;
+      this._$header = this._$footer = this._$noResultsMessage = null;
+    },
+
+    activate: function () {
+      if (!this.shown) {
+        this.clear();
+        this.$el.show();
+        if (this.className) { this.$el.addClass(this.className); }
+        this.completer.fire('textComplete:show');
+        this.shown = true;
+      }
+      return this;
+    },
+
+    deactivate: function () {
+      if (this.shown) {
+        this.$el.hide();
+        if (this.className) { this.$el.removeClass(this.className); }
+        this.completer.fire('textComplete:hide');
+        this.shown = false;
+      }
+      return this;
+    },
+
+    isUp: function (e) {
+      return e.keyCode === 38 || (e.ctrlKey && e.keyCode === 80);  // UP, Ctrl-P
+    },
+
+    isDown: function (e) {
+      return e.keyCode === 40 || (e.ctrlKey && e.keyCode === 78);  // DOWN, Ctrl-N
+    },
+
+    isEnter: function (e) {
+      var modifiers = e.ctrlKey || e.altKey || e.metaKey || e.shiftKey;
+      return !modifiers && (e.keyCode === 13 || e.keyCode === 9 || (this.option.completeOnSpace === true && e.keyCode === 32))  // ENTER, TAB
+    },
+
+    isPageup: function (e) {
+      return e.keyCode === 33;  // PAGEUP
+    },
+
+    isPagedown: function (e) {
+      return e.keyCode === 34;  // PAGEDOWN
+    },
+
+    isEscape: function (e) {
+      return e.keyCode === 27;  // ESCAPE
+    },
+
+    // Private properties
+    // ------------------
+
+    _data:    null,  // Currently shown zipped data.
+    _index:   null,
+    _$header: null,
+    _$noResultsMessage: null,
+    _$footer: null,
+
+    // Private methods
+    // ---------------
+
+    _bindEvents: function () {
+      this.$el.on('mousedown.' + this.id, '.textcomplete-item', $.proxy(this._onClick, this));
+      this.$el.on('touchstart.' + this.id, '.textcomplete-item', $.proxy(this._onClick, this));
+      this.$el.on('mouseover.' + this.id, '.textcomplete-item', $.proxy(this._onMouseover, this));
+      this.$inputEl.on('keydown.' + this.id, $.proxy(this._onKeydown, this));
+    },
+
+    _onClick: function (e) {
+      var $el = $(e.target);
+      e.preventDefault();
+      e.originalEvent.keepTextCompleteDropdown = this.id;
+      if (!$el.hasClass('textcomplete-item')) {
+        $el = $el.closest('.textcomplete-item');
+      }
+      var datum = this.data[parseInt($el.data('index'), 10)];
+      this.completer.select(datum.value, datum.strategy, e);
+      var self = this;
+      // Deactive at next tick to allow other event handlers to know whether
+      // the dropdown has been shown or not.
+      setTimeout(function () {
+        self.deactivate();
+        if (e.type === 'touchstart') {
+          self.$inputEl.focus();
+        }
+      }, 0);
+    },
+
+    // Activate hovered item.
+    _onMouseover: function (e) {
+      var $el = $(e.target);
+      e.preventDefault();
+      if (!$el.hasClass('textcomplete-item')) {
+        $el = $el.closest('.textcomplete-item');
+      }
+      this._index = parseInt($el.data('index'), 10);
+      this._activateIndexedItem();
+    },
+
+    _onKeydown: function (e) {
+      if (!this.shown) { return; }
+
+      var command;
+
+      if ($.isFunction(this.option.onKeydown)) {
+        command = this.option.onKeydown(e, commands);
+      }
+
+      if (command == null) {
+        command = this._defaultKeydown(e);
+      }
+
+      switch (command) {
+        case commands.KEY_UP:
+          e.preventDefault();
+          this._up();
+          break;
+        case commands.KEY_DOWN:
+          e.preventDefault();
+          this._down();
+          break;
+        case commands.KEY_ENTER:
+          e.preventDefault();
+          this._enter(e);
+          break;
+        case commands.KEY_PAGEUP:
+          e.preventDefault();
+          this._pageup();
+          break;
+        case commands.KEY_PAGEDOWN:
+          e.preventDefault();
+          this._pagedown();
+          break;
+        case commands.KEY_ESCAPE:
+          e.preventDefault();
+          this.deactivate();
+          break;
+      }
+    },
+
+    _defaultKeydown: function (e) {
+      if (this.isUp(e)) {
+        return commands.KEY_UP;
+      } else if (this.isDown(e)) {
+        return commands.KEY_DOWN;
+      } else if (this.isEnter(e)) {
+        return commands.KEY_ENTER;
+      } else if (this.isPageup(e)) {
+        return commands.KEY_PAGEUP;
+      } else if (this.isPagedown(e)) {
+        return commands.KEY_PAGEDOWN;
+      } else if (this.isEscape(e)) {
+        return commands.KEY_ESCAPE;
+      }
+    },
+
+    _up: function () {
+      if (this._index === 0) {
+        this._index = this.data.length - 1;
+      } else {
+        this._index -= 1;
+      }
+      this._activateIndexedItem();
+      this._setScroll();
+    },
+
+    _down: function () {
+      if (this._index === this.data.length - 1) {
+        this._index = 0;
+      } else {
+        this._index += 1;
+      }
+      this._activateIndexedItem();
+      this._setScroll();
+    },
+
+    _enter: function (e) {
+      var datum = this.data[parseInt(this._getActiveElement().data('index'), 10)];
+      this.completer.select(datum.value, datum.strategy, e);
+      this.deactivate();
+    },
+
+    _pageup: function () {
+      var target = 0;
+      var threshold = this._getActiveElement().position().top - this.$el.innerHeight();
+      this.$el.children().each(function (i) {
+        if ($(this).position().top + $(this).outerHeight() > threshold) {
+          target = i;
+          return false;
+        }
+      });
+      this._index = target;
+      this._activateIndexedItem();
+      this._setScroll();
+    },
+
+    _pagedown: function () {
+      var target = this.data.length - 1;
+      var threshold = this._getActiveElement().position().top + this.$el.innerHeight();
+      this.$el.children().each(function (i) {
+        if ($(this).position().top > threshold) {
+          target = i;
+          return false
+        }
+      });
+      this._index = target;
+      this._activateIndexedItem();
+      this._setScroll();
+    },
+
+    _activateIndexedItem: function () {
+      this.$el.find('.textcomplete-item.active').removeClass('active');
+      this._getActiveElement().addClass('active');
+    },
+
+    _getActiveElement: function () {
+      return this.$el.children('.textcomplete-item:nth(' + this._index + ')');
+    },
+
+    _setScroll: function () {
+      var $activeEl = this._getActiveElement();
+      var itemTop = $activeEl.position().top;
+      var itemHeight = $activeEl.outerHeight();
+      var visibleHeight = this.$el.innerHeight();
+      var visibleTop = this.$el.scrollTop();
+      if (this._index === 0 || this._index == this.data.length - 1 || itemTop < 0) {
+        this.$el.scrollTop(itemTop + visibleTop);
+      } else if (itemTop + itemHeight > visibleHeight) {
+        this.$el.scrollTop(itemTop + itemHeight + visibleTop - visibleHeight);
+      }
+    },
+
+    _buildContents: function (zippedData) {
+      var datum, i, index;
+      var html = '';
+      for (i = 0; i < zippedData.length; i++) {
+        if (this.data.length === this.maxCount) break;
+        datum = zippedData[i];
+        if (include(this.data, datum)) { continue; }
+        index = this.data.length;
+        this.data.push(datum);
+        html += '<li class="textcomplete-item" data-index="' + index + '"><a>';
+        html +=   datum.strategy.template(datum.value, datum.term);
+        html += '</a></li>';
+      }
+      return html;
+    },
+
+    _renderHeader: function (unzippedData) {
+      if (this.header) {
+        if (!this._$header) {
+          this._$header = $('<li class="textcomplete-header"></li>').prependTo(this.$el);
+        }
+        var html = $.isFunction(this.header) ? this.header(unzippedData) : this.header;
+        this._$header.html(html);
+      }
+    },
+
+    _renderFooter: function (unzippedData) {
+      if (this.footer) {
+        if (!this._$footer) {
+          this._$footer = $('<li class="textcomplete-footer"></li>').appendTo(this.$el);
+        }
+        var html = $.isFunction(this.footer) ? this.footer(unzippedData) : this.footer;
+        this._$footer.html(html);
+      }
+    },
+
+    _renderNoResultsMessage: function (unzippedData) {
+      if (this.noResultsMessage) {
+        if (!this._$noResultsMessage) {
+          this._$noResultsMessage = $('<li class="textcomplete-no-results-message"></li>').appendTo(this.$el);
+        }
+        var html = $.isFunction(this.noResultsMessage) ? this.noResultsMessage(unzippedData) : this.noResultsMessage;
+        this._$noResultsMessage.html(html);
+      }
+    },
+
+    _renderContents: function (html) {
+      if (this._$footer) {
+        this._$footer.before(html);
+      } else {
+        this.$el.append(html);
+      }
+    },
+
+    _fitToBottom: function() {
+      var windowScrollBottom = $window.scrollTop() + $window.height();
+      var height = this.$el.height();
+      if ((this.$el.position().top + height) > windowScrollBottom) {
+        // only do this if we are not in an iframe
+        if (!this.completer.$iframe) {
+          this.$el.offset({top: windowScrollBottom - height});
+        }
+      }
+    },
+
+    _fitToRight: function() {
+      // We don't know how wide our content is until the browser positions us, and at that point it clips us
+      // to the document width so we don't know if we would have overrun it. As a heuristic to avoid that clipping
+      // (which makes our elements wrap onto the next line and corrupt the next item), if we're close to the right
+      // edge, move left. We don't know how far to move left, so just keep nudging a bit.
+      var tolerance = this.option.rightEdgeOffset; // pixels. Make wider than vertical scrollbar because we might not be able to use that space.
+      var lastOffset = this.$el.offset().left, offset;
+      var width = this.$el.width();
+      var maxLeft = $window.width() - tolerance;
+      while (lastOffset + width > maxLeft) {
+        this.$el.offset({left: lastOffset - tolerance});
+        offset = this.$el.offset().left;
+        if (offset >= lastOffset) { break; }
+        lastOffset = offset;
+      }
+    },
+
+    _applyPlacement: function (position) {
+      // If the 'placement' option set to 'top', move the position above the element.
+      if (this.placement.indexOf('top') !== -1) {
+        // Overwrite the position object to set the 'bottom' property instead of the top.
+        position = {
+          top: 'auto',
+          bottom: this.$el.parent().height() - position.top + position.lineHeight,
+          left: position.left
+        };
+      } else {
+        position.bottom = 'auto';
+        delete position.lineHeight;
+      }
+      if (this.placement.indexOf('absleft') !== -1) {
+        position.left = 0;
+      } else if (this.placement.indexOf('absright') !== -1) {
+        position.right = 0;
+        position.left = 'auto';
+      }
+      return position;
+    }
+  });
+
+  $.fn.textcomplete.Dropdown = Dropdown;
+  $.extend($.fn.textcomplete, commands);
+}(jQuery);
+
++function ($) {
+  'use strict';
+
+  // Memoize a search function.
+  var memoize = function (func) {
+    var memo = {};
+    return function (term, callback) {
+      if (memo[term]) {
+        callback(memo[term]);
+      } else {
+        func.call(this, term, function (data) {
+          memo[term] = (memo[term] || []).concat(data);
+          callback.apply(null, arguments);
+        });
+      }
+    };
+  };
+
+  function Strategy(options) {
+    $.extend(this, options);
+    if (this.cache) { this.search = memoize(this.search); }
+  }
+
+  Strategy.parse = function (strategiesArray, params) {
+    return $.map(strategiesArray, function (strategy) {
+      var strategyObj = new Strategy(strategy);
+      strategyObj.el = params.el;
+      strategyObj.$el = params.$el;
+      return strategyObj;
+    });
+  };
+
+  $.extend(Strategy.prototype, {
+    // Public properties
+    // -----------------
+
+    // Required
+    match:      null,
+    replace:    null,
+    search:     null,
+
+    // Optional
+    id:         null,
+    cache:      false,
+    context:    function () { return true; },
+    index:      2,
+    template:   function (obj) { return obj; },
+    idProperty: null
+  });
+
+  $.fn.textcomplete.Strategy = Strategy;
+
+}(jQuery);
+
++function ($) {
+  'use strict';
+
+  var now = Date.now || function () { return new Date().getTime(); };
+
+  // Returns a function, that, as long as it continues to be invoked, will not
+  // be triggered. The function will be called after it stops being called for
+  // `wait` msec.
+  //
+  // This utility function was originally implemented at Underscore.js.
+  var debounce = function (func, wait) {
+    var timeout, args, context, timestamp, result;
+    var later = function () {
+      var last = now() - timestamp;
+      if (last < wait) {
+        timeout = setTimeout(later, wait - last);
+      } else {
+        timeout = null;
+        result = func.apply(context, args);
+        context = args = null;
+      }
+    };
+
+    return function () {
+      context = this;
+      args = arguments;
+      timestamp = now();
+      if (!timeout) {
+        timeout = setTimeout(later, wait);
+      }
+      return result;
+    };
+  };
+
+  function Adapter () {}
+
+  $.extend(Adapter.prototype, {
+    // Public properties
+    // -----------------
+
+    id:        null, // Identity.
+    completer: null, // Completer object which creates it.
+    el:        null, // Textarea element.
+    $el:       null, // jQuery object of the textarea.
+    option:    null,
+
+    // Public methods
+    // --------------
+
+    initialize: function (element, completer, option) {
+      this.el        = element;
+      this.$el       = $(element);
+      this.id        = completer.id + this.constructor.name;
+      this.completer = completer;
+      this.option    = option;
+
+      if (this.option.debounce) {
+        this._onKeyup = debounce(this._onKeyup, this.option.debounce);
+      }
+
+      this._bindEvents();
+    },
+
+    destroy: function () {
+      this.$el.off('.' + this.id); // Remove all event handlers.
+      this.$el = this.el = this.completer = null;
+    },
+
+    // Update the element with the given value and strategy.
+    //
+    // value    - The selected object. It is one of the item of the array
+    //            which was callbacked from the search function.
+    // strategy - The Strategy associated with the selected value.
+    select: function (/* value, strategy */) {
+      throw new Error('Not implemented');
+    },
+
+    // Returns the caret's relative coordinates from body's left top corner.
+    getCaretPosition: function () {
+      var position = this._getCaretRelativePosition();
+      var offset = this.$el.offset();
+
+      // Calculate the left top corner of `this.option.appendTo` element.
+      var $parent = this.option.appendTo;
+      if ($parent) {
+         if (!($parent instanceof $)) { $parent = $($parent); }
+         var parentOffset = $parent.offsetParent().offset();
+         offset.top -= parentOffset.top;
+         offset.left -= parentOffset.left;
+      }
+
+      position.top += offset.top;
+      position.left += offset.left;
+      return position;
+    },
+
+    // Focus on the element.
+    focus: function () {
+      this.$el.focus();
+    },
+
+    // Private methods
+    // ---------------
+
+    _bindEvents: function () {
+      this.$el.on('keyup.' + this.id, $.proxy(this._onKeyup, this));
+    },
+
+    _onKeyup: function (e) {
+      if (this._skipSearch(e)) { return; }
+      this.completer.trigger(this.getTextFromHeadToCaret(), true);
+    },
+
+    // Suppress searching if it returns true.
+    _skipSearch: function (clickEvent) {
+      switch (clickEvent.keyCode) {
+        case 9:  // TAB
+        case 13: // ENTER
+        case 40: // DOWN
+        case 38: // UP
+        case 27: // ESC
+          return true;
+      }
+      if (clickEvent.ctrlKey) switch (clickEvent.keyCode) {
+        case 78: // Ctrl-N
+        case 80: // Ctrl-P
+          return true;
+      }
+    }
+  });
+
+  $.fn.textcomplete.Adapter = Adapter;
+}(jQuery);
+
++function ($) {
+  'use strict';
+
+  // Textarea adapter
+  // ================
+  //
+  // Managing a textarea. It doesn't know a Dropdown.
+  function Textarea(element, completer, option) {
+    this.initialize(element, completer, option);
+  }
+
+  $.extend(Textarea.prototype, $.fn.textcomplete.Adapter.prototype, {
+    // Public methods
+    // --------------
+
+    // Update the textarea with the given value and strategy.
+    select: function (value, strategy, e) {
+      var pre = this.getTextFromHeadToCaret();
+      var post = this.el.value.substring(this.el.selectionEnd);
+      var newSubstr = strategy.replace(value, e);
+      var regExp;
+      if (typeof newSubstr !== 'undefined') {
+        if ($.isArray(newSubstr)) {
+          post = newSubstr[1] + post;
+          newSubstr = newSubstr[0];
+        }
+        regExp = $.isFunction(strategy.match) ? strategy.match(pre) : strategy.match;
+        pre = pre.replace(regExp, newSubstr);
+        this.$el.val(pre + post);
+        this.el.selectionStart = this.el.selectionEnd = pre.length;
+      }
+    },
+
+    getTextFromHeadToCaret: function () {
+      return this.el.value.substring(0, this.el.selectionEnd);
+    },
+
+    // Private methods
+    // ---------------
+
+    _getCaretRelativePosition: function () {
+      var p = $.fn.textcomplete.getCaretCoordinates(this.el, this.el.selectionStart);
+      return {
+        top: p.top + this._calculateLineHeight() - this.$el.scrollTop(),
+        left: p.left - this.$el.scrollLeft(),
+        lineHeight: this._calculateLineHeight()
+      };
+    },
+
+    _calculateLineHeight: function () {
+      var lineHeight = parseInt(this.$el.css('line-height'), 10);
+      if (isNaN(lineHeight)) {
+        // http://stackoverflow.com/a/4515470/1297336
+        var parentNode = this.el.parentNode;
+        var temp = document.createElement(this.el.nodeName);
+        var style = this.el.style;
+        temp.setAttribute(
+          'style',
+          'margin:0px;padding:0px;font-family:' + style.fontFamily + ';font-size:' + style.fontSize
+        );
+        temp.innerHTML = 'test';
+        parentNode.appendChild(temp);
+        lineHeight = temp.clientHeight;
+        parentNode.removeChild(temp);
+      }
+      return lineHeight;
+    }
+  });
+
+  $.fn.textcomplete.Textarea = Textarea;
+}(jQuery);
+
++function ($) {
+  'use strict';
+
+  var sentinelChar = '吶';
+
+  function IETextarea(element, completer, option) {
+    this.initialize(element, completer, option);
+    $('<span>' + sentinelChar + '</span>').css({
+      position: 'absolute',
+      top: -9999,
+      left: -9999
+    }).insertBefore(element);
+  }
+
+  $.extend(IETextarea.prototype, $.fn.textcomplete.Textarea.prototype, {
+    // Public methods
+    // --------------
+
+    select: function (value, strategy, e) {
+      var pre = this.getTextFromHeadToCaret();
+      var post = this.el.value.substring(pre.length);
+      var newSubstr = strategy.replace(value, e);
+      var regExp;
+      if (typeof newSubstr !== 'undefined') {
+        if ($.isArray(newSubstr)) {
+          post = newSubstr[1] + post;
+          newSubstr = newSubstr[0];
+        }
+        regExp = $.isFunction(strategy.match) ? strategy.match(pre) : strategy.match;
+        pre = pre.replace(regExp, newSubstr);
+        this.$el.val(pre + post);
+        this.el.focus();
+        var range = this.el.createTextRange();
+        range.collapse(true);
+        range.moveEnd('character', pre.length);
+        range.moveStart('character', pre.length);
+        range.select();
+      }
+    },
+
+    getTextFromHeadToCaret: function () {
+      this.el.focus();
+      var range = document.selection.createRange();
+      range.moveStart('character', -this.el.value.length);
+      var arr = range.text.split(sentinelChar)
+      return arr.length === 1 ? arr[0] : arr[1];
+    }
+  });
+
+  $.fn.textcomplete.IETextarea = IETextarea;
+}(jQuery);
+
+// NOTE: TextComplete plugin has contenteditable support but it does not work
+//       fine especially on old IEs.
+//       Any pull requests are REALLY welcome.
+
++function ($) {
+  'use strict';
+
+  // ContentEditable adapter
+  // =======================
+  //
+  // Adapter for contenteditable elements.
+  function ContentEditable (element, completer, option) {
+    this.initialize(element, completer, option);
+  }
+
+  $.extend(ContentEditable.prototype, $.fn.textcomplete.Adapter.prototype, {
+    // Public methods
+    // --------------
+
+    // Update the content with the given value and strategy.
+    // When an dropdown item is selected, it is executed.
+    select: function (value, strategy, e) {
+      var pre = this.getTextFromHeadToCaret();
+      // use ownerDocument instead of window to support iframes
+      var sel = this.el.ownerDocument.getSelection();
+      
+      var range = sel.getRangeAt(0);
+      var selection = range.cloneRange();
+      selection.selectNodeContents(range.startContainer);
+      var content = selection.toString();
+      var post = content.substring(range.startOffset);
+      var newSubstr = strategy.replace(value, e);
+      var regExp;
+      if (typeof newSubstr !== 'undefined') {
+        if ($.isArray(newSubstr)) {
+          post = newSubstr[1] + post;
+          newSubstr = newSubstr[0];
+        }
+        regExp = $.isFunction(strategy.match) ? strategy.match(pre) : strategy.match;
+        pre = pre.replace(regExp, newSubstr)
+            .replace(/ $/, "&nbsp"); // &nbsp necessary at least for CKeditor to not eat spaces
+        range.selectNodeContents(range.startContainer);
+        range.deleteContents();
+        
+        // create temporary elements
+        var preWrapper = this.el.ownerDocument.createElement("div");
+        preWrapper.innerHTML = pre;
+        var postWrapper = this.el.ownerDocument.createElement("div");
+        postWrapper.innerHTML = post;
+        
+        // create the fragment thats inserted
+        var fragment = this.el.ownerDocument.createDocumentFragment();
+        var childNode;
+        var lastOfPre;
+        while (childNode = preWrapper.firstChild) {
+        	lastOfPre = fragment.appendChild(childNode);
+        }
+        while (childNode = postWrapper.firstChild) {
+        	fragment.appendChild(childNode);
+        }
+        
+        // insert the fragment & jump behind the last node in "pre"
+        range.insertNode(fragment);
+        range.setStartAfter(lastOfPre);
+        
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    },
+
+    // Private methods
+    // ---------------
+
+    // Returns the caret's relative position from the contenteditable's
+    // left top corner.
+    //
+    // Examples
+    //
+    //   this._getCaretRelativePosition()
+    //   //=> { top: 18, left: 200, lineHeight: 16 }
+    //
+    // Dropdown's position will be decided using the result.
+    _getCaretRelativePosition: function () {
+      var range = this.el.ownerDocument.getSelection().getRangeAt(0).cloneRange();
+      var node = this.el.ownerDocument.createElement('span');
+      range.insertNode(node);
+      range.selectNodeContents(node);
+      range.deleteContents();
+      var $node = $(node);
+      var position = $node.offset();
+      position.left -= this.$el.offset().left;
+      position.top += $node.height() - this.$el.offset().top;
+      position.lineHeight = $node.height();
+      
+      // special positioning logic for iframes
+      // this is typically used for contenteditables such as tinymce or ckeditor
+      if (this.completer.$iframe) {
+        var iframePosition = this.completer.$iframe.offset();
+        position.top += iframePosition.top;
+        position.left += iframePosition.left;
+        //subtract scrollTop from element in iframe
+        position.top -= this.$el.scrollTop(); 
+      }
+      
+      $node.remove();
+      return position;
+    },
+
+    // Returns the string between the first character and the caret.
+    // Completer will be triggered with the result for start autocompleting.
+    //
+    // Example
+    //
+    //   // Suppose the html is '<b>hello</b> wor|ld' and | is the caret.
+    //   this.getTextFromHeadToCaret()
+    //   // => ' wor'  // not '<b>hello</b> wor'
+    getTextFromHeadToCaret: function () {
+      var range = this.el.ownerDocument.getSelection().getRangeAt(0);
+      var selection = range.cloneRange();
+      selection.selectNodeContents(range.startContainer);
+      return selection.toString().substring(0, range.startOffset);
+    }
+  });
+
+  $.fn.textcomplete.ContentEditable = ContentEditable;
+}(jQuery);
+
+// NOTE: TextComplete plugin has contenteditable support but it does not work
+//       fine especially on old IEs.
+//       Any pull requests are REALLY welcome.
+
++function ($) {
+  'use strict';
+
+  // CKEditor adapter
+  // =======================
+  //
+  // Adapter for CKEditor, based on contenteditable elements.
+  function CKEditor (element, completer, option) {
+    this.initialize(element, completer, option);
+  }
+
+  $.extend(CKEditor.prototype, $.fn.textcomplete.ContentEditable.prototype, {
+    _bindEvents: function () {
+      var $this = this;
+      this.option.ckeditor_instance.on('key', function(event) {
+        var domEvent = event.data;
+        $this._onKeyup(domEvent);
+        if ($this.completer.dropdown.shown && $this._skipSearch(domEvent)) {
+          return false;
+        }
+      }, null, null, 1); // 1 = Priority = Important!
+      // we actually also need the native event, as the CKEditor one is happening to late
+      this.$el.on('keyup.' + this.id, $.proxy(this._onKeyup, this));
+    },
+});
+
+  $.fn.textcomplete.CKEditor = CKEditor;
+}(jQuery);
+
+// The MIT License (MIT)
+// 
+// Copyright (c) 2015 Jonathan Ong me@jongleberry.com
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+// associated documentation files (the "Software"), to deal in the Software without restriction,
+// including without limitation the rights to use, copy, modify, merge, publish, distribute,
+// sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all copies or
+// substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT
+// NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+// NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+//
+// https://github.com/component/textarea-caret-position
+
+(function ($) {
+
+// The properties that we copy into a mirrored div.
+// Note that some browsers, such as Firefox,
+// do not concatenate properties, i.e. padding-top, bottom etc. -> padding,
+// so we have to do every single property specifically.
+var properties = [
+  'direction',  // RTL support
+  'boxSizing',
+  'width',  // on Chrome and IE, exclude the scrollbar, so the mirror div wraps exactly as the textarea does
+  'height',
+  'overflowX',
+  'overflowY',  // copy the scrollbar for IE
+
+  'borderTopWidth',
+  'borderRightWidth',
+  'borderBottomWidth',
+  'borderLeftWidth',
+  'borderStyle',
+
+  'paddingTop',
+  'paddingRight',
+  'paddingBottom',
+  'paddingLeft',
+
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/font
+  'fontStyle',
+  'fontVariant',
+  'fontWeight',
+  'fontStretch',
+  'fontSize',
+  'fontSizeAdjust',
+  'lineHeight',
+  'fontFamily',
+
+  'textAlign',
+  'textTransform',
+  'textIndent',
+  'textDecoration',  // might not make a difference, but better be safe
+
+  'letterSpacing',
+  'wordSpacing',
+
+  'tabSize',
+  'MozTabSize'
+
+];
+
+var isBrowser = (typeof window !== 'undefined');
+var isFirefox = (isBrowser && window.mozInnerScreenX != null);
+
+function getCaretCoordinates(element, position, options) {
+  if(!isBrowser) {
+    throw new Error('textarea-caret-position#getCaretCoordinates should only be called in a browser');
+  }
+
+  var debug = options && options.debug || false;
+  if (debug) {
+    var el = document.querySelector('#input-textarea-caret-position-mirror-div');
+    if ( el ) { el.parentNode.removeChild(el); }
+  }
+
+  // mirrored div
+  var div = document.createElement('div');
+  div.id = 'input-textarea-caret-position-mirror-div';
+  document.body.appendChild(div);
+
+  var style = div.style;
+  var computed = window.getComputedStyle? getComputedStyle(element) : element.currentStyle;  // currentStyle for IE < 9
+
+  // default textarea styles
+  style.whiteSpace = 'pre-wrap';
+  if (element.nodeName !== 'INPUT')
+    style.wordWrap = 'break-word';  // only for textarea-s
+
+  // position off-screen
+  style.position = 'absolute';  // required to return coordinates properly
+  if (!debug)
+    style.visibility = 'hidden';  // not 'display: none' because we want rendering
+
+  // transfer the element's properties to the div
+  properties.forEach(function (prop) {
+    style[prop] = computed[prop];
+  });
+
+  if (isFirefox) {
+    // Firefox lies about the overflow property for textareas: https://bugzilla.mozilla.org/show_bug.cgi?id=984275
+    if (element.scrollHeight > parseInt(computed.height))
+      style.overflowY = 'scroll';
+  } else {
+    style.overflow = 'hidden';  // for Chrome to not render a scrollbar; IE keeps overflowY = 'scroll'
+  }
+
+  div.textContent = element.value.substring(0, position);
+  // the second special handling for input type="text" vs textarea: spaces need to be replaced with non-breaking spaces - http://stackoverflow.com/a/13402035/1269037
+  if (element.nodeName === 'INPUT')
+    div.textContent = div.textContent.replace(/\s/g, '\u00a0');
+
+  var span = document.createElement('span');
+  // Wrapping must be replicated *exactly*, including when a long word gets
+  // onto the next line, with whitespace at the end of the line before (#7).
+  // The  *only* reliable way to do that is to copy the *entire* rest of the
+  // textarea's content into the <span> created at the caret position.
+  // for inputs, just '.' would be enough, but why bother?
+  span.textContent = element.value.substring(position) || '.';  // || because a completely empty faux span doesn't render at all
+  div.appendChild(span);
+
+  var coordinates = {
+    top: span.offsetTop + parseInt(computed['borderTopWidth']),
+    left: span.offsetLeft + parseInt(computed['borderLeftWidth'])
+  };
+
+  if (debug) {
+    span.style.backgroundColor = '#aaa';
+  } else {
+    document.body.removeChild(div);
+  }
+
+  return coordinates;
+}
+
+$.fn.textcomplete.getCaretCoordinates = getCaretCoordinates;
+
+}(jQuery));
+
+return jQuery;
+}));
+;define('textcomplete', ['textcomplete/dist/jquery.textcomplete'], function (main) { return main; });
+
 define('wurl',['require','exports','module'],function (require, exports, module) {module.exports = function (arg, url) {
 
     function _t() {
