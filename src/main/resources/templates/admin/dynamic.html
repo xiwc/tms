@@ -776,6 +776,7 @@
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/deps-dynamic.js}" src="../../static/admin/js/deps-dynamic.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
+    <!-- <script type="text/javascript" th:src="@{/lib/jquery.textcomplete.min.js}" src="../../static/lib/jquery.textcomplete.min.js"></script> -->
     <!-- <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script> -->
     <!-- <script type="text/javascript" th:src="@{/lib/desktop-notify-min.js}" src="../../static/lib/desktop-notify-min.js"></script> -->
     <!-- <script type="text/javascript" th:src="@{/lib/clipboard.min.js}" src="../../static/lib/clipboard.min.js"></script> -->
@@ -817,7 +818,7 @@
         // --------------------------------------------------------------------------------- var define start
         var allUserInfo = Utils.getAllUserInfo();
         // --------------------------------------------------------------------------------- var define end
-        
+
         // --------------------------------------------------------------------------------- username mapping to name start
         Utils.showMappedTxt('.mapping-user');
         // --------------------------------------------------------------------------------- username mapping to name end
@@ -2654,7 +2655,7 @@
                             var gms = [];
                             $.each(group.groupMembers, function(index, gm) {
                                 var userInfo = allUserInfo[gm.username];
-                                if(userInfo && userInfo.status == 'true') {
+                                if (userInfo && userInfo.status == 'true') {
                                     gms.push(gm);
                                 }
                             });
@@ -3127,6 +3128,36 @@
         // -------------------------------------------------------------------------------- chat stows end
 
     });
+
+    // 输入文本框提示补全
+    // jQuery(document).ready(function($) {
+
+    //     var tips = {
+    //         'test1': {
+    //             label: 'test1',
+    //             value: 'value1'
+    //         }
+    //     };
+
+    //     $('.fm-reply .CodeMirror textarea').textcomplete([{
+    //         match: /(|\b)(\/.*)$/,
+    //         search: (term, callback) => {
+    //             var keys = ['test1'];
+    //             callback($.map(keys, function(key) {
+    //                 return key.indexOf(term) === 0 ? key : null;
+    //             }));
+    //         },
+    //         template: function(value, term) {
+    //             return tips[value].label;
+    //         },
+    //         replace: function(value) {
+    //             return tips[value].value;
+    //         }
+    //     }], {
+    //         // appendTo: '.tms-upload-progress',
+    //         // maxCount: 20
+    //     });
+    // });
     </script>
 </body>
 
