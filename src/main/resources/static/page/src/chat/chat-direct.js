@@ -294,13 +294,15 @@ export class ChatDirect {
 
     sendKeydownHandler(evt, chatInputRef) {
 
-        if (!evt.ctrlKey && evt.keyCode === 13) {
+        if (!evt.shiftKey && !evt.ctrlKey && !evt.altKey && evt.keyCode === 13) {
             if ($('.textcomplete-dropdown:visible').size() == 1) {
                 return false;
             }
             this.sendChatMsg();
             return false;
-        } else if (evt.ctrlKey && evt.keyCode === 13) {
+        } else if (evt.shiftKey && evt.keyCode === 13) {
+            autosize.update(chatInputRef);
+        } else if ((evt.ctrlKey || evt.altKey) && evt.keyCode === 13) {
             this.insertTxt($(this.chatInputRef), '\n');
             autosize.update(chatInputRef);
         }
