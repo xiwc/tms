@@ -98,7 +98,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea ref="chatInputRef" placeholder="输入聊天内容(按下 / 键提示补全) (Ctrl+Enter换行,Enter发送)" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
+                        <textarea ref="chatInputRef" placeholder="输入聊天内容(按下 / 键提示补全) (Ctrl+Enter换行,Enter发送,Esc清空)" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
                         <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
                     <div ref="uploadProgressRef" class="tms-upload-progress dropzone-previews"></div>

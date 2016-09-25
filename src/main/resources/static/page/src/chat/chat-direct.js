@@ -298,6 +298,10 @@ export class ChatDirect {
             if ($('.textcomplete-dropdown:visible').size() == 1) {
                 return false;
             }
+            if (!$.trim($(this.chatInputRef).val())) {
+                $(this.chatInputRef).val('');
+                return;
+            }
             this.sendChatMsg();
             return false;
         } else if (evt.shiftKey && evt.keyCode === 13) {
@@ -305,6 +309,8 @@ export class ChatDirect {
         } else if ((evt.ctrlKey || evt.altKey) && evt.keyCode === 13) {
             this.insertTxt($(this.chatInputRef), '\n');
             autosize.update(chatInputRef);
+        } else if (evt.keyCode === 27) {
+            $(this.chatInputRef).val('');
         }
 
         return true;
