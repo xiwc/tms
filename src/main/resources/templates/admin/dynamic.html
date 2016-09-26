@@ -662,13 +662,13 @@
                             <i class="refresh icon"></i>
                             <div class="floating ui red circular label lbl-chat-news-count">0</div>
                         </div>
-                        <div class="ui circular icon button btn-chat-s2h" title="滚动至消息头"> <i class="chevron up icon"></i> </div>
-                        <div class="ui circular icon button btn-chat-s2b" title="滚动至下个消息头"> <i class="chevron down icon"></i> </div>
+                        <div class="ui circular icon button btn-chat-s2h" title="滚动至消息头(alt+up)"> <i class="chevron up icon"></i> </div>
+                        <div class="ui circular icon button btn-chat-s2b" title="滚动至下个消息头(alt+down)"> <i class="chevron down icon"></i> </div>
                         <div class="ui vertical circular icon buttons btns-scroll">
-                            <div class="ui circular icon button btn-scroll-up" title="滚动至顶部">
+                            <div class="ui circular icon button btn-scroll-up" title="滚动至顶部(ctrl+alt+up)">
                                 <i class="arrow up icon"></i>
                             </div>
-                            <div class="ui circular icon button btn-scroll-down" title="滚动至底部">
+                            <div class="ui circular icon button btn-scroll-down" title="滚动至底部(ctrl+alt+down)">
                                 <i class="arrow down icon"></i>
                             </div>
                         </div>
@@ -776,6 +776,7 @@
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/deps-dynamic.js}" src="../../static/admin/js/deps-dynamic.js"></script>
     <script type="text/javascript" th:src="@{/lib/simplemde/simplemde.min.js}" src="../../static/lib/simplemde/simplemde.min.js"></script>
+    <script type="text/javascript" th:src="@{/lib/jquery.hotkeys.js}" src="../../static/lib/jquery.hotkeys.js"></script>
     <!-- <script type="text/javascript" th:src="@{/lib/jquery.textcomplete.min.js}" src="../../static/lib/jquery.textcomplete.min.js"></script> -->
     <!-- <script type="text/javascript" th:src="@{/lib/jquery.timeago.min.js}" src="../../static/lib/jquery.timeago.min.js"></script> -->
     <!-- <script type="text/javascript" th:src="@{/lib/desktop-notify-min.js}" src="../../static/lib/desktop-notify-min.js"></script> -->
@@ -3127,6 +3128,55 @@
         });
         // -------------------------------------------------------------------------------- chat stows end
 
+    });
+
+    // 热键处理
+    jQuery(document).ready(function($) {
+
+        var $currentComment = null;
+        $(document).bind('keydown', 'alt+up', function() {
+            event.preventDefault();
+            if (!$currentComment || $currentComment.size() === 0) {
+                $currentComment = $('.chat .comments .comment:first');
+            } else {
+                var $pr = $currentComment.prev('.comment');
+                $currentComment = $pr.size() > 0 ? $pr : $currentComment;
+            }
+
+            if ($currentComment.size() === 1) {
+                $('html, body, .ad-index-content').scrollTo($currentComment, {
+                    offset: -50
+                });
+            }
+        }).bind('keydown', 'alt+down', function() {
+            event.preventDefault();
+            if (!$currentComment || $currentComment.size() === 0) {
+                $currentComment = $('.chat .comments .comment:last');
+            } else {
+                var $nx = $currentComment.next('.comment');
+                $currentComment = $nx.size() > 0 ? $nx : $currentComment;
+            }
+
+            if ($currentComment.size() === 1) {
+                $('html, body, .ad-index-content').scrollTo($currentComment, {
+                    offset: -50
+                });
+            }
+        }).bind('keydown', 'alt+ctrl+up', function() {
+            event.preventDefault();
+            $('.btn-scroll-up').click();
+        }).bind('keydown', 'alt+ctrl+down', function() {
+            event.preventDefault();
+            $('.btn-scroll-down').click();
+        });
+
+        $('.chat .comments .comment').hover(function(event) {
+            event.preventDefault();
+            $currentComment = $(this);
+        }, function(event) {
+            event.preventDefault();
+            $currentComment = null;
+        });
     });
 
     // 输入文本框提示补全
