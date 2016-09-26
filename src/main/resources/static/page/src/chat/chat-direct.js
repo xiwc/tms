@@ -67,6 +67,7 @@ export class ChatDirect {
     activate(params, routeConfig, navigationInstruction) {
 
         this.markId = params.id;
+        this.routeConfig = routeConfig;
 
         this.user = _.find(this.users, {
             username: params.username
@@ -200,6 +201,7 @@ export class ChatDirect {
                 this.user = _.find(this.users, {
                     username: this.chatTo
                 });
+                this.user && this.routeConfig.navModel.setTitle(`${this.user.name} | 私聊 | TMS`);
             } else {
                 toastr.error(data.data, '获取全部用户失败!');
             }

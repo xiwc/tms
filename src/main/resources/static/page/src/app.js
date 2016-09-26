@@ -81,6 +81,12 @@ export class App {
             moduleId: 'user/user-login',
             nav: false,
             title: '登录'
+        },  {
+            route: ['test'],
+            name: 'test',
+            moduleId: 'test/test-lifecycle',
+            nav: false,
+            title: '测试'
         }, {
             route: '',
             redirect: 'chat-direct/admin'
