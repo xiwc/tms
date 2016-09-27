@@ -3102,7 +3102,7 @@
         $('.btn-get-chat-ats').hover(function() {
 
         }, function() {
-            if (!$('.pp-ats-lock').hasClass('lock')) {
+            if (!$('.pp-ats-lock').hasClass('lock') && !$('.pp-translate:visible').size()) {
                 $('.pp-ats').hide();
             }
         });
@@ -3146,7 +3146,7 @@
         $('.btn-get-chat-stows').hover(function() {
 
         }, function() {
-            if (!$('.pp-stows-lock').hasClass('lock')) {
+            if (!$('.pp-stows-lock').hasClass('lock') && !$('.pp-translate:visible').size()) {
                 $('.pp-stows').hide();
             }
         });
@@ -3238,7 +3238,7 @@
                     var content = $a.closest('.item').attr('data-content');
                     $('<div class="markdown-body" />').html(parseMd(content)).css({
                         "width": "200px",
-                        "height": "120px",
+                        "height": "100px",
                         "overflow": "auto"
                     }).appendTo($(this).empty());
                 }
