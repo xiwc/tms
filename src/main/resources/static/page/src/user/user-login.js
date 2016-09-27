@@ -10,6 +10,14 @@ export class UserLogin {
         $(this.rememberMeRef).checkbox();
     }
 
+    kdHandler(evt) {
+        if(evt.keyCode === 13) {
+            this.loginHandler();
+        }
+
+        return true;
+    }
+
     loginHandler() {
 
         $.get('/admin/login', (data) => {

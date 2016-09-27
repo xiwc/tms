@@ -207,7 +207,7 @@ export class ChatDirect {
             }
         });
 
-        poll.start(() => {
+        poll.start((resetCb, stopCb) => {
 
             if (!this.chats) {
                 return;
@@ -230,6 +230,11 @@ export class ChatDirect {
                 } else {
                     toastr.error(data.data, '轮询获取消息失败!');
                 }
+            }).fail(() => {
+                stopCb();
+                utils.errorAutoTry(() => {
+                    resetCb();
+                });
             });
         });
     }

@@ -312,6 +312,39 @@ jQuery(function($) {
                     $a.remove();
                 }, 200);
             }
+        },
+        errorAutoTry: function(callback, time) {
+
+            var _this = this;
+
+            if (_this.isRunning) {
+                return;
+            }
+
+            var cnt = time ? time : 10;
+            var $t = toastr.error("网络连接错误," + cnt + "秒后自动重试!", null, {
+                "closeButton": false,
+                "timeOut": "0",
+                "preventDuplicates": false,
+                "onclick": function() {
+                    clearInterval(timer);
+                    toastr.remove();
+                    callback && callback();
+                }
+            });
+
+            _this.isRunning = true;
+            var timer = setInterval(function() {
+                if (cnt === 0) {
+                    clearInterval(timer);
+                    _this.isRunning = false;
+                    toastr.remove();
+                    callback && callback();
+                    return;
+                }
+                $t && $t.find('.toast-message').text("网络连接错误," + cnt + "秒后自动重试!");
+                cnt--;
+            }, 1000);
         }
     });
 

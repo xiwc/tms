@@ -2420,10 +2420,9 @@
                 }
             }).fail(function() {
                 stopCb();
-                toastr.error("请刷新浏览器,重新尝试!", "网络链接错误!", {
-                    "closeButton": true,
-                    "timeOut": "0"
-                });
+                Utils.errorAutoTry(function() {
+                    resetCb();
+                }, 30);
             });
         });
 

@@ -67,6 +67,43 @@ export class CommonUtils {
 
         return s;
     }
+
+    /**
+     * 网络连接错误后自动重试
+     * @param  {Function} callback 重试回调
+     * @return {[type]}            [description]
+     */
+    errorAutoTry(callback, time) {
+
+        if(this.isRunning) {
+            return;
+        }
+
+        let cnt = time ? time : 10;
+        let timer = null;
+        let $t = toastr.error(`网络连接错误,${cnt}秒后自动重试!`, null, {
+            "closeButton": false,
+            "timeOut": "0",
+            "preventDuplicates": false,
+            "onclick": () => {
+                clearInterval(this.timer);
+                callback && callback();
+            }
+        });
+
+        this.isRunning = true;
+        timer = setInterval(() => {
+            if (cnt === 0) {
+                clearInterval(timer);
+                this.isRunning = false;
+                toastr.remove();
+                callback && callback();
+                return;
+            }
+            $t && $t.find('.toast-message').text(`网络连接错误,${cnt}秒后自动重试!`);
+            cnt--;
+        }, 1000);
+    }
 }
 
 export default new CommonUtils();
