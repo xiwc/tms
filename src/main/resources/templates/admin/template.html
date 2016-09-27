@@ -488,7 +488,7 @@
     </script>
     <!-- 沟通stow消息popup内容模板 -->
     <script th:fragment="chatStowsTpl" id="chatStowsTpl" type="text/x-jquery-tmpl">
-        <div class="item" data-type="stow" data-id="${id}" data-chat-stow-id="${chatStowId}">
+        <div style="position:relative;" class="item" data-type="stow" data-content="${content}" data-id="${id}" data-chat-stow-id="${chatStowId}">
             <div style="float: left;">
                 <a class="avatar ui mini circular image" style="padding-right: 0px; width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
                     {{if iconName}}
@@ -509,11 +509,13 @@
                 <div class="metadata" style="float: right;">
                     <span class="date timeago" style="font-size: 12px;" title="${createDateFormat}">${createDateFormat}</span>
                 </div>
-                <div class="actions" style="position: absolute; right: 65px; top: 0;">
-                    <a class="remove">移除</a>
+                <div class="actions" style="position: absolute; right: 65px; top: -3px;">
+                    <!-- <a class="remove">移除</a> -->
+                    <i title="移除" class="remove large circle outline icon"></i>
                 </div>
                 <div class="description">${contentBrief}</div>
             </div>
+            <i style="position: absolute;left: 120px;top: 0px;" class="unhide large icon preview"></i>
         </div>
     </script>
     <!-- delete confirm modal -->
