@@ -299,15 +299,19 @@
         margin-top: 10px!important;
     }
     
+    .pp-ats-content .list .item .preview.icon,
+    .pp-ats-content .list .item .actions,
     .pp-stows-content .list .item .preview.icon,
     .pp-stows-content .list .item .actions {
         display: none;
     }
     
+    .pp-ats-content .list .item:hover .preview.icon,
     .pp-stows-content .list .item:hover .preview.icon {
         display: table-cell;
     }
     
+    .pp-ats-content .list .item:hover .actions,
     .pp-stows-content .list .item:hover .actions {
         display: block;
     }
@@ -1189,7 +1193,7 @@
         });
 
         // @消息 知悉 处理
-        $('.pp-ats-content').on('click', '.item .actions a.markAsRead', function(event) {
+        $('.pp-ats-content').on('click', '.item .actions .markAsRead', function(event) {
             event.preventDefault();
             event.stopImmediatePropagation();
             $item = $(this).closest('.item');
@@ -3205,10 +3209,10 @@
         });
     });
 
-    // 收藏消息预览
+    // 收藏消息预览 & @消息预览预览
     jQuery(document).ready(function($) {
 
-        $('.pp-stows-content').on('mouseenter', 'i.preview.icon', function(event) {
+        $('.pp-stows-content, .pp-ats-content').on('mouseenter', 'i.preview.icon', function(event) {
             event.preventDefault();
 
             var $a = $(this);
