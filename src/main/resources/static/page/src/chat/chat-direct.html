@@ -59,8 +59,8 @@
                 </a>
             </div>
         </div>
-        <div class="tms-content ${isRightSidebarShow ? 'tms-sidebar-show' : ''}">
-            <div class="tms-content-body">
+        <div ref="contentRef" class="tms-content ${isRightSidebarShow ? 'tms-sidebar-show' : ''}">
+            <div ref="contentBodyRef" class="tms-content-body">
                 <div ref="commentsRef" class="ui basic segment minimal selection list segment comments">
                     <button if.bind="!last" click.delegate="lastMoreHandler()" class="fluid basic ui button tms-pre-more">加载更多(${lastCnt})</button>
                     <div repeat.for="item of chats" swipebox class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
@@ -105,7 +105,7 @@
                     <div ref="uploadProgressRef" class="tms-upload-progress dropzone-previews"></div>
                 </div>
             </div>
-            <div class="tms-right-sidebar">
+            <div ref="rightSidebarRef" class="tms-right-sidebar">
             </div>
         </div>
     </div>

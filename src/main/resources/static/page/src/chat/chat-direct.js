@@ -577,9 +577,10 @@ export class ChatDirect {
     }
 
     searchFocusinHandler() {
+        $(this.contentBodyRef).width($(this.contentRef).width() - 392);
         this.isRightSidebarShow = true;
     }
-    
+
     searchFocusoutHandler() {
         this.isRightSidebarShow = false;
     }
