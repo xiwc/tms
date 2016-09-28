@@ -575,4 +575,12 @@ export class ChatDirect {
     sendChatMsgHandler() {
         this.sendChatMsg();
     }
+
+    searchFocusinHandler() {
+        this.isRightSidebarShow = true;
+    }
+    
+    searchFocusoutHandler() {
+        this.isRightSidebarShow = false;
+    }
 }

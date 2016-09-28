@@ -10,14 +10,8 @@
             <!-- <div class="item">
                 <i class="icon link sidebar"></i>
             </div> -->
-            <!-- <a class="item header">私聊@${user.name ? user.name : chatTo}</a> -->
             <div ref="chatToDropdownRef" class="ui dropdown link item">
-                <!-- <span style="font-weight: bold; font-size: 20px;">私聊</span> -->
                 <i class="big loading at icon"></i>
-                <!-- <i class="big icons">
-                    <i class="large loading sun icon"></i>
-                    <i class="at icon"></i>
-                </i> -->
                 <span class="text"></span>
                 <i class="dropdown icon"></i>
                 <div class="menu">
@@ -37,6 +31,14 @@
                 </div>
             </div>
             <div class="right menu">
+                <div class="item">
+                    <div class="ui search">
+                        <div class="ui left icon input">
+                            <input focusout.trigger="searchFocusoutHandler()" focusin.trigger="searchFocusinHandler()" class="prompt" type="text" placeholder="搜索...">
+                            <i class="search icon"></i>
+                        </div>
+                    </div>
+                </div>
                 <a class="item">
                     <i class="circular user icon"></i> ${loginUser.name}
                 </a>
@@ -57,11 +59,10 @@
                 </a>
             </div>
         </div>
-        <div class="tms-content">
-            <div class="tms-col w65">
+        <div class="tms-content ${isRightSidebarShow ? 'tms-sidebar-show' : ''}">
+            <div class="tms-content-body">
                 <div ref="commentsRef" class="ui basic segment minimal selection list segment comments">
-                    <!-- <h3 class="ui dividing header">私聊内容</h3> -->
-                    <button if.bind="!last" click.delegate="lastMoreHandler()" class="fluid ui button">加载更多(${lastCnt})</button>
+                    <button if.bind="!last" click.delegate="lastMoreHandler()" class="fluid basic ui button tms-pre-more">加载更多(${lastCnt})</button>
                     <div repeat.for="item of chats" swipebox class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
                         <a class="avatar">
                             <i class="circular icon large user"></i>
@@ -81,7 +82,7 @@
                             </div>
                         </div>
                     </div>
-                    <button if.bind="!first" click.delegate="firstMoreHandler()" class="fluid ui button">加载更多(${firstCnt})</button>
+                    <button if.bind="!first" click.delegate="firstMoreHandler()" class="fluid ui button tms-next-more">加载更多(${firstCnt})</button>
                 </div>
                 <div class="ui basic segment tms-msg-input dropzone">
                     <div ref="inputRef" class="ui left action fluid icon input dropzone">
@@ -104,7 +105,8 @@
                     <div ref="uploadProgressRef" class="tms-upload-progress dropzone-previews"></div>
                 </div>
             </div>
-            <!-- <div class="tms-col w35"></div> -->
+            <div class="tms-right-sidebar">
+            </div>
         </div>
     </div>
     <div ref="previewTemplateRef" style="display: none;">
