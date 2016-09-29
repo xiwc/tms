@@ -32,12 +32,12 @@
             </div>
             <div class="right menu">
                 <div class="item">
-                    <button class="basic active ui icon button">
+                    <button click.delegate="sibebarRightHandler()" title="右侧边栏" class="basic ${isRightSidebarShow ? 'active' : ''} ui icon button">
                         <i class="columns icon"></i>
                     </button>
                 </div>
                 <div class="item">
-                    <button class="basic ui icon button">
+                    <button click.delegate="starHandler()" title="收藏消息" class="basic ${isStarShow ? 'active' : ''} ui icon button">
                         <i class="empty star icon"></i>
                     </button>
                 </div>

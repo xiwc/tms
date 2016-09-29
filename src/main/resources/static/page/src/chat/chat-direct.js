@@ -576,12 +576,33 @@ export class ChatDirect {
         this.sendChatMsg();
     }
 
+    sibebarRightHandler() {
+        this.toggleRightSidebar();
+    }
+
+    toggleRightSidebar(asShow) {
+        if(_.isUndefined(asShow)) {
+            this.isRightSidebarShow = !this.isRightSidebarShow;
+        } else {
+            this.isRightSidebarShow = asShow;
+        }
+
+        if(this.isRightSidebarShow) {
+            $(this.contentBodyRef).width($(this.contentRef).width() - 392);
+        }
+    }
+
+    starHandler() {
+        this.isStarShow = !this.isStarShow;
+        this.toggleRightSidebar(this.isStarShow);
+    }
+
     searchFocusinHandler() {
         $(this.contentBodyRef).width($(this.contentRef).width() - 392);
-        this.isRightSidebarShow = true;
+        // this.isRightSidebarShow = true;
     }
 
     searchFocusoutHandler() {
-        this.isRightSidebarShow = false;
+        // this.isRightSidebarShow = false;
     }
 }
