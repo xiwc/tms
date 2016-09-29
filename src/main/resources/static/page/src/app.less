@@ -17,18 +17,20 @@ body {
     background: #999;
 }
 
-.ui.modal {
-    &.tms-md450 {
-        width: 450px!important;
-        margin-left: -225px!important;
-    }
-    &.tms-md510 {
-        width: 510px!important;
-        margin-left: -255px!important;
-    }
-    &.tms-md540 {
-        width: 540px!important;
-        margin-left: -275px!important;
+@media only screen and (min-width: 768px) {
+    .ui.modal {
+        &.tms-md450 {
+            width: 450px!important;
+            margin-left: -225px!important;
+        }
+        &.tms-md510 {
+            width: 510px!important;
+            margin-left: -255px!important;
+        }
+        &.tms-md540 {
+            width: 540px!important;
+            margin-left: -275px!important;
+        }
     }
 }
 
