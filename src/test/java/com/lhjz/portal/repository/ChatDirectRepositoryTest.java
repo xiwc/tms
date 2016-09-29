@@ -47,7 +47,7 @@ public class ChatDirectRepositoryTest extends AbstractTestNGSpringContextTests {
 
 		List<ChatDirect> list = chatDirectRepository.queryAboutMe(
 				userRepository.findOne("test"), "%df%",
-				0L, 5);
+				0, 5);
 
 		System.out.println(list.size());
 
