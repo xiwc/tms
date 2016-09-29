@@ -23,12 +23,13 @@ export class ChatDirect {
 
     @bindable content = '';
 
-    offset = -70;
+    offset = 0;
 
     selfLink = utils.getBaseUrl() + wurl('path') + '#' + utils.getHash();
 
     first = true;
     last = true;
+    lastSearch = true;
 
     originalHref = wurl();
 
@@ -501,7 +502,107 @@ export class ChatDirect {
 
         this.initHotkeys();
         this.initTextcomplete();
+        this.initSearch();
 
+    }
+
+    initSearch() {
+        var source = [];
+        if (localStorage) {
+            var v = localStorage.getItem('tms/chat-direct:search');
+            source = v ? $.parseJSON(v) : [];
+        }
+        this.searchSource = source;
+        $(this.searchRef).search({
+            source: source,
+            onSelect: (result, response) => {
+                this.searchHandler();
+            },
+            onResults: () => {
+                $(this.searchRef).search('hide results');
+            }
+        });
+
+    }
+
+    searchKeyupHandler(evt) {
+        if (evt.keyCode === 13) {
+            this.searchHandler();
+        }
+        return true;
+    }
+
+    searchHandler() {
+
+        $(this.searchRef).search('hide results');
+
+        let search = $(this.searchInputRef).val();
+
+        if (!search || search.length < 2) {
+            toastr.error('检索条件至少需要两个字符!');
+            return;
+        }
+
+        this.search = search;
+
+        // 保存检索值
+        var isExists = false;
+        $.each(this.searchSource, function(index, val) {
+            if (val.title == search) {
+                isExists = true;
+                return false;
+            }
+        });
+        if (!isExists) {
+            this.searchSource.splice(0, 0, {
+                title: search
+            });
+            $(this.searchRef).search({
+                source: _.clone(this.searchSource)
+            });
+        }
+        localStorage && localStorage.setItem('tms/chat-direct:search', JSON.stringify(this.searchSource));
+
+        $.get('/admin/chat/direct/search', {
+            search: this.search,
+            size: 20,
+            page: 0
+        }, (data) => {
+            if (data.success) {
+                this.toggleRightSidebar(true);
+                this.searchChats = data.data.content;
+                _.each(this.searchChats, (item) => {
+                    item.contentMd = marked(item.content);
+                });
+                this.searchPage = data.data;
+                this.lastSearch = data.data.last;
+                this.moreSearchCnt = data.data.totalElements - (data.data.number + 1) * data.data.size;
+            }
+        });
+    }
+
+    searchMoreHandler() {
+
+        $.get('/admin/chat/direct/search', {
+            search: this.search,
+            size: this.searchPage.size,
+            page: this.searchPage.number + 1
+        }, (data) => {
+            if (data.success) {
+                _.each(data.data.content, (item) => {
+                    item.contentMd = marked(item.content);
+                });
+                this.searchChats = _.concat(this.searchChats, data.data.content);
+
+                this.searchPage = data.data;
+                this.lastSearch = data.data.last;
+                this.moreSearchCnt = data.data.totalElements - (data.data.number + 1) * data.data.size;
+            }
+        });
+    }
+
+    clearSearchHandler() {
+        $(this.searchInputRef).val('').focus();
     }
 
     initTextcomplete() {
@@ -581,13 +682,13 @@ export class ChatDirect {
     }
 
     toggleRightSidebar(asShow) {
-        if(_.isUndefined(asShow)) {
+        if (_.isUndefined(asShow)) {
             this.isRightSidebarShow = !this.isRightSidebarShow;
         } else {
             this.isRightSidebarShow = asShow;
         }
 
-        if(this.isRightSidebarShow) {
+        if (this.isRightSidebarShow) {
             $(this.contentBodyRef).width($(this.contentRef).width() - 392);
         }
     }
@@ -598,11 +699,30 @@ export class ChatDirect {
     }
 
     searchFocusinHandler() {
-        $(this.contentBodyRef).width($(this.contentRef).width() - 392);
-        // this.isRightSidebarShow = true;
+        $(this.searchInputRef).css('width', 'auto');
+        $(this.searchRemoveRef).show();
     }
 
     searchFocusoutHandler() {
-        // this.isRightSidebarShow = false;
+        if (!$(this.searchInputRef).val()) {
+            $(this.searchInputRef).css('width', '100px');
+            $(this.searchRemoveRef).hide();
+        }
+    }
+
+    gotoChatHandler(item) {
+
+        let chat = _.find(this.chats, { id: item.id });
+        if (chat) {
+            $(this.commentsRef).find(`.comment[data-id]`).removeClass('active');
+            $(this.commentsRef).find(`.comment[data-id=${item.id}]`).addClass('active');
+            $(this.commentsRef).scrollTo(`.comment[data-id=${item.id}]`, {
+                offset: this.offset
+            });
+        } else {
+            window.location = `#/chat-direct/${item.chatTo.username}?id=${item.id}`;
+            window.location.reload(true);
+        }
+
     }
 }
