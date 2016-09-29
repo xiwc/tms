@@ -319,6 +319,7 @@ export class ChatDirect {
             autosize.update(chatInputRef);
         } else if (evt.keyCode === 27) {
             $(this.chatInputRef).val('');
+            autosize.update(chatInputRef);
         }
 
         return true;

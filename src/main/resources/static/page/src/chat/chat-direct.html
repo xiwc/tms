@@ -119,6 +119,7 @@
             <div ref="rightSidebarRef" class="tms-right-sidebar">
                 <div class="panel-search">
                     <div class="ui basic segment minimal selection list segment comments">
+                        <h1 show.bind="!searchChats.length" class="ui center aligned header">无符合检索结果</h1>
                         <!-- <button if.bind="!first" click.delegate="lastMoreHandler()" class="fluid basic ui button tms-pre-more">加载更多(${lastCnt})</button> -->
                         <div repeat.for="item of searchChats" swipebox class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
                             <a class="avatar">

@@ -17,12 +17,14 @@
             padding: 4px;
             width: 190px;
             outline: none;
+            margin-top: 10px;
+            border-radius: 2px;
         }
     }
     .ui.left.sidebar .ui.list {
         position: absolute;
         bottom: 0;
-        top: 60px;
+        top: 80px;
         overflow-y: auto;
         width: 190px;
         a > i.circular.icon {
@@ -38,7 +40,10 @@
     .ui.left.sidebar .tms-header i.close.icon {
         position: absolute;
         right: 11px;
-        top: 45px;
+        top: 55px;
+        box-shadow: 0 0 0 .1em rgb(103, 104, 104) inset;
+        border-top-right-radius: 2px;
+        border-bottom-right-radius: 2px;
     }
     .ui.left.sidebar .tms-header .ui.header {
         margin-bottom: 0;
@@ -88,10 +93,11 @@
             max-width: none;
             margin-bottom: 0;
             margin-top: 10px;
-            .tms-pre-more,
+            .tms-pre-more {
+                margin-bottom: 10px;
+            }
             .tms-next-more {
                 margin-top: 10px;
-                margin-bottom: 10px;
             }
         }
     }
