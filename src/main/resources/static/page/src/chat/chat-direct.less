@@ -83,6 +83,7 @@
     }
     .tms-content-body {
         width: 100%;
+        max-width: 100%;
         flex: 1 1 0;
         display: flex;
         align-items: stretch;
@@ -136,8 +137,6 @@
             border-left-color: transparent!important;
         }
         .textareaWrapper {
-            // padding-right: 2.67142857em!important;
-            margin: 0;
             max-width: 100%;
             -webkit-box-flex: 1;
             -webkit-flex: 1 0 auto;
@@ -146,6 +145,12 @@
             border: 1px solid rgba(34, 36, 38, .15);
             border-top-right-radius: .28571429rem;
             border-bottom-right-radius: .28571429rem;
+            .CodeMirror,
+            .CodeMirror-scroll {
+                min-height: 0;
+                margin-right: 35px;
+                border: none;
+            }
         }
         .ui.input textarea {
             resize: none;

@@ -507,12 +507,45 @@ export class ChatDirect {
         this.initHotkeys();
         this.initTextcomplete();
         this.initSearch();
-        // this.initSimpleMDE(this.chatInputRef);
+        this.initSimpleMDE(this.chatInputRef);
 
     }
 
     initSimpleMDE(textareaDom) {
-        var simplemde = new SimpleMDE({ element: textareaDom });
+        var simplemde = new SimpleMDE({
+            element: textareaDom,
+            spellChecker: false,
+            status: false,
+            autofocus: true,
+            toolbar: false,
+            autoDownloadFontAwesome: false,
+            // toolbar: [
+            //     "bold",
+            //     "italic",
+            //     "strikethrough",
+            //     "heading-smaller",
+            //     "heading-bigger",
+            //     "|",
+            //     "code",
+            //     "quote",
+            //     "unordered-list",
+            //     "ordered-list",
+            //     "|",
+            //     "link",
+            //     "image",
+            //     "table",
+            //     "horizontal-rule",
+            //     "|",
+            //     "preview",
+            //     "side-by-side",
+            //     "fullscreen",
+            //     "guide"
+
+            // ],
+            insertTexts: {
+                table: ["", "\n\n| 列1 | 列2 | 列3 |\n| ------ | ------ | ------ |\n| 文本 | 文本 | 文本 |\n\n"],
+            }
+        });
     }
 
     initSearch() {
