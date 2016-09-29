@@ -914,8 +914,15 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                     offset: this.offset
                 });
             } else {
-                window.location = '#/chat-direct/' + item.chatTo.username + '?id=' + item.id;
-                window.location.reload(true);
+
+                if (this.chatTo == item.chatTo.username) {
+                    this.activate({
+                        id: item.id,
+                        username: item.chatTo.username
+                    }, this.routeConfig);
+                } else {
+                    window.location = wurl('path') + ('#/chat-direct/' + item.chatTo.username + '?id=' + item.id);
+                }
             }
         };
 
