@@ -5,7 +5,19 @@
         height: 60px;
     }
     .ui.left.sidebar {
+        background-color: #4d394b;
         width: 220px;
+        * {
+            color: #4183c4!important;
+        }
+        .tms-header > input {
+            background-color: transparent;
+            border: 1px #676868 solid;
+            font-size: 12px;
+            padding: 4px;
+            width: 190px;
+            outline: none;
+        }
     }
     .ui.left.sidebar .ui.list {
         position: absolute;
@@ -13,15 +25,15 @@
         top: 60px;
         overflow-y: auto;
         width: 190px;
+        a > i.circular.icon {
+            box-shadow: 0 0 0 .1em rgb(65, 131, 196) inset;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #475a81;
+        }
     }
     .ui.left.sidebar .tms-header {
         height: 40px;
-    }
-    .ui.left.sidebar .tms-header input {
-        border: 1px #e0e1e2 solid;
-        font-size: 12px;
-        padding: 4px;
-        width: 190px;
     }
     .ui.left.sidebar .tms-header i.close.icon {
         position: absolute;
