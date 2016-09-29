@@ -312,7 +312,7 @@ public class ChatDirectController extends BaseController {
 		User loginUser = getLoginUser();
 		String _search = "%" + search + "%";
 		List<ChatDirect> chats = chatDirectRepository.queryAboutMe(loginUser,
-				_search, pageable.getOffset(), pageable.getPageNumber());
+				_search, pageable.getOffset(), pageable.getPageSize());
 		long cnt = chatDirectRepository.countAboutMe(loginUser, _search);
 
 		Page<ChatDirect> page = new PageImpl<>(chats, pageable, cnt);
