@@ -117,45 +117,55 @@
         @media only screen and (max-width: 767px) {
             left: 0;
         }
-    }
-    .ui.basic.segment.tms-msg-input .tms-upload-progress {
-        position: absolute;
-        bottom: 65px;
-        right: 15px;
-        left: 15px;
-    }
-    .ui.basic.segment.tms-msg-input .tms-upload-progress .dz-preview {
-        display: block!important;
-        width: auto!important;
-        background: #e0e1e2;
-        margin: 0;
-        padding: 7px;
-    }
-    .tms-msg-input .ui[class*="left action"].input>textarea {
-        border-top-left-radius: 0!important;
-        border-bottom-left-radius: 0!important;
-        border-left-color: transparent!important;
-    }
-    .tms-msg-input .ui.icon.input textarea {
-        padding-right: 2.67142857em!important;
-    }
-    .tms-msg-input .ui.input textarea {
-        margin: 0;
-        max-width: 100%;
-        -webkit-box-flex: 1;
-        -webkit-flex: 1 0 auto;
-        -ms-flex: 1 0 auto;
-        flex: 1 0 auto;
-        outline: 0;
-        -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-        text-align: left;
-        line-height: 1.2142em;
-        padding: .67861429em 1em;
-        background: #FFF;
-        border: 1px solid rgba(34, 36, 38, .15);
-        color: rgba(0, 0, 0, .87);
-        border-radius: .28571429rem;
-        box-shadow: none;
+        .tms-upload-progress {
+            position: absolute;
+            bottom: 65px;
+            right: 15px;
+            left: 15px;
+            .dz-preview {
+                display: block!important;
+                width: auto!important;
+                background: #e0e1e2;
+                margin: 0;
+                padding: 7px;
+            }
+        }
+        .ui[class*="left action"].input>textarea {
+            border-top-left-radius: 0!important;
+            border-bottom-left-radius: 0!important;
+            border-left-color: transparent!important;
+        }
+        .textareaWrapper {
+            // padding-right: 2.67142857em!important;
+            margin: 0;
+            max-width: 100%;
+            -webkit-box-flex: 1;
+            -webkit-flex: 1 0 auto;
+            -ms-flex: 1 0 auto;
+            flex: 1 0 auto;
+            border: 1px solid rgba(34, 36, 38, .15);
+            border-top-right-radius: .28571429rem;
+            border-bottom-right-radius: .28571429rem;
+        }
+        .ui.input textarea {
+            resize: none;
+            width: 100%;
+            padding-right: 2.67142857em!important;
+            margin: 0;
+            max-width: 100%;
+            outline: 0;
+            -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
+            text-align: left;
+            display: block;
+            // line-height: 1.2142em;
+            padding: .67861429em 1em;
+            background: #FFF;
+            border: none;
+            color: rgba(0, 0, 0, .87);
+            box-shadow: none;
+            border-top-right-radius: .28571429rem;
+            border-bottom-right-radius: .28571429rem;
+        }
     }
     .ui.top.menu {
         .item.tms-item:before {

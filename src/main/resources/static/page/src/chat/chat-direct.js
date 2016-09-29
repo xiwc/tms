@@ -18,6 +18,9 @@ import {
 import 'hotkeys';
 import 'textcomplete';
 import tips from 'common/common-tips';
+import {
+    default as SimpleMDE
+} from 'simplemde';
 
 export class ChatDirect {
 
@@ -504,7 +507,12 @@ export class ChatDirect {
         this.initHotkeys();
         this.initTextcomplete();
         this.initSearch();
+        // this.initSimpleMDE(this.chatInputRef);
 
+    }
+
+    initSimpleMDE(textareaDom) {
+        var simplemde = new SimpleMDE({ element: textareaDom });
     }
 
     initSearch() {

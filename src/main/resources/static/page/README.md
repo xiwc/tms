@@ -12,3 +12,4 @@ https://github.com/jeresig/jquery.hotkeys
 https://github.com/yuku-t/jquery-textcomplete
 https://github.com/yuku-t/jquery-textcomplete/blob/master/doc/how_to_use.md
 https://www.npmjs.com/package/aurelia-textcomplete
+https://github.com/NextStepWebs/simplemde-markdown-editor/

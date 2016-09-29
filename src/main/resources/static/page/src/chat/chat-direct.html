@@ -3,6 +3,7 @@
     <require from="./md-github.css"></require>
     <require from="dropzone/dist/basic.css"></require>
     <require from="swipebox/src/css/swipebox.min.css"></require>
+    <require from="simplemde/dist/simplemde.min.css"></require>
     <require from="resources/elements/em-confirm-modal"></require>
     <require from="resources/elements/em-hotkeys-modal"></require>
     <div ref="chatContainerRef" class="tms-chat-direct">
@@ -110,7 +111,9 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea ref="chatInputRef" placeholder="输入聊天内容(按下 / 键提示补全) (Ctrl+Enter换行,Enter发送,Esc清空)" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
+                        <div class="textareaWrapper">
+                            <textarea ref="chatInputRef" placeholder="输入聊天内容(按下 / 键提示补全) (Ctrl+Enter换行,Enter发送,Esc清空)" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
+                        </div>
                         <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
                     </div>
                     <div ref="uploadProgressRef" class="tms-upload-progress dropzone-previews"></div>

@@ -113,6 +113,14 @@
             ]
           },
           {
+            "name": "simplemde",
+            "path": "../node_modules/simplemde",
+            "main": "dist/simplemde.min",
+            "resources": [
+              "dist/simplemde.min.css"
+            ]
+          },
+          {
             "name": "paste",
             "path": "../node_modules/paste.js",
             "main": "paste",
