@@ -104,7 +104,7 @@ export class ChatDirect {
                 this.last = (data.msgs[0] - data.data.length <= 0);
                 !this.last && (this.lastCnt = data.msgs[0] - data.data.length);
                 _.defer(() => {
-                    $('html,body').scrollTo(`.tms-chat-direct .comments .comment[data-id=${start}]`, {
+                    $(this.commentsRef).scrollTo(`.comment[data-id=${start}]`, {
                         offset: this.offset
                     });
                 });
@@ -128,7 +128,7 @@ export class ChatDirect {
                 this.first = (data.msgs[0] - data.data.length <= 0);
                 !this.first && (this.firstCnt = data.msgs[0] - data.data.length);
                 _.defer(() => {
-                    $('html,body').scrollTo(`.tms-chat-direct .comments .comment[data-id=${start}]`, {
+                    $(this.commentsRef).scrollTo(`.comment[data-id=${start}]`, {
                         offset: this.offset
                     });
                 });
@@ -161,11 +161,11 @@ export class ChatDirect {
 
                 _.defer(() => {
                     if (this.markId) {
-                        $('html,body').scrollTo(`.tms-chat-direct .comments .comment[data-id=${this.markId}]`, {
+                        $(this.commentsRef).scrollTo(`.comment[data-id=${this.markId}]`, {
                             offset: this.offset
                         });
                     } else {
-                        $('html,body').scrollTo('max');
+                        $(this.commentsRef).scrollTo('max');
                     }
                 });
             } else {
@@ -225,7 +225,7 @@ export class ChatDirect {
                     }
                     this.chats = _.unionBy(this.chats, this.convertMd(data.data), 'id');
                     _.defer(() => {
-                        $('html,body').scrollTo('max');
+                        $(this.commentsRef).scrollTo('max');
                     });
                 } else {
                     toastr.error(data.data, '轮询获取消息失败!');
