@@ -48,4 +48,30 @@ public interface ChatDirectRepository extends JpaRepository<ChatDirect, Long> {
 	@Query(value = "SELECT COUNT(*) as cnt FROM chat_direct WHERE ((creator = ?1 AND chat_to = ?2) OR (creator = ?2 AND chat_to = ?1)) AND id > ?3", nativeQuery = true)
 	long countAllNew(User chatFrom, User chatTo, Long startId);
 
+	// 我 -> 其他人
+	@Query(value = "SELECT * FROM `chat_direct` WHERE creator = ?1 AND content LIKE ?2 ORDER BY create_date DESC LIMIT ?3,?4", nativeQuery = true)
+	List<ChatDirect> queryToOthers(User chatFrom, String search, int startId,
+			int limit);
+
+	// 我 -> 其他人
+	@Query(value = "SELECT COUNT(*) FROM `chat_direct` WHERE creator = ?1 AND content LIKE ?2", nativeQuery = true)
+	long countToOthers(User chatFrom, String search);
+
+	// 其他人 -> 我
+	@Query(value = "SELECT * FROM `chat_direct` WHERE chat_to = ?1 AND content LIKE ?2 ORDER BY create_date DESC LIMIT ?3,?4", nativeQuery = true)
+	List<ChatDirect> queryToMe(User chatTo, String search, int startId,
+			int limit);
+
+	// 其他人 -> 我
+	@Query(value = "SELECT COUNT(*) FROM `chat_direct` WHERE chat_to = ?1 AND content LIKE ?2", nativeQuery = true)
+	long countToMe(User chatTo, String search);
+
+	// 其他人 -> 我 & 我 -> 其他人
+	@Query(value = "SELECT * FROM `chat_direct` WHERE ((creator = ?1) OR (chat_to = ?1)) AND content LIKE ?2 ORDER BY create_date DESC LIMIT ?3,?4", nativeQuery = true)
+	List<ChatDirect> queryAboutMe(User user, String search, int startId,
+			int limit);
+
+	// 其他人 -> 我 & 我 -> 其他人
+	@Query(value = "SELECT COUNT(*) FROM `chat_direct` WHERE ((creator = ?1) OR (chat_to = ?1)) AND content LIKE ?2", nativeQuery = true)
+	long countAboutMe(User user, String search);
 }

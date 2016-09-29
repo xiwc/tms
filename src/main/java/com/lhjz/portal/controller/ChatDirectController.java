@@ -299,4 +299,25 @@ public class ChatDirectController extends BaseController {
 		return RespBody.succeed(chats).addMsg(count);
 	}
 
+	@RequestMapping(value = "search", method = RequestMethod.GET)
+	@ResponseBody
+	public RespBody search(@RequestParam("search") String search,
+			@PageableDefault(sort = {
+					"createDate" }, direction = Direction.DESC) Pageable pageable) {
+
+		if (StringUtil.isEmpty(search)) {
+			return RespBody.failed("检索条件不能为空!");
+		}
+
+		User loginUser = getLoginUser();
+		String _search = "%" + search + "%";
+		List<ChatDirect> chats = chatDirectRepository.queryAboutMe(loginUser,
+				_search, pageable.getOffset(), pageable.getPageNumber());
+		long cnt = chatDirectRepository.countAboutMe(loginUser, _search);
+
+		Page<ChatDirect> page = new PageImpl<>(chats, pageable, cnt);
+
+		return RespBody.succeed(page);
+	}
+
 }
