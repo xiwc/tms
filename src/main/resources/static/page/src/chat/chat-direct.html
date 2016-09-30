@@ -6,6 +6,7 @@
     <require from="simplemde/dist/simplemde.min.css"></require>
     <require from="resources/elements/em-confirm-modal"></require>
     <require from="resources/elements/em-hotkeys-modal"></require>
+    <require from="resources/elements/em-chat-input"></require>
     <div ref="chatContainerRef" class="tms-chat-direct">
         <div class="ui top fixed menu">
             <!-- <div class="item">
@@ -96,34 +97,12 @@
                     </div>
                     <button if.bind="!first" click.delegate="firstMoreHandler()" class="fluid basic ui button tms-next-more">加载更多(${firstCnt})</button>
                 </div>
-                <div class="ui basic segment tms-msg-input dropzone">
-                    <div ref="inputRef" class="ui left action fluid icon input dropzone">
-                        <div ref="chatBtnRef" class="ui icon button">
-                            <i class="plus icon"></i>
-                        </div>
-                        <div class="ui flowing popup bottom left transition hidden">
-                            <div class="ui middle aligned selection list">
-                                <div ref="btnItemUploadRef" class="item">
-                                    <i class="upload icon"></i>
-                                    <div class="content">
-                                        上传文件
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="textareaWrapper">
-                            <textarea ref="chatInputRef" placeholder="输入聊天内容(按下 / 键提示补全) (Ctrl+Enter换行,Enter发送,Esc清空)" pastable autosize value.bind="content" keydown.trigger="sendKeydownHandler($event, chatInputRef)" rows="1"></textarea>
-                        </div>
-                        <i click.delegate="sendChatMsgHandler()" title="发送消息(Enter)" class="send link icon"></i>
-                    </div>
-                    <div ref="uploadProgressRef" class="tms-upload-progress dropzone-previews"></div>
-                </div>
+                <em-chat-input chat-to.bind="chatTo" poll.bind="poll" em-chat-input.ref="emChatInputRef"></em-chat-input>
             </div>
             <div ref="rightSidebarRef" class="tms-right-sidebar">
                 <div class="panel-search">
                     <div class="ui basic segment minimal selection list segment comments">
                         <h1 show.bind="!searchChats.length" class="ui center aligned header">无符合检索结果</h1>
-                        <!-- <button if.bind="!first" click.delegate="lastMoreHandler()" class="fluid basic ui button tms-pre-more">加载更多(${lastCnt})</button> -->
                         <div repeat.for="item of searchChats" swipebox class="comment item ${item.id == markId ? 'active' : ''}" data-id="${item.id}">
                             <a class="avatar">
                                 <i class="circular icon large user"></i>
@@ -134,10 +113,7 @@
                                     <div class="date" data-timeago="${item.createDate}" title="${item.createDate | date}">${item.createDate | timeago}</div>
                                 </div>
                                 <div class="text markdown-body" innerhtml.bind="item.contentMd"></div>
-                                <!-- <textarea ref="editTxtRef" pastable autosize focusout.trigger="focusoutHandler(item)" keydown.trigger="eidtKeydownHandler($event, item, editTxtRef)" show.bind="item.isEditing" value.bind="item.content" class="tms-edit-textarea" rows="1"></textarea> -->
                                 <div class="actions">
-                                    <!-- <a if.bind="item.creator.username == loginUser.username" click.delegate="editHandler(item, editTxtRef)" class="tms-edit">编辑</a> -->
-                                    <!-- <a if.bind="item.creator.username == loginUser.username" click.delegate="deleteHandler(item)" class="tms-delete">删除</a> -->
                                     <a click.delegate="gotoChatHandler(item)" class="tms-goto" href="">定位</a>
                                     <a class="tms-copy tms-clipboard" data-clipboard-text="${item.content}">复制</a>
                                     <a class="tms-share tms-clipboard" data-clipboard-text="${selfLink + '?id=' + item.id}">分享</a>
@@ -148,19 +124,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-    <div ref="previewTemplateRef" style="display: none;">
-        <div class="dz-preview dz-file-preview">
-            <div class="dz-details">
-                <div class="dz-filename"><span data-dz-name></span></div>
-                <div class="dz-size" data-dz-size></div>
-                <img data-dz-thumbnail />
-            </div>
-            <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div>
-            <div class="dz-success-mark"><span>✔</span></div>
-            <div class="dz-error-mark"><span>✘</span></div>
-            <div class="dz-error-message"><span data-dz-errormessage></span></div>
         </div>
     </div>
     <em-confirm-modal em-confirm-modal.ref="emConfirmModal"></em-confirm-modal>
