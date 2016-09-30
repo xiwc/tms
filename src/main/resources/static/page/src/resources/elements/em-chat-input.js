@@ -74,7 +74,7 @@ export class EmChatInput {
             dictDefaultMessage: '',
             maxFilesize: 10,
             addRemoveLinks: true,
-            previewsContainer: this.uploadProgressRef,
+            previewsContainer: this.chatStatusBarRef,
             previewTemplate: this.previewTemplateRef.innerHTML,
             dictCancelUpload: '取消上传',
             dictCancelUploadConfirmation: '确定要取消上传吗?',
@@ -155,7 +155,7 @@ export class EmChatInput {
                 return '';
             }
         }], {
-            appendTo: '.tms-upload-progress',
+            appendTo: '.tms-chat-status-bar',
             maxCount: 20
         });
 
@@ -214,7 +214,7 @@ export class EmChatInput {
     }
 
     isTipsShow() {
-        return $(this.uploadProgressRef).find('.textcomplete-dropdown:visible').size() === 1;
+        return $(this.chatStatusBarRef).find('.textcomplete-dropdown:visible').size() === 1;
     }
 
     /**
