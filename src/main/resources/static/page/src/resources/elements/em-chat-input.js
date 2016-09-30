@@ -44,7 +44,7 @@ export class EmChatInput {
     }
 
     initDropzone() {
-        this.initUploadDropzone(this.$chatMsgInputRef, () => {
+        this.initUploadDropzone($('.CodeMirror-wrap', this.inputRef), () => {
             return this.$chatMsgInputRef
         }, false);
         this.initUploadDropzone($(this.btnItemUploadRef).children().andSelf(), () => {
@@ -166,6 +166,10 @@ export class EmChatInput {
                 this.sendChatMsg();
             } else if(e.keyCode === 27) {
             	this.simplemde.value('');
+            } else if(e.ctrlKey && e.keyCode == 85) {
+            	$(this.btnItemUploadRef).find('.content').click();
+            } else if(e.ctrlKey && e.keyCode == 191) {
+            	this.emHotkeysModal.show();
             }
         });
     }
@@ -195,6 +199,7 @@ export class EmChatInput {
             contentHtml: html
         }, (data, textStatus, xhr) => {
             if (data.success) {
+            	this.poll.reset();
                 this.simplemde.value('');
             } else {
                 toastr.error(data.data, '发送消息失败!');

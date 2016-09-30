@@ -12,7 +12,7 @@
         }
         .tms-upload-progress {
             position: absolute;
-            bottom: 70px;
+            bottom: 75px;
             right: 15px;
             left: 15px;
             .dz-preview {
@@ -40,8 +40,10 @@
             .CodeMirror,
             .CodeMirror-scroll {
                 min-height: 0;
-                margin-right: 35px;
                 border: none;
+            }
+            .CodeMirror-scroll {
+            	max-height: 300px;
             }
         }
         .ui.input textarea {

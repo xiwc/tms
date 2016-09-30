@@ -368,6 +368,7 @@ export class ChatDirect {
         }, 5000);
 
         this.initSearch();
+        this.initHotkeys();
 
     }
 
@@ -474,10 +475,10 @@ export class ChatDirect {
     initHotkeys() {
         $(document).bind('keydown', 'ctrl+u', (evt) => {
             evt.preventDefault();
-            $(this.btnItemUploadRef).find('.content').click();
+            $(this.emChatInputRef.btnItemUploadRef).find('.content').click();
         }).bind('keydown', 'ctrl+/', (evt) => {
             evt.preventDefault();
-            this.emHotkeysModal.show();
+            this.emChatInputRef.emHotkeysModal.show();
         });
     }
 
