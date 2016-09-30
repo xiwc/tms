@@ -97,9 +97,9 @@ INSERT INTO `authorities` (username, authority) VALUES ('user', 'ROLE_USER');
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('super', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'super@tms.com', 'Bultin', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('admin', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'admin@tms.com', 'Normal', '2015-04-25 10:01:51', '0');
-INSERT INTO `users` (username, password, enabled, mails, status, create_date, version) VALUES ('user', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'user@tms.com', 'Normal', '2015-04-25 10:01:51', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, login_count, version) VALUES ('super', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'super@tms.com', 'Bultin', '2015-04-25 10:01:51', '0', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, login_count, version) VALUES ('admin', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'admin@tms.com', 'Normal', '2015-04-25 10:01:51', '0', '0');
+INSERT INTO `users` (username, password, enabled, mails, status, create_date, login_count, version) VALUES ('user', '$2a$10$gVkJuJuU0.yWP4GQq3745OYvoxav9zGcDYlDuk0lxnLASGaeDGtDW', '', 'user@tms.com', 'Normal', '2015-04-25 10:01:51', '0', '0');
 
 -- ----------------------------
 -- Table structure for persistent_logins
