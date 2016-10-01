@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -11,6 +13,11 @@ import javax.persistence.TemporalType;
 public class OauthApprovals implements Serializable {
 
 	private static final long serialVersionUID = -2506015946074440618L;
+
+	@Id
+	@GeneratedValue
+	private Long id;
+
 	private String userId;
 	private String clientId;
 	private String scope;
@@ -19,6 +26,14 @@ public class OauthApprovals implements Serializable {
 	private Date expiresAt;
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date lastModifiedAt;
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 	public String getUserId() {
 		return userId;
