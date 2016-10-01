@@ -369,7 +369,28 @@ export class ChatDirect {
 
         this.initSearch();
         this.initHotkeys();
+        this.initFocusedComment();
 
+    }
+
+    initFocusedComment() {
+        $(this.commentsRef).on('click', '.comment.item', (event) => {
+            event.preventDefault();
+            this.focusedComment = $(event.currentTarget);
+        }).on('dblclick', '.comment.item', (event) => {
+            event.preventDefault();
+            if (event.ctrlKey) {
+                let chatId = $(event.currentTarget).attr('data-id');
+                let $t = $(event.currentTarget).find('.content > textarea');
+                let item = _.find(this.chats, { id: Number.parseInt(chatId) });
+
+                item.isEditing = true;
+                _.defer(() => {
+                    $t.focus().select();
+                    autosize.update($t.get(0));
+                });
+            }
+        });
     }
 
     initSearch() {
@@ -471,6 +492,30 @@ export class ChatDirect {
         $(this.searchInputRef).val('').focus();
     }
 
+    getScrollTargetComment(isPrev) {
+        if (isPrev) {
+            if (this.focusedComment && this.focusedComment.size() === 1) {
+                let prev = this.focusedComment.prev('.comment.item');
+                (prev.size() === 1) && (this.focusedComment = prev);
+            } else {
+                this.focusedComment = $(this.commentsRef).children('.comment.item:first');
+            }
+        } else {
+            if (this.focusedComment && this.focusedComment.size() === 1) {
+                let next = this.focusedComment.next('.comment.item');
+                (next.size() === 1) && (this.focusedComment = next);
+            } else {
+                this.focusedComment = $(this.commentsRef).children('.comment.item:last');
+            }
+        }
+        return this.focusedComment;
+    }
+
+    scrollTo(target) {
+        $(this.commentsRef).scrollTo(target, {
+            offset: this.offset
+        });
+    }
 
     initHotkeys() {
         $(document).bind('keydown', 'ctrl+u', (evt) => {
@@ -479,6 +524,18 @@ export class ChatDirect {
         }).bind('keydown', 'ctrl+/', (evt) => {
             evt.preventDefault();
             this.emChatInputRef.emHotkeysModal.show();
+        }).bind('keydown', 'alt+up', (evt) => {
+            evt.preventDefault();
+            this.scrollTo(this.getScrollTargetComment(true));
+        }).bind('keydown', 'alt+down', (evt) => {
+            evt.preventDefault();
+            this.scrollTo(this.getScrollTargetComment());
+        }).bind('keydown', 'alt+ctrl+up', () => {
+            event.preventDefault();
+            this.scrollTo($(this.commentsRef).children('.comment.item:first'));
+        }).bind('keydown', 'alt+ctrl+down', () => {
+            event.preventDefault();
+            this.scrollTo($(this.commentsRef).children('.comment.item:last'));
         });
     }
 

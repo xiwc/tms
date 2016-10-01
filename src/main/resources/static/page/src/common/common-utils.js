@@ -75,7 +75,7 @@ export class CommonUtils {
      */
     errorAutoTry(callback, time) {
 
-        if(this.isRunning) {
+        if (this.isRunning) {
             return;
         }
 
@@ -104,6 +104,29 @@ export class CommonUtils {
             cnt--;
         }, 1000);
     }
+
+    /**
+     * 判断视图元素是否在可视区域中
+     * @param  {[type]}  el [description]
+     * @return {Boolean}    [description]
+     */
+    isElementInViewport(el) {
+
+        //special bonus for those using jQuery
+        if (typeof jQuery === "function" && el instanceof jQuery) {
+            el = el[0];
+        }
+
+        var rect = el.getBoundingClientRect();
+
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+        );
+    }
+
 }
 
 export default new CommonUtils();
