@@ -324,7 +324,7 @@ export class ChatDirect {
                 if (data.success) {
                     toastr.success('更新消息成功!');
                     item.contentMd = marked(item.content);
-                    item.isEditing = false;
+                    // item.isEditing = false;
                 } else {
                     toastr.error(data.data, '更新消息失败!');
                 }
