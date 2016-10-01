@@ -17,14 +17,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -42,11 +47,19 @@ import com.lhjz.portal.repository.UserRepository;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
-public class SecurityConfig {
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
+public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 
 	@Autowired
 	DataSource dataSource;
+
+	@Autowired
+	private SecurityConfiguration securityConfig;
+
+	@Override
+	protected MethodSecurityExpressionHandler createExpressionHandler() {
+		return new OAuth2MethodSecurityExpressionHandler();
+	}
 
 	@Bean
 	BCryptPasswordEncoder bCryptPasswordEncoderBean() {
@@ -54,18 +67,15 @@ public class SecurityConfig {
 	}
 
 	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth)
-			throws Exception {
+	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
-		auth.jdbcAuthentication().dataSource(dataSource)
-				.passwordEncoder(bCryptPasswordEncoderBean());
+		auth.jdbcAuthentication().dataSource(dataSource).passwordEncoder(bCryptPasswordEncoderBean());
 	}
 
 	@Configuration
 	@Order(1)
 	@Profile({ "dev", "prod" })
-	public static class SecurityConfiguration extends
-			WebSecurityConfigurerAdapter {
+	public static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 		@Autowired
 		DataSource dataSource;
@@ -81,24 +91,42 @@ public class SecurityConfig {
 		}
 
 		@Override
+		@Bean
+		public AuthenticationManager authenticationManagerBean() throws Exception {
+			return super.authenticationManagerBean();
+		}
+
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			web.ignoring().antMatchers("/oauth/uncache_approvals", "/oauth/cache_approvals");
+		}
+
+		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/admin/**")
-					.authorizeRequests()
-					.antMatchers("/admin/file/download/**")
-					.permitAll()
-					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**", "/admin/login", "/admin/page/**")
-					.permitAll()
-					.anyRequest().authenticated().and().formLogin()
+			// @formatter:off
+			http
+			.antMatcher("/admin/**")
+			.authorizeRequests()
+				.antMatchers("/admin/file/download/**").permitAll()
+				.antMatchers("/admin/css/**", 
+						"/admin/img/**", 
+						"/admin/js/**", 
+						"/admin/login", 
+						"/admin/page/**").permitAll()
+				.anyRequest().authenticated()
+				.and().formLogin()
 					.loginPage("/admin/login").permitAll()
 					.loginProcessingUrl("/admin/signin")
-					.successHandler(loginSuccessHandler).and().logout()
+					.successHandler(loginSuccessHandler)
+				.and().logout()
 					.logoutUrl("/admin/logout").permitAll()
-					.logoutSuccessUrl("/admin/login?logout").and().rememberMe()
+					.logoutSuccessUrl("/admin/login?logout")
+				.and().rememberMe()
 					.tokenRepository(persistentTokenRepository())
-					.tokenValiditySeconds(1209600).and().csrf().disable();
-
+					.tokenValiditySeconds(1209600)
+				.and().csrf().disable();
+			// @formatter:on
 		}
 
 	}
@@ -106,8 +134,7 @@ public class SecurityConfig {
 	@Configuration
 	@Order(1)
 	@Profile("test")
-	public static class SecurityConfigurationTest extends
-			WebSecurityConfigurerAdapter {
+	public static class SecurityConfigurationTest extends WebSecurityConfigurerAdapter {
 
 		@Autowired
 		LoginSuccessHandler loginSuccessHandler;
@@ -115,34 +142,25 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/admin/**")
-					.authorizeRequests()
-					.antMatchers("/admin/file/download/**")
-					.permitAll()
-					.antMatchers("/admin/css/**", "/admin/img/**",
-							"/admin/js/**").permitAll().anyRequest()
-					.authenticated().and().formLogin()
-					.loginPage("/admin/login").permitAll()
-					.loginProcessingUrl("/admin/signin")
-					.successHandler(loginSuccessHandler).and().logout()
-					.logoutUrl("/admin/logout")
-					.logoutSuccessUrl("/admin/login").and().csrf().disable();
+			http.antMatcher("/admin/**").authorizeRequests().antMatchers("/admin/file/download/**").permitAll()
+					.antMatchers("/admin/css/**", "/admin/img/**", "/admin/js/**").permitAll().anyRequest()
+					.authenticated().and().formLogin().loginPage("/admin/login").permitAll()
+					.loginProcessingUrl("/admin/signin").successHandler(loginSuccessHandler).and().logout()
+					.logoutUrl("/admin/logout").logoutSuccessUrl("/admin/login").and().csrf().disable();
 
 		}
 
 	}
 
 	@Component("loginSuccessHandler")
-	public static class LoginSuccessHandler extends
-			SavedRequestAwareAuthenticationSuccessHandler {
+	public static class LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
 		@Autowired
 		UserRepository userRepository;
 
 		@Override
-		public void onAuthenticationSuccess(HttpServletRequest request,
-				HttpServletResponse response, Authentication authentication)
-				throws IOException, ServletException {
+		public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+				Authentication authentication) throws IOException, ServletException {
 
 			UserDetails uds = (UserDetails) authentication.getPrincipal();
 			// WebAuthenticationDetails wauth = (WebAuthenticationDetails)
@@ -153,8 +171,7 @@ public class SecurityConfig {
 			if (loginUser != null) {
 				loginUser.setLastLoginDate(new Date());
 				// loginUser.setLoginRemoteAddress(wauth.getRemoteAddress());
-				loginUser.setLoginRemoteAddress(
-						LoginSuccessHandler.getIpAddr(request));
+				loginUser.setLoginRemoteAddress(LoginSuccessHandler.getIpAddr(request));
 
 				long loginCount = loginUser.getLoginCount();
 				loginUser.setLoginCount(++loginCount);
@@ -172,16 +189,13 @@ public class SecurityConfig {
 		public static final String getIpAddr(final HttpServletRequest request) {
 
 			String ipString = request.getHeader("x-forwarded-for");
-			if (StringUtils.isBlank(ipString)
-					|| "unknown".equalsIgnoreCase(ipString)) {
+			if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
 				ipString = request.getHeader("Proxy-Client-IP");
 			}
-			if (StringUtils.isBlank(ipString)
-					|| "unknown".equalsIgnoreCase(ipString)) {
+			if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
 				ipString = request.getHeader("WL-Proxy-Client-IP");
 			}
-			if (StringUtils.isBlank(ipString)
-					|| "unknown".equalsIgnoreCase(ipString)) {
+			if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
 				ipString = request.getRemoteAddr();
 			}
 
