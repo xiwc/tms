@@ -1,4 +1,4 @@
-import { bindable, containerless } from 'aurelia-framework';
+import { bindable, containerless, inject } from 'aurelia-framework';
 import 'textcomplete';
 import tips from 'common/common-tips';
 import {
@@ -7,12 +7,38 @@ import {
 import {
     default as marked
 } from 'marked'; // https://github.com/chjj/marked
+import {
+    EventAggregator
+}
+from 'aurelia-event-aggregator';
 
 @containerless
+@inject(EventAggregator)
 export class EmChatInput {
 
     @bindable chatTo;
     @bindable poll;
+
+    /**
+     * 构造函数
+     */
+    constructor(ea) {
+        this.eventAggregator = ea;
+
+        this.subscribe = this.eventAggregator.subscribe(nsCons.HOTKEY, (payload) => {
+            let key = payload.key;
+            if(key == 'ctrl+i') {
+                this.simplemde.codemirror.focus();
+            }
+        });
+    }
+
+    /**
+     * 当数据绑定引擎从视图解除绑定时被调用
+     */
+    unbind() {
+        this.subscribe.dispose();
+    }
 
     /**
      * 当视图被附加到DOM中时被调用
@@ -164,12 +190,12 @@ export class EmChatInput {
                 e.preventDefault();
             } else if (e.ctrlKey && e.keyCode === 13) {
                 this.sendChatMsg();
-            } else if(e.keyCode === 27) {
-            	this.simplemde.value('');
-            } else if(e.ctrlKey && e.keyCode == 85) {
-            	$(this.btnItemUploadRef).find('.content').click();
-            } else if(e.ctrlKey && e.keyCode == 191) {
-            	this.emHotkeysModal.show();
+            } else if (e.keyCode === 27) {
+                this.simplemde.value('');
+            } else if (e.ctrlKey && e.keyCode == 85) {
+                $(this.btnItemUploadRef).find('.content').click();
+            } else if (e.ctrlKey && e.keyCode == 191) {
+                this.emHotkeysModal.show();
             }
         });
     }
@@ -199,7 +225,7 @@ export class EmChatInput {
             contentHtml: html
         }, (data, textStatus, xhr) => {
             if (data.success) {
-            	this.poll.reset();
+                this.poll.reset();
                 this.simplemde.value('');
             } else {
                 toastr.error(data.data, '发送消息失败!');

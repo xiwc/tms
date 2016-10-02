@@ -1,0 +1,3 @@
+window.nsCons = {
+    HOTKEY: 'hotkey'
+}

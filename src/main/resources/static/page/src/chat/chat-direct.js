@@ -1,4 +1,4 @@
-import { bindable } from 'aurelia-framework';
+import { bindable, inject } from 'aurelia-framework';
 import poll from "common/common-poll";
 import 'jquery.scrollto'; // https://github.com/flesler/jquery.scrollTo
 import {
@@ -16,7 +16,15 @@ import {
     default as autosize
 } from 'autosize';
 import 'hotkeys';
+import {
+    default as hljs
+} from 'highlight';
+import {
+    EventAggregator
+}
+from 'aurelia-event-aggregator';
 
+@inject(EventAggregator)
 export class ChatDirect {
 
     @bindable content = '';
@@ -36,9 +44,13 @@ export class ChatDirect {
     /**
      * 构造函数
      */
-    constructor() {
+    constructor(ea) {
+        this.eventAggregator = ea;
         marked.setOptions({
-            breaks: true
+            breaks: true,
+            highlight: function(code) {
+                return hljs.highlightAuto(code).value;
+            }
         });
 
         Dropzone.autoDiscover = false;
@@ -536,6 +548,17 @@ export class ChatDirect {
         }).bind('keydown', 'alt+ctrl+down', () => {
             event.preventDefault();
             this.scrollTo($(this.commentsRef).children('.comment.item:last'));
+        }).bind('keydown', 'ctrl+.', () => {
+            event.preventDefault();
+            this.toggleRightSidebar();
+        }).bind('keydown', 'ctrl+k', () => {
+            event.preventDefault();
+            $(this.chatToDropdownRef).dropdown('toggle');
+        }).bind('keydown', 'ctrl+i', () => {
+            event.preventDefault();
+            this.eventAggregator.publish(nsCons.HOTKEY, {
+                key: 'ctrl+i'
+            });
         });
     }
 

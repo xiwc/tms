@@ -9,6 +9,7 @@ import {
 from 'wurl';
 import 'lodash';
 import utils from 'common/common-utils';
+import 'common/common-constant';
 
 export class App {
     constructor() {

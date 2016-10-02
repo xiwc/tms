@@ -121,6 +121,14 @@
             ]
           },
           {
+            "name": "highlight",
+            "path": "../node_modules/highlight.js",
+            "main": "lib/index",
+            "resources": [
+              "styles/github.css"
+            ]
+          },
+          {
             "name": "paste",
             "path": "../node_modules/paste.js",
             "main": "paste",
