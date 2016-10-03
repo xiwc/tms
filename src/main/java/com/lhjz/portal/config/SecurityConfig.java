@@ -17,19 +17,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
-import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.provider.expression.OAuth2MethodSecurityExpressionHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -47,19 +42,11 @@ import com.lhjz.portal.repository.UserRepository;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true, proxyTargetClass = true)
-public class SecurityConfig extends GlobalMethodSecurityConfiguration {
+@EnableGlobalMethodSecurity(securedEnabled = true)
+public class SecurityConfig {
 
 	@Autowired
 	DataSource dataSource;
-
-	@Autowired
-	private SecurityConfiguration securityConfig;
-
-	@Override
-	protected MethodSecurityExpressionHandler createExpressionHandler() {
-		return new OAuth2MethodSecurityExpressionHandler();
-	}
 
 	@Bean
 	BCryptPasswordEncoder bCryptPasswordEncoderBean() {
@@ -91,41 +78,40 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 		}
 
 		@Override
-		@Bean
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
-
-		@Override
-		public void configure(WebSecurity web) throws Exception {
-			web.ignoring().antMatchers("/oauth/uncache_approvals", "/oauth/cache_approvals");
-		}
-
-		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
 			// @formatter:off
 			http
-			.antMatcher("/admin/**")
-			.authorizeRequests()
-				.antMatchers("/admin/file/download/**").permitAll()
+				.antMatcher("/admin/**")
+					.authorizeRequests()
+					.antMatchers("/admin/file/download/**")
+					.permitAll()
 				.antMatchers("/admin/css/**", 
 						"/admin/img/**", 
 						"/admin/js/**", 
 						"/admin/login", 
-						"/admin/page/**").permitAll()
-				.anyRequest().authenticated()
-				.and().formLogin()
-					.loginPage("/admin/login").permitAll()
+						"/admin/page/**")
+					.permitAll()
+				.anyRequest()
+					.authenticated()
+				.and()
+					.formLogin()
+					.loginPage("/admin/login")
+					.permitAll()
 					.loginProcessingUrl("/admin/signin")
 					.successHandler(loginSuccessHandler)
-				.and().logout()
-					.logoutUrl("/admin/logout").permitAll()
+				.and()
+					.logout()
+					.logoutUrl("/admin/logout")
+					.permitAll()
 					.logoutSuccessUrl("/admin/login?logout")
-				.and().rememberMe()
+				.and()
+					.rememberMe()
 					.tokenRepository(persistentTokenRepository())
 					.tokenValiditySeconds(1209600)
-				.and().csrf().disable();
+				.and()
+					.csrf()
+					.disable();
 			// @formatter:on
 		}
 
@@ -142,11 +128,30 @@ public class SecurityConfig extends GlobalMethodSecurityConfiguration {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/admin/**").authorizeRequests().antMatchers("/admin/file/download/**").permitAll()
-					.antMatchers("/admin/css/**", "/admin/img/**", "/admin/js/**").permitAll().anyRequest()
-					.authenticated().and().formLogin().loginPage("/admin/login").permitAll()
-					.loginProcessingUrl("/admin/signin").successHandler(loginSuccessHandler).and().logout()
-					.logoutUrl("/admin/logout").logoutSuccessUrl("/admin/login").and().csrf().disable();
+			// @formatter:off
+			http
+				.antMatcher("/admin/**")
+					.authorizeRequests()
+					.antMatchers("/admin/file/download/**")
+					.permitAll()
+				.antMatchers("/admin/css/**", "/admin/img/**", "/admin/js/**")
+					.permitAll()
+				.anyRequest()
+					.authenticated()
+				.and()
+					.formLogin()
+					.loginPage("/admin/login")
+					.permitAll()
+					.loginProcessingUrl("/admin/signin")
+					.successHandler(loginSuccessHandler)
+				.and()
+					.logout()
+					.logoutUrl("/admin/logout")
+					.logoutSuccessUrl("/admin/login")
+				.and()
+					.csrf()
+					.disable();
+			// @formatter:on
 
 		}
 
