@@ -8,9 +8,8 @@ import org.springframework.security.oauth2.provider.ClientDetails;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
 import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.security.oauth2.provider.approval.ApprovalStoreUserApprovalHandler;
-import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 public class TmsUserApprovalHandler extends ApprovalStoreUserApprovalHandler {
 
 	private boolean useApprovalStore = true;
