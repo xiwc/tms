@@ -27,18 +27,22 @@ export default {
     '/b': {
         label: '/b [粗体]',
         value: '****',
+        ch: 2,
     },
     '/i': {
         label: '/i [斜体]',
         value: '**',
+        ch: 1,
     },
     '/s': {
         label: '/s [删除线]',
         value: '~~~~',
+        ch: 2,
     },
     '/code': {
         label: '/code [代码]',
         value: '```\n\n```\n',
+        line: 1
     },
     '/quote': {
         label: '/quote [引用]',
@@ -51,10 +55,12 @@ export default {
     '/href': {
         label: '/href [链接]',
         value: '[](http://)',
+        ch: 1,
     },
     '/img': {
         label: '/img [图片]',
         value: '![](http://)',
+        ch: 2,
     },
     '/table': {
         label: '/table [表格]',
