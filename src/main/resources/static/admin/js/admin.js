@@ -137,6 +137,19 @@ jQuery(function($) {
         $(this).find('form').find(':hidden[name="name"]').val($('title').text()).end().submit();
     });
 
+    // 初始化系统外链
+    $.get('/admin/json/sys-links.json', function(data) {
+        $.each(data.links, function(index, item) {
+            if (!item.disabled) {
+                var $item = $('<a target="_blank" class="item"></a>')
+                    .attr('href', item.href)
+                    .html(item.title);
+
+                $('.tms-sys-links').append($item);
+            }
+        });
+    });
+
 });
 
 jQuery(function($) {
