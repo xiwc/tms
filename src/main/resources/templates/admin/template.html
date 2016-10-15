@@ -118,7 +118,7 @@
                     <a class="reply">回复</a>
                     <a class="stow">收藏</a> 
                     {{if isEditable}}
-                    <a class="edit">编辑</a> 
+                    <a title="Alt+双击" class="edit">编辑</a> 
                     {{/if}}
                     {{if actions}}
                     <a class="delete">删除</a> 
@@ -128,12 +128,12 @@
                         <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                         <div class="menu">
                             {{if isEditable}}
-                            <div class="item edit">编辑</div>
+                            <div title="Alt+双击" class="item edit">编辑</div>
                             {{/if}}
                             {{if actions}}
                             <div class="item delete">删除</div> 
                             {{/if}}
-                            <div class="item btn-read">阅读</div>
+                            <div class="item btn-read" title="Ctrl+双击">阅读</div>
                             <div class="item btn-jira">转JIRA</div>
                             {{if actions}}
                             <div class="item btn-openEdit" data-value="${isOpenEdit}">${openEditText}</div>
@@ -181,7 +181,7 @@
                     <a class="reply">回复</a>
                     <a class="stow">收藏</a> 
                     {{if isEditable}}
-                    <a class="edit">编辑</a> 
+                    <a title="Alt+双击" class="edit">编辑</a> 
                     {{/if}}
                     {{if actions}}
                     <a class="delete">删除</a> 
@@ -191,12 +191,12 @@
                         <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                         <div class="menu">
                             {{if isEditable}}
-                            <div class="item edit">编辑</div>
+                            <div title="Alt+双击" class="item edit">编辑</div>
                             {{/if}}
                             {{if actions}}
                             <div class="item delete">删除</div> 
                             {{/if}}
-                            <div class="item btn-read">阅读</div>
+                            <div class="item btn-read" title="Ctrl+双击">阅读</div>
                             <div class="item btn-jira">转JIRA</div>
                             {{if actions}}
                             <div class="item btn-openEdit" data-value="${isOpenEdit}">${openEditText}</div>
