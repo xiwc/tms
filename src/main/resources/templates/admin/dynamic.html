@@ -2134,7 +2134,7 @@
 
         $('body').on('dblclick', '.comments .comment .text.markdown-body', function(event) {
             $edit = $(this).closest('.comment').find('.actions .edit');
-            if (event.altKey && $edit.size() === 1) {
+            if (event.altKey && $edit.size() !== 0) {
                 $edit.click();
             } else if (event.ctrlKey) {
                 commentRead($(this).closest('.comment'));
