@@ -2132,6 +2132,15 @@
             });
         });
 
+        $('body').on('dblclick', '.comments .comment .text.markdown-body', function(event) {
+            $edit = $(this).closest('.comment').find('.actions .edit');
+            if (event.altKey && $edit.size() === 1) {
+                $edit.click();
+            } else if (event.ctrlKey) {
+                commentRead($(this).closest('.comment'));
+            }
+        });
+
         $('body').on('click', '.comments .comment .content .author, .comments .comment .avatar, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user, .pp-translate .group-user, .pp-translate .user-group', function(event) {
             event.preventDefault();
             insertAtUserOrGroup(cm, $(this).attr('data-value'));
