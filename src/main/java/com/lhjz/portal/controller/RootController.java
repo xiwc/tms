@@ -103,6 +103,8 @@ public class RootController extends BaseController {
 			@PageableDefault(size = 2, sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Chat> chats = null;
+		
+		boolean isLogin = WebUtil.isLogin();
 
 		if (StringUtil.isNotEmpty(id)) {
 			long cntGtId = chatRepository.countPublicGtId(id);
@@ -113,12 +115,15 @@ public class RootController extends BaseController {
 			}
 
 			pageable = new PageRequest(page > -1 ? (int) page : 0, size, Direction.DESC, "createDate");
-			chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki, false, pageable);
+			chats = isLogin ? chatRepository.findByType(ChatType.Wiki, pageable)
+					: chatRepository.findByTypeAndPrivated(ChatType.Wiki, false, pageable);
 		} else if (StringUtil.isNotEmpty(search)) {
-			chats = chatRepository.findByTypeAndPrivatedAndContentLike(ChatType.Wiki, false, "%" + search + "%",
-					pageable);
+			chats = isLogin ? chatRepository.findByTypeAndContentLike(ChatType.Wiki, "%" + search + "%", pageable)
+					: chatRepository.findByTypeAndPrivatedAndContentLike(ChatType.Wiki, false, "%" + search + "%",
+							pageable);
 		} else {
-			chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki, false, pageable);
+			chats = isLogin ? chatRepository.findByType(ChatType.Wiki, pageable)
+					: chatRepository.findByTypeAndPrivated(ChatType.Wiki, false, pageable);
 		}
 
 		List<User> users = userRepository.findAll();
@@ -154,12 +159,16 @@ public class RootController extends BaseController {
 			@PageableDefault(sort = { "createDate" }, direction = Direction.DESC) Pageable pageable) {
 
 		Page<Chat> chats = null;
+		
+		boolean isLogin = WebUtil.isLogin();
 
 		if (StringUtil.isNotEmpty(search)) {
-			chats = chatRepository.findByTypeAndPrivatedAndContentLike(ChatType.Wiki, false, "%" + search + "%",
-					pageable);
+			chats = isLogin ? chatRepository.findByTypeAndContentLike(ChatType.Wiki, "%" + search + "%", pageable)
+					: chatRepository.findByTypeAndPrivatedAndContentLike(ChatType.Wiki, false, "%" + search + "%",
+							pageable);
 		} else {
-			chats = chatRepository.findByTypeAndPrivated(ChatType.Wiki, false, pageable);
+			chats = isLogin ? chatRepository.findByType(ChatType.Wiki, pageable)
+					: chatRepository.findByTypeAndPrivated(ChatType.Wiki, false, pageable);
 		}
 
 		return RespBody.succeed(chats);
