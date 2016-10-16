@@ -446,7 +446,8 @@ public final class WebUtil {
 	 * @return
 	 */
 	public static boolean isLogin() {
-		return StringUtil.isNotEmpty(getUsername());
+		String username = getUsername();
+		return StringUtil.isNotEmpty(username) && !"anonymousUser".equals(username);
 	}
 
 	/**
