@@ -103,37 +103,35 @@
                 <div class="metadata">
                     <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
                     <div class="rating">
-                        <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZan}}
+                        <i style="cursor: pointer;" title="赞一下" class="cbutton cbutton--effect-novak thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZan}}
                         <span title="${voteZan}">${zanCount} 赞</span> {{/if}}
                     </div>
                     <div class="rating">
-                        <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCai}}
+                        <i style="cursor: pointer;" title="踩一下" class="cbutton cbutton--effect-novak thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCai}}
                         <span title="${voteCai}">${caiCount} 踩</span> {{/if}}
                     </div>
                 </div>
-                <div class="text markdown-body">
+                <div class="text markdown-body" data-content="${content}">
                     {{html contentMd}}
                 </div>
                 <div class="actions">
                     <a class="reply">回复</a>
-                    <a class="stow">收藏</a> 
-                    {{if isEditable}}
-                    <a title="Alt+双击" class="edit">编辑</a> 
-                    {{/if}}
-                    {{if actions}}
-                    <a class="delete">删除</a> 
-                    {{/if}}
+                    <a class="stow">收藏</a> {{if isEditable}}
+                    <a title="Alt+双击" class="edit">编辑</a> {{/if}} {{if actions}}
+                    <a class="delete">删除</a> {{/if}}
                     <div class="ui top right pointing dropdown dd-more-actions">
                         <div class="text" style="margin: 0;">更多</div>
                         <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                         <div class="menu">
                             {{if isEditable}}
                             <div title="Alt+双击" class="item edit">编辑</div>
-                            {{/if}}
-                            {{if actions}}
-                            <div class="item delete">删除</div> 
+                            {{/if}} {{if actions}}
+                            <div class="item delete">删除</div>
                             {{/if}}
                             <div class="item btn-read" title="Ctrl+双击">阅读</div>
+                            {{if isNotWiki}}
+                            <div class="item btn-wiki">转博</div>
+                            {{/if}}
                             <div class="item btn-jira">转JIRA</div>
                             {{if actions}}
                             <div class="item btn-openEdit" data-value="${isOpenEdit}">${openEditText}</div>
@@ -166,41 +164,85 @@
                 <div class="metadata">
                     <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
                     <div class="rating">
-                        <i style="cursor: pointer;" title="赞一下" class="thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZan}}
+                        <i style="cursor: pointer;" title="赞一下" class="cbutton cbutton--effect-novak thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZan}}
                         <span title="${voteZan}">${zanCount} 赞</span> {{/if}}
                     </div>
                     <div class="rating">
-                        <i style="cursor: pointer;" title="踩一下" class="thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCai}}
+                        <i style="cursor: pointer;" title="踩一下" class="cbutton cbutton--effect-novak thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCai}}
                         <span title="${voteCai}">${caiCount} 踩</span> {{/if}}
                     </div>
                 </div>
-                <div class="text markdown-body">
+                <div class="text markdown-body" data-content="${content}">
                     {{html contentMd}}
                 </div>
                 <div class="actions">
                     <a class="reply">回复</a>
-                    <a class="stow">收藏</a> 
-                    {{if isEditable}}
-                    <a title="Alt+双击" class="edit">编辑</a> 
-                    {{/if}}
-                    {{if actions}}
-                    <a class="delete">删除</a> 
-                    {{/if}}
+                    <a class="stow">收藏</a> {{if isEditable}}
+                    <a title="Alt+双击" class="edit">编辑</a> {{/if}} {{if actions}}
+                    <a class="delete">删除</a> {{/if}}
                     <div class="ui top right pointing dropdown dd-more-actions">
                         <div class="text" style="margin: 0;">更多</div>
                         <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                         <div class="menu">
                             {{if isEditable}}
                             <div title="Alt+双击" class="item edit">编辑</div>
-                            {{/if}}
-                            {{if actions}}
-                            <div class="item delete">删除</div> 
+                            {{/if}} {{if actions}}
+                            <div class="item delete">删除</div>
                             {{/if}}
                             <div class="item btn-read" title="Ctrl+双击">阅读</div>
+                            {{if isNotWiki}}
+                            <div class="item btn-wiki">转博</div>
+                            {{/if}}
                             <div class="item btn-jira">转JIRA</div>
                             {{if actions}}
                             <div class="item btn-openEdit" data-value="${isOpenEdit}">${openEditText}</div>
                             {{/if}}
+                            <div class="item btn-copy" data-clipboard-text="${content}">复制</div>
+                            <div class="item btn-share" data-clipboard-text="${textShare}">分享</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+    <script th:fragment="wikiMoreTpl" id="wikiMoreTpl" type="text/x-jquery-tmpl">
+        <div class="animated bounceInLeft comment ${marked} ${marker}" data-id="${id}">
+            <a class="avatar ui mini circular image" style="width: 35px; height: 35px; font-size: 35px; background-color: rgba(150, 178, 183, 0.4); text-align: center;">
+                {{if creator.iconName}}
+                    <span style="display: inline-block; height: 35px; line-height: 35px; vertical-align: top;">${creator.iconName}</span>
+                {{else}}
+                    <img src="/img/head.png">
+                {{/if}}
+            </a>
+            <div class="content">
+                <a class="author" data-value="${creator.username}">
+                    {{if creator.name}}
+                        ${creator.name}
+                    {{else}}
+                        ${creator.username}
+                    {{/if}}
+                </a>
+                <div class="metadata">
+                    <span class="date timeago" title="${createDateFormat}">${createDateFormat}</span>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="赞一下" class="cbutton cbutton--effect-novak thumbs outline up icon" data-type="zan" data-label="赞"></i> {{if voteZanCnt}}
+                        <span>${voteZanCnt} 赞</span> {{/if}}
+                    </div>
+                    <div class="rating">
+                        <i style="cursor: pointer;" title="踩一下" class="cbutton cbutton--effect-novak thumbs outline down icon" data-type="cai" data-label="踩"></i> {{if voteCaiCnt}}
+                        <span>${voteCaiCnt} 踩</span> {{/if}}
+                    </div>
+                </div>
+                <div class="text markdown-body" data-content="${content}">
+                    {{html contentMd}}
+                </div>
+                <div class="actions">
+                    <a class="reply">回复</a>
+                    <a class="btn-read">阅读</a>
+                    <div class="ui top right pointing dropdown dd-more-actions">
+                        <div class="text" style="margin: 0;">更多</div>
+                        <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
+                        <div class="menu">
                             <div class="item btn-copy" data-clipboard-text="${content}">复制</div>
                             <div class="item btn-share" data-clipboard-text="${textShare}">分享</div>
                         </div>
@@ -255,6 +297,43 @@
             </div>
         </div>
     </script>
+    <!-- chat msg as wiki -->
+    <div th:fragment="ad-msg-as-wiki" class="ui small modal ad-msg-as-wiki">
+        <!-- <i class="close icon"></i> -->
+        <div class="header">
+            消息转博文
+        </div>
+        <div class="content">
+            <div class="ui form">
+                <div class="required field">
+                    <label>标题:</label>
+                    <input name="title" type="text" placeholder="标题">
+                </div>
+                <div class="field">
+                    <label>标签:</label>
+                    <div class="ui fluid multiple search selection dropdown dd-labels">
+                        <input name="labels" type="hidden">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">标签</div>
+                        <div class="menu">
+                            <div th:each="lbl : ${labels}" class="item" th:attr="data-value=${lbl}" th:text="${lbl}"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="inline field">
+                    <label>可见性:</label>
+                    <div class="ui checkbox">
+                        <input type="checkbox" name="privated">
+                        <label>登录用户可见</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="actions">
+            <div class="ui cancel negative button">取消</div>
+            <div class="ui ok positive button">确定</div>
+        </div>
+    </div>
     <!-- 翻译popup内容模板 -->
     <script th:fragment="tansPpTpl" id="tansPpTpl" type="text/x-jquery-tmpl">
         <div class="ui items">
@@ -339,12 +418,10 @@
                             {{if lastLoginDateFormat}}
                             <div class="item" style="padding-top: 5px!important; padding-bottom: 5px!important;">
                                 <div class="content">
-                                    <a class="header" style="display: inline;">登录</a>
-                                    从IP ${loginRemoteAddress} (<span style="font-style: italic; color:gray;" class="timeago" title="${lastLoginDateFormat}">${lastLoginDateFormat}</span>)
+                                    <a class="header" style="display: inline;">登录</a> 从IP ${loginRemoteAddress} (<span style="font-style: italic; color:gray;" class="timeago" title="${lastLoginDateFormat}">${lastLoginDateFormat}</span>)
                                 </div>
                             </div>
-                            {{/if}}
-                            {{if userGroups}}
+                            {{/if}} {{if userGroups}}
                             <div class="item" style="padding-top: 5px!important; padding-bottom: 5px!important;">
                                 <div class="content">
                                     <!-- <a class="header">组别</a> -->

@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Translate;
 
@@ -24,7 +25,14 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
 
 	List<Label> findByCreator(String creator);
 
+	List<Label> findByChat(Chat chat);
+
+	Label findOneByNameAndChat(String name, Chat chat);
+	
 	@Query(value = "SELECT * FROM label WHERE creator = ?1 GROUP BY name;", nativeQuery = true)
 	List<Label> findByCreatorGroupByName(String creator);
+	
+	@Query(value = "SELECT * FROM `label` WHERE chat_id  IS NOT NULL GROUP BY `name`", nativeQuery = true)
+	List<Label> queryWikiLabels();
 
 }
