@@ -889,6 +889,23 @@ public class ChatController extends BaseController {
 		return RespBody.succeed(id);
 	}
 
+	@RequestMapping(value = "deleteWiki", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody deleteWiki(@RequestParam("id") Long id) {
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("博文不存在!");
+		}
+
+		chat.setType(ChatType.Msg);
+		
+		chatRepository.saveAndFlush(chat);
+
+		return RespBody.succeed(id);
+	}
+	
 	@RequestMapping(value = { "addLabel", "addLabel/unmask" }, method = RequestMethod.POST)
 	@ResponseBody
 	public RespBody addLabel(@RequestParam("id") Long id,
