@@ -354,12 +354,14 @@
                                         How artistic!
                                     </div>
                                     <div class="actions">
-                                        <a class="reply">回复</a>
+                                        <a class="reply">评论</a>
                                         <a class="btn-read">阅读</a>
+                                        <a class="btn-edit" th:if="${user != null and (c.creator.username == user.username)}" target="_blank" th:href="@{/admin/dynamic(id=${c.id})}">编辑</a>
                                         <div class="ui top right pointing dropdown dd-more-actions">
                                             <a class="text" style="margin: 0;">更多</a>
                                             <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                                             <div class="menu">
+                                                <div th:if="${user != null and (c.creator.username == user.username)}" class="item btn-del">删除</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
                                             </div>
@@ -418,6 +420,7 @@
     <div class="ui flowing popup top left transition hidden pp-wiki"></div>
     <!-- popup container end -->
     <div th:replace="admin/template :: ad-handle-confirm"></div>
+    <div th:replace="admin/template :: ad-delete-confirm"></div>
     <div th:replace="admin/template :: ad-comment-page-dimmer"></div>
     <div th:replace="admin/template :: wikiMoreTpl"></div>
     <div th:replace="admin/template :: chatMsgPpTpl"></div>
@@ -427,6 +430,7 @@
     <input type="hidden" name="page.size" th:value="${chats.size}" />
     <input type="hidden" name="param.id" th:value="${param.containsKey('id') ? param.id[0] : ''}" />
     <input type="hidden" name="param.search" th:value="${param.containsKey('search') ? param.search[0] : ''}" />
+    <input type="hidden" name="user.username" th:value="${user != null ? user.username : ''}" />
     <!-- <input type="hidden" th:each="u : ${users}" data-group="users" th:attr="data-status=${u.enabled}" th:name="${u.username}" th:value="${u.name}" /> -->
     <script type="text/javascript" th:src="@{/admin/js/deps-base.js}" src="../static/admin/js/deps-base.js"></script>
     <script type="text/javascript" th:src="@{/admin/js/deps-dynamic.js}" src="../static/admin/js/deps-dynamic.js"></script>
@@ -721,11 +725,11 @@
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
                 chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                 chat.textShare = baseURL + 'admin/dynamic?id=' + chat.id;
-                chat.isNotWiki = (chat.type != "wiki");
+                chat.isNotWiki = (chat.type != "Wiki");
                 if (chat.creator.name) {
                     chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                 }
-                if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
+                if (loginUsername == chat.creator.username) {
                     chat.actions = true;
                 }
                 var d = new Date(chat.createDate);
@@ -889,9 +893,29 @@
         });
 
         //-----------------------------------------------------------chat comment more-actions start
-        $('body').on('click', '.chat .comments .comment .btn-read', function(event) {
+        $('body').on('click', '.chat .comments .comment .actions .btn-read', function(event) {
             event.preventDefault();
             commentRead($(this).closest('.comment'));
+        });
+        $('body').on('click', '.chat .comments .comment .actions .btn-del', function(event) {
+            event.preventDefault();
+            var $c = $(this).closest('.comment');
+
+            $('.ad-delete-confirm').modal({
+                onApprove: function() {
+                    $.post('/admin/chat/deleteWiki', {
+                        id: $c.attr('data-id')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $c.remove();
+                            toastr.success('博文删除成功!');
+                        } else {
+                            toastr.error(data.data, '博文删除失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+
         });
         //-----------------------------------------------------------chat comment more-actions end
 
