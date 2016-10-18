@@ -16,10 +16,6 @@
         "href": "http://220.248.17.34:8073/",
         "disabled": false
     }, {
-        "title": "Jenkins(新)",
-        "href": "http://192.168.205.12:8080/job/x-console-frontend/",
-        "disabled": false
-    }, {
         "title": "Console(测试)",
         "href": "http://220.248.17.34:8063/",
         "disabled": true
