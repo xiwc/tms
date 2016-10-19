@@ -3,6 +3,12 @@
     .top.fixed.menu {
         padding-left: 220px;
         height: 60px;
+
+        @media only screen and (max-width: 767px) {
+            .tms-chat-at.tms-hide {
+                display: none;
+            }
+        }
     }
     .ui.left.sidebar {
         background-color: #4d394b;
@@ -145,10 +151,19 @@
         }
         .tms-right-sidebar {
             position: fixed;
+            left: 0;
             right: 0;
             bottom: 0;
             top: 59px;
             background-color: white;
+            margin-left: 0!important;
+
+            .panel-search {
+                .ui.basic.segment.minimal.selection.list.segment.comments {
+                    padding-left: 0;
+                    padding-right: 7px;
+                }
+            }
         }
         .tms-login-user {
             display: none!important;

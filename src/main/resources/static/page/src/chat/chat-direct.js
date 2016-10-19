@@ -605,12 +605,14 @@ export class ChatDirect {
     searchFocusinHandler() {
         $(this.searchInputRef).css('width', 'auto');
         $(this.searchRemoveRef).show();
+        this.isActiveSearch = true;
     }
 
     searchFocusoutHandler() {
         if (!$(this.searchInputRef).val()) {
             $(this.searchInputRef).css('width', '100px');
             $(this.searchRemoveRef).hide();
+            this.isActiveSearch = false;
         }
     }
 
