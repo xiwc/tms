@@ -39,5 +39,7 @@ export class UserLogin {
             });
         });
 
+        return true;
+
     }
 }

@@ -227,6 +227,9 @@ export class EmChatInput {
             if (data.success) {
                 this.poll.reset();
                 this.simplemde.value('');
+                this.eventAggregator.publish(nsCons.EVENT_CHAT_MSG_SENDED, {
+                    data: data
+                });
             } else {
                 toastr.error(data.data, '发送消息失败!');
             }

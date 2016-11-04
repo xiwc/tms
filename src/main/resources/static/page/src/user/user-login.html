@@ -5,17 +5,17 @@
             <h2 class="ui center aligned icon header">
             <i class="circular users icon"></i> 用户登录
             </h2>
-            <div class="ui form segment">
+            <form class="ui form segment">
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="user icon"></i>
-                        <input type="text" value.bind="username" placeholder="用户名" />
+                        <input type="text" name="username" value.bind="username" placeholder="用户名" />
                     </div>
                 </div>
                 <div class="field">
                     <div class="ui left icon input">
                         <i class="lock icon"></i>
-                        <input type="password" keydown.trigger="kdHandler($event)" value.bind="password" placeholder="密码" />
+                        <input type="password" name="password" keydown.trigger="kdHandler($event)" value.bind="password" placeholder="密码" />
                     </div>
                 </div>
                 <div class="field">
@@ -25,13 +25,13 @@
                     </div>
                 </div>
                 <div class="ui center aligned header">
-                    <button click.delegate="loginHandler()" class="ui submit fluid button ${isReq ? 'disabled' : ''}">登录</button>
+                    <button type="submit" click.delegate="loginHandler()" class="ui submit fluid button ${isReq ? 'disabled' : ''}">登录</button>
                 </div>
                 <div style="text-align: center; font-size:12px;">
                     <a href="#/pwd-reset">忘记密码</a> &nbsp;&nbsp;
                     <a href="#/register">注册用户</a>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 </template>

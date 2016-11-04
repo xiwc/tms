@@ -62,6 +62,18 @@ export class ChatDirect {
             }).on('error', function(e) {
                 toastr.error('复制到剪贴板成功!');
             });
+
+        this.initSubscribeEvent();
+    }
+
+    initSubscribeEvent() {
+
+        this.subscribe = this.eventAggregator.subscribe(nsCons.EVENT_CHAT_MSG_SENDED, (payload) => {
+
+            if (!this.first) {
+                this._init(false);
+            }
+        });
     }
 
     convertMd(chats) {
@@ -152,16 +164,19 @@ export class ChatDirect {
         });
     }
 
-    init(chatTo) {
+    _init(isCareMarkId) {
 
-        this.chatTo = chatTo;
+        if (!this.chatTo) {
+            toastr.error('聊天对象未指定!');
+            return;
+        }
 
         var data = {
             size: 20,
-            chatTo: chatTo
+            chatTo: this.chatTo
         };
 
-        if (this.markId) {
+        if (this.markId && isCareMarkId) {
             data.id = this.markId;
         }
 
@@ -174,13 +189,17 @@ export class ChatDirect {
                 !this.first && (this.firstCnt = data.data.size * data.data.number);
 
                 _.defer(() => {
-                    if (this.markId) {
-                        $(this.commentsRef).scrollTo(`.comment[data-id=${this.markId}]`, {
-                            offset: this.offset
-                        });
-                    } else {
-                        $(this.commentsRef).scrollTo('max');
-                    }
+
+                    utils.imgLoaded($(this.commentsRef).find('.comment img'), () => {
+                        if (this.markId) {
+                            $(this.commentsRef).scrollTo(`.comment[data-id=${this.markId}]`, {
+                                offset: this.offset
+                            });
+                        } else {
+                            $(this.commentsRef).scrollTo('max');
+                        }
+                    });
+
                 });
             } else {
                 toastr.error(data.data, '获取消息失败!');
@@ -191,6 +210,12 @@ export class ChatDirect {
                 window.location = utils.getBaseUrl() + wurl('path') + `#/login?redirect=${encodeURIComponent(this.originalHref)}`;
             }
         });
+    }
+
+    init(chatTo) {
+
+        this.chatTo = chatTo;
+        this._init(true);
     }
 
     /**
@@ -223,7 +248,7 @@ export class ChatDirect {
 
         poll.start((resetCb, stopCb) => {
 
-            if (!this.chats) {
+            if (!this.chats || !this.first) {
                 return;
             }
 

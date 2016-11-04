@@ -264,7 +264,20 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
             }).on('error', function (e) {
                 toastr.error('复制到剪贴板成功!');
             });
+
+            this.initSubscribeEvent();
         }
+
+        ChatDirect.prototype.initSubscribeEvent = function initSubscribeEvent() {
+            var _this = this;
+
+            this.subscribe = this.eventAggregator.subscribe(nsCons.EVENT_CHAT_MSG_SENDED, function (payload) {
+
+                if (!_this.first) {
+                    _this._init(false);
+                }
+            });
+        };
 
         ChatDirect.prototype.convertMd = function convertMd(chats) {
             _.each(chats, function (item) {
@@ -299,7 +312,7 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.lastMoreHandler = function lastMoreHandler() {
-            var _this = this;
+            var _this2 = this;
 
             var start = _.first(this.chats).id;
             $.get('/admin/chat/direct/more', {
@@ -309,34 +322,9 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                 chatTo: this.chatTo
             }, function (data) {
                 if (data.success) {
-                    _this.chats = _.unionBy(_.reverse(_this.convertMd(data.data)), _this.chats);
-                    _this.last = data.msgs[0] - data.data.length <= 0;
-                    !_this.last && (_this.lastCnt = data.msgs[0] - data.data.length);
-                    _.defer(function () {
-                        $(_this.commentsRef).scrollTo('.comment[data-id=' + start + ']', {
-                            offset: _this.offset
-                        });
-                    });
-                } else {
-                    toastr.error(data.data, '获取更多消息失败!');
-                }
-            });
-        };
-
-        ChatDirect.prototype.firstMoreHandler = function firstMoreHandler() {
-            var _this2 = this;
-
-            var start = _.last(this.chats).id;
-            $.get('/admin/chat/direct/more', {
-                last: false,
-                start: start,
-                size: 20,
-                chatTo: this.chatTo
-            }, function (data) {
-                if (data.success) {
-                    _this2.chats = _.unionBy(_this2.chats, _this2.convertMd(data.data));
-                    _this2.first = data.msgs[0] - data.data.length <= 0;
-                    !_this2.first && (_this2.firstCnt = data.msgs[0] - data.data.length);
+                    _this2.chats = _.unionBy(_.reverse(_this2.convertMd(data.data)), _this2.chats);
+                    _this2.last = data.msgs[0] - data.data.length <= 0;
+                    !_this2.last && (_this2.lastCnt = data.msgs[0] - data.data.length);
                     _.defer(function () {
                         $(_this2.commentsRef).scrollTo('.comment[data-id=' + start + ']', {
                             offset: _this2.offset
@@ -348,54 +336,91 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
             });
         };
 
-        ChatDirect.prototype.init = function init(chatTo) {
+        ChatDirect.prototype.firstMoreHandler = function firstMoreHandler() {
             var _this3 = this;
 
-            this.chatTo = chatTo;
+            var start = _.last(this.chats).id;
+            $.get('/admin/chat/direct/more', {
+                last: false,
+                start: start,
+                size: 20,
+                chatTo: this.chatTo
+            }, function (data) {
+                if (data.success) {
+                    _this3.chats = _.unionBy(_this3.chats, _this3.convertMd(data.data));
+                    _this3.first = data.msgs[0] - data.data.length <= 0;
+                    !_this3.first && (_this3.firstCnt = data.msgs[0] - data.data.length);
+                    _.defer(function () {
+                        $(_this3.commentsRef).scrollTo('.comment[data-id=' + start + ']', {
+                            offset: _this3.offset
+                        });
+                    });
+                } else {
+                    toastr.error(data.data, '获取更多消息失败!');
+                }
+            });
+        };
+
+        ChatDirect.prototype._init = function _init(isCareMarkId) {
+            var _this4 = this;
+
+            if (!this.chatTo) {
+                toastr.error('聊天对象未指定!');
+                return;
+            }
 
             var data = {
                 size: 20,
-                chatTo: chatTo
+                chatTo: this.chatTo
             };
 
-            if (this.markId) {
+            if (this.markId && isCareMarkId) {
                 data.id = this.markId;
             }
 
             $.get('/admin/chat/direct/list', data, function (data) {
                 if (data.success) {
-                    _this3.chats = _.reverse(_this3.convertMd(data.data.content));
-                    _this3.last = data.data.last;
-                    _this3.first = data.data.first;
-                    !_this3.last && (_this3.lastCnt = data.data.totalElements - data.data.numberOfElements);
-                    !_this3.first && (_this3.firstCnt = data.data.size * data.data.number);
+                    _this4.chats = _.reverse(_this4.convertMd(data.data.content));
+                    _this4.last = data.data.last;
+                    _this4.first = data.data.first;
+                    !_this4.last && (_this4.lastCnt = data.data.totalElements - data.data.numberOfElements);
+                    !_this4.first && (_this4.firstCnt = data.data.size * data.data.number);
 
                     _.defer(function () {
-                        if (_this3.markId) {
-                            $(_this3.commentsRef).scrollTo('.comment[data-id=' + _this3.markId + ']', {
-                                offset: _this3.offset
-                            });
-                        } else {
-                            $(_this3.commentsRef).scrollTo('max');
-                        }
+
+                        utils.imgLoaded($(_this4.commentsRef).find('.comment img'), function () {
+                            if (_this4.markId) {
+                                $(_this4.commentsRef).scrollTo('.comment[data-id=' + _this4.markId + ']', {
+                                    offset: _this4.offset
+                                });
+                            } else {
+                                $(_this4.commentsRef).scrollTo('max');
+                            }
+                        });
                     });
                 } else {
                     toastr.error(data.data, '获取消息失败!');
-                    window.location = utils.getBaseUrl() + wurl('path') + ('#/login?redirect=' + encodeURIComponent(_this3.originalHref));
+                    window.location = utils.getBaseUrl() + wurl('path') + ('#/login?redirect=' + encodeURIComponent(_this4.originalHref));
                 }
             }).always(function (xhr, sts, error) {
                 if (sts == 'error') {
-                    window.location = utils.getBaseUrl() + wurl('path') + ('#/login?redirect=' + encodeURIComponent(_this3.originalHref));
+                    window.location = utils.getBaseUrl() + wurl('path') + ('#/login?redirect=' + encodeURIComponent(_this4.originalHref));
                 }
             });
         };
 
+        ChatDirect.prototype.init = function init(chatTo) {
+
+            this.chatTo = chatTo;
+            this._init(true);
+        };
+
         ChatDirect.prototype.bind = function bind(ctx) {
-            var _this4 = this;
+            var _this5 = this;
 
             $.get('/admin/user/loginUser', function (data) {
                 if (data.success) {
-                    _this4.loginUser = data.data;
+                    _this5.loginUser = data.data;
                 } else {
                     toastr.error(data.data, '获取当前登录用户失败!');
                 }
@@ -405,11 +430,11 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                 enabled: true
             }, function (data) {
                 if (data.success) {
-                    _this4.users = data.data;
-                    _this4.user = _.find(_this4.users, {
-                        username: _this4.chatTo
+                    _this5.users = data.data;
+                    _this5.user = _.find(_this5.users, {
+                        username: _this5.chatTo
                     });
-                    _this4.user && _this4.routeConfig.navModel.setTitle(_this4.user.name + ' | 私聊 | TMS');
+                    _this5.user && _this5.routeConfig.navModel.setTitle(_this5.user.name + ' | 私聊 | TMS');
                 } else {
                     toastr.error(data.data, '获取全部用户失败!');
                 }
@@ -417,23 +442,23 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
 
             _commonPoll2.default.start(function (resetCb, stopCb) {
 
-                if (!_this4.chats) {
+                if (!_this5.chats || !_this5.first) {
                     return;
                 }
 
-                var lastChat = _.last(_this4.chats);
+                var lastChat = _.last(_this5.chats);
 
                 $.get('/admin/chat/direct/latest', {
                     id: lastChat ? lastChat.id : 0,
-                    chatTo: _this4.chatTo
+                    chatTo: _this5.chatTo
                 }, function (data) {
                     if (data.success) {
                         if (data.data.length == 0) {
                             return;
                         }
-                        _this4.chats = _.unionBy(_this4.chats, _this4.convertMd(data.data), 'id');
+                        _this5.chats = _.unionBy(_this5.chats, _this5.convertMd(data.data), 'id');
                         _.defer(function () {
-                            $(_this4.commentsRef).scrollTo('max');
+                            $(_this5.commentsRef).scrollTo('max');
                         });
                     } else {
                         toastr.error(data.data, '轮询获取消息失败!');
@@ -452,10 +477,10 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.chatToUserFilerKeyupHanlder = function chatToUserFilerKeyupHanlder(evt) {
-            var _this5 = this;
+            var _this6 = this;
 
             _.each(this.users, function (item) {
-                item.hidden = item.username.indexOf(_this5.filter) == -1;
+                item.hidden = item.username.indexOf(_this6.filter) == -1;
             });
 
             if (evt.keyCode === 13) {
@@ -470,16 +495,16 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.clearFilterHandler = function clearFilterHandler() {
-            var _this6 = this;
+            var _this7 = this;
 
             this.filter = '';
             _.each(this.users, function (item) {
-                item.hidden = item.username.indexOf(_this6.filter) == -1;
+                item.hidden = item.username.indexOf(_this7.filter) == -1;
             });
         };
 
         ChatDirect.prototype.deleteHandler = function deleteHandler(item) {
-            var _this7 = this;
+            var _this8 = this;
 
             this.emConfirmModal.show({
                 onapprove: function onapprove() {
@@ -487,7 +512,7 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                         id: item.id
                     }, function (data, textStatus, xhr) {
                         if (data.success) {
-                            _this7.chats = _.reject(_this7.chats, {
+                            _this8.chats = _.reject(_this8.chats, {
                                 id: item.id
                             });
                             toastr.success('删除消息成功!');
@@ -508,7 +533,7 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.eidtKeydownHandler = function eidtKeydownHandler(evt, item, txtRef) {
-            var _this8 = this;
+            var _this9 = this;
 
             if (this.sending) {
                 return false;
@@ -536,7 +561,7 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                         toastr.error(data.data, '更新消息失败!');
                     }
                 }).always(function () {
-                    _this8.sending = false;
+                    _this9.sending = false;
                 });
 
                 return false;
@@ -559,15 +584,15 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.attached = function attached() {
-            var _this9 = this;
+            var _this10 = this;
 
             _.delay(function () {
-                $(_this9.userListRef).scrollTo('a.item[data-id="' + _this9.chatTo + '"]');
+                $(_this10.userListRef).scrollTo('a.item[data-id="' + _this10.chatTo + '"]');
             }, 1000);
 
             var tg = timeago();
             this.timeagoTimer = setInterval(function () {
-                $(_this9.chatContainerRef).find('[data-timeago]').each(function (index, el) {
+                $(_this10.chatContainerRef).find('[data-timeago]').each(function (index, el) {
                     $(el).text(tg.format($(el).attr('data-timeago'), 'zh_CN'));
                 });
             }, 5000);
@@ -578,18 +603,18 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.initFocusedComment = function initFocusedComment() {
-            var _this10 = this;
+            var _this11 = this;
 
             $(this.commentsRef).on('click', '.comment.item', function (event) {
                 event.preventDefault();
-                _this10.focusedComment = $(event.currentTarget);
+                _this11.focusedComment = $(event.currentTarget);
             }).on('dblclick', '.comment.item', function (event) {
                 event.preventDefault();
                 if (event.ctrlKey) {
                     (function () {
                         var chatId = $(event.currentTarget).attr('data-id');
                         var $t = $(event.currentTarget).find('.content > textarea');
-                        var item = _.find(_this10.chats, { id: Number.parseInt(chatId) });
+                        var item = _.find(_this11.chats, { id: Number.parseInt(chatId) });
 
                         item.isEditing = true;
                         _.defer(function () {
@@ -602,7 +627,7 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.initSearch = function initSearch() {
-            var _this11 = this;
+            var _this12 = this;
 
             var source = [];
             if (localStorage) {
@@ -613,10 +638,10 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
             $(this.searchRef).search({
                 source: source,
                 onSelect: function onSelect(result, response) {
-                    _this11.searchHandler();
+                    _this12.searchHandler();
                 },
                 onResults: function onResults() {
-                    $(_this11.searchRef).search('hide results');
+                    $(_this12.searchRef).search('hide results');
                 }
             });
         };
@@ -629,7 +654,7 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.searchHandler = function searchHandler() {
-            var _this12 = this;
+            var _this13 = this;
 
             $(this.searchRef).search('hide results');
 
@@ -665,20 +690,20 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                 page: 0
             }, function (data) {
                 if (data.success) {
-                    _this12.toggleRightSidebar(true);
-                    _this12.searchChats = data.data.content;
-                    _.each(_this12.searchChats, function (item) {
+                    _this13.toggleRightSidebar(true);
+                    _this13.searchChats = data.data.content;
+                    _.each(_this13.searchChats, function (item) {
                         item.contentMd = (0, _marked2.default)(item.content);
                     });
-                    _this12.searchPage = data.data;
-                    _this12.lastSearch = data.data.last;
-                    _this12.moreSearchCnt = data.data.totalElements - (data.data.number + 1) * data.data.size;
+                    _this13.searchPage = data.data;
+                    _this13.lastSearch = data.data.last;
+                    _this13.moreSearchCnt = data.data.totalElements - (data.data.number + 1) * data.data.size;
                 }
             });
         };
 
         ChatDirect.prototype.searchMoreHandler = function searchMoreHandler() {
-            var _this13 = this;
+            var _this14 = this;
 
             $.get('/admin/chat/direct/search', {
                 search: this.search,
@@ -689,11 +714,11 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
                     _.each(data.data.content, function (item) {
                         item.contentMd = (0, _marked2.default)(item.content);
                     });
-                    _this13.searchChats = _.concat(_this13.searchChats, data.data.content);
+                    _this14.searchChats = _.concat(_this14.searchChats, data.data.content);
 
-                    _this13.searchPage = data.data;
-                    _this13.lastSearch = data.data.last;
-                    _this13.moreSearchCnt = data.data.totalElements - (data.data.number + 1) * data.data.size;
+                    _this14.searchPage = data.data;
+                    _this14.lastSearch = data.data.last;
+                    _this14.moreSearchCnt = data.data.totalElements - (data.data.number + 1) * data.data.size;
                 }
             });
         };
@@ -728,35 +753,35 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.initHotkeys = function initHotkeys() {
-            var _this14 = this;
+            var _this15 = this;
 
             $(document).bind('keydown', 'ctrl+u', function (evt) {
                 evt.preventDefault();
-                $(_this14.emChatInputRef.btnItemUploadRef).find('.content').click();
+                $(_this15.emChatInputRef.btnItemUploadRef).find('.content').click();
             }).bind('keydown', 'ctrl+/', function (evt) {
                 evt.preventDefault();
-                _this14.emChatInputRef.emHotkeysModal.show();
+                _this15.emChatInputRef.emHotkeysModal.show();
             }).bind('keydown', 'alt+up', function (evt) {
                 evt.preventDefault();
-                _this14.scrollTo(_this14.getScrollTargetComment(true));
+                _this15.scrollTo(_this15.getScrollTargetComment(true));
             }).bind('keydown', 'alt+down', function (evt) {
                 evt.preventDefault();
-                _this14.scrollTo(_this14.getScrollTargetComment());
+                _this15.scrollTo(_this15.getScrollTargetComment());
             }).bind('keydown', 'alt+ctrl+up', function () {
                 event.preventDefault();
-                _this14.scrollTo($(_this14.commentsRef).children('.comment.item:first'));
+                _this15.scrollTo($(_this15.commentsRef).children('.comment.item:first'));
             }).bind('keydown', 'alt+ctrl+down', function () {
                 event.preventDefault();
-                _this14.scrollTo($(_this14.commentsRef).children('.comment.item:last'));
+                _this15.scrollTo($(_this15.commentsRef).children('.comment.item:last'));
             }).bind('keydown', 'ctrl+.', function () {
                 event.preventDefault();
-                _this14.toggleRightSidebar();
+                _this15.toggleRightSidebar();
             }).bind('keydown', 'ctrl+k', function () {
                 event.preventDefault();
-                $(_this14.chatToDropdownRef).dropdown('toggle');
+                $(_this15.chatToDropdownRef).dropdown('toggle');
             }).bind('keydown', 'ctrl+i', function () {
                 event.preventDefault();
-                _this14.eventAggregator.publish(nsCons.HOTKEY, {
+                _this15.eventAggregator.publish(nsCons.HOTKEY, {
                     key: 'ctrl+i'
                 });
             });
@@ -767,11 +792,11 @@ define('chat/chat-direct',['exports', 'aurelia-framework', 'common/common-poll',
         };
 
         ChatDirect.prototype.initChatToDropdownHandler = function initChatToDropdownHandler(last) {
-            var _this15 = this;
+            var _this16 = this;
 
             if (last) {
                 _.defer(function () {
-                    $(_this15.chatToDropdownRef).dropdown().dropdown('set selected', _this15.chatTo).dropdown({
+                    $(_this16.chatToDropdownRef).dropdown().dropdown('set selected', _this16.chatTo).dropdown({
                         onChange: function onChange(value, text, $choice) {
                             window.location = wurl('path') + ('#/chat-direct/' + value);
                         }
@@ -849,7 +874,8 @@ define('common/common-constant',[], function () {
     'use strict';
 
     window.nsCons = {
-        HOTKEY: 'hotkey'
+        HOTKEY: 'hotkey',
+        EVENT_CHAT_MSG_SENDED: 'event_chat_msg_sended'
     };
 });
 define('common/common-plugin',[], function () {
@@ -1180,6 +1206,26 @@ define('common/common-utils',['exports'], function (exports) {
             return rect.top >= 0 && rect.left >= 0 && rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
         };
 
+        CommonUtils.prototype.imgLoaded = function imgLoaded($imgs, callback) {
+            var imgdefereds = [];
+            $imgs.each(function () {
+                var dfd = $.Deferred();
+                $(this).bind('load', function () {
+                    dfd.resolve();
+                }).bind('error', function () {
+                    dfd.resolve();
+                });
+                if (this.complete) {
+                    dfd.resolve();
+                }
+
+                imgdefereds.push(dfd);
+            });
+            $.when.apply(null, imgdefereds).done(function () {
+                callback && callback.call(null);
+            });
+        };
+
         return CommonUtils;
     }();
 
@@ -1481,6 +1527,8 @@ define('user/user-login',['exports'], function (exports) {
                     }
                 });
             });
+
+            return true;
         };
 
         return UserLogin;
@@ -2201,6 +2249,9 @@ define('resources/elements/em-chat-input',['exports', 'aurelia-framework', 'comm
                 if (data.success) {
                     _this6.poll.reset();
                     _this6.simplemde.value('');
+                    _this6.eventAggregator.publish(nsCons.EVENT_CHAT_MSG_SENDED, {
+                        data: data
+                    });
                 } else {
                     toastr.error(data.data, '发送消息失败!');
                 }
@@ -18068,20 +18119,20 @@ define('highlight/lib/languages/zephir',['require','exports','module'],function 
 });
 
 define('text!app.html', ['module'], function(module) { module.exports = "<template>\r\n\t<require from=\"./app.css\"></require>\r\n\t<require from=\"nprogress/nprogress.css\"></require>\r\n\t<require from=\"toastr/build/toastr.css\"></require>\r\n    <require from=\"tms-semantic-ui/semantic.min.css\"></require>\r\n    <router-view></router-view>\r\n</template>\r\n"; });
-define('text!app.css', ['module'], function(module) { module.exports = "html,\nbody {\n  height: 100%;\n}\n::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n::-webkit-scrollbar-thumb {\n  border-radius: 6px;\n  background-color: #c6c6c6;\n}\n::-webkit-scrollbar-thumb:hover {\n  background: #999;\n}\n@media only screen and (min-width: 768px) {\n  .ui.modal.tms-md450 {\n    width: 450px!important;\n    margin-left: -225px !important;\n  }\n  .ui.modal.tms-md510 {\n    width: 510px!important;\n    margin-left: -255px !important;\n  }\n  .ui.modal.tms-md540 {\n    width: 540px!important;\n    margin-left: -275px !important;\n  }\n}\n/* for swipebox */\n#swipebox-overlay {\n  background: rgba(13, 13, 13, 0.5) !important;\n}\n.keyboard {\n  background: #fff;\n  font-weight: 700;\n  padding: 2px .35rem;\n  font-size: .8rem;\n  margin: 0 2px;\n  border-radius: .25rem;\n  color: #3d3c40;\n  border-bottom: 2px solid #9e9ea6;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);\n  text-shadow: none;\n}\n"; });
 define('text!chat/chat-direct.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./chat-direct.css\"></require>\r\n    <require from=\"./md-github.css\"></require>\r\n    <require from=\"dropzone/dist/basic.css\"></require>\r\n    <require from=\"swipebox/src/css/swipebox.min.css\"></require>\r\n    <require from=\"simplemde/dist/simplemde.min.css\"></require>\r\n    <require from=\"highlight/styles/github.css\"></require>\r\n    <require from=\"resources/elements/em-confirm-modal\"></require>\r\n    <require from=\"resources/elements/em-chat-input\"></require>\r\n    <div ref=\"chatContainerRef\" class=\"tms-chat-direct\">\r\n        <div class=\"ui top fixed menu\">\r\n            <!-- <div class=\"item\">\r\n                <i class=\"icon link sidebar\"></i>\r\n            </div> -->\r\n            <div ref=\"chatToDropdownRef\" class=\"ui dropdown link item ${isActiveSearch ? 'tms-hide' : ''} tms-chat-at\">\r\n                <i class=\"big loading at icon\"></i>\r\n                <span class=\"text\"></span>\r\n                <i class=\"dropdown icon\"></i>\r\n                <div class=\"menu\">\r\n                    <div class=\"ui icon search input\">\r\n                        <i class=\"search icon\"></i>\r\n                        <input type=\"text\" placeholder=\"过滤私聊对象\">\r\n                    </div>\r\n                    <div class=\"divider\"></div>\r\n                    <div class=\"header\">\r\n                        <i class=\"user icon\"></i> 切换私聊对象(Ctrl+k)\r\n                    </div>\r\n                    <div class=\"scrolling menu\">\r\n                        <a repeat.for=\"item of users\" task.bind=\"initChatToDropdownHandler($last)\" href=\"#/chat-direct/${item.username}\" class=\"item\" title=\"${item.username}\" data-value=\"${item.username}\">\r\n                            <i class=\"circular icon user\"></i> ${item.name}\r\n                        </a>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"right menu\">\r\n                <div class=\"item tms-item\">\r\n                    <button click.delegate=\"sibebarRightHandler()\" title=\"右侧边栏(Ctrl+.)\" class=\"basic ${isRightSidebarShow ? 'active' : ''} ui icon button\">\r\n                        <i class=\"columns icon\"></i>\r\n                    </button>\r\n                </div>\r\n                <!-- <div class=\"item tms-item\">\r\n                    <button click.delegate=\"starHandler()\" title=\"收藏消息\" class=\"basic ${isStarShow ? 'active' : ''} ui icon button\">\r\n                        <i class=\"empty star icon\"></i>\r\n                    </button>\r\n                </div> -->\r\n                <div class=\"item\">\r\n                    <div ref=\"searchRef\" class=\"ui search\">\r\n                        <div class=\"ui left icon input\">\r\n                            <input ref=\"searchInputRef\" keyup.trigger=\"searchKeyupHandler($event)\" focusout.trigger=\"searchFocusoutHandler()\" focusin.trigger=\"searchFocusinHandler()\" class=\"prompt\" type=\"text\" placeholder=\"搜索...\">\r\n                            <i class=\"search icon\"></i>\r\n                            <i ref=\"searchRemoveRef\" click.delegate=\"clearSearchHandler()\" class=\"remove link icon\"></i>\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n                <a class=\"item tms-login-user\">\r\n                    <i class=\"circular user icon\"></i> ${loginUser.name}\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div ref=\"sidebarRef\" class=\"ui left visible segment sidebar tms-left-sidebar\">\r\n            <div class=\"tms-header\">\r\n                <h1 class=\"ui header\"><a href=\"/admin/dynamic?scroll=1\">私聊频道</a></h1>\r\n                <input value.bind=\"filter\" focusin.trigger=\"chatToUserFilerFocusinHanlder()\" keyup.trigger=\"chatToUserFilerKeyupHanlder($event)\" type=\"text\" placeholder=\"私聊对象查找\">\r\n                <i title=\"清空过滤输入\" click.delegate=\"clearFilterHandler()\" class=\"bordered close icon link small\"></i>\r\n            </div>\r\n            <div ref=\"userListRef\" class=\"ui middle aligned selection list\">\r\n                <a repeat.for=\"item of users\" title=\"${item.username}\" show.bind=\"!item.hidden\" href=\"#/chat-direct/${item.username}\" class=\"item ${item.username == chatTo ? 'active' : ''}\" data-id=\"${item.username}\">\r\n                    <i class=\"circular icon user\"></i>\r\n                    <div class=\"content\">\r\n                        <div style=\"color: black;\">${item.name ? item.name : item.username}</div>\r\n                    </div>\r\n                </a>\r\n            </div>\r\n        </div>\r\n        <div ref=\"contentRef\" class=\"tms-content ${isRightSidebarShow ? 'tms-sidebar-show' : ''}\">\r\n            <div ref=\"contentBodyRef\" class=\"tms-content-body\">\r\n                <div ref=\"commentsRef\" class=\"ui basic segment minimal selection list segment comments\">\r\n                    <button if.bind=\"!last\" click.delegate=\"lastMoreHandler()\" class=\"fluid basic ui button tms-pre-more\">加载更多(${lastCnt})</button>\r\n                    <div repeat.for=\"item of chats\" swipebox class=\"comment item ${item.id == markId ? 'active' : ''}\" data-id=\"${item.id}\">\r\n                        <a class=\"avatar\">\r\n                            <i class=\"circular icon large user\"></i>\r\n                        </a>\r\n                        <div class=\"content\">\r\n                            <a class=\"author\">${item.creator.name}</a>\r\n                            <div class=\"metadata\">\r\n                                <div class=\"date\" data-timeago=\"${item.createDate}\" title=\"${item.createDate | date}\">${item.createDate | timeago}</div>\r\n                            </div>\r\n                            <div show.bind=\"!item.isEditing\" class=\"text markdown-body\" innerhtml.bind=\"item.contentMd\"></div>\r\n                            <textarea ref=\"editTxtRef\" pastable autosize focusout.trigger=\"focusoutHandler(item)\" keydown.trigger=\"eidtKeydownHandler($event, item, editTxtRef)\" show.bind=\"item.isEditing\" value.bind=\"item.content\" class=\"tms-edit-textarea\" rows=\"1\"></textarea>\r\n                            <div class=\"actions\">\r\n                                <a if.bind=\"item.creator.username == loginUser.username\" click.delegate=\"editHandler(item, editTxtRef)\" class=\"tms-edit\">编辑</a>\r\n                                <a if.bind=\"item.creator.username == loginUser.username\" click.delegate=\"deleteHandler(item)\" class=\"tms-delete\">删除</a>\r\n                                <a class=\"tms-copy tms-clipboard\" data-clipboard-text=\"${item.content}\">复制</a>\r\n                                <a class=\"tms-share tms-clipboard\" data-clipboard-text=\"${selfLink + '?id=' + item.id}\">分享</a>\r\n                            </div>\r\n                        </div>\r\n                    </div>\r\n                    <button if.bind=\"!first\" click.delegate=\"firstMoreHandler()\" class=\"fluid basic ui button tms-next-more\">加载更多(${firstCnt})</button>\r\n                </div>\r\n                <em-chat-input chat-to.bind=\"chatTo\" poll.bind=\"poll\" em-chat-input.ref=\"emChatInputRef\"></em-chat-input>\r\n            </div>\r\n            <div ref=\"rightSidebarRef\" class=\"tms-right-sidebar\">\r\n                <div class=\"panel-search\">\r\n                    <div class=\"ui basic segment minimal selection list segment comments\">\r\n                        <h1 show.bind=\"!searchChats.length\" class=\"ui center aligned header\">无符合检索结果</h1>\r\n                        <div repeat.for=\"item of searchChats\" swipebox class=\"comment item ${item.id == markId ? 'active' : ''}\" data-id=\"${item.id}\">\r\n                            <a class=\"avatar\">\r\n                                <i class=\"circular icon large user\"></i>\r\n                            </a>\r\n                            <div class=\"content\">\r\n                                <a class=\"author\">${item.creator.name}</a>\r\n                                <div class=\"metadata\">\r\n                                    <div class=\"date\" data-timeago=\"${item.createDate}\" title=\"${item.createDate | date}\">${item.createDate | timeago}</div>\r\n                                </div>\r\n                                <div class=\"text markdown-body\" innerhtml.bind=\"item.contentMd\"></div>\r\n                                <div class=\"actions\">\r\n                                    <a click.delegate=\"gotoChatHandler(item)\" class=\"tms-goto\" href=\"\">定位</a>\r\n                                    <a class=\"tms-copy tms-clipboard\" data-clipboard-text=\"${item.content}\">复制</a>\r\n                                    <a class=\"tms-share tms-clipboard\" data-clipboard-text=\"${selfLink + '?id=' + item.id}\">分享</a>\r\n                                </div>\r\n                            </div>\r\n                        </div>\r\n                        <button if.bind=\"!lastSearch\" click.delegate=\"searchMoreHandler()\" class=\"fluid ui basic button tms-search-more\">加载更多(${moreSearchCnt})</button>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n    <em-confirm-modal em-confirm-modal.ref=\"emConfirmModal\"></em-confirm-modal>\r\n</template>\r\n"; });
-define('text!user/user-login.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-login.css\"></require>\r\n    <div class=\"tms-user-login\">\r\n        <div class=\"container\">\r\n            <h2 class=\"ui center aligned icon header\">\r\n            <i class=\"circular users icon\"></i> 用户登录\r\n            </h2>\r\n            <div class=\"ui form segment\">\r\n                <div class=\"field\">\r\n                    <div class=\"ui left icon input\">\r\n                        <i class=\"user icon\"></i>\r\n                        <input type=\"text\" value.bind=\"username\" placeholder=\"用户名\" />\r\n                    </div>\r\n                </div>\r\n                <div class=\"field\">\r\n                    <div class=\"ui left icon input\">\r\n                        <i class=\"lock icon\"></i>\r\n                        <input type=\"password\" keydown.trigger=\"kdHandler($event)\" value.bind=\"password\" placeholder=\"密码\" />\r\n                    </div>\r\n                </div>\r\n                <div class=\"field\">\r\n                    <div ref=\"rememberMeRef\" class=\"ui checkbox\">\r\n                        <input type=\"checkbox\" name=\"remember-me\" />\r\n                        <label>记住我在此计算机的登录(2周)</label>\r\n                    </div>\r\n                </div>\r\n                <div class=\"ui center aligned header\">\r\n                    <button click.delegate=\"loginHandler()\" class=\"ui submit fluid button ${isReq ? 'disabled' : ''}\">登录</button>\r\n                </div>\r\n                <div style=\"text-align: center; font-size:12px;\">\r\n                    <a href=\"#/pwd-reset\">忘记密码</a> &nbsp;&nbsp;\r\n                    <a href=\"#/register\">注册用户</a>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!app.css', ['module'], function(module) { module.exports = "html,\nbody {\n  height: 100%;\n}\n::-webkit-scrollbar {\n  width: 6px;\n  height: 6px;\n}\n::-webkit-scrollbar-thumb {\n  border-radius: 6px;\n  background-color: #c6c6c6;\n}\n::-webkit-scrollbar-thumb:hover {\n  background: #999;\n}\n@media only screen and (min-width: 768px) {\n  .ui.modal.tms-md450 {\n    width: 450px!important;\n    margin-left: -225px !important;\n  }\n  .ui.modal.tms-md510 {\n    width: 510px!important;\n    margin-left: -255px !important;\n  }\n  .ui.modal.tms-md540 {\n    width: 540px!important;\n    margin-left: -275px !important;\n  }\n}\n/* for swipebox */\n#swipebox-overlay {\n  background: rgba(13, 13, 13, 0.5) !important;\n}\n.keyboard {\n  background: #fff;\n  font-weight: 700;\n  padding: 2px .35rem;\n  font-size: .8rem;\n  margin: 0 2px;\n  border-radius: .25rem;\n  color: #3d3c40;\n  border-bottom: 2px solid #9e9ea6;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);\n  text-shadow: none;\n}\n"; });
+define('text!test/test-lifecycle.html', ['module'], function(module) { module.exports = "<template>\r\n    <!-- <require from=\"\"></require> -->\r\n    <div class=\"ui container\">\r\n        <h1 class=\"ui header\">Aurelia框架模块生命周期钩子函数调用顺序测试(看console输出)</h1>\r\n    </div>\r\n</template>\r\n"; });
 define('text!chat/chat-direct.css', ['module'], function(module) { module.exports = ".tms-chat-direct {\n  height: 100%;\n}\n.tms-chat-direct .top.fixed.menu {\n  padding-left: 220px;\n  height: 60px;\n}\n@media only screen and (max-width: 767px) {\n  .tms-chat-direct .top.fixed.menu .tms-chat-at.tms-hide {\n    display: none;\n  }\n}\n.tms-chat-direct .ui.left.sidebar {\n  background-color: #4d394b;\n  width: 220px;\n}\n.tms-chat-direct .ui.left.sidebar * {\n  color: #4183c4!important;\n}\n.tms-chat-direct .ui.left.sidebar .tms-header > input {\n  background-color: transparent;\n  border: 1px #676868 solid;\n  font-size: 12px;\n  padding: 4px;\n  width: 190px;\n  outline: none;\n  margin-top: 10px;\n  border-radius: 2px;\n}\n.tms-chat-direct .ui.left.sidebar .ui.list {\n  position: absolute;\n  bottom: 0;\n  top: 80px;\n  overflow-y: auto;\n  width: 190px;\n}\n.tms-chat-direct .ui.left.sidebar .ui.list a > i.circular.icon {\n  box-shadow: 0 0 0 0.1em #4183c4 inset;\n}\n.tms-chat-direct .ui.left.sidebar .ui.list::-webkit-scrollbar-thumb {\n  background-color: #475a81;\n}\n.tms-chat-direct .ui.left.sidebar .tms-header {\n  height: 40px;\n}\n.tms-chat-direct .ui.left.sidebar .tms-header i.close.icon {\n  position: absolute;\n  right: 11px;\n  top: 55px;\n  box-shadow: 0 0 0 0.1em #676868 inset;\n  border-top-right-radius: 2px;\n  border-bottom-right-radius: 2px;\n}\n.tms-chat-direct .ui.left.sidebar .tms-header .ui.header {\n  margin-bottom: 0;\n}\n.tms-chat-direct .tms-edit-textarea {\n  width: 100%;\n}\n.tms-chat-direct .ui.selection.list > .item {\n  cursor: default;\n}\n.tms-chat-direct .ui.search .prompt {\n  border-radius: .28571429rem;\n}\n.tms-chat-direct .tms-content {\n  position: absolute;\n  top: 60px;\n  left: 220px;\n  bottom: 0;\n  right: 0;\n  display: flex;\n  align-items: stretch;\n}\n.tms-chat-direct .tms-content.tms-sidebar-show .tms-right-sidebar {\n  width: 388px;\n  border-left: 1px #e9e9e9 solid;\n  transition: width 0.15s ease-out 0s;\n  margin: 4px;\n  margin-right: 0;\n}\n@media only screen and (max-width: 767px) {\n  .tms-chat-direct .tms-content {\n    left: 0;\n  }\n}\n.tms-chat-direct .tms-content-body {\n  width: 100%;\n  max-width: 100%;\n  flex: 1 1 0;\n  display: flex;\n  align-items: stretch;\n  padding-bottom: 73px;\n}\n.tms-chat-direct .tms-content-body .ui.comments {\n  overflow-y: auto;\n  flex: 1 1 0;\n  max-width: none;\n  margin-bottom: 12px;\n  margin-top: 10px;\n}\n.tms-chat-direct .tms-content-body .ui.comments .tms-pre-more {\n  margin-bottom: 10px;\n}\n.tms-chat-direct .tms-content-body .ui.comments .tms-next-more {\n  margin-top: 10px;\n}\n.tms-chat-direct .tms-right-sidebar {\n  width: 0;\n  overflow-y: auto;\n  padding-top: 10px;\n  padding-bottom: 10px;\n}\n.tms-chat-direct .ui.top.menu .item.tms-item:before {\n  display: none;\n}\n.tms-chat-direct .ui.top.menu > .ui.dropdown.item > .text > .icon {\n  display: none;\n}\n.tms-chat-direct .ui.top.menu .right.menu .item.tms-item {\n  padding-left: 5px;\n  padding-right: 5px;\n}\n.tms-chat-direct .ui.top.menu .right.menu .ui.search input {\n  width: 100px;\n  transition: width 0.15s ease-out 0s;\n}\n.tms-chat-direct .ui.top.menu .right.menu .ui.search i.remove.icon {\n  display: none;\n  position: absolute;\n  right: 0;\n  left: auto;\n}\n@media only screen and (max-width: 767px) {\n  .tms-chat-direct .ui.top.menu {\n    padding-left: 0;\n  }\n}\n.tms-chat-direct .ui.top.menu .ui.basic.button {\n  box-shadow: none;\n}\n@media only screen and (max-width: 767px) {\n  .tms-chat-direct .tms-left-sidebar {\n    display: none;\n  }\n  .tms-chat-direct .tms-right-sidebar {\n    position: fixed;\n    left: 0;\n    right: 0;\n    bottom: 0;\n    top: 59px;\n    background-color: white;\n    margin-left: 0!important;\n  }\n  .tms-chat-direct .tms-right-sidebar .panel-search .ui.basic.segment.minimal.selection.list.segment.comments {\n    padding-left: 0;\n    padding-right: 0;\n  }\n  .tms-chat-direct .tms-sidebar-show .tms-right-sidebar {\n    width: 100%!important;\n  }\n  .tms-chat-direct .tms-login-user {\n    display: none!important;\n  }\n}\n"; });
-define('text!user/user-pwd-reset.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-pwd-reset.css\"></require>\r\n    <div class=\"ui container tms-user-pwd-reset\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">输入您的邮箱地址,我们会发送密码重置链接到您的邮箱!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">邮件地址</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的邮件地址\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"resetPwdHandler()\">发送密码重置邮件</div>\r\n            </div>\r\n            <div if.bind=\"token\" ref=\"fm2\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">设置您的新密码,密码长度要求至少8位字符!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">新密码</label>\r\n                    <input type=\"password\" name=\"mail\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"设置您的新密码\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"newPwdHandler()\">确认</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
+define('text!user/user-login.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-login.css\"></require>\r\n    <div class=\"tms-user-login\">\r\n        <div class=\"container\">\r\n            <h2 class=\"ui center aligned icon header\">\r\n            <i class=\"circular users icon\"></i> 用户登录\r\n            </h2>\r\n            <form class=\"ui form segment\">\r\n                <div class=\"field\">\r\n                    <div class=\"ui left icon input\">\r\n                        <i class=\"user icon\"></i>\r\n                        <input type=\"text\" name=\"username\" value.bind=\"username\" placeholder=\"用户名\" />\r\n                    </div>\r\n                </div>\r\n                <div class=\"field\">\r\n                    <div class=\"ui left icon input\">\r\n                        <i class=\"lock icon\"></i>\r\n                        <input type=\"password\" name=\"password\" keydown.trigger=\"kdHandler($event)\" value.bind=\"password\" placeholder=\"密码\" />\r\n                    </div>\r\n                </div>\r\n                <div class=\"field\">\r\n                    <div ref=\"rememberMeRef\" class=\"ui checkbox\">\r\n                        <input type=\"checkbox\" name=\"remember-me\" />\r\n                        <label>记住我在此计算机的登录(2周)</label>\r\n                    </div>\r\n                </div>\r\n                <div class=\"ui center aligned header\">\r\n                    <button type=\"submit\" click.delegate=\"loginHandler()\" class=\"ui submit fluid button ${isReq ? 'disabled' : ''}\">登录</button>\r\n                </div>\r\n                <div style=\"text-align: center; font-size:12px;\">\r\n                    <a href=\"#/pwd-reset\">忘记密码</a> &nbsp;&nbsp;\r\n                    <a href=\"#/register\">注册用户</a>\r\n                </div>\r\n            </form>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!chat/md-github.css', ['module'], function(module) { module.exports = ".markdown-body {\n  font-size: 14px;\n  line-height: 1.6;\n}\n.markdown-body > br,\n.markdown-body ul br .markdown-body ol br {\n  display: none;\n}\n.markdown-body > *:first-child {\n  margin-top: 0 !important;\n}\n.markdown-body > *:last-child {\n  margin-bottom: 0 !important;\n}\n.markdown-body a.absent {\n  color: #CC0000;\n}\n.markdown-body a.anchor {\n  bottom: 0;\n  cursor: pointer;\n  display: block;\n  left: 0;\n  margin-left: -30px;\n  padding-left: 30px;\n  position: absolute;\n  top: 0;\n}\n.markdown-body h1,\n.markdown-body h2,\n.markdown-body h3,\n.markdown-body h4,\n.markdown-body h5,\n.markdown-body h6 {\n  cursor: text;\n  font-weight: bold;\n  margin: 20px 0 10px;\n  padding: 0;\n  position: relative;\n}\n.markdown-body h1 .mini-icon-link,\n.markdown-body h2 .mini-icon-link,\n.markdown-body h3 .mini-icon-link,\n.markdown-body h4 .mini-icon-link,\n.markdown-body h5 .mini-icon-link,\n.markdown-body h6 .mini-icon-link {\n  color: #000000;\n  display: none;\n}\n.markdown-body h1:hover a.anchor,\n.markdown-body h2:hover a.anchor,\n.markdown-body h3:hover a.anchor,\n.markdown-body h4:hover a.anchor,\n.markdown-body h5:hover a.anchor,\n.markdown-body h6:hover a.anchor {\n  line-height: 1;\n  margin-left: -22px;\n  padding-left: 0;\n  text-decoration: none;\n  top: 15%;\n}\n.markdown-body h1:hover a.anchor .mini-icon-link,\n.markdown-body h2:hover a.anchor .mini-icon-link,\n.markdown-body h3:hover a.anchor .mini-icon-link,\n.markdown-body h4:hover a.anchor .mini-icon-link,\n.markdown-body h5:hover a.anchor .mini-icon-link,\n.markdown-body h6:hover a.anchor .mini-icon-link {\n  display: inline-block;\n}\n.markdown-body h1 tt,\n.markdown-body h1 code,\n.markdown-body h2 tt,\n.markdown-body h2 code,\n.markdown-body h3 tt,\n.markdown-body h3 code,\n.markdown-body h4 tt,\n.markdown-body h4 code,\n.markdown-body h5 tt,\n.markdown-body h5 code,\n.markdown-body h6 tt,\n.markdown-body h6 code {\n  font-size: inherit;\n}\n.markdown-body h1 {\n  color: #000000;\n  font-size: 28px;\n}\n.markdown-body h2 {\n  border-bottom: 1px solid #CCCCCC;\n  color: #000000;\n  font-size: 24px;\n}\n.markdown-body h3 {\n  font-size: 18px;\n}\n.markdown-body h4 {\n  font-size: 16px;\n}\n.markdown-body h5 {\n  font-size: 14px;\n}\n.markdown-body h6 {\n  color: #777777;\n  font-size: 14px;\n}\n.markdown-body p,\n.markdown-body blockquote,\n.markdown-body ul,\n.markdown-body ol,\n.markdown-body dl,\n.markdown-body table,\n.markdown-body pre {\n  margin: 15px 0;\n}\n.markdown-body hr {\n  overflow: hidden;\n  background: 0 0;\n}\n.markdown-body hr:before {\n  display: table;\n  content: \"\";\n}\n.markdown-body hr:after {\n  display: table;\n  clear: both;\n  content: \"\";\n}\n.markdown-body hr {\n  height: 4px;\n  padding: 0;\n  margin: 16px 0;\n  background-color: #e7e7e7;\n  border: 0;\n}\n.markdown-body hr {\n  -moz-box-sizing: content-box;\n  box-sizing: content-box;\n}\n.markdown-body > h2:first-child,\n.markdown-body > h1:first-child,\n.markdown-body > h1:first-child + h2,\n.markdown-body > h3:first-child,\n.markdown-body > h4:first-child,\n.markdown-body > h5:first-child,\n.markdown-body > h6:first-child {\n  margin-top: 0;\n  padding-top: 0;\n}\n.markdown-body a:first-child h1,\n.markdown-body a:first-child h2,\n.markdown-body a:first-child h3,\n.markdown-body a:first-child h4,\n.markdown-body a:first-child h5,\n.markdown-body a:first-child h6 {\n  margin-top: 0;\n  padding-top: 0;\n}\n.markdown-body h1 + p,\n.markdown-body h2 + p,\n.markdown-body h3 + p,\n.markdown-body h4 + p,\n.markdown-body h5 + p,\n.markdown-body h6 + p {\n  margin-top: 0;\n}\n.markdown-body li p.first {\n  display: inline-block;\n}\n.markdown-body ul,\n.markdown-body ol {\n  padding-left: 30px;\n}\n.markdown-body ul.no-list,\n.markdown-body ol.no-list {\n  list-style-type: none;\n  padding: 0;\n}\n.markdown-body ul li > *:first-child,\n.markdown-body ol li > *:first-child {\n  margin-top: 0;\n}\n.markdown-body ul ul,\n.markdown-body ul ol,\n.markdown-body ol ol,\n.markdown-body ol ul {\n  margin-bottom: 0;\n}\n.markdown-body dl {\n  padding: 0;\n}\n.markdown-body dl dt {\n  font-size: 14px;\n  font-style: italic;\n  font-weight: bold;\n  margin: 15px 0 5px;\n  padding: 0;\n}\n.markdown-body dl dt:first-child {\n  padding: 0;\n}\n.markdown-body dl dt > *:first-child {\n  margin-top: 0;\n}\n.markdown-body dl dt > *:last-child {\n  margin-bottom: 0;\n}\n.markdown-body dl dd {\n  margin: 0 0 15px;\n  padding: 0 15px;\n}\n.markdown-body dl dd > *:first-child {\n  margin-top: 0;\n}\n.markdown-body dl dd > *:last-child {\n  margin-bottom: 0;\n}\n.markdown-body blockquote {\n  border-left: 4px solid #DDDDDD;\n  color: #777777;\n  padding: 0 15px;\n}\n.markdown-body blockquote > *:first-child {\n  margin-top: 0;\n}\n.markdown-body blockquote > *:last-child {\n  margin-bottom: 0;\n}\n.markdown-body table th {\n  font-weight: bold;\n}\n.markdown-body table th,\n.markdown-body table td {\n  border: 1px solid #CCCCCC;\n  padding: 6px 13px;\n}\n.markdown-body table tr {\n  background-color: #FFFFFF;\n  border-top: 1px solid #CCCCCC;\n}\n.markdown-body table tr:nth-child(2n) {\n  background-color: #F8F8F8;\n}\n.markdown-body img {\n  max-width: 100%;\n}\n.markdown-body span.frame {\n  display: block;\n  overflow: hidden;\n}\n.markdown-body span.frame > span {\n  border: 1px solid #DDDDDD;\n  display: block;\n  float: left;\n  margin: 13px 0 0;\n  overflow: hidden;\n  padding: 7px;\n  width: auto;\n}\n.markdown-body span.frame span img {\n  display: block;\n  float: left;\n}\n.markdown-body span.frame span span {\n  clear: both;\n  color: #333333;\n  display: block;\n  padding: 5px 0 0;\n}\n.markdown-body span.align-center {\n  clear: both;\n  display: block;\n  overflow: hidden;\n}\n.markdown-body span.align-center > span {\n  display: block;\n  margin: 13px auto 0;\n  overflow: hidden;\n  text-align: center;\n}\n.markdown-body span.align-center span img {\n  margin: 0 auto;\n  text-align: center;\n}\n.markdown-body span.align-right {\n  clear: both;\n  display: block;\n  overflow: hidden;\n}\n.markdown-body span.align-right > span {\n  display: block;\n  margin: 13px 0 0;\n  overflow: hidden;\n  text-align: right;\n}\n.markdown-body span.align-right span img {\n  margin: 0;\n  text-align: right;\n}\n.markdown-body span.float-left {\n  display: block;\n  float: left;\n  margin-right: 13px;\n  overflow: hidden;\n}\n.markdown-body span.float-left span {\n  margin: 13px 0 0;\n}\n.markdown-body span.float-right {\n  display: block;\n  float: right;\n  margin-left: 13px;\n  overflow: hidden;\n}\n.markdown-body span.float-right > span {\n  display: block;\n  margin: 13px auto 0;\n  overflow: hidden;\n  text-align: right;\n}\n.markdown-body code,\n.markdown-body tt {\n  background-color: #F8F8F8;\n  border: 1px solid #EAEAEA;\n  border-radius: 3px 3px 3px 3px;\n  margin: 0 2px;\n  padding: 0 5px;\n  white-space: nowrap;\n}\n.markdown-body pre > code {\n  background: none repeat scroll 0 0 transparent;\n  border: medium none;\n  margin: 0;\n  padding: 0;\n  white-space: pre;\n}\n.markdown-body .highlight pre,\n.markdown-body pre {\n  background-color: #F8F8F8;\n  border: 1px solid #CCCCCC;\n  border-radius: 3px 3px 3px 3px;\n  font-size: 13px;\n  line-height: 19px;\n  overflow: auto;\n  padding: 6px 10px;\n}\n.markdown-body pre code,\n.markdown-body pre tt {\n  background-color: transparent;\n  border: medium none;\n}\n"; });
+define('text!user/user-pwd-reset.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-pwd-reset.css\"></require>\r\n    <div class=\"ui container tms-user-pwd-reset\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">输入您的邮箱地址,我们会发送密码重置链接到您的邮箱!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">邮件地址</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的邮件地址\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"resetPwdHandler()\">发送密码重置邮件</div>\r\n            </div>\r\n            <div if.bind=\"token\" ref=\"fm2\" class=\"ui form segment\" style=\"width: 260px;\">\r\n                <div class=\"ui message\">设置您的新密码,密码长度要求至少8位字符!</div>\r\n                <div class=\"field\">\r\n                    <label style=\"display:none;\">新密码</label>\r\n                    <input type=\"password\" name=\"mail\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"设置您的新密码\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"newPwdHandler()\">确认</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!user/user-register.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./user-register.css\"></require>\r\n    <div class=\"ui container tms-user-register\">\r\n        <div class=\"tms-flex\">\r\n            <div if.bind=\"!token\" ref=\"fm\" class=\"ui form segment\" style=\"width: 280px;\">\r\n                <div class=\"ui message\">提交账户注册信息成功后,我们会向您的注册邮箱发送一封账户激活邮件,激活账户后即可登录!</div>\r\n                <div class=\"required field\">\r\n                    <label>用户名</label>\r\n                    <input type=\"text\" name=\"username\" autofocus=\"\" value.bind=\"username\" placeholder=\"输入您的登录用户名\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>密码</label>\r\n                    <input type=\"password\" name=\"pwd\" autofocus=\"\" value.bind=\"pwd\" placeholder=\"输入您的登录密码\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>姓名</label>\r\n                    <input type=\"text\" name=\"name\" autofocus=\"\" value.bind=\"name\" placeholder=\"输入您的显示名称\">\r\n                </div>\r\n                <div class=\"required field\">\r\n                    <label>邮箱</label>\r\n                    <input type=\"text\" name=\"mail\" autofocus=\"\" value.bind=\"mail\" placeholder=\"输入您的账户激活邮箱\">\r\n                </div>\r\n                <div class=\"ui green fluid button ${isReq ? 'disabled' : ''}\" click.delegate=\"okHandler()\">确认</div>\r\n            </div>\r\n            <div if.bind=\"token\" class=\"ui center aligned very padded segment\" style=\"width: 320px;\">\r\n            \t<h1 class=\"ui header\">${header}</h1>\r\n            \t<a href=\"/admin/login\" class=\"ui green button\">返回登录页面</a>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
 define('text!user/user-login.css', ['module'], function(module) { module.exports = ".tms-user-login {\n  width: 100%;\n  min-height: 100%;\n  background-color: #5a3636;\n  overflow: hidden;\n}\n.tms-user-login .container {\n  width: 300px;\n  top: 50px;\n  margin-left: auto;\n  margin-right: auto;\n  position: relative;\n}\n.tms-user-login h2 {\n  color: rgba(197, 164, 164, 0.8) !important;\n}\n.tms-user-login .ui.form {\n  background-color: #353131;\n}\n.tms-user-login .ui.error.message {\n  background-color: #5a3636;\n}\n.tms-user-login .ui.error.message .header {\n  color: #e0b4b4;\n}\n.tms-user-login .ui.checkbox label {\n  color: #ad8b8b;\n}\n.tms-user-login .ui.checkbox input:focus ~ label {\n  color: #ad8b8b;\n}\n.tms-user-login .ui.checkbox label:hover {\n  color: #ad8b8b;\n}\n.tms-user-login .ui.button {\n  background-color: #5a3636;\n  color: #ad8b75;\n}\n"; });
-define('text!test/test-lifecycle.html', ['module'], function(module) { module.exports = "<template>\r\n    <!-- <require from=\"\"></require> -->\r\n    <div class=\"ui container\">\r\n        <h1 class=\"ui header\">Aurelia框架模块生命周期钩子函数调用顺序测试(看console输出)</h1>\r\n    </div>\r\n</template>\r\n"; });
-define('text!user/user-pwd-reset.css', ['module'], function(module) { module.exports = ".tms-user-pwd-reset {\n  height: 100%;\n}\n.tms-user-pwd-reset .tms-flex {\n  height: 100%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n"; });
-define('text!user/user-register.css', ['module'], function(module) { module.exports = ".tms-user-register {\n  height: 100%;\n}\n.tms-user-register .tms-flex {\n  height: 100%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n"; });
 define('text!resources/elements/em-chat-input.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./em-chat-input.css\"></require>\r\n    <require from=\"./em-hotkeys-modal\"></require>\r\n    <div class=\"ui basic segment tms-msg-input tms-em-chat-input dropzone\">\r\n        <div ref=\"chatStatusBarRef\" class=\"tms-chat-status-bar dropzone-previews\"></div>\r\n        <div ref=\"inputRef\" class=\"ui left action fluid icon input dropzone\">\r\n            <div ref=\"chatBtnRef\" class=\"ui icon button\">\r\n                <i class=\"plus icon\"></i>\r\n            </div>\r\n            <div class=\"ui flowing popup bottom left transition hidden\">\r\n                <div class=\"ui middle aligned selection list\">\r\n                    <div ref=\"btnItemUploadRef\" class=\"item\">\r\n                        <i class=\"upload icon\"></i>\r\n                        <div class=\"content\">\r\n                            上传文件\r\n                        </div>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <div class=\"textareaWrapper\">\r\n                <textarea ref=\"chatInputRef\" placeholder=\"/ 键提示,Ctrl+Enter发送,Esc清空\"></textarea>\r\n            </div>\r\n            <i click.delegate=\"sendChatMsgHandler()\" title=\"发送消息(Enter)\" class=\"send link icon\"></i>\r\n        </div>\r\n    </div>\r\n    <div ref=\"previewTemplateRef\" style=\"display: none;\">\r\n        <div class=\"dz-preview dz-file-preview\">\r\n            <div class=\"dz-details\">\r\n                <div class=\"dz-filename\"><span data-dz-name></span></div>\r\n                <div class=\"dz-size\" data-dz-size></div>\r\n                <img data-dz-thumbnail />\r\n            </div>\r\n            <div class=\"dz-progress\"><span class=\"dz-upload\" data-dz-uploadprogress></span></div>\r\n            <div class=\"dz-success-mark\"><span>✔</span></div>\r\n            <div class=\"dz-error-mark\"><span>✘</span></div>\r\n            <div class=\"dz-error-message\"><span data-dz-errormessage></span></div>\r\n        </div>\r\n    </div>\r\n    <em-hotkeys-modal em-hotkeys-modal.ref=\"emHotkeysModal\"></em-hotkeys-modal>\r\n</template>\r\n"; });
-define('text!resources/elements/em-chat-input.css', ['module'], function(module) { module.exports = ".tms-em-chat-input.ui.segment {\n  margin: 0;\n  position: fixed;\n  bottom: 0;\n  left: 220px;\n  right: 0;\n  background-color: white;\n  padding-bottom: 22px;\n}\n@media only screen and (max-width: 767px) {\n  .tms-em-chat-input.ui.segment {\n    left: 0;\n  }\n}\n.tms-em-chat-input.ui.segment .tms-chat-status-bar .dz-preview {\n  display: block!important;\n  width: auto!important;\n  background: #e0e1e2;\n  margin: 0;\n  padding: 7px;\n}\n.tms-em-chat-input.ui.segment .ui[class*=\"left action\"].input > textarea {\n  border-top-left-radius: 0!important;\n  border-bottom-left-radius: 0!important;\n  border-left-color: transparent!important;\n}\n.tms-em-chat-input.ui.segment .textareaWrapper {\n  width: calc(100% - 35px);\n  /* max-width: 100%;\n            -webkit-box-flex: 1;\n            -webkit-flex: 1 0 auto;\n            -ms-flex: 1 0 auto;\n            flex: 1 0 auto; */\n  border: 1px solid rgba(34, 36, 38, 0.15);\n  border-top-right-radius: .28571429rem;\n  border-bottom-right-radius: .28571429rem;\n}\n.tms-em-chat-input.ui.segment .textareaWrapper .CodeMirror,\n.tms-em-chat-input.ui.segment .textareaWrapper .CodeMirror-scroll {\n  min-height: 0;\n  border: none;\n}\n.tms-em-chat-input.ui.segment .textareaWrapper .CodeMirror-scroll {\n  max-height: 300px;\n}\n.tms-em-chat-input.ui.segment .ui.input i.send.icon {\n  z-index: 1;\n}\n.tms-em-chat-input.ui.segment .ui.input textarea {\n  resize: none;\n  width: 100%;\n  padding-right: 2.67142857em!important;\n  margin: 0;\n  max-width: 100%;\n  outline: 0;\n  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);\n  text-align: left;\n  display: block;\n  padding: .67861429em 1em;\n  background: #FFF;\n  border: none;\n  color: rgba(0, 0, 0, 0.87);\n  box-shadow: none;\n  border-top-right-radius: .28571429rem;\n  border-bottom-right-radius: .28571429rem;\n}\n@media only screen and (min-width: 768px) {\n  .tms-chat-direct .tms-content.tms-sidebar-show .tms-em-chat-input {\n    right: 392px;\n  }\n}\n.textcomplete-dropdown {\n  position: static!important;\n  border: 1px solid #ddd;\n  background-color: white;\n  list-style: none;\n  padding: 0;\n  margin: 0;\n  border-radius: 5px;\n}\n.textcomplete-dropdown li {\n  /* border-top: 1px solid #ddd; */\n  padding: 2px 5px;\n}\n.textcomplete-dropdown li:first-child {\n  border-top: none;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n}\n.textcomplete-dropdown li:last-child {\n  border-bottom-left-radius: 5px;\n  border-bottom-right-radius: 5px;\n}\n.textcomplete-dropdown li:hover,\n.textcomplete-dropdown .active {\n  background-color: #439fe0;\n}\n.textcomplete-dropdown a:hover {\n  cursor: pointer;\n}\n.textcomplete-dropdown li.textcomplete-item a {\n  color: black;\n}\n.textcomplete-dropdown li.textcomplete-item:hover a,\n.textcomplete-dropdown li.textcomplete-item.active a {\n  color: white;\n}\n"; });
-define('text!resources/elements/em-confirm-modal.html', ['module'], function(module) { module.exports = "<template>\r\n    <div ref=\"md\" class=\"ui small modal nx-ui-confirm tms-md450\">\r\n        <div class=\"header\">\r\n            ${config.title}\r\n        </div>\r\n        <div class=\"content\">\r\n            <i if.bind=\"config.warning\" class=\"large yellow warning sign icon\" style=\"float: left;\"></i>\r\n            <i if.bind=\"!config.warning\" class=\"large blue info circle icon\" style=\"float: left;\"></i>\r\n            <p style=\"margin-left: 20px;\">\r\n                <span innerhtml.bind=\"config.content\"></span>\r\n            </p>\r\n        </div>\r\n        <div class=\"actions\">\r\n            <div class=\"ui cancel basic blue left floated button\">取消</div>\r\n            <div class=\"ui ok blue button\">确认</div>\r\n        </div>\r\n    </div>\r\n</template>\r\n"; });
-define('text!resources/elements/em-hotkeys-modal.css', ['module'], function(module) { module.exports = ".tms-em-hotkeys-modal ul {\n  padding-left: 30px;\n}\n.tms-em-hotkeys-modal ul.no_bullets {\n  margin: 0 0 2rem;\n}\n.tms-em-hotkeys-modal ul.no_bullets li {\n  line-height: 2rem;\n  list-style-type: none;\n  padding: 0;\n  font-size: 1rem;\n  font-weight: 700;\n}\n.tms-em-hotkeys-modal > .content {\n  background-color: rgba(11, 7, 11, 0.78) !important;\n}\n.tms-em-hotkeys-modal .keyboard i.icon {\n  margin-right: 0px!important;\n}\n.tms-em-hotkeys-modal .subtle_silver {\n  color: #9e9ea6!important;\n}\n.tms-em-hotkeys-modal .ui.grid .column {\n  padding: 0!important;\n}\n"; });
+define('text!user/user-pwd-reset.css', ['module'], function(module) { module.exports = ".tms-user-pwd-reset {\n  height: 100%;\n}\n.tms-user-pwd-reset .tms-flex {\n  height: 100%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n"; });
+define('text!resources/elements/em-confirm-modal.html', ['module'], function(module) { module.exports = "<template>\n    <div ref=\"md\" class=\"ui small modal nx-ui-confirm tms-md450\">\n        <div class=\"header\">\n            ${config.title}\n        </div>\n        <div class=\"content\">\n            <i if.bind=\"config.warning\" class=\"large yellow warning sign icon\" style=\"float: left;\"></i>\n            <i if.bind=\"!config.warning\" class=\"large blue info circle icon\" style=\"float: left;\"></i>\n            <p style=\"margin-left: 20px;\">\n                <span innerhtml.bind=\"config.content\"></span>\n            </p>\n        </div>\n        <div class=\"actions\">\n            <div class=\"ui cancel basic blue left floated button\">取消</div>\n            <div class=\"ui ok blue button\">确认</div>\n        </div>\n    </div>\n</template>\n"; });
+define('text!user/user-register.css', ['module'], function(module) { module.exports = ".tms-user-register {\n  height: 100%;\n}\n.tms-user-register .tms-flex {\n  height: 100%;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n}\n"; });
 define('text!resources/elements/em-hotkeys-modal.html', ['module'], function(module) { module.exports = "<template>\r\n    <require from=\"./em-hotkeys-modal.css\"></require>\r\n    <div ref=\"md\" class=\"ui basic modal tms-em-hotkeys-modal\">\r\n        <i class=\"close icon\"></i>\r\n        <!-- <div class=\"header\">\r\n            Archive Old Messages\r\n        </div> -->\r\n        <div class=\"content\">\r\n            <h1 class=\"ui center inverted aligned header\">键盘快捷键\r\n\t\t\t\t<span style=\"position: relative; top: -0.375rem; left: 1rem;\" aria-hidden=\"true\">\r\n\t\t\t\t\t<span class=\"keyboard\" aria-label=\"Control\">Ctrl</span>\r\n\t\t\t\t\t<span class=\"keyboard\" aria-label=\"Question mark\">/</span>\r\n\t\t\t\t</span>\r\n            </h1>\r\n            <div class=\"ui grid\">\r\n                <div class=\"three column row\">\r\n                    <div class=\"column\">\r\n                        <ul class=\"no_bullets\">\r\n                            <li>上一条: <span class=\"keyboard\">Alt</span><span class=\"keyboard\"><i class=\"long arrow up icon\" aria-label=\"Up arrow\"></i></span></li>\r\n                            <li>下一条: <span class=\"keyboard\">Alt</span><span class=\"keyboard\"><i class=\"long arrow down icon\" aria-label=\"Down arrow\"></i></span></li>\r\n                            <li>第一条: <span class=\"keyboard\">Alt</span><span class=\"keyboard\">Ctrl</span><span class=\"keyboard\"><i class=\"long arrow up icon\" aria-label=\"Up arrow\"></i></span></li>\r\n                            <li>最后一条: <span class=\"keyboard\">Alt</span><span class=\"keyboard\">Ctrl</span><span class=\"keyboard\"><i class=\"long arrow down icon\" aria-label=\"Down arrow\"></i></span></li>\r\n                            <li>历史回退: <span class=\"keyboard\">Alt</span><span class=\"keyboard\"><i class=\"long arrow left icon\" aria-label=\"Left arrow\"></i></span></li>\r\n                            <li>历史向前: <span class=\"keyboard\">Alt</span><span class=\"keyboard\"><i class=\"long arrow right icon\" aria-label=\"Right arrow\"></i></span></li>\r\n                            <li>标记已读: <span class=\"keyboard\" aria-label=\"Escape\">Esc</span></li>\r\n                            <li>全部标记已读: <span class=\"keyboard\">Shift</span><span class=\"keyboard\" aria-label=\"Escape\">Esc</span></li>\r\n                            <li>快速切换: <span class=\"keyboard\" aria-label=\"Control\">Ctrl</span><span class=\"keyboard\">k</span></li>\r\n                            <li>Browse DMs: <span class=\"keyboard\" aria-label=\"Control\">Ctrl</span><span class=\"keyboard\">Shift</span><span class=\"keyboard\">k</span></li>\r\n                        </ul>\r\n                    </div>\r\n                    <div class=\"column\">\r\n                        <ul class=\"no_bullets\">\r\n                            <li>\r\n                                自动补全\r\n                                <ul>\r\n                                    <li>名称: <span class=\"subtle_silver\">[a-z]</span><span class=\"keyboard\">Tab</span> <span class=\"subtle_silver\">or</span> <span class=\"keyboard\">@</span><span class=\"keyboard\">Tab</span></li>\r\n                                    <li>频道: <span class=\"keyboard\" aria-label=\"Number symbol\">#</span><span class=\"keyboard\">Tab</span></li>\r\n                                    <li>表情: <span class=\"keyboard\" aria-label=\"Colon\">:</span><span class=\"keyboard\">Tab</span></li>\r\n                                </ul>\r\n                            </li>\r\n                            <li>换行: <span class=\"keyboard\">Shift</span><span class=\"keyboard\">Enter</span></li>\r\n                            <li>输入聚焦: <span class=\"keyboard\">Ctrl</span><span class=\"keyboard\">i</span></li>\r\n                            <li>编辑: <span class=\"keyboard\">Ctrl</span><span class=\"keyboard\">DblClick</span></li>\r\n                            <li>编辑上一条: <span class=\"keyboard\"><i class=\"long arrow up icon\" aria-label=\"Up arrow\"></i></span> <span class=\"subtle_silver\">in input</span></li>\r\n                            <li>响应最后一条: <span class=\"keyboard\" aria-label=\"control\">Ctrl</span><span class=\"keyboard\">Shift</span><span class=\"keyboard\">\\</span></li>\r\n                        </ul>\r\n                    </div>\r\n                    <div class=\"column\">\r\n                        <ul class=\"no_bullets\">\r\n                            <li>切换边栏: <span class=\"keyboard\" aria-label=\"Control\">Ctrl</span><span class=\"keyboard\">.</span></li>\r\n                            <ul>\r\n                                <li>团队: <span class=\"keyboard\" aria-label=\"Control\">Ctrl</span><span class=\"keyboard\">Shift</span><span class=\"keyboard\">e</span></li>\r\n                                <li>标星: <span class=\"keyboard\" aria-label=\"Control\">Ctrl</span><span class=\"keyboard\">Shift</span><span class=\"keyboard\">s</span></li>\r\n                            </ul>\r\n                            <li>粘贴代码片段: <span class=\"keyboard\" aria-label=\"Control\">Ctrl</span><span class=\"keyboard\">Shift</span><span class=\"keyboard\">Enter</span></li>\r\n                            <li>上传文件: <span class=\"keyboard\" aria-label=\"Control\">Ctrl</span><span class=\"keyboard\">u</span></li>\r\n                            <li>关闭对话框: <span class=\"keyboard\" aria-label=\"Escape\">Esc</span></li>\r\n                        </ul>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n            <!-- <div class=\"image\">\r\n                <i class=\"archive icon\"></i>\r\n            </div>\r\n            <div class=\"description\">\r\n                <p>Your inbox is getting full, would you like us to enable automatic archiving of old messages?</p>\r\n            </div> -->\r\n        </div>\r\n        <!-- <div class=\"actions\">\r\n            <div class=\"two fluid ui inverted buttons\">\r\n                <div class=\"ui cancel red basic inverted button\">\r\n                    <i class=\"remove icon\"></i> No\r\n                </div>\r\n                <div class=\"ui ok green basic inverted button\">\r\n                    <i class=\"checkmark icon\"></i> Yes\r\n                </div>\r\n            </div>\r\n        </div> -->\r\n    </div>\r\n</template>\r\n"; });
+define('text!resources/elements/em-chat-input.css', ['module'], function(module) { module.exports = ".tms-em-chat-input.ui.segment {\n  margin: 0;\n  position: fixed;\n  bottom: 0;\n  left: 220px;\n  right: 0;\n  background-color: white;\n  padding-bottom: 22px;\n}\n@media only screen and (max-width: 767px) {\n  .tms-em-chat-input.ui.segment {\n    left: 0;\n  }\n}\n.tms-em-chat-input.ui.segment .tms-chat-status-bar .dz-preview {\n  display: block!important;\n  width: auto!important;\n  background: #e0e1e2;\n  margin: 0;\n  padding: 7px;\n}\n.tms-em-chat-input.ui.segment .ui[class*=\"left action\"].input > textarea {\n  border-top-left-radius: 0!important;\n  border-bottom-left-radius: 0!important;\n  border-left-color: transparent!important;\n}\n.tms-em-chat-input.ui.segment .textareaWrapper {\n  width: calc(100% - 35px);\n  /* max-width: 100%;\n            -webkit-box-flex: 1;\n            -webkit-flex: 1 0 auto;\n            -ms-flex: 1 0 auto;\n            flex: 1 0 auto; */\n  border: 1px solid rgba(34, 36, 38, 0.15);\n  border-top-right-radius: .28571429rem;\n  border-bottom-right-radius: .28571429rem;\n}\n.tms-em-chat-input.ui.segment .textareaWrapper .CodeMirror,\n.tms-em-chat-input.ui.segment .textareaWrapper .CodeMirror-scroll {\n  min-height: 0;\n  border: none;\n}\n.tms-em-chat-input.ui.segment .textareaWrapper .CodeMirror-scroll {\n  max-height: 300px;\n}\n.tms-em-chat-input.ui.segment .ui.input i.send.icon {\n  z-index: 1;\n}\n.tms-em-chat-input.ui.segment .ui.input textarea {\n  resize: none;\n  width: 100%;\n  padding-right: 2.67142857em!important;\n  margin: 0;\n  max-width: 100%;\n  outline: 0;\n  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);\n  text-align: left;\n  display: block;\n  padding: .67861429em 1em;\n  background: #FFF;\n  border: none;\n  color: rgba(0, 0, 0, 0.87);\n  box-shadow: none;\n  border-top-right-radius: .28571429rem;\n  border-bottom-right-radius: .28571429rem;\n}\n@media only screen and (min-width: 768px) {\n  .tms-chat-direct .tms-content.tms-sidebar-show .tms-em-chat-input {\n    right: 392px;\n  }\n}\n.textcomplete-dropdown {\n  position: static!important;\n  border: 1px solid #ddd;\n  background-color: white;\n  list-style: none;\n  padding: 0;\n  margin: 0;\n  border-radius: 5px;\n}\n.textcomplete-dropdown li {\n  /* border-top: 1px solid #ddd; */\n  padding: 2px 5px;\n}\n.textcomplete-dropdown li:first-child {\n  border-top: none;\n  border-top-left-radius: 5px;\n  border-top-right-radius: 5px;\n}\n.textcomplete-dropdown li:last-child {\n  border-bottom-left-radius: 5px;\n  border-bottom-right-radius: 5px;\n}\n.textcomplete-dropdown li:hover,\n.textcomplete-dropdown .active {\n  background-color: #439fe0;\n}\n.textcomplete-dropdown a:hover {\n  cursor: pointer;\n}\n.textcomplete-dropdown li.textcomplete-item a {\n  color: black;\n}\n.textcomplete-dropdown li.textcomplete-item:hover a,\n.textcomplete-dropdown li.textcomplete-item.active a {\n  color: white;\n}\n"; });
+define('text!resources/elements/em-hotkeys-modal.css', ['module'], function(module) { module.exports = ".tms-em-hotkeys-modal ul {\n  padding-left: 30px;\n}\n.tms-em-hotkeys-modal ul.no_bullets {\n  margin: 0 0 2rem;\n}\n.tms-em-hotkeys-modal ul.no_bullets li {\n  line-height: 2rem;\n  list-style-type: none;\n  padding: 0;\n  font-size: 1rem;\n  font-weight: 700;\n}\n.tms-em-hotkeys-modal > .content {\n  background-color: rgba(11, 7, 11, 0.78) !important;\n}\n.tms-em-hotkeys-modal .keyboard i.icon {\n  margin-right: 0px!important;\n}\n.tms-em-hotkeys-modal .subtle_silver {\n  color: #9e9ea6!important;\n}\n.tms-em-hotkeys-modal .ui.grid .column {\n  padding: 0!important;\n}\n"; });
 //# sourceMappingURL=app-bundle.js.map
