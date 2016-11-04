@@ -343,7 +343,7 @@ export class ChatDirect {
             return false;
         }
 
-        if (!evt.ctrlKey && evt.keyCode === 13) {
+        if (evt.ctrlKey && evt.keyCode === 13) {
 
             this.sending = true;
 
@@ -361,7 +361,7 @@ export class ChatDirect {
                 if (data.success) {
                     toastr.success('更新消息成功!');
                     item.contentMd = marked(item.content);
-                    // item.isEditing = false;
+                    item.isEditing = false;
                 } else {
                     toastr.error(data.data, '更新消息失败!');
                 }
@@ -370,11 +370,6 @@ export class ChatDirect {
             });
 
             return false;
-        } else if (evt.ctrlKey && evt.keyCode === 13) {
-            let $t = $(evt.target);
-            $t.insertAtCaret('\n');
-            autosize.update(txtRef);
-            item.content = $t.val();
         }
 
         return true;
