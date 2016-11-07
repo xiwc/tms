@@ -387,6 +387,10 @@ export class ChatDirect {
             this.editSave(item, txtRef);
 
             return false;
+        } else if (evt.ctrlKey && evt.keyCode === 85) {
+            // $(txtRef).next('.tms-edit-actions').find('.upload').click();
+            this.eventAggregator.publish(nsCons.EVENT_CHAT_MSG_EDIT_UPLOAD, { target: txtRef });
+            return false;
         } else if (evt.keyCode === 27) {
             this.editCancelHandler(evt, item, txtRef);
         }
