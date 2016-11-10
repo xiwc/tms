@@ -599,6 +599,10 @@ export class ChatDirect {
             this.eventAggregator.publish(nsCons.HOTKEY, {
                 key: 'ctrl+i'
             });
+        }).bind('keydown', 'o', () => {
+            event.preventDefault();
+            let item = _.find(this.searchChats, { isHover: true });
+            item && (item.isOpen = !item.isOpen);
         });
     }
 
@@ -678,5 +682,18 @@ export class ChatDirect {
 
         }
 
+    }
+
+    openSearchItemHandler(item) {
+        item.isOpen = !item.isOpen;
+    }
+
+    searchItemMouseleaveHandler(item) {
+        item.isOpen = false;
+        item.isHover = false;
+    }
+
+    searchItemMouseenterHandler(item) {
+        item.isHover = true;
     }
 }

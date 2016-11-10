@@ -109,6 +109,33 @@
         overflow-y: auto;
         padding-top: 10px;
         padding-bottom: 10px;
+        .comments .comment {
+            .markdown-body {
+                max-height: 65px;
+                overflow-y: hidden;
+                &.tms-open {
+                    max-height: none;
+                    overflow-y: auto;
+                    padding-bottom: 20px;
+                }
+            }
+            .tms-btn-open-search-item {
+                display: none;
+                height: 25px;
+                background-color: rgba(0, 0, 0, 0.1);
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                text-align: center;
+                padding-top: 2px;
+            }
+            &:hover {
+                .tms-btn-open-search-item {
+                    display: block;
+                }
+            }
+        }
     }
     .ui.top.menu {
         .item.tms-item:before {
