@@ -83,6 +83,14 @@ export class ChatDirect {
         return chats;
     }
 
+    getChatName(name) {
+        if (_.startsWith(name, '@')) {
+            return name.substr(1);
+        } else {
+            return name;
+        }
+    }
+
     /**
      * 在视图模型(ViewModel)展示前执行一些自定义代码逻辑
      * @param  {[object]} params                参数
@@ -95,14 +103,17 @@ export class ChatDirect {
         this.markId = params.id;
         this.routeConfig = routeConfig;
 
+        this.isAt = _.startsWith(params.username, '@');
+        this.chatName = this.getChatName(params.username);
+
         this.user = _.find(this.users, {
-            username: params.username
+            username: this.chatName
         });
 
-        let name = this.user ? this.user.name : params.username;
+        let name = this.user ? this.user.name : this.chatName;
         routeConfig.navModel.setTitle(`${name} | 私聊 | TMS`);
 
-        this.init(params.username);
+        this.init(this.chatName);
 
         $(this.chatToDropdownRef).dropdown('set selected', this.chatTo);
 
@@ -296,7 +307,7 @@ export class ChatDirect {
             });
 
             if (user) {
-                window.location = wurl('path') + `#/chat-direct/${user.username}`;
+                window.location = wurl('path') + `#/chat/@${user.username}`;
             }
         }
     }
@@ -618,7 +629,7 @@ export class ChatDirect {
             _.defer(() => {
                 $(this.chatToDropdownRef).dropdown().dropdown('set selected', this.chatTo).dropdown({
                     onChange: (value, text, $choice) => {
-                        window.location = wurl('path') + `#/chat-direct/${value}`;
+                        window.location = wurl('path') + `#/chat/@${value}`;
                     }
                 });
             });
@@ -674,10 +685,10 @@ export class ChatDirect {
             if (this.chatTo == item.chatTo.username) {
                 this.activate({
                     id: item.id,
-                    username: item.chatTo.username
+                    username: `@${item.chatTo.username}`
                 }, this.routeConfig);
             } else {
-                window.location = wurl('path') + `#/chat-direct/${item.chatTo.username}?id=${item.id}`;
+                window.location = wurl('path') + `#/chat/@${item.chatTo.username}?id=${item.id}`;
             }
 
         }

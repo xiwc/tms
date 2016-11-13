@@ -35,5 +35,9 @@
         "title": "绘图(processon)",
         "href": "https://www.processon.com/i/57ac7a10e4b09150b0fc8e21",
         "disabled": false
+    }, {
+        "title": "百度脑图",
+        "href": "http://naotu.baidu.com/home",
+        "disabled": false
     }]
 }

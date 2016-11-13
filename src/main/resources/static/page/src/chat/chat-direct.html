@@ -26,7 +26,7 @@
                         <i class="user icon"></i> 切换私聊对象(Ctrl+k)
                     </div>
                     <div class="scrolling menu">
-                        <a repeat.for="item of users" task.bind="initChatToDropdownHandler($last)" href="#/chat-direct/${item.username}" class="item" title="${item.username}" data-value="${item.username}">
+                        <a repeat.for="item of users" task.bind="initChatToDropdownHandler($last)" href="#/chat/@${item.username}" class="item" title="${item.username}" data-value="${item.username}">
                             <i class="circular icon user"></i> ${item.name}
                         </a>
                     </div>
@@ -64,7 +64,7 @@
                 <i title="清空过滤输入" click.delegate="clearFilterHandler()" class="bordered close icon link small"></i>
             </div>
             <div ref="userListRef" class="ui middle aligned selection list">
-                <a repeat.for="item of users" title="${item.username}" show.bind="!item.hidden" href="#/chat-direct/${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
+                <a repeat.for="item of users" title="${item.username}" show.bind="!item.hidden" href="#/chat/@${item.username}" class="item ${item.username == chatTo ? 'active' : ''}" data-id="${item.username}">
                     <i class="circular icon user"></i>
                     <div class="content">
                         <div style="color: black;">${item.name ? item.name : item.username}</div>

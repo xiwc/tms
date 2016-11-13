@@ -103,7 +103,7 @@ public class ChatDirectController extends BaseController {
 		ChatDirect chatDirect2 = chatDirectRepository.saveAndFlush(chatDirect);
 
 		final User loginUser = getLoginUser();
-		final String href = baseUrl + path + "#/chat-direct/"
+		final String href = baseUrl + path + "#/chat/@"
 				+ loginUser.getUsername() + "?id="
 				+ chatDirect2.getId();
 
@@ -156,7 +156,7 @@ public class ChatDirectController extends BaseController {
 		chatDirectRepository.saveAndFlush(chatDirect);
 
 		final User loginUser = getLoginUser();
-		final String href = baseUrl + path + "#/chat-direct/"
+		final String href = baseUrl + path + "#/chat/@"
 				+ loginUser.getUsername() + "?id="
 				+ chatDirect.getId();
 
