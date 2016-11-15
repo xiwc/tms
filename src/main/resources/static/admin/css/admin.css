@@ -116,7 +116,8 @@ div.admin.login {
 /* Remove these to get rid of the spinner */
 
 #nprogress .spinner {
-    display: block;
+    /* display: block; */
+    display: none!important;
     position: fixed;
     z-index: 1031;
     top: 45px;

@@ -109,8 +109,9 @@ jQuery(function($) {
 
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
-        if (settings.url.lastIndexOf('/unmask') == -1) {
+        if (settings.url.lastIndexOf('/poll/unmask') == -1) {
             // $('.ad-page-dimmer').addClass('active');
+            NProgress && NProgress.start();
         }
 
         var csrf = {};
@@ -123,9 +124,9 @@ jQuery(function($) {
         }
     });
 
-    $(document).on('ajaxStart', function() {
-        NProgress && NProgress.start();
-    });
+    // $(document).on('ajaxStart', function() {
+    //     NProgress && NProgress.start();
+    // });
     $(document).on('ajaxStop', function() {
         // $('.ad-page-dimmer').removeClass('active');
         NProgress && NProgress.done();

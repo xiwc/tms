@@ -75,9 +75,16 @@ export class Config {
 
     initAjax() {
 
-        $(document).on('ajaxStart', function() {
-            NProgress && NProgress.start();
+        $(document).ajaxSend(function(event, jqxhr, settings) {
+
+            if (settings.url.lastIndexOf('/chat/direct/latest') == -1) {
+                NProgress && NProgress.start();
+            }
         });
+
+        // $(document).on('ajaxStart', function() {
+        //     NProgress && NProgress.start();
+        // });
         $(document).on('ajaxStop', function() {
             NProgress && NProgress.done();
         });
