@@ -399,8 +399,8 @@ export class ChatDirect {
 
             return false;
         } else if (evt.ctrlKey && evt.keyCode === 85) {
-            // $(txtRef).next('.tms-edit-actions').find('.upload').click();
-            this.eventAggregator.publish(nsCons.EVENT_CHAT_MSG_EDIT_UPLOAD, { target: txtRef });
+            $(txtRef).next('.tms-edit-actions').find('.upload').click();
+            // this.eventAggregator.publish(nsCons.EVENT_CHAT_MSG_EDIT_UPLOAD, { target: txtRef });
             return false;
         } else if (evt.keyCode === 27) {
             this.editCancelHandler(evt, item, txtRef);
@@ -437,10 +437,10 @@ export class ChatDirect {
 
     initFocusedComment() {
         $(this.commentsRef).on('click', '.comment.item', (event) => {
-            event.preventDefault();
+            // event.preventDefault();
             this.focusedComment = $(event.currentTarget);
         }).on('dblclick', '.comment.item', (event) => {
-            event.preventDefault();
+            // event.preventDefault();
             if (event.ctrlKey) {
                 let chatId = $(event.currentTarget).attr('data-id');
                 let $t = $(event.currentTarget).find('.content > textarea');
@@ -614,6 +614,11 @@ export class ChatDirect {
             event.preventDefault();
             let item = _.find(this.searchChats, { isHover: true });
             item && (item.isOpen = !item.isOpen);
+        });
+
+        $(this.filterChatToUser).bind('keydown', 'ctrl+k', () => {
+            event.preventDefault();
+            $(this.chatToDropdownRef).dropdown('toggle');
         });
     }
 
