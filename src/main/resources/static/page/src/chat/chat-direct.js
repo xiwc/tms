@@ -130,7 +130,7 @@ export class ChatDirect {
     lastMoreHandler() {
 
         let start = _.first(this.chats).id;
-        $.get('/admin/chat/direct/more', {
+        this.lastMoreP = $.get('/admin/chat/direct/more', {
             last: true,
             start: start,
             size: 20,
@@ -154,7 +154,7 @@ export class ChatDirect {
     firstMoreHandler() {
 
         let start = _.last(this.chats).id;
-        $.get('/admin/chat/direct/more', {
+        this.nextMoreP = $.get('/admin/chat/direct/more', {
             last: false,
             start: start,
             size: 20,
@@ -513,7 +513,7 @@ export class ChatDirect {
         }
         localStorage && localStorage.setItem('tms/chat-direct:search', JSON.stringify(this.searchSource));
 
-        $.get('/admin/chat/direct/search', {
+        this.searchingP = $.get('/admin/chat/direct/search', {
             search: this.search,
             size: 20,
             page: 0
@@ -533,7 +533,7 @@ export class ChatDirect {
 
     searchMoreHandler() {
 
-        $.get('/admin/chat/direct/search', {
+        this.searchMoreP = $.get('/admin/chat/direct/search', {
             search: this.search,
             size: this.searchPage.size,
             page: this.searchPage.number + 1
