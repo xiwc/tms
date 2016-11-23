@@ -13,3 +13,4 @@ log/
 .README.md.html
 
 src/main/webapp/upload/
+/.apt_generated/
