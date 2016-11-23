@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity
 public class OauthCode implements Serializable {
@@ -15,6 +16,7 @@ public class OauthCode implements Serializable {
 
 	private static final long serialVersionUID = 2072255024118911470L;
 	private String code;
+	@Lob
 	private Byte[] authentication;
 
 	public Long getId() {

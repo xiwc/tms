@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity
 public class OauthClientToken implements Serializable {
@@ -12,6 +13,7 @@ public class OauthClientToken implements Serializable {
 	@Id
 	private String authenticationId;
 	private String tokenId;
+	@Lob
 	private Byte[] token;
 	private String userName;
 	private String clientId;

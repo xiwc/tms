@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 
 @Entity
 public class OauthRefreshToken implements Serializable {
@@ -16,7 +17,9 @@ public class OauthRefreshToken implements Serializable {
 	private Long id;
 
 	private String tokenId;
+	@Lob
 	private Byte[] token;
+	@Lob
 	private Byte[] authentication;
 
 	public Long getId() {
