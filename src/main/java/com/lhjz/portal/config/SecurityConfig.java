@@ -116,7 +116,37 @@ public class SecurityConfig {
 		}
 
 	}
+	
+	@Configuration
+	@Order(2)
+	@Profile({ "dev", "prod" })
+	public static class SecurityConfiguration2 extends
+			WebSecurityConfigurerAdapter {
 
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+
+			http.antMatcher("/").authorizeRequests().anyRequest().permitAll();
+
+		}
+
+	}
+	
+	@Configuration
+	@Order(3)
+	@Profile({ "dev", "prod" })
+	public static class SecurityConfiguration3 extends
+	WebSecurityConfigurerAdapter {
+		
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			
+			http.antMatcher("/free/**").authorizeRequests().anyRequest().permitAll();
+			
+		}
+		
+	}
+	
 	@Configuration
 	@Order(1)
 	@Profile("test")

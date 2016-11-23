@@ -4,8 +4,7 @@
 }
 
 .markdown-body > br,
-.markdown-body ul br
-.markdown-body ol br {
+.markdown-body ul br .markdown-body ol br {
     display: none;
 }
 
@@ -385,7 +384,9 @@
     border-radius: 3px 3px 3px 3px;
     margin: 0 2px;
     padding: 0 5px;
-    white-space: nowrap;
+    /* white-space: nowrap; */
+    white-space: normal;
+    word-break: break-all;
 }
 
 .markdown-body pre > code {

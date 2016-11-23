@@ -236,11 +236,24 @@ public class AdminController extends BaseController {
 
 		List<Group> groups = groupRepository.findAll();
 		Collections.sort(groups);
+		
+		// login user labels
+		List<Label> labels = labelRepository.findByCreatorGroupByName(WebUtil
+				.getUsername());
+		Set<String> lbls = null;
+		if (labels != null) {
+			lbls = labels.stream().map((label) -> {
+				return label.getName();
+			}).collect(Collectors.toSet());
+		} else {
+			lbls = new HashSet<String>();
+		}
 
 		model.addAttribute("chats", chats);
 		model.addAttribute("logs", logs);
 		model.addAttribute("users", users);
 		model.addAttribute("groups", groups);
+		model.addAttribute("labels", new TreeSet<>(lbls));
 		model.addAttribute("user", getLoginUser());
 		
 		return "admin/dynamic";

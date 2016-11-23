@@ -109,8 +109,9 @@ jQuery(function($) {
 
     $(document).ajaxSend(function(event, jqxhr, settings) {
 
-        if (settings.url.lastIndexOf('/unmask') == -1) {
+        if (settings.url.lastIndexOf('/poll/unmask') == -1) {
             // $('.ad-page-dimmer').addClass('active');
+            NProgress && NProgress.start();
         }
 
         var csrf = {};
@@ -123,9 +124,9 @@ jQuery(function($) {
         }
     });
 
-    $(document).on('ajaxStart', function() {
-        NProgress && NProgress.start();
-    });
+    // $(document).on('ajaxStart', function() {
+    //     NProgress && NProgress.start();
+    // });
     $(document).on('ajaxStop', function() {
         // $('.ad-page-dimmer').removeClass('active');
         NProgress && NProgress.done();
@@ -136,6 +137,21 @@ jQuery(function($) {
         event.stopImmediatePropagation();
         $(this).find('form').find(':hidden[name="name"]').val($('title').text()).end().submit();
     });
+
+    // 初始化系统外链
+    if ($('.tms-sys-links').size() === 1) {
+        $.get('/admin/json/sys-links.json', function(data) {
+            $.each(data.links, function(index, item) {
+                if (!item.disabled) {
+                    var $item = $('<a target="_blank" class="item"></a>')
+                        .attr('href', item.href)
+                        .html(item.title);
+
+                    $('.tms-sys-links').append($item);
+                }
+            });
+        });
+    }
 
 });
 

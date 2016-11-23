@@ -32,6 +32,7 @@ import com.lhjz.portal.constant.SysConstant;
 import com.lhjz.portal.entity.Chat;
 import com.lhjz.portal.entity.ChatAt;
 import com.lhjz.portal.entity.ChatStow;
+import com.lhjz.portal.entity.Label;
 import com.lhjz.portal.entity.Log;
 import com.lhjz.portal.entity.security.Group;
 import com.lhjz.portal.entity.security.GroupMember;
@@ -39,6 +40,8 @@ import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.model.Mail;
 import com.lhjz.portal.model.RespBody;
 import com.lhjz.portal.pojo.Enum.Action;
+import com.lhjz.portal.pojo.Enum.ChatType;
+import com.lhjz.portal.pojo.Enum.Prop;
 import com.lhjz.portal.pojo.Enum.Status;
 import com.lhjz.portal.pojo.Enum.Target;
 import com.lhjz.portal.pojo.Enum.VoteType;
@@ -47,6 +50,7 @@ import com.lhjz.portal.repository.ChatRepository;
 import com.lhjz.portal.repository.ChatStowRepository;
 import com.lhjz.portal.repository.GroupMemberRepository;
 import com.lhjz.portal.repository.GroupRepository;
+import com.lhjz.portal.repository.LabelRepository;
 import com.lhjz.portal.repository.LogRepository;
 import com.lhjz.portal.util.CollectionUtil;
 import com.lhjz.portal.util.DateUtil;
@@ -86,6 +90,9 @@ public class ChatController extends BaseController {
 
 	@Autowired
 	ChatStowRepository chatStowRepository;
+	
+	@Autowired
+	LabelRepository labelRepository;
 
 	@Autowired
 	MailSender2 mailSender;
@@ -114,6 +121,7 @@ public class ChatController extends BaseController {
 		chat.setCreateDate(new Date());
 		chat.setCreator(loginUser);
 		chat.setStatus(Status.New);
+		chat.setType(ChatType.Msg);
 
 		Chat chat2 = chatRepository.saveAndFlush(chat);
 
@@ -599,6 +607,12 @@ public class ChatController extends BaseController {
 			} else {
 				chat.setVoteZan(voteZan == null ? loginUsername : voteZan + ','
 						+ loginUsername);
+				
+				Integer voteZanCnt = chat.getVoteZanCnt();
+				if (voteZanCnt == null) {
+					voteZanCnt = 0;
+				}
+				chat.setVoteZanCnt(++voteZanCnt);
 
 				chat2 = chatRepository.saveAndFlush(chat);
 				title = loginUser.getName() + "[" + loginUsername
@@ -612,6 +626,13 @@ public class ChatController extends BaseController {
 			} else {
 				chat.setVoteCai(voteCai == null ? loginUsername : voteCai + ','
 						+ loginUsername);
+				
+				Integer voteCaiCnt = chat.getVoteCaiCnt();
+				if (voteCaiCnt == null) {
+					voteCaiCnt = 0;
+				}
+				chat.setVoteCaiCnt(++voteCaiCnt);
+				
 				chat2 = chatRepository.saveAndFlush(chat);
 				title = loginUser.getName() + "[" + loginUsername
 						+ "]踩了你的沟通消息!";
@@ -670,6 +691,20 @@ public class ChatController extends BaseController {
 		chatAtRepository.saveAndFlush(chatAt);
 
 		return RespBody.succeed(chatAt);
+	}
+	
+	@RequestMapping(value = { "markAsReadedByChat", "markAsReadedByChat/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody markAsReadedByChat(@RequestParam("chatId") Long chatId) {
+		
+		Chat chat = chatRepository.findOne(chatId);
+		if (chat == null) {
+			return RespBody.failed("@消息不存在,可能已经被删除!");
+		}
+		
+		int cnt = chatAtRepository.markAsReaded(chat, getLoginUser());
+		
+		return RespBody.succeed(cnt);
 	}
 
 	@RequestMapping(value = { "markAllAsReaded",
@@ -759,5 +794,173 @@ public class ChatController extends BaseController {
 		chatRepository.saveAndFlush(chat);
 
 		return RespBody.succeed();
+	}
+	
+	@RequestMapping(value = { "asWiki", "asWiki/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody asWiki(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("title") String title,
+			@RequestParam(value = "privated", required = false) Boolean privated,
+			@RequestParam(value = "labels", required = false) String labels) {
+
+		if (StringUtil.isEmpty(title)) {
+			return RespBody.failed("标题不能为空!");
+		}
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("聊天内容不存在!");
+		}
+
+		chat.setTitle(title);
+		chat.setType(ChatType.Wiki);
+		chat.setPrivated(privated == null ? false : privated);
+
+		Chat chat2 = chatRepository.saveAndFlush(chat);
+
+		if (StringUtil.isNotEmpty(labels)) {
+
+			List<Label> labelList = new ArrayList<Label>();
+
+			String[] labelArr = labels.split(SysConstant.COMMA);
+			Stream.of(labelArr).forEach((lbl) -> {
+				Label label = new Label();
+				label.setCreateDate(new Date());
+				label.setCreator(WebUtil.getUsername());
+				label.setName(lbl);
+				label.setStatus(Status.New);
+				label.setChat(chat2);
+
+				labelList.add(label);
+			});
+
+			labelRepository.save(labelList);
+			labelRepository.flush();
+		}
+
+		logWithProperties(Action.Update, Target.Chat, chat2.getId(),
+				Prop.Title.name(), title);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = { "updateWiki", "updateWiki/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody updateWiki(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("title") String title,
+			@RequestParam(value = "privated", required = false) Boolean privated,
+			@RequestParam(value = "labels", required = false) String labels) {
+
+		if (StringUtil.isEmpty(title)) {
+			return RespBody.failed("标题不能为空!");
+		}
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("聊天内容不存在!");
+		}
+
+		String oldTitle = chat.getTitle();
+		chat.setTitle(title);
+		
+		if (privated != null) {
+			chat.setPrivated(privated);
+		}
+
+		Chat chat2 = chatRepository.saveAndFlush(chat);
+
+		if (StringUtil.isNotEmpty(labels)) {
+
+			List<Label> labelList2 = labelRepository.findByChat(chat2);
+			labelRepository.delete(labelList2);
+			labelRepository.flush();
+
+			List<Label> labelList = new ArrayList<Label>();
+
+			String[] labelArr = labels.split(SysConstant.COMMA);
+			Stream.of(labelArr).forEach((lbl) -> {
+				Label label = new Label();
+				label.setCreateDate(new Date());
+				label.setCreator(WebUtil.getUsername());
+				label.setName(lbl);
+				label.setStatus(Status.New);
+				label.setChat(chat2);
+
+				labelList.add(label);
+			});
+
+			labelRepository.save(labelList);
+			labelRepository.flush();
+		}
+
+		logWithProperties(Action.Update, Target.Chat, chat2.getId(),
+				Prop.Title.name(), title, oldTitle);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = "deleteWiki", method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody deleteWiki(@RequestParam("id") Long id) {
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("博文不存在!");
+		}
+
+		chat.setType(ChatType.Msg);
+		
+		chatRepository.saveAndFlush(chat);
+
+		return RespBody.succeed(id);
+	}
+	
+	@RequestMapping(value = { "addLabel", "addLabel/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody addLabel(@RequestParam("id") Long id,
+			@RequestParam("baseURL") String baseURL,
+			@RequestParam("label") String label) {
+
+		if (StringUtil.isEmpty(label)) {
+			return RespBody.failed("标签不能为空!");
+		}
+
+		Chat chat = chatRepository.findOne(id);
+
+		if (chat == null) {
+			return RespBody.failed("聊天内容不存在!");
+		}
+
+		Label label2 = new Label();
+		label2.setCreateDate(new Date());
+		label2.setCreator(WebUtil.getUsername());
+		label2.setName(label);
+		label2.setStatus(Status.New);
+		label2.setChat(chat);
+
+		labelRepository.save(label2);
+		labelRepository.flush();
+
+		logWithProperties(Action.Update, Target.Chat, chat.getId(),
+				Prop.Labels.name(), label);
+
+		return RespBody.succeed(id);
+	}
+
+	@RequestMapping(value = { "deleteLabel", "deleteLabel/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody deleteLabel(@RequestParam("baseURL") String baseURL,
+			@RequestParam("labelId") Long labelId) {
+
+		labelRepository.delete(labelId);
+
+		log(Action.Delete, Target.Label, labelId);
+
+		return RespBody.succeed(labelId);
 	}
 }

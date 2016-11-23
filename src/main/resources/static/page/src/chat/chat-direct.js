@@ -1,4 +1,4 @@
-import { bindable } from 'aurelia-framework';
+import { bindable, inject } from 'aurelia-framework';
 import poll from "common/common-poll";
 import 'jquery.scrollto'; // https://github.com/flesler/jquery.scrollTo
 import {
@@ -16,7 +16,15 @@ import {
     default as autosize
 } from 'autosize';
 import 'hotkeys';
+import {
+    default as hljs
+} from 'highlight';
+import {
+    EventAggregator
+}
+from 'aurelia-event-aggregator';
 
+@inject(EventAggregator)
 export class ChatDirect {
 
     @bindable content = '';
@@ -36,9 +44,13 @@ export class ChatDirect {
     /**
      * 构造函数
      */
-    constructor() {
+    constructor(ea) {
+        this.eventAggregator = ea;
         marked.setOptions({
-            breaks: true
+            breaks: true,
+            highlight: function(code) {
+                return hljs.highlightAuto(code).value;
+            }
         });
 
         Dropzone.autoDiscover = false;
@@ -50,6 +62,18 @@ export class ChatDirect {
             }).on('error', function(e) {
                 toastr.error('复制到剪贴板成功!');
             });
+
+        this.initSubscribeEvent();
+    }
+
+    initSubscribeEvent() {
+
+        this.subscribe = this.eventAggregator.subscribe(nsCons.EVENT_CHAT_MSG_SENDED, (payload) => {
+
+            if (!this.first) {
+                this._init(false);
+            }
+        });
     }
 
     convertMd(chats) {
@@ -57,6 +81,14 @@ export class ChatDirect {
             item.contentMd = marked(item.content);
         });
         return chats;
+    }
+
+    getChatName(name) {
+        if (_.startsWith(name, '@')) {
+            return name.substr(1);
+        } else {
+            return name;
+        }
     }
 
     /**
@@ -71,14 +103,17 @@ export class ChatDirect {
         this.markId = params.id;
         this.routeConfig = routeConfig;
 
+        this.isAt = _.startsWith(params.username, '@');
+        this.chatName = this.getChatName(params.username);
+
         this.user = _.find(this.users, {
-            username: params.username
+            username: this.chatName
         });
 
-        let name = this.user ? this.user.name : params.username;
+        let name = this.user ? this.user.name : this.chatName;
         routeConfig.navModel.setTitle(`${name} | 私聊 | TMS`);
 
-        this.init(params.username);
+        this.init(this.chatName);
 
         $(this.chatToDropdownRef).dropdown('set selected', this.chatTo);
 
@@ -95,7 +130,7 @@ export class ChatDirect {
     lastMoreHandler() {
 
         let start = _.first(this.chats).id;
-        $.get('/admin/chat/direct/more', {
+        this.lastMoreP = $.get('/admin/chat/direct/more', {
             last: true,
             start: start,
             size: 20,
@@ -119,7 +154,7 @@ export class ChatDirect {
     firstMoreHandler() {
 
         let start = _.last(this.chats).id;
-        $.get('/admin/chat/direct/more', {
+        this.nextMoreP = $.get('/admin/chat/direct/more', {
             last: false,
             start: start,
             size: 20,
@@ -140,16 +175,19 @@ export class ChatDirect {
         });
     }
 
-    init(chatTo) {
+    _init(isCareMarkId) {
 
-        this.chatTo = chatTo;
+        if (!this.chatTo) {
+            toastr.error('聊天对象未指定!');
+            return;
+        }
 
         var data = {
             size: 20,
-            chatTo: chatTo
+            chatTo: this.chatTo
         };
 
-        if (this.markId) {
+        if (this.markId && isCareMarkId) {
             data.id = this.markId;
         }
 
@@ -162,13 +200,17 @@ export class ChatDirect {
                 !this.first && (this.firstCnt = data.data.size * data.data.number);
 
                 _.defer(() => {
-                    if (this.markId) {
-                        $(this.commentsRef).scrollTo(`.comment[data-id=${this.markId}]`, {
-                            offset: this.offset
-                        });
-                    } else {
-                        $(this.commentsRef).scrollTo('max');
-                    }
+
+                    utils.imgLoaded($(this.commentsRef).find('.comment img'), () => {
+                        if (this.markId) {
+                            $(this.commentsRef).scrollTo(`.comment[data-id=${this.markId}]`, {
+                                offset: this.offset
+                            });
+                        } else {
+                            $(this.commentsRef).scrollTo('max');
+                        }
+                    });
+
                 });
             } else {
                 toastr.error(data.data, '获取消息失败!');
@@ -179,6 +221,12 @@ export class ChatDirect {
                 window.location = utils.getBaseUrl() + wurl('path') + `#/login?redirect=${encodeURIComponent(this.originalHref)}`;
             }
         });
+    }
+
+    init(chatTo) {
+
+        this.chatTo = chatTo;
+        this._init(true);
     }
 
     /**
@@ -211,7 +259,7 @@ export class ChatDirect {
 
         poll.start((resetCb, stopCb) => {
 
-            if (!this.chats) {
+            if (!this.chats || !this.first) {
                 return;
             }
 
@@ -259,7 +307,7 @@ export class ChatDirect {
             });
 
             if (user) {
-                window.location = wurl('path') + `#/chat-direct/${user.username}`;
+                window.location = wurl('path') + `#/chat/@${user.username}`;
             }
         }
     }
@@ -294,9 +342,48 @@ export class ChatDirect {
 
     editHandler(item, editTxtRef) {
         item.isEditing = true;
+        item.contentOld = item.content;
         _.defer(() => {
             $(editTxtRef).focus().select();
             autosize.update(editTxtRef);
+        });
+    }
+
+    editOkHandler(evt, item, txtRef) {
+        this.editSave(item, txtRef);
+        item.isEditing = false;
+    }
+
+    editCancelHandler(evt, item, txtRef) {
+        item.content = item.contentOld;
+        $(txtRef).val(item.content);
+        item.isEditing = false;
+    }
+
+    editSave(item, txtRef) {
+
+        this.sending = true;
+
+        item.content = $(txtRef).val();
+
+        var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + marked(item.content)).wrap('<div/>').parent().html();
+
+        $.post('/admin/chat/direct/update', {
+            baseUrl: utils.getBaseUrl(),
+            path: wurl('path'),
+            id: item.id,
+            content: item.content,
+            contentHtml: html
+        }, (data, textStatus, xhr) => {
+            if (data.success) {
+                toastr.success('更新消息成功!');
+                item.contentMd = marked(item.content);
+                item.isEditing = false;
+            } else {
+                toastr.error(data.data, '更新消息失败!');
+            }
+        }).always(() => {
+            this.sending = false;
         });
     }
 
@@ -306,45 +393,20 @@ export class ChatDirect {
             return false;
         }
 
-        if (!evt.ctrlKey && evt.keyCode === 13) {
+        if (evt.ctrlKey && evt.keyCode === 13) {
 
-            this.sending = true;
-
-            item.content = $(txtRef).val();
-
-            var html = $('<div class="markdown-body"/>').html('<style>.markdown-body{font-size:14px;line-height:1.6}.markdown-body>:first-child{margin-top:0!important}.markdown-body>:last-child{margin-bottom:0!important}.markdown-body a.absent{color:#C00}.markdown-body a.anchor{bottom:0;cursor:pointer;display:block;left:0;margin-left:-30px;padding-left:30px;position:absolute;top:0}.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4,.markdown-body h5,.markdown-body h6{cursor:text;font-weight:700;margin:20px 0 10px;padding:0;position:relative}.markdown-body h1 .mini-icon-link,.markdown-body h2 .mini-icon-link,.markdown-body h3 .mini-icon-link,.markdown-body h4 .mini-icon-link,.markdown-body h5 .mini-icon-link,.markdown-body h6 .mini-icon-link{color:#000;display:none}.markdown-body h1:hover a.anchor,.markdown-body h2:hover a.anchor,.markdown-body h3:hover a.anchor,.markdown-body h4:hover a.anchor,.markdown-body h5:hover a.anchor,.markdown-body h6:hover a.anchor{line-height:1;margin-left:-22px;padding-left:0;text-decoration:none;top:15%}.markdown-body h1:hover a.anchor .mini-icon-link,.markdown-body h2:hover a.anchor .mini-icon-link,.markdown-body h3:hover a.anchor .mini-icon-link,.markdown-body h4:hover a.anchor .mini-icon-link,.markdown-body h5:hover a.anchor .mini-icon-link,.markdown-body h6:hover a.anchor .mini-icon-link{display:inline-block}.markdown-body hr:after,.markdown-body hr:before{display:table;content:""}.markdown-body h1 code,.markdown-body h1 tt,.markdown-body h2 code,.markdown-body h2 tt,.markdown-body h3 code,.markdown-body h3 tt,.markdown-body h4 code,.markdown-body h4 tt,.markdown-body h5 code,.markdown-body h5 tt,.markdown-body h6 code,.markdown-body h6 tt{font-size:inherit}.markdown-body h1{color:#000;font-size:28px}.markdown-body h2{border-bottom:1px solid #CCC;color:#000;font-size:24px}.markdown-body h3{font-size:18px}.markdown-body h4{font-size:16px}.markdown-body h5{font-size:14px}.markdown-body h6{color:#777;font-size:14px}.markdown-body blockquote,.markdown-body dl,.markdown-body ol,.markdown-body p,.markdown-body pre,.markdown-body table,.markdown-body ul{margin:15px 0}.markdown-body hr{overflow:hidden;background:#e7e7e7;height:4px;padding:0;margin:16px 0;border:0;-moz-box-sizing:content-box;box-sizing:content-box}.markdown-body h1+p,.markdown-body h2+p,.markdown-body h3+p,.markdown-body h4+p,.markdown-body h5+p,.markdown-body h6+p,.markdown-body ol li>:first-child,.markdown-body ul li>:first-child{margin-top:0}.markdown-body hr:after{clear:both}.markdown-body a:first-child h1,.markdown-body a:first-child h2,.markdown-body a:first-child h3,.markdown-body a:first-child h4,.markdown-body a:first-child h5,.markdown-body a:first-child h6,.markdown-body>h1:first-child,.markdown-body>h1:first-child+h2,.markdown-body>h2:first-child,.markdown-body>h3:first-child,.markdown-body>h4:first-child,.markdown-body>h5:first-child,.markdown-body>h6:first-child{margin-top:0;padding-top:0}.markdown-body li p.first{display:inline-block}.markdown-body ol,.markdown-body ul{padding-left:30px}.markdown-body ol.no-list,.markdown-body ul.no-list{list-style-type:none;padding:0}.markdown-body ol ol,.markdown-body ol ul,.markdown-body ul ol,.markdown-body ul ul{margin-bottom:0}.markdown-body dl{padding:0}.markdown-body dl dt{font-size:14px;font-style:italic;font-weight:700;margin:15px 0 5px;padding:0}.markdown-body dl dt:first-child{padding:0}.markdown-body dl dt>:first-child{margin-top:0}.markdown-body dl dt>:last-child{margin-bottom:0}.markdown-body dl dd{margin:0 0 15px;padding:0 15px}.markdown-body blockquote>:first-child,.markdown-body dl dd>:first-child{margin-top:0}.markdown-body blockquote>:last-child,.markdown-body dl dd>:last-child{margin-bottom:0}.markdown-body blockquote{border-left:4px solid #DDD;color:#777;padding:0 15px}.markdown-body table th{font-weight:700}.markdown-body table td,.markdown-body table th{border:1px solid #CCC;padding:6px 13px}.markdown-body table tr{background-color:#FFF;border-top:1px solid #CCC}.markdown-body table tr:nth-child(2n){background-color:#F8F8F8}.markdown-body img{max-width:100%}.markdown-body span.frame{display:block;overflow:hidden}.markdown-body span.frame>span{border:1px solid #DDD;display:block;float:left;margin:13px 0 0;overflow:hidden;padding:7px;width:auto}.markdown-body span.frame span img{display:block;float:left}.markdown-body span.frame span span{clear:both;color:#333;display:block;padding:5px 0 0}.markdown-body span.align-center{clear:both;display:block;overflow:hidden}.markdown-body span.align-center>span{display:block;margin:13px auto 0;overflow:hidden;text-align:center}.markdown-body span.align-center span img{margin:0 auto;text-align:center}.markdown-body span.align-right{clear:both;display:block;overflow:hidden}.markdown-body span.align-right>span{display:block;margin:13px 0 0;overflow:hidden;text-align:right}.markdown-body span.align-right span img{margin:0;text-align:right}.markdown-body span.float-left{display:block;float:left;margin-right:13px;overflow:hidden}.markdown-body span.float-left span{margin:13px 0 0}.markdown-body span.float-right{display:block;float:right;margin-left:13px;overflow:hidden}.markdown-body span.float-right>span{display:block;margin:13px auto 0;overflow:hidden;text-align:right}.markdown-body code,.markdown-body tt{background-color:#F8F8F8;border:1px solid #EAEAEA;border-radius:3px;margin:0 2px;padding:0 5px;white-space:nowrap}.markdown-body pre>code{background:none;border:none;margin:0;padding:0;white-space:pre}.markdown-body .highlight pre,.markdown-body pre{background-color:#F8F8F8;border:1px solid #CCC;border-radius:3px;font-size:13px;line-height:19px;overflow:auto;padding:6px 10px}.markdown-body pre code,.markdown-body pre tt{background-color:transparent;border:none}</style>' + marked(item.content)).wrap('<div/>').parent().html();
-
-            $.post('/admin/chat/direct/update', {
-                baseUrl: utils.getBaseUrl(),
-                path: wurl('path'),
-                id: item.id,
-                content: item.content,
-                contentHtml: html
-            }, (data, textStatus, xhr) => {
-                if (data.success) {
-                    toastr.success('更新消息成功!');
-                    item.contentMd = marked(item.content);
-                    // item.isEditing = false;
-                } else {
-                    toastr.error(data.data, '更新消息失败!');
-                }
-            }).always(() => {
-                this.sending = false;
-            });
+            this.editSave(item, txtRef);
 
             return false;
-        } else if (evt.ctrlKey && evt.keyCode === 13) {
-            let $t = $(evt.target);
-            $t.insertAtCaret('\n');
-            autosize.update(txtRef);
-            item.content = $t.val();
+        } else if (evt.ctrlKey && evt.keyCode === 85) {
+            $(txtRef).next('.tms-edit-actions').find('.upload').click();
+            // this.eventAggregator.publish(nsCons.EVENT_CHAT_MSG_EDIT_UPLOAD, { target: txtRef });
+            return false;
+        } else if (evt.keyCode === 27) {
+            this.editCancelHandler(evt, item, txtRef);
         }
 
         return true;
-    }
-
-    focusoutHandler(item) {
-        item.isEditing = false;
     }
 
     chatToUserFilerFocusinHanlder() {
@@ -369,7 +431,29 @@ export class ChatDirect {
 
         this.initSearch();
         this.initHotkeys();
+        this.initFocusedComment();
 
+    }
+
+    initFocusedComment() {
+        $(this.commentsRef).on('click', '.comment.item', (event) => {
+            // event.preventDefault();
+            this.focusedComment = $(event.currentTarget);
+        }).on('dblclick', '.comment.item', (event) => {
+            // event.preventDefault();
+            if (event.ctrlKey) {
+                let chatId = $(event.currentTarget).attr('data-id');
+                let $t = $(event.currentTarget).find('.content > textarea');
+                let item = _.find(this.chats, { id: Number.parseInt(chatId) });
+
+                item.isEditing = true;
+                item.contentOld = item.content;
+                _.defer(() => {
+                    $t.focus().select();
+                    autosize.update($t.get(0));
+                });
+            }
+        });
     }
 
     initSearch() {
@@ -429,7 +513,7 @@ export class ChatDirect {
         }
         localStorage && localStorage.setItem('tms/chat-direct:search', JSON.stringify(this.searchSource));
 
-        $.get('/admin/chat/direct/search', {
+        this.searchingP = $.get('/admin/chat/direct/search', {
             search: this.search,
             size: 20,
             page: 0
@@ -449,7 +533,7 @@ export class ChatDirect {
 
     searchMoreHandler() {
 
-        $.get('/admin/chat/direct/search', {
+        this.searchMoreP = $.get('/admin/chat/direct/search', {
             search: this.search,
             size: this.searchPage.size,
             page: this.searchPage.number + 1
@@ -471,6 +555,30 @@ export class ChatDirect {
         $(this.searchInputRef).val('').focus();
     }
 
+    getScrollTargetComment(isPrev) {
+        if (isPrev) {
+            if (this.focusedComment && this.focusedComment.size() === 1) {
+                let prev = this.focusedComment.prev('.comment.item');
+                (prev.size() === 1) && (this.focusedComment = prev);
+            } else {
+                this.focusedComment = $(this.commentsRef).children('.comment.item:first');
+            }
+        } else {
+            if (this.focusedComment && this.focusedComment.size() === 1) {
+                let next = this.focusedComment.next('.comment.item');
+                (next.size() === 1) && (this.focusedComment = next);
+            } else {
+                this.focusedComment = $(this.commentsRef).children('.comment.item:last');
+            }
+        }
+        return this.focusedComment;
+    }
+
+    scrollTo(target) {
+        $(this.commentsRef).scrollTo(target, {
+            offset: this.offset
+        });
+    }
 
     initHotkeys() {
         $(document).bind('keydown', 'ctrl+u', (evt) => {
@@ -479,6 +587,38 @@ export class ChatDirect {
         }).bind('keydown', 'ctrl+/', (evt) => {
             evt.preventDefault();
             this.emChatInputRef.emHotkeysModal.show();
+        }).bind('keydown', 'alt+up', (evt) => {
+            evt.preventDefault();
+            this.scrollTo(this.getScrollTargetComment(true));
+        }).bind('keydown', 'alt+down', (evt) => {
+            evt.preventDefault();
+            this.scrollTo(this.getScrollTargetComment());
+        }).bind('keydown', 'alt+ctrl+up', () => {
+            event.preventDefault();
+            this.scrollTo($(this.commentsRef).children('.comment.item:first'));
+        }).bind('keydown', 'alt+ctrl+down', () => {
+            event.preventDefault();
+            this.scrollTo($(this.commentsRef).children('.comment.item:last'));
+        }).bind('keydown', 'ctrl+.', () => {
+            event.preventDefault();
+            this.toggleRightSidebar();
+        }).bind('keydown', 'ctrl+k', () => {
+            event.preventDefault();
+            $(this.chatToDropdownRef).dropdown('toggle');
+        }).bind('keydown', 'ctrl+i', () => {
+            event.preventDefault();
+            this.eventAggregator.publish(nsCons.HOTKEY, {
+                key: 'ctrl+i'
+            });
+        }).bind('keydown', 'o', () => {
+            event.preventDefault();
+            let item = _.find(this.searchChats, { isHover: true });
+            item && (item.isOpen = !item.isOpen);
+        });
+
+        $(this.filterChatToUser).bind('keydown', 'ctrl+k', () => {
+            event.preventDefault();
+            $(this.chatToDropdownRef).dropdown('toggle');
         });
     }
 
@@ -494,7 +634,7 @@ export class ChatDirect {
             _.defer(() => {
                 $(this.chatToDropdownRef).dropdown().dropdown('set selected', this.chatTo).dropdown({
                     onChange: (value, text, $choice) => {
-                        window.location = wurl('path') + `#/chat-direct/${value}`;
+                        window.location = wurl('path') + `#/chat/@${value}`;
                     }
                 });
             });
@@ -525,12 +665,14 @@ export class ChatDirect {
     searchFocusinHandler() {
         $(this.searchInputRef).css('width', 'auto');
         $(this.searchRemoveRef).show();
+        this.isActiveSearch = true;
     }
 
     searchFocusoutHandler() {
         if (!$(this.searchInputRef).val()) {
             $(this.searchInputRef).css('width', '100px');
             $(this.searchRemoveRef).hide();
+            this.isActiveSearch = false;
         }
     }
 
@@ -548,13 +690,26 @@ export class ChatDirect {
             if (this.chatTo == item.chatTo.username) {
                 this.activate({
                     id: item.id,
-                    username: item.chatTo.username
+                    username: `@${item.chatTo.username}`
                 }, this.routeConfig);
             } else {
-                window.location = wurl('path') + `#/chat-direct/${item.chatTo.username}?id=${item.id}`;
+                window.location = wurl('path') + `#/chat/@${item.chatTo.username}?id=${item.id}`;
             }
 
         }
 
+    }
+
+    openSearchItemHandler(item) {
+        item.isOpen = !item.isOpen;
+    }
+
+    searchItemMouseleaveHandler(item) {
+        item.isOpen = false;
+        item.isHover = false;
+    }
+
+    searchItemMouseenterHandler(item) {
+        item.isHover = true;
     }
 }

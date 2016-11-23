@@ -3,6 +3,11 @@
     .top.fixed.menu {
         padding-left: 220px;
         height: 60px;
+        @media only screen and (max-width: 767px) {
+            .tms-chat-at.tms-hide {
+                display: none;
+            }
+        }
     }
     .ui.left.sidebar {
         background-color: #4d394b;
@@ -104,6 +109,33 @@
         overflow-y: auto;
         padding-top: 10px;
         padding-bottom: 10px;
+        .comments .comment {
+            .markdown-body {
+                max-height: 65px;
+                overflow-y: hidden;
+                &.tms-open {
+                    max-height: none;
+                    overflow-y: auto;
+                    padding-bottom: 20px;
+                }
+            }
+            .tms-btn-open-search-item {
+                display: none;
+                height: 25px;
+                background-color: rgba(0, 0, 0, 0.1);
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                left: 0;
+                text-align: center;
+                padding-top: 2px;
+            }
+            &:hover {
+                .tms-btn-open-search-item {
+                    display: block;
+                }
+            }
+        }
     }
     .ui.top.menu {
         .item.tms-item:before {
@@ -142,6 +174,37 @@
     @media only screen and (max-width: 767px) {
         .tms-left-sidebar {
             display: none;
+        }
+        .tms-right-sidebar {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            top: 59px;
+            background-color: white;
+            margin-left: 0!important;
+            .panel-search {
+                .ui.basic.segment.minimal.selection.list.segment.comments {
+                    padding-left: 0;
+                    padding-right: 0;
+                }
+            }
+        }
+        .tms-sidebar-show {
+            .tms-right-sidebar {
+                width: 100%!important;
+            }
+        }
+        .tms-login-user {
+            display: none!important;
+        }
+    }
+    .tms-edit-actions {
+        .left.button {
+            border-top-left-radius: 0;
+        }
+        .right.button {
+            border-top-right-radius: 0;
         }
     }
 }

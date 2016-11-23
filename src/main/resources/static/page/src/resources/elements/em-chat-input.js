@@ -1,4 +1,4 @@
-import { bindable, containerless } from 'aurelia-framework';
+import { bindable, containerless, inject } from 'aurelia-framework';
 import 'textcomplete';
 import tips from 'common/common-tips';
 import {
@@ -7,12 +7,38 @@ import {
 import {
     default as marked
 } from 'marked'; // https://github.com/chjj/marked
+import {
+    EventAggregator
+}
+from 'aurelia-event-aggregator';
 
 @containerless
+@inject(EventAggregator)
 export class EmChatInput {
 
     @bindable chatTo;
     @bindable poll;
+
+    /**
+     * 构造函数
+     */
+    constructor(ea) {
+        this.eventAggregator = ea;
+
+        this.subscribe = this.eventAggregator.subscribe(nsCons.HOTKEY, (payload) => {
+            let key = payload.key;
+            if (key == 'ctrl+i') {
+                this.simplemde.codemirror.focus();
+            }
+        });
+    }
+
+    /**
+     * 当数据绑定引擎从视图解除绑定时被调用
+     */
+    unbind() {
+        this.subscribe.dispose();
+    }
 
     /**
      * 当视图被附加到DOM中时被调用
@@ -164,12 +190,12 @@ export class EmChatInput {
                 e.preventDefault();
             } else if (e.ctrlKey && e.keyCode === 13) {
                 this.sendChatMsg();
-            } else if(e.keyCode === 27) {
-            	this.simplemde.value('');
-            } else if(e.ctrlKey && e.keyCode == 85) {
-            	$(this.btnItemUploadRef).find('.content').click();
-            } else if(e.ctrlKey && e.keyCode == 191) {
-            	this.emHotkeysModal.show();
+            } else if (e.keyCode === 27) {
+                this.simplemde.value('');
+            } else if (e.ctrlKey && e.keyCode == 85) {
+                $(this.btnItemUploadRef).find('.content').click();
+            } else if (e.ctrlKey && e.keyCode == 191) {
+                this.emHotkeysModal.show();
             }
         });
     }
@@ -199,8 +225,11 @@ export class EmChatInput {
             contentHtml: html
         }, (data, textStatus, xhr) => {
             if (data.success) {
-            	this.poll.reset();
+                this.poll.reset();
                 this.simplemde.value('');
+                this.eventAggregator.publish(nsCons.EVENT_CHAT_MSG_SENDED, {
+                    data: data
+                });
             } else {
                 toastr.error(data.data, '发送消息失败!');
             }
@@ -220,20 +249,29 @@ export class EmChatInput {
     /**
      * 编辑器插入自定义沟通内容
      * @param  {[type]} cm      [description]
-     * @param  {[type]} comment [description]
+     * @param  {[type]} tip [description]
      * @return {[type]}         [description]
      */
-    insertTipContent(content, mde) {
+    insertTipContent(tip, mde) {
         let cm = mde ? mde.codemirror : this.simplemde.codemirror;
         var cursor = cm.getCursor();
         var line = cm.getLine(cursor.line);
         var indexSlash = _.lastIndexOf(line, '/', cursor.ch);
         if (cursor) {
-            cm.replaceRange(content, {
+            cm.replaceRange(tip.value, {
                 ch: indexSlash,
                 line: cursor.line
             }, cursor);
             cm.focus();
+
+            // TODO bug:奇怪被填充前面的字符
+            if (tip.ch || tip.line) {
+                cm.setCursor({
+                    line: tip.line ? (cursor.line + tip.line) : cm.getCursor().line,
+                    ch: tip.ch ? (indexSlash + tip.ch) : 0
+                });
+            }
+
         }
     }
 
@@ -258,7 +296,7 @@ export class EmChatInput {
         } else if (value == '/shortcuts') {
             this.emHotkeysModal.show();
         } else {
-            this.insertTipContent(tips[value].value);
+            this.insertTipContent(tips[value]);
         }
     }
 

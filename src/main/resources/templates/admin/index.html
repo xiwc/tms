@@ -29,7 +29,7 @@
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/dynamic')} ? 'active' : ''" class="item mi-dynamic" th:href="@{/admin/dynamic}" href="dynamic.html"> <i class="at icon"></i> 沟通动态
         </a>
-        <a class="item" target="_blank" th:href="${'/page/index.html#/chat-direct/' + #authentication.name}" href="/page/index.html#/chat-direct/admin"> <i class="chat icon"></i> 私聊频道
+        <a class="item" target="_blank" th:href="${'/page/index.html#/chat/@' + #authentication.name}" href="/page/index.html#/chat/@admin"> <i class="chat icon"></i> 私聊频道
         </a>
         <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html"> <i class="world icon"></i> 翻译管理
         </a>
@@ -48,8 +48,8 @@
         <a class="item ad-index-btn-menu">
             <i class="content icon"></i> 菜单
         </a>
-        <a class="title item" th:href="@{/admin}" href="index.html">
-            <b>TMS</b>
+        <a class="title item" th:href="@{/}" href="index.html">
+            <b>TMS博文</b>
         </a>
         <div class="right menu">
             <div class="item link ad-item-feedback">
@@ -61,7 +61,7 @@
             </div>
             <div class="ui floating top right pointing dropdown link item dd-top-menu-user">
                 <i class="user icon"></i>
-                <span class="" th:text="${#authentication != null ? #authentication.name : ''}">admin</span>
+                <span class="ad-index-user-username" th:text="${#authentication != null ? #authentication.name : ''}">admin</span>
                 <div class="menu">
                     <div class="header">选择操作</div>
                     <div class="item ad-index-user-edit" th:attr="data-id=${#authentication != null ? #authentication.name : ''}">
@@ -87,7 +87,7 @@
                     <a th:classappend="${#strings.contains(uri, '/admin/dynamic')} ? 'active' : ''" class="item mi-dynamic" th:href="@{/admin/dynamic}" href="dynamic.html">
                         <i class="at icon"></i> 沟通动态
                     </a>
-                    <a class="item" target="_blank" th:href="${'/page/index.html#/chat-direct/' + #authentication.name}" href="/page/index.html#/chat-direct/admin">
+                    <a class="item" target="_blank" th:href="${'/page/index.html#/chat/@' + #authentication.name}" href="/page/index.html#/chat/@admin">
                         <i class="chat icon"></i> 私聊频道
                     </a>
                     <a th:classappend="${#strings.contains(uri, '/admin/translate')} ? 'active' : ''" class="item mi-translate" th:href="@{/admin/translate}" href="translate.html">
@@ -110,15 +110,15 @@
                     </a>
                     <div class="item">
                         <i class="linkify icon"></i> 系统外链
-                        <div class="menu">
-                            <a target="_blank" class="item" href="http://220.248.17.34:7991/">JIRA</a>
+                        <div class="menu tms-sys-links">
+                            <!-- <a target="_blank" class="item" href="http://220.248.17.34:7991/">JIRA</a>
                             <a target="_blank" class="item" href="http://220.248.17.34:7992/">Confluence</a>
                             <a target="_blank" class="item" href="http://220.248.17.34:7990/">Stash</a>
                             <a target="_blank" class="item" href="http://220.248.17.34:8073/">Jenkins</a>
                             <a target="_blank" class="item" href="http://220.248.17.34:8063/">Console(测试)</a>
-                            <a target="_blank" class="item" href="http://x-console-test.sh1.newtouch.com/">Console(开发)</a>
+                            <a target="_blank" class="item" href="http://x-console-test.sh1.newtouch.com/">Console(开发)</a> -->
                             <!-- <a target="_blank" class="item" href="https://www.draw.io/">绘图(draw)</a> -->
-                            <a target="_blank" class="item" href="https://www.processon.com/i/57ac7a10e4b09150b0fc8e21">绘图(processon)</a>
+                            <!-- <a target="_blank" class="item" href="https://www.processon.com/i/57ac7a10e4b09150b0fc8e21">绘图(processon)</a> -->
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,43 @@
+{
+    "links": [{
+        "title": "JIRA",
+        "href": "http://220.248.17.34:7991/",
+        "disabled": false
+    }, {
+        "title": "Confluence",
+        "href": "http://220.248.17.34:7992/",
+        "disabled": false
+    }, {
+        "title": "Stash",
+        "href": "http://220.248.17.34:7990/",
+        "disabled": false
+    }, {
+        "title": "Jenkins",
+        "href": "http://220.248.17.34:8073/",
+        "disabled": false
+    }, {
+        "title": "Console(测试)",
+        "href": "http://220.248.17.34:8063/",
+        "disabled": true
+    },  {
+        "title": "Console(预生产)",
+        "href": "http://103.36.173.13:20080/",
+        "disabled": false
+    }, {
+        "title": "Console(开发)",
+        "href": "http://x-console-test.sh1.newtouch.com/",
+        "disabled": false
+    }, {
+        "title": "绘图(draw)",
+        "href": "https://www.draw.io/",
+        "disabled": true
+    }, {
+        "title": "绘图(processon)",
+        "href": "https://www.processon.com/i/57ac7a10e4b09150b0fc8e21",
+        "disabled": false
+    }, {
+        "title": "百度脑图",
+        "href": "http://naotu.baidu.com/home",
+        "disabled": false
+    }]
+}

@@ -9,6 +9,7 @@ import {
 from 'wurl';
 import 'lodash';
 import utils from 'common/common-utils';
+import 'common/common-constant';
 
 export class App {
     constructor() {
@@ -70,8 +71,8 @@ export class App {
             nav: false,
             title: '用户注册'
         }, {
-            route: ['chat-direct/:username'],
-            name: 'chat-direct',
+            route: ['chat/:username'],
+            name: 'chat',
             moduleId: 'chat/chat-direct',
             nav: false,
             title: '私聊'
@@ -89,7 +90,7 @@ export class App {
             title: '测试'
         }, {
             route: '',
-            redirect: 'chat-direct/admin'
+            redirect: 'chat/@admin'
         }]);
 
         this.router = router;

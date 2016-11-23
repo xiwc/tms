@@ -25,11 +25,12 @@
             border-left-color: transparent!important;
         }
         .textareaWrapper {
-            max-width: 100%;
+            width: calc(~"100% - 35px");
+            /* max-width: 100%;
             -webkit-box-flex: 1;
             -webkit-flex: 1 0 auto;
             -ms-flex: 1 0 auto;
-            flex: 1 0 auto;
+            flex: 1 0 auto; */
             border: 1px solid rgba(34, 36, 38, .15);
             border-top-right-radius: .28571429rem;
             border-bottom-right-radius: .28571429rem;
@@ -56,7 +57,6 @@
                 -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
                 text-align: left;
                 display: block;
-                // line-height: 1.2142em;
                 padding: .67861429em 1em;
                 background: #FFF;
                 border: none;
@@ -72,8 +72,10 @@
 .tms-chat-direct {
     .tms-content {
         &.tms-sidebar-show {
-            .tms-em-chat-input {
-                right: 392px;
+            @media only screen and (min-width: 768px) {
+                .tms-em-chat-input {
+                    right: 392px;
+                }
             }
         }
     }

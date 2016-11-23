@@ -212,7 +212,8 @@
         position: fixed;
         top: 50px;
         right: 433px;
-        z-index: 1;
+        z-index: 4;
+        height: 45px;
         /* display: none; */
         /* width: 30px; */
     }
@@ -265,7 +266,8 @@
     }
     
     .editor-toolbar.fullscreen {
-        z-index: 999!important;
+        z-index: 1000!important;
+        overflow: visible;
     }
     /* 文件上传 end*/
     
@@ -608,15 +610,16 @@
                                     <div class="actions">
                                         <a class="reply">回复</a>
                                         <a class="stow">收藏</a>
-                                        <a class="edit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username) or (c.openEdit != null and c.openEdit)}">编辑</a>
+                                        <a class="edit" title="Alt+双击" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username) or (c.openEdit != null and c.openEdit)}">编辑</a>
                                         <a class="delete" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">删除</a>
                                         <div class="ui top right pointing dropdown dd-more-actions">
                                             <a class="text" style="margin: 0;">更多</a>
                                             <i class="dropdown icon" style="margin-left: 0px; margin-right: 5px;"></i>
                                             <div class="menu">
-                                                <div class="edit item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username) or (c.openEdit != null and c.openEdit)}">编辑</div>
+                                                <div class="edit item" title="Alt+双击" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username) or (c.openEdit != null and c.openEdit)}">编辑</div>
                                                 <div class="delete item" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}">删除</div>
-                                                <div class="item btn-read">阅读</div>
+                                                <div class="item btn-read" title="Ctrl+双击">阅读</div>
+                                                <div class="item btn-wiki" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')') or (c.creator.username == user.username)}" th:if="${#strings.toString(c.type) != 'Wiki'}">转博</div>
                                                 <div class="item btn-jira">转JIRA</div>
                                                 <div class="item btn-openEdit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}" th:attr="data-value=${c.openEdit}" th:text="${(c.openEdit != null and c.openEdit) ? '关闭协作' : '开启协作'}">开启协作</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
@@ -785,6 +788,7 @@
     <div th:replace="admin/template :: userGroupInfoPpTpl"></div>
     <div th:replace="admin/template :: allUserInfoPpTpl"></div>
     <div th:replace="admin/template :: chatSearchTpl"></div>
+    <div th:replace="admin/template :: ad-msg-as-wiki"></div>
     <div th:replace="admin/template :: chatAtsTpl"></div>
     <div th:replace="admin/template :: chatStowsTpl"></div>
     <input type="hidden" name="page.number" th:value="${chats.number}" />
@@ -1234,6 +1238,9 @@
         $('.ui.dropdown').dropdown();
         $('.ui.dropdown.dd-more-actions').dropdown({
             action: 'hide'
+        });
+        $('.ui.dropdown.dd-labels').dropdown({
+            allowAdditions: true
         });
         $('.pp').popup();
         $('.pp-users.field,.pp-edit-users.field').popup({
@@ -1868,7 +1875,7 @@
          * @return {[type]}       返回模板编译后的jquery dom
          */
         function convertChat(chats, markId, first) {
-            // var isAdminRole = $('input:hidden[name="role.admin"]').val();
+            var isAdminRole = $('input:hidden[name="role.admin"]').val();
             var isSuperRole = $('input:hidden[name="role.super"]').val();
             var loginUsername = $('input:hidden[name="user.username"]').val();
             $.each(chats, function(index, chat) {
@@ -1878,6 +1885,7 @@
                 chat.zanCount = (chat.voteZan) ? chat.voteZan.split(',').length : 0;
                 chat.caiCount = (chat.voteCai) ? chat.voteCai.split(',').length : 0;
                 chat.textShare = baseURL + 'admin/dynamic?id=' + chat.id;
+                chat.isNotWiki = (chat.type != "Wiki");
                 if (chat.creator.name) {
                     chat.creator.iconName = chat.creator.name.substr(chat.creator.name.length - 1).toUpperCase();
                 }
@@ -1885,9 +1893,9 @@
                 chat.isOpenEdit = !!chat.openEdit;
                 chat.openEditText = chat.isOpenEdit ? '关闭协作' : '开启协作';
 
-                // if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
-                //     chat.actions = true;
-                // }
+                if (isAdminRole == 'true' || loginUsername == chat.creator.username) {
+                    chat.isWikiable = chat.isNotWiki;
+                }
                 if (isSuperRole == 'true' || loginUsername == chat.creator.username) {
                     chat.actions = true;
                 }
@@ -2017,6 +2025,7 @@
             };
         })();
 
+        // 消息回复点击处理
         $('body').on('click', '.comments .actions a.reply', function(event) {
             event.preventDefault();
             $btn = $(this);
@@ -2031,6 +2040,11 @@
                 .replace(/\{baseURL\}/g, baseURL)
                 .replace(/\{username\}/g, username);
             insertComment(cm, comment);
+
+            // 标记对应消息@到自己的消息为已读
+            $.post('/admin/chat/markAsReadedByChat/unmask', {
+                chatId: id
+            });
 
         });
 
@@ -2130,6 +2144,15 @@
                     toastr.error(data.data, '获取失败!');
                 }
             });
+        });
+
+        $('body').on('dblclick', '.comments .comment .text.markdown-body', function(event) {
+            $edit = $(this).closest('.comment').find('.actions .edit');
+            if (event.altKey && $edit.size() !== 0) {
+                $edit.click();
+            } else if (event.ctrlKey) {
+                commentRead($(this).closest('.comment'));
+            }
         });
 
         $('body').on('click', '.comments .comment .content .author, .comments .comment .avatar, .ui.comments .comment .text span.at-user, .pp-translate .ui.items>.item>.content>.description span.at-user, .fd-dynamic .event .content .summary .user, .pp-translate .group-user, .pp-translate .user-group', function(event) {
@@ -2741,7 +2764,46 @@
             event.preventDefault();
             commentRead($(this).closest('.comment'));
         });
+        $('body').on('click', '.chat .comments .comment .dd-more-actions .btn-wiki', function(event) {
+            event.preventDefault();
+            $btn = $(this);
+            $('.ad-msg-as-wiki').modal({
+                onShow: function() {
+                    var $md = $(this);
+                    $md.find('.ui.form').form('clear');
 
+                    var content = $btn.closest('.comment').find('.content .text.markdown-body').attr('data-content');
+                    var lines = content.split('\n');
+                    $.each(lines, function(index, line) {
+                        line = $.trim(line);
+                        var arr = line.split(/\s+/);
+                        if (arr.length > 1) {
+                            if (/^#+$/.test(arr[0])) {
+                                $md.find('input[name="title"]').val(line.replace(/^#+\s+/, ''));
+                                return false;
+                            }
+                        }
+                    });
+                },
+                onApprove: function() {
+                    $md = $(this);
+                    $.post('/admin/chat/asWiki', {
+                        id: $btn.closest('.comment').attr('data-id'),
+                        baseURL: baseURL,
+                        title: $md.find('input[name="title"]').val(),
+                        privated: $md.find('.ui.checkbox').checkbox('is checked'),
+                        labels: $md.find('.dd-labels').dropdown('get value')
+                    }, function(data, textStatus, xhr) {
+                        if (data.success) {
+                            $btn.remove();
+                            toastr.success('消息转博文成功!');
+                        } else {
+                            toastr.error(data.data, '消息转博文失败!');
+                        }
+                    });
+                }
+            }).modal('show');
+        });
         $('body').on('click', '.comments .comment .dd-more-actions .btn-openEdit', function(event) {
             event.preventDefault();
             var $btn = $(this);

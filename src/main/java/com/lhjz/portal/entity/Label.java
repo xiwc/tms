@@ -63,6 +63,10 @@ public class Label implements Serializable {
 	@JsonIgnore
 	@ManyToOne
 	private Translate translate;
+	
+	@JsonIgnore
+	@ManyToOne
+	private Chat chat;
 
 	public Translate getTranslate() {
 		return translate;
@@ -143,7 +147,15 @@ public class Label implements Serializable {
 	public void setVersion(long version) {
 		this.version = version;
 	}
+	
+	public Chat getChat() {
+		return chat;
+	}
 
+	public void setChat(Chat chat) {
+		this.chat = chat;
+	}
+	
 	@Override
 	public String toString() {
 		return "Label [id=" + id + ", name=" + name + ", description="

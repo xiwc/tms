@@ -440,6 +440,15 @@ public final class WebUtil {
 			return StringUtil.EMPTY;
 		}
 	}
+	
+	/**
+	 * 判断用户是否登录.
+	 * @return
+	 */
+	public static boolean isLogin() {
+		String username = getUsername();
+		return StringUtil.isNotEmpty(username) && !"anonymousUser".equals(username);
+	}
 
 	/**
 	 * 获取验证登录的用户信息

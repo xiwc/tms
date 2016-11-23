@@ -10,5 +10,6 @@ export function configure(aurelia) {
         'resources/attributes/attr-swipebox',
         'resources/attributes/attr-pastable',
         'resources/attributes/attr-autosize',
+        'resources/attributes/attr-dropzone',
     ]);
 }
