@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 
 @Entity
 public class OauthAccessToken implements Serializable {
@@ -13,12 +12,10 @@ public class OauthAccessToken implements Serializable {
 	@Id
 	private String authenticationId;
 	private String tokenId;
-	@Lob
-	private String token;
+	private Byte[] token;
 	private String userName;
 	private String clientId;
-	@Lob
-	private String authentication;
+	private Byte[] authentication;
 	private String refreshToken;
 
 	public String getAuthenticationId() {
@@ -37,14 +34,6 @@ public class OauthAccessToken implements Serializable {
 		this.tokenId = tokenId;
 	}
 
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
 	public String getUserName() {
 		return userName;
 	}
@@ -61,20 +50,28 @@ public class OauthAccessToken implements Serializable {
 		this.clientId = clientId;
 	}
 
-	public String getAuthentication() {
-		return authentication;
-	}
-
-	public void setAuthentication(String authentication) {
-		this.authentication = authentication;
-	}
-
 	public String getRefreshToken() {
 		return refreshToken;
 	}
 
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
+	}
+
+	public Byte[] getToken() {
+		return token;
+	}
+
+	public void setToken(Byte[] token) {
+		this.token = token;
+	}
+
+	public Byte[] getAuthentication() {
+		return authentication;
+	}
+
+	public void setAuthentication(Byte[] authentication) {
+		this.authentication = authentication;
 	}
 
 }
