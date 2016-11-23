@@ -133,7 +133,7 @@ public class SecurityConfig {
 	}
 	
 	@Configuration
-	@Order(3)
+	@Order(4)
 	@Profile({ "dev", "prod" })
 	public static class SecurityConfiguration3 extends
 	WebSecurityConfigurerAdapter {
