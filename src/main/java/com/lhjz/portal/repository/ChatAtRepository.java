@@ -41,4 +41,9 @@ public interface ChatAtRepository extends JpaRepository<ChatAt, Long> {
 	@Modifying
 	@Query("update ChatAt ca set ca.status = 'Readed' where ca.atUser = ?1 and ca.status = 'New'")
 	int markAllAsReaded(User atUser);
+	
+	@Transactional
+	@Modifying
+	@Query("update ChatAt ca set ca.status = 'Readed' where ca.chat = ?1 and ca.atUser = ?2 and ca.status = 'New'")
+	int markAsReaded(Chat chat, User atUser);
 }

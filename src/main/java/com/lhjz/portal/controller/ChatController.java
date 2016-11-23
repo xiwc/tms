@@ -692,6 +692,20 @@ public class ChatController extends BaseController {
 
 		return RespBody.succeed(chatAt);
 	}
+	
+	@RequestMapping(value = { "markAsReadedByChat", "markAsReadedByChat/unmask" }, method = RequestMethod.POST)
+	@ResponseBody
+	public RespBody markAsReadedByChat(@RequestParam("chatId") Long chatId) {
+		
+		Chat chat = chatRepository.findOne(chatId);
+		if (chat == null) {
+			return RespBody.failed("@消息不存在,可能已经被删除!");
+		}
+		
+		int cnt = chatAtRepository.markAsReaded(chat, getLoginUser());
+		
+		return RespBody.succeed(cnt);
+	}
 
 	@RequestMapping(value = { "markAllAsReaded",
 			"markAllAsReaded/unmask" }, method = RequestMethod.POST)
