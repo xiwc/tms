@@ -2025,6 +2025,7 @@
             };
         })();
 
+        // 消息回复点击处理
         $('body').on('click', '.comments .actions a.reply', function(event) {
             event.preventDefault();
             $btn = $(this);
@@ -2039,6 +2040,11 @@
                 .replace(/\{baseURL\}/g, baseURL)
                 .replace(/\{username\}/g, username);
             insertComment(cm, comment);
+
+            // 标记对应消息@到自己的消息为已读
+            $.post('/admin/chat/markAsReadedByChat/unmask', {
+                chatId: id
+            });
 
         });
 
