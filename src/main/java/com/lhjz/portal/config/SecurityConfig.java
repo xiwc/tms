@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import com.lhjz.portal.entity.security.User;
 import com.lhjz.portal.repository.UserRepository;
+import com.lhjz.portal.util.WebUtil;
 
 /**
  * 
@@ -206,7 +206,7 @@ public class SecurityConfig {
 			if (loginUser != null) {
 				loginUser.setLastLoginDate(new Date());
 				// loginUser.setLoginRemoteAddress(wauth.getRemoteAddress());
-				loginUser.setLoginRemoteAddress(LoginSuccessHandler.getIpAddr(request));
+				loginUser.setLoginRemoteAddress(WebUtil.getIpAddr(request));
 
 				long loginCount = loginUser.getLoginCount();
 				loginUser.setLoginCount(++loginCount);
@@ -219,31 +219,6 @@ public class SecurityConfig {
 
 			super.onAuthenticationSuccess(request, response, authentication);
 
-		}
-
-		public static final String getIpAddr(final HttpServletRequest request) {
-
-			String ipString = request.getHeader("x-forwarded-for");
-			if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
-				ipString = request.getHeader("Proxy-Client-IP");
-			}
-			if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
-				ipString = request.getHeader("WL-Proxy-Client-IP");
-			}
-			if (StringUtils.isBlank(ipString) || "unknown".equalsIgnoreCase(ipString)) {
-				ipString = request.getRemoteAddr();
-			}
-
-			// 多个路由时，取第一个非unknown的ip
-			final String[] arr = ipString.split(",");
-			for (final String str : arr) {
-				if (!"unknown".equalsIgnoreCase(str)) {
-					ipString = str;
-					break;
-				}
-			}
-
-			return ipString;
 		}
 
 	}

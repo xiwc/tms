@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
@@ -512,6 +513,31 @@ public final class WebUtil {
 
 		return RememberMeAuthenticationToken.class
 				.isAssignableFrom(authentication.getClass());
+	}
+	
+	public static String getIpAddr(final HttpServletRequest request) {
+
+		String ip = request.getHeader("x-forwarded-for");
+		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+		}
+		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+		}
+		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
+		}
+
+		// 多个路由时，取第一个非unknown的ip
+		final String[] arr = ip.split(",");
+		for (final String str : arr) {
+			if (!"unknown".equalsIgnoreCase(str)) {
+				ip = str;
+				break;
+			}
+		}
+
+		return ip;
 	}
 
 }
