@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -69,6 +70,12 @@ public class SecurityConfig {
 
 		@Autowired
 		LoginSuccessHandler loginSuccessHandler;
+
+		@Override
+		@Bean(name = "authenticationManager")
+		public AuthenticationManager authenticationManagerBean() throws Exception {
+			return super.authenticationManagerBean();
+		}
 
 		@Bean
 		public PersistentTokenRepository persistentTokenRepository() {
