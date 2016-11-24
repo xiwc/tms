@@ -126,7 +126,7 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 
-			http.antMatcher("/").authorizeRequests().anyRequest().permitAll();
+			http.antMatcher("/").authorizeRequests().anyRequest().permitAll().and().csrf().disable();
 
 		}
 
@@ -141,7 +141,7 @@ public class SecurityConfig {
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
 			
-			http.antMatcher("/free/**").authorizeRequests().anyRequest().permitAll();
+			http.antMatcher("/free/**").authorizeRequests().anyRequest().permitAll().and().csrf().disable();
 			
 		}
 		
