@@ -7,7 +7,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
@@ -19,12 +18,12 @@ import org.springframework.security.oauth2.provider.token.TokenStore;
 @Configuration
 public class OAuth2ServerConfig {
 
-	private static final String RESOURCE_ID_TMS_USER = "resource_id_tms_user";
-	private static final String RESOURCE_ID_TMS_ADMIN = "resource_id_tms_admin";
+	private static final String RESOURCE_ID_TMS_USER = "tms_user";
+	private static final String RESOURCE_ID_TMS_ADMIN = "tms_admin";
 
-	@Configuration
-	@EnableResourceServer
-	protected static class UnityResourceServerConfiguration extends ResourceServerConfigurerAdapter {
+	// @Configuration
+	// @EnableResourceServer
+	protected static class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
 		// @Autowired
 		// private AccessDecisionManager oauth2AccessDecisionManager;
@@ -55,13 +54,9 @@ public class OAuth2ServerConfig {
 
 	}
 
-	// AuthorizationServer
 	@Configuration
 	@EnableAuthorizationServer
 	protected static class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
-
-		// @Autowired
-		// private DefaultTokenServices tokenServices;
 
 		@Autowired
 		private TokenStore tokenStore;
@@ -71,18 +66,10 @@ public class OAuth2ServerConfig {
 
 		@Autowired
 		private AuthorizationCodeServices authorizationCodeServices;
-		// @Autowired
-		// private ClientDetailsService clientDetailsService;
-		// @Autowired
-		// private OAuth2AccessDeniedHandler oauth2AccessDeniedHandler;
-		// @Autowired
-		// private OAuth2AuthenticationEntryPoint
-		// oAuth2AuthenticationEntryPoint;
 
 		@Override
 		public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 			// @formatter:off
-			// clients.withClientDetails(clientDetailsService);
 			clients.inMemory()
 				.withClient("tms-user-client")
 				.resourceIds(RESOURCE_ID_TMS_USER)
@@ -111,10 +98,6 @@ public class OAuth2ServerConfig {
 
 		@Override
 		public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-			// security.accessDeniedHandler(oauth2AccessDeniedHandler)
-			// .authenticationEntryPoint(oAuth2AuthenticationEntryPoint)
-			// .allowFormAuthenticationForClients();
-			security.realm("spring-oauth-server_realm");
 		}
 
 	}

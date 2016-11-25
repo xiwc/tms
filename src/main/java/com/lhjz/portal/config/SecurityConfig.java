@@ -16,10 +16,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
@@ -71,17 +71,28 @@ public class SecurityConfig {
 		@Autowired
 		LoginSuccessHandler loginSuccessHandler;
 
-		@Override
-		@Bean(name = "authenticationManager")
-		public AuthenticationManager authenticationManagerBean() throws Exception {
-			return super.authenticationManagerBean();
-		}
-
 		@Bean
 		public PersistentTokenRepository persistentTokenRepository() {
 			JdbcTokenRepositoryImpl db = new JdbcTokenRepositoryImpl();
 			db.setDataSource(dataSource);
 			return db;
+		}
+
+		@Override
+		public void configure(WebSecurity web) throws Exception {
+			// @formatter:off
+			web.ignoring().antMatchers("/admin/file/download/**", 
+					"/admin/css/**", 
+					"/admin/img/**", 
+					"/admin/js/**",
+					"/admin/login", 
+					"/admin/page/**",
+					"/img/**",
+					"/landing/**",
+					"/lib/**",
+					"/page/**",
+					"/favicon.ico");
+			// @formatter:on
 		}
 
 		@Override
@@ -91,15 +102,16 @@ public class SecurityConfig {
 			http
 				.antMatcher("/admin/**")
 					.authorizeRequests()
-					.antMatchers("/admin/file/download/**")
-					.permitAll()
-				.antMatchers("/admin/css/**", 
-						"/admin/img/**", 
-						"/admin/js/**", 
-						"/admin/login", 
-						"/admin/page/**")
-					.permitAll()
+//					.antMatchers("/admin/file/download/**")
+//					.permitAll()
+//				.antMatchers("/admin/css/**", 
+//						"/admin/img/**", 
+//						"/admin/js/**", 
+//						"/admin/login", 
+//						"/admin/page/**")
+//					.permitAll()
 				.anyRequest()
+//					.access("#oauth2.hasScope('read') or (!#oauth2.isOAuth() and hasRole('ROLE_USER'))")
 					.authenticated()
 				.and()
 					.formLogin()
@@ -123,12 +135,11 @@ public class SecurityConfig {
 		}
 
 	}
-	
+
 	@Configuration
 	@Order(2)
 	@Profile({ "dev", "prod" })
-	public static class SecurityConfiguration2 extends
-			WebSecurityConfigurerAdapter {
+	public static class SecurityConfiguration2 extends WebSecurityConfigurerAdapter {
 
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
@@ -138,22 +149,21 @@ public class SecurityConfig {
 		}
 
 	}
-	
+
 	@Configuration
 	@Order(4)
 	@Profile({ "dev", "prod" })
-	public static class SecurityConfiguration3 extends
-	WebSecurityConfigurerAdapter {
-		
+	public static class SecurityConfiguration3 extends WebSecurityConfigurerAdapter {
+
 		@Override
 		protected void configure(HttpSecurity http) throws Exception {
-			
+
 			http.antMatcher("/free/**").authorizeRequests().anyRequest().permitAll().and().csrf().disable();
-			
+
 		}
-		
+
 	}
-	
+
 	@Configuration
 	@Order(1)
 	@Profile("test")

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.vote.AuthenticatedVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.access.vote.UnanimousBased;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
@@ -34,13 +35,15 @@ public class OAuth2Config extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/resources/**");
 		web.expressionHandler(new OAuth2WebSecurityExpressionHandler());
 	}
 
-	/**
-	 * OAuth2 Configuration start
-	 */
+	@Override
+	@Bean(name = "authenticationManager")
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
+	}
+
 	@Bean(name = "clientDetailsService")
 	public ClientDetailsService clientDetailsService(DataSource dataSource) {
 		return new JdbcClientDetailsService(dataSource);
@@ -55,16 +58,6 @@ public class OAuth2Config extends WebSecurityConfigurerAdapter {
 	public ApprovalStore approvalStore(DataSource dataSource) {
 		return new JdbcApprovalStore(dataSource);
 	}
-
-	// @Bean(name = "tokenServices")
-	// public DefaultTokenServices tokenServices(TokenStore tokenStore,
-	// ClientDetailsService clientDetailsService) {
-	// final DefaultTokenServices tokenServices = new DefaultTokenServices();
-	// tokenServices.setTokenStore(tokenStore);
-	// tokenServices.setClientDetailsService(clientDetailsService);
-	// tokenServices.setSupportRefreshToken(true);
-	// return tokenServices;
-	// }
 
 	@Bean(name = "oAuth2RequestFactory")
 	public OAuth2RequestFactory oAuth2RequestFactory(ClientDetailsService clientDetailsService) {
@@ -96,18 +89,6 @@ public class OAuth2Config extends WebSecurityConfigurerAdapter {
 		return new ClientDetailsUserDetailsService(clientDetailsService);
 	}
 
-	// @Bean(name = "oauth2AuthenticationManager")
-	// public AuthenticationManager
-	// oauth2AuthenticationManager(ClientDetailsUserDetailsService
-	// detailsService) {
-	// DaoAuthenticationProvider daoAuthenticationProvider = new
-	// DaoAuthenticationProvider();
-	// daoAuthenticationProvider.setUserDetailsService(detailsService);
-	// List<AuthenticationProvider> providers =
-	// Arrays.asList(daoAuthenticationProvider);
-	// return new ProviderManager(providers);
-	// }
-
 	@Bean(name = "oauth2AccessDecisionManager")
 	public UnanimousBased oauth2AccessDecisionManager() {
 		return new UnanimousBased(Arrays.asList(new ScopeVoter(), new RoleVoter(), new AuthenticatedVoter()));
@@ -117,15 +98,5 @@ public class OAuth2Config extends WebSecurityConfigurerAdapter {
 	public OAuth2AccessDeniedHandler oauth2AccessDeniedHandler() {
 		return new OAuth2AccessDeniedHandler();
 	}
-
-	// @Bean(name = "clientCredentialsTokenEndpointFilter")
-	// public ClientCredentialsTokenEndpointFilter
-	// clientCredentialsTokenEndpointFilter(AuthenticationManager
-	// oauth2AuthenticationManager) {
-	// ClientCredentialsTokenEndpointFilter clientCredentialsTokenEndpointFilter
-	// = new ClientCredentialsTokenEndpointFilter();
-	// clientCredentialsTokenEndpointFilter.setAuthenticationManager(oauth2AuthenticationManager);
-	// return clientCredentialsTokenEndpointFilter;
-	// }
 
 }
