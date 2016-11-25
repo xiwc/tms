@@ -1,105 +1,108 @@
 package com.lhjz.portal.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.Filter;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.ResourceServerProperties;
+import org.springframework.boot.autoconfigure.security.oauth2.resource.UserInfoTokenServices;
+import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
-import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.oauth2.client.OAuth2ClientContext;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientAuthenticationProcessingFilter;
+import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilter;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
-import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
-import org.springframework.security.oauth2.config.annotation.web.configurers.ResourceServerSecurityConfigurer;
-import org.springframework.security.oauth2.provider.approval.UserApprovalHandler;
-import org.springframework.security.oauth2.provider.code.AuthorizationCodeServices;
-import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.filter.CompositeFilter;
 
 @Configuration
 public class OAuth2ServerConfig {
 
-	private static final String RESOURCE_ID_TMS_USER = "tms_user";
-	private static final String RESOURCE_ID_TMS_ADMIN = "tms_admin";
-
-	// @Configuration
-	// @EnableResourceServer
+	@Configuration
+	@EnableResourceServer
 	protected static class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
-
-		// @Autowired
-		// private AccessDecisionManager oauth2AccessDecisionManager;
-
-		@Override
-		public void configure(ResourceServerSecurityConfigurer resources) {
-			resources.resourceId(RESOURCE_ID_TMS_USER).stateless(false);
-		}
 
 		@Override
 		public void configure(HttpSecurity http) throws Exception {
-
 			// @formatter:off
-            http.sessionManagement()
-                    .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                    .and()
-                    .requestMatchers()
-                    .antMatchers("/admin/**")
-                    .and()
-                    .authorizeRequests()
-                    .antMatchers("/admin/**")
-                    .access("#oauth2.hasScope('read') or (!#oauth2.isOAuth() and hasRole('ROLE_USER'))")
-//                    .accessDecisionManager(oauth2AccessDecisionManager)
-                    .and().csrf().disable();
-         // @formatter:on
-
+			http.antMatcher("/admin/user/loginUser").authorizeRequests().anyRequest().authenticated();
+			// @formatter:on
 		}
-
 	}
 
 	@Configuration
+	@EnableOAuth2Client
 	@EnableAuthorizationServer
-	protected static class AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
-
+	protected static class AuthorizationServerConfiguration extends WebSecurityConfigurerAdapter {
+		
 		@Autowired
-		private TokenStore tokenStore;
-
-		@Autowired
-		private UserApprovalHandler userApprovalHandler;
-
-		@Autowired
-		private AuthorizationCodeServices authorizationCodeServices;
-
+		OAuth2ClientContext oauth2ClientContext;
+		
 		@Override
-		public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-			// @formatter:off
-			clients.inMemory()
-				.withClient("user")
-				.resourceIds(RESOURCE_ID_TMS_USER)
-				.authorizedGrantTypes("authorization_code", "refresh_token", "implicit")
-				.authorities("ROLE_USER")
-				.scopes("read")
-				.secret("user")
-				.and()
-				.withClient("admin")
-				.resourceIds(RESOURCE_ID_TMS_ADMIN)
-				.authorizedGrantTypes("password", "refresh_token")
-				.authorities("ROLE_ADMIN")
-				.scopes("read")
-				.secret("admin");
-			// @formatter:on
+		protected void configure(HttpSecurity http) throws Exception {
+			http.addFilterBefore(ssoFilter(), BasicAuthenticationFilter.class);
+		}
+		
+		@Bean
+		public FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter) {
+			FilterRegistrationBean registration = new FilterRegistrationBean();
+			registration.setFilter(filter);
+			registration.setOrder(-100);
+			return registration;
+		}
+		
+		@Bean
+		@ConfigurationProperties("github")
+		public ClientResources github() {
+			return new ClientResources();
+		}
+		
+		private Filter ssoFilter() {
+			CompositeFilter filter = new CompositeFilter();
+			List<Filter> filters = new ArrayList<>();
+			filters.add(ssoFilter(github(), "/login/github"));
+			filter.setFilters(filters);
+			return filter;
 		}
 
-		@Override
-		public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-			// @formatter:off
-			endpoints.tokenStore(tokenStore)
-				.userApprovalHandler(userApprovalHandler)
-				.authorizationCodeServices(authorizationCodeServices);
-			// @formatter:on
+		private Filter ssoFilter(ClientResources client, String path) {
+			OAuth2ClientAuthenticationProcessingFilter filter = new OAuth2ClientAuthenticationProcessingFilter(
+					path);
+			OAuth2RestTemplate template = new OAuth2RestTemplate(client.getClient(), oauth2ClientContext);
+			filter.setRestTemplate(template);
+			filter.setTokenServices(new UserInfoTokenServices(
+					client.getResource().getUserInfoUri(), client.getClient().getClientId()));
+			return filter;
 		}
-
-		@Override
-		public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
-		}
-
 	}
 
+}
+
+class ClientResources {
+
+	@NestedConfigurationProperty
+	private AuthorizationCodeResourceDetails client = new AuthorizationCodeResourceDetails();
+
+	@NestedConfigurationProperty
+	private ResourceServerProperties resource = new ResourceServerProperties();
+
+	public AuthorizationCodeResourceDetails getClient() {
+		return client;
+	}
+
+	public ResourceServerProperties getResource() {
+		return resource;
+	}
 }

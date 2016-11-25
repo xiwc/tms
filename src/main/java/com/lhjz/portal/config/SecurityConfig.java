@@ -25,6 +25,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
@@ -102,17 +103,11 @@ public class SecurityConfig {
 			http
 				.antMatcher("/admin/**")
 					.authorizeRequests()
-//					.antMatchers("/admin/file/download/**")
-//					.permitAll()
-//				.antMatchers("/admin/css/**", 
-//						"/admin/img/**", 
-//						"/admin/js/**", 
-//						"/admin/login", 
-//						"/admin/page/**")
-//					.permitAll()
 				.anyRequest()
-//					.access("#oauth2.hasScope('read') or (!#oauth2.isOAuth() and hasRole('ROLE_USER'))")
 					.authenticated()
+				.and()
+					.exceptionHandling()
+					.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/admin/login"))
 				.and()
 					.formLogin()
 					.loginPage("/admin/login")
