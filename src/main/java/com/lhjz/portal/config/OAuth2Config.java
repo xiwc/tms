@@ -10,6 +10,7 @@ import org.springframework.security.access.vote.AuthenticatedVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.access.vote.UnanimousBased;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.provider.ClientDetailsService;
@@ -29,9 +30,26 @@ import org.springframework.security.oauth2.provider.request.DefaultOAuth2Request
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 import org.springframework.security.oauth2.provider.vote.ScopeVoter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 public class OAuth2Config extends WebSecurityConfigurerAdapter {
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+
+		// @formatter:off
+		http.authorizeRequests()
+        .antMatchers("/oauth/**").hasAnyRole("ROLE_USER", "ROLE_ADMIN", "ROLE_SUPER")
+//        .antMatchers("/**").anonymous()
+        .and()
+        .exceptionHandling().accessDeniedPage("/admin/login?error")
+        .and()
+        .csrf()
+        .requireCsrfProtectionMatcher(new AntPathRequestMatcher("/oauth/authorize"))
+        .disable();
+		// @formatter:on
+	}
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {

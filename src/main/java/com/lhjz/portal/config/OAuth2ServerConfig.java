@@ -71,19 +71,19 @@ public class OAuth2ServerConfig {
 		public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 			// @formatter:off
 			clients.inMemory()
-				.withClient("tms-user-client")
+				.withClient("user")
 				.resourceIds(RESOURCE_ID_TMS_USER)
 				.authorizedGrantTypes("authorization_code", "refresh_token", "implicit")
 				.authorities("ROLE_USER")
 				.scopes("read")
-				.secret("tms-user")
+				.secret("user")
 				.and()
-				.withClient("tms-admin-client")
+				.withClient("admin")
 				.resourceIds(RESOURCE_ID_TMS_ADMIN)
 				.authorizedGrantTypes("password", "refresh_token")
 				.authorities("ROLE_ADMIN")
 				.scopes("read")
-				.secret("tms-admin");
+				.secret("admin");
 			// @formatter:on
 		}
 
