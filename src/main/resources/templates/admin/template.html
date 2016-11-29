@@ -142,6 +142,33 @@
                     </div>
                 </div>
             </div>
+            <div class="toolbar">
+                <div title="快捷回复" class="ui right pointing dropdown icon mini button reply dd-quick-reply">
+                    <i class="reply icon"></i>
+                    <div class="menu">
+                        <div class="ui icon input">
+                            <i class="send link icon"></i>
+                            <input type="text" name="reply" placeholder="快捷回复...">
+                        </div>
+                        <div class="item ok">
+                            <div class="ui red empty circular label"></div>
+                            <span class="text">好的!</span>
+                        </div>
+                        <div class="item got">
+                            <div class="ui blue empty circular label"></div>
+                            <span class="text">收到!</span>
+                        </div>
+                        <div class="item done">
+                            <div class="ui black empty circular label"></div>
+                            <span class="text">搞定!</span>
+                        </div>
+                        <div class="item ongoing">
+                            <div class="ui yellow empty circular label"></div>
+                            <span class="text">处理中!</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </script>
     <script th:fragment="chatReplyTpl" id="chatReplyTpl" type="text/x-jquery-tmpl">
@@ -199,6 +226,33 @@
                             {{/if}}
                             <div class="item btn-copy" data-clipboard-text="${content}">复制</div>
                             <div class="item btn-share" data-clipboard-text="${textShare}">分享</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="toolbar">
+                <div title="快捷回复" class="ui right pointing dropdown icon mini button reply dd-quick-reply">
+                    <i class="reply icon"></i>
+                    <div class="menu">
+                        <div class="ui icon input">
+                            <i class="send link icon"></i>
+                            <input type="text" name="reply" placeholder="快捷回复...">
+                        </div>
+                        <div class="item ok">
+                            <div class="ui red empty circular label"></div>
+                            <span class="text">好的!</span>
+                        </div>
+                        <div class="item got">
+                            <div class="ui blue empty circular label"></div>
+                            <span class="text">收到!</span>
+                        </div>
+                        <div class="item done">
+                            <div class="ui black empty circular label"></div>
+                            <span class="text">搞定!</span>
+                        </div>
+                        <div class="item ongoing">
+                            <div class="ui yellow empty circular label"></div>
+                            <span class="text">处理中!</span>
                         </div>
                     </div>
                 </div>

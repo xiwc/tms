@@ -44,7 +44,7 @@
         <a sec:authorize="hasRole('ROLE_SUPER')" th:classappend="${#strings.contains(uri, '/admin/setting')} ? 'active' : ''" class="item" th:href="@{/admin/setting}" href="setting.html"> <i class="settings icon"></i> 系统设置
         </a>
     </div>
-    <div th:fragment="top-fixed-menu" class="ui fixed inverted main menu">
+    <div th:fragment="top-fixed-menu" style="z-index:1992;" class="ui fixed inverted main menu">
         <a class="item ad-index-btn-menu">
             <i class="content icon"></i> 菜单
         </a>
