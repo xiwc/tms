@@ -80,10 +80,14 @@
         -moz-box-shadow: 0 0 5px 1px #0CC!important;
         box-shadow: 0 0 5px 1px #0CC!important;
     }
-    
-    .ui.comments .comment {
-        overflow-y: auto;
+
+    .ui.comments .comment:hover {
+        z-index: 1;
     }
+    
+    /* .ui.comments .comment {
+        overflow-y: auto;
+    } */
     
     .ui.comments .comment .text {
         margin-top: 0.5em;
@@ -1237,7 +1241,8 @@
         $('table').tablesort().data('tablesort');
         $('.ui.dropdown').dropdown();
         $('.ui.dropdown.dd-more-actions').dropdown({
-            action: 'hide'
+            action: 'hide',
+            direction: 'downward'
         });
         $('.ui.dropdown.dd-labels').dropdown({
             allowAdditions: true
@@ -1254,9 +1259,6 @@
                 show: 300,
                 hide: 800
             }
-        });
-        $('.ui.dropdown.dd-actions').dropdown({
-            action: 'hide'
         });
 
         var baseURL = Utils.getBaseURL();
