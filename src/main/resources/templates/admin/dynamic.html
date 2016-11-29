@@ -80,17 +80,22 @@
         -moz-box-shadow: 0 0 5px 1px #0CC!important;
         box-shadow: 0 0 5px 1px #0CC!important;
     }
-
+    
     .ui.comments .comment:hover {
         z-index: 1;
     }
-    
     /* .ui.comments .comment {
         overflow-y: auto;
     } */
     
     .ui.comments .comment .text {
         margin-top: 0.5em;
+    }
+    
+    .ui.comments .comment .toolbar {
+        position: absolute;
+        right: 0;
+        bottom: 0;
     }
     
     .ui.feed>.event>.content .summary {
@@ -628,6 +633,29 @@
                                                 <div class="item btn-openEdit" th:if="${#authorization.expression('hasRole(''ROLE_SUPER'')') or (c.creator.username == user.username)}" th:attr="data-value=${c.openEdit}" th:text="${(c.openEdit != null and c.openEdit) ? '关闭协作' : '开启协作'}">开启协作</div>
                                                 <div class="item btn-copy" th:attr="data-clipboard-text=${c.content}">复制</div>
                                                 <div class="item btn-share" th:attr="data-clipboard-text=${#httpServletRequest.getRequestURL() + '?id=' + c.id}">分享</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="toolbar">
+                                    <div title="快捷回复" class="ui left pointing dropdown icon button">
+                                        <i class="reply icon"></i>
+                                        <div class="menu">
+                                            <div class="ui left search icon input">
+                                                <i class="search icon"></i>
+                                                <input type="text" name="search" placeholder="Search issues...">
+                                            </div>
+                                            <div class="item">
+                                                <div class="ui red empty circular label"></div>
+                                                好的!
+                                            </div>
+                                            <div class="item">
+                                                <div class="ui blue empty circular label"></div>
+                                                收到!
+                                            </div>
+                                            <div class="item">
+                                                <div class="ui black empty circular label"></div>
+                                                搞定!
                                             </div>
                                         </div>
                                     </div>
